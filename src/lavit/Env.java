@@ -49,7 +49,7 @@ import java.util.Properties;
 public class Env {
 
 	static public final String APP_NAME = "LaViT";
-	static public final String APP_VERSION = "1.0.0";
+	static public final String APP_VERSION = "2.0.0";
 	static public final String APP_DATE = "2010/4/22";
 	static public final String APP_HREF = "http://www.ueda.info.waseda.ac.jp/lmntal/lmntaleditor/";
 

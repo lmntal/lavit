@@ -375,7 +375,7 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			setTitle("Genetic Algorithm");
-			setIconImage(Env.getImageOfFile("img/icon.gif"));
+			setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 			setAlwaysOnTop(true);
 			setResizable(false);
 

@@ -65,7 +65,7 @@ public class MainFrame extends JFrame{
 		setSize(Env.getInt("WINDOW_WIDTH"),Env.getInt("WINDOW_HEIGHT"));
         setLocation(new Point(Env.getInt("WINDOW_X"),Env.getInt("WINDOW_Y")));
         setTitle(Env.APP_NAME);
-        setIconImage(Env.getImageOfFile("img/icon.gif"));
+        setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         mainMenuBar = new MainMenuBar();

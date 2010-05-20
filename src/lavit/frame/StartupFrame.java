@@ -61,12 +61,12 @@ public class StartupFrame extends JFrame {
 
 	public StartupFrame(){
 
-		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/logo.gif"));
+		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
 
 		//setSize(image.getIconWidth()+30, image.getIconHeight()+30);
 	    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	    setUndecorated(true);
-	    setIconImage(Env.getImageOfFile("img/icon.gif"));
+	    setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 
 	    JPanel panel = new JPanel();
 		//panel.setBorder(new LineBorder(new Color(200,200,200), 2, true));

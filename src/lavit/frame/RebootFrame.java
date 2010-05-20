@@ -65,7 +65,7 @@ public class RebootFrame extends JFrame  {
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("LaViT Reboot");
-		setIconImage(Env.getImageOfFile("img/icon.gif"));
+		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
         setAlwaysOnTop(true);
         setResizable(false);
 

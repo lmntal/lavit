@@ -163,7 +163,7 @@ public class StateGraphStretchMoveWorker extends SwingWorker<Object,Integer>{
 
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			setTitle("Stretch Move");
-			setIconImage(Env.getImageOfFile("img/icon.gif"));
+			setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 			setAlwaysOnTop(true);
 			setResizable(false);
 

@@ -35,97 +35,93 @@
 
 package lavit.frame;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.Lang;
+import lavit.util.FixFlowLayout;
 
-//言語の設定がされていないときのみ使用
-public class LangSettingFrame extends JFrame {
-	private SelectPanel panel;
+public class VersionFrame extends JFrame implements ActionListener {
+	JButton button;
 
-	public LangSettingFrame(){
+	String strTable[] = {
+			"LaViT",
+			"Version : "+Env.APP_VERSION,
+			"Date : "+Env.APP_DATE,
+			"",
+			Env.LMNTAL_VERSION,
+			Env.SLIM_VERSION,
+			Env.UNYO_VERSION
+	};
 
+	VersionFrame(){
+		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
+
+		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setTitle("Language");
-        setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
-        setAlwaysOnTop(true);
-        setResizable(false);
+		setAlwaysOnTop(true);
 
-        panel = new SelectPanel(this);
-        add(panel);
+	    JPanel panel = new JPanel();
+	    panel.setBackground(new Color(255,255,255));
+	    panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
+		add(panel);
 
-        addWindowListener(new ChildWindowListener(this));
+		JLabel icon = new JLabel(image);
+		icon.setAlignmentX(Component.CENTER_ALIGNMENT);
+		panel.add(icon);
 
-        pack();
-        setLocationRelativeTo(FrontEnd.mainFrame);
-        setVisible(true);
+		JPanel lPanel = new JPanel();
+		lPanel.setBorder(new LineBorder(Color.WHITE , 10));
+		lPanel.setBackground(Color.WHITE);
+		lPanel.setLayout(new GridLayout((int)(strTable.length/1),1));
+		for(String s : strTable){
+			lPanel.add(new JLabel(s));
+		}
+		panel.add(lPanel);
+
+		button = new JButton("OK");
+		button.addActionListener(this);
+		button.setAlignmentX(Component.CENTER_ALIGNMENT);
+		panel.add(button);
+
+		addWindowListener(new ChildWindowListener(this));
+
+		pack();
+		setLocationRelativeTo(null);
+	    setVisible(true);
+
 	}
 
-	private class SelectPanel extends JPanel implements ActionListener {
-		private JFrame frame;
-
-		private ButtonGroup group = new ButtonGroup();
-		private String[] labels = {"English","日本語"};
-		private String[] langs = {"en","jp"};
-		private JRadioButton[] radios = new JRadioButton[labels.length];
-
-		private JButton ok = new JButton("OK");
-
-		SelectPanel(JFrame frame){
-			this.frame = frame;
-
-			setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-
-			JLabel label = new JLabel();
-			label.setText("Please select your languare.");
-			label.setPreferredSize(new Dimension(250, 40));
-			label.setAlignmentX(Component.CENTER_ALIGNMENT);
-			add(label);
-
-			JPanel radioPanel = new JPanel();
-			radioPanel.setLayout(new GridLayout(3,1));
-
-			for(int i=0;i<labels.length;++i){
-				radios[i] = new JRadioButton(labels[i]);
-				radios[i].setMargin(new Insets(2,10,2,10));
-				group.add(radios[i]);
-				radioPanel.add(radios[i]);
-			}
-			radios[0].setSelected(true);
-
-			add(radioPanel);
-
-			JPanel buttonPanel = new JPanel();
-
-			ok.addActionListener(this);
-			buttonPanel.add(ok);
-
-			add(buttonPanel);
-
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			for(int i=0;i<labels.length;++i){
-				if(radios[i].isSelected()){
-					Env.set("LANG",langs[i]);
-					break;
-				}
-			}
-			frame.dispose();
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object src = e.getSource();
+		if(src==button){
+			dispose();
 		}
 
 	}

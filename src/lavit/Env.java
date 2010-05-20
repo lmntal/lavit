@@ -69,6 +69,8 @@ public class Env {
 
     static private Properties prop = new Properties();
 
+    static public final String IMAGEFILE_ICON = "img/icon.png";
+
     public Env(){
     	env = this;
 

@@ -270,7 +270,7 @@ public class Ltl2baInstaller {
 
 		InstallWindow(){
 
-			setIconImage(Env.getImageOfFile("img/icon.gif"));
+			setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			setAlwaysOnTop(true);
 			//setUndecorated(true);

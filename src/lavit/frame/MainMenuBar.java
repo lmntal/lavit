@@ -299,6 +299,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         }else if(src == iGeneral) {
         	new GeneralSettingFrame();
         }else if(src == iVersion) {
+        	new VersionFrame();
+        	/*
         	JOptionPane.showMessageDialog(
         			FrontEnd.mainFrame,
         			"LaViT\n"+
@@ -311,6 +313,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         			"LaViT",
         		JOptionPane.PLAIN_MESSAGE
         	);
+        	*/
         }else if(src == iMemory) {
         	JOptionPane.showMessageDialog(
         			FrontEnd.mainFrame,

@@ -74,7 +74,7 @@ public class SlimPathSettingFrame extends JFrame {
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("SLIM");
-        setIconImage(Env.getImageOfFile("img/icon.gif"));
+        setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
         setAlwaysOnTop(true);
         setResizable(false);
 

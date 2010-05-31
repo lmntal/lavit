@@ -107,7 +107,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	private StatePainter painter;
 	private StateDynamicMover mover;
 
-	private JTextField clickStringField;
+	private StateNodeLabel clickField;
+
+	private Font font;
 
 	public StateGraphPanel(StatePanel statePanel){
 		this.statePanel = statePanel;
@@ -115,9 +117,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		setFocusable(true);
 		setLayout(new BorderLayout());
 
-		clickStringField = new JTextField();
-		clickStringField.setVisible(false);
-		add(clickStringField, BorderLayout.SOUTH);
+		clickField = new StateNodeLabel();
+		clickField.setVisible(false);
+		add(clickField, BorderLayout.SOUTH);
 
 		selectNodes  = new ArrayList<StateNode>();
 
@@ -187,8 +189,8 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	public void loadFont(){
-		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
-		clickStringField.setFont(font);
+		font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")-4);
+		update();
 		revalidate();
 	}
 
@@ -802,12 +804,12 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		update();
 	}
 
-	private void setStateString(String str){
-		if(str==null){
-			clickStringField.setVisible(false);
+	private void setStateString(StateNode node){
+		if(node==null){
+			clickField.setVisible(false);
 		}else{
-			clickStringField.setVisible(true);
-			clickStringField.setText(str);
+			clickField.setVisible(true);
+			clickField.setNode(node);
 			validate();
 		}
 	}
@@ -820,6 +822,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 	public void paintComponent(Graphics g){
 		Graphics2D g2 = (Graphics2D)g;
+		g2.setFont(font);
 
 		//フレームの初期化
 		g2.setColor(Color.white);
@@ -877,7 +880,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			drawSelectNodeAndLink(g2,node);
 		}
 		if(selectNodes.size()==1){
-			setStateString(selectNodes.get(0).state);
+			setStateString(selectNodes.get(0));
 		}else{
 			setStateString(null);
 		}

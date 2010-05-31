@@ -33,44 +33,11 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.util;
 
 import java.util.ArrayList;
+import lavit.stateviewer.StateTransition;
 
-public class StateTransition{
-	StateNode from;
-	StateNode to;
-	boolean em = false;
-
-	private ArrayList<String> rules = new ArrayList<String>();
-
-	StateTransition(StateNode from,StateNode to,boolean em){
-		this.from = from;
-		this.to = to;
-		this.em = em;
-	}
-
-	String getRuleNameString(){
-		StringBuffer buf = new StringBuffer();
-		for(String s : rules){
-			if(buf.length()>0){ buf.append(" "); }
-			buf.append(s);
-		}
-		return buf.toString();
-	}
-
-	public ArrayList<String> getRules(){
-		return rules;
-	}
-
-	public boolean isToDummy(){
-		return to.dummy;
-	}
-
-	void addRules(ArrayList<String> rs){
-		if(rs==null){ return; }
-		for(String r : rs){
-			rules.add(r);
-		}
-	}
+public interface StateTransitionCatcher {
+	public void transitionCatch(String rule,ArrayList<StateTransition> trans);
 }

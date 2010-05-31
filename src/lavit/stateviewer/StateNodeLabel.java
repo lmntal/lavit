@@ -35,42 +35,48 @@
 
 package lavit.stateviewer;
 
-import java.util.ArrayList;
+import java.awt.BorderLayout;
+import java.awt.Font;
 
-public class StateTransition{
-	StateNode from;
-	StateNode to;
-	boolean em = false;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-	private ArrayList<String> rules = new ArrayList<String>();
+import lavit.Env;
+import lavit.FrontEnd;
+import lavit.util.CommonFontUser;
 
-	StateTransition(StateNode from,StateNode to,boolean em){
-		this.from = from;
-		this.to = to;
-		this.em = em;
+public class StateNodeLabel extends JPanel implements CommonFontUser {
+	private JLabel stateLabel;
+	private JTextField stateTextField;
+
+	private StateNode node;
+
+	StateNodeLabel(){
+
+		setLayout(new BorderLayout());
+
+		stateLabel = new JLabel();
+		add(stateLabel, BorderLayout.WEST);
+
+		stateTextField = new JTextField();
+		add(stateTextField, BorderLayout.CENTER);
+
+		loadFont();
+		FrontEnd.addFontUser(this);
+
 	}
 
-	String getRuleNameString(){
-		StringBuffer buf = new StringBuffer();
-		for(String s : rules){
-			if(buf.length()>0){ buf.append(" "); }
-			buf.append(s);
-		}
-		return buf.toString();
+	public void loadFont(){
+		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
+		stateLabel.setFont(font);
+		stateTextField.setFont(font);
+		revalidate();
 	}
 
-	public ArrayList<String> getRules(){
-		return rules;
+	public void setNode(StateNode node){
+		stateLabel.setText(node.label);
+		stateTextField.setText(node.state);
 	}
 
-	public boolean isToDummy(){
-		return to.dummy;
-	}
-
-	void addRules(ArrayList<String> rs){
-		if(rs==null){ return; }
-		for(String r : rs){
-			rules.add(r);
-		}
-	}
 }

@@ -62,15 +62,16 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.stateviewer.*;
+import lavit.util.StateTransitionCatcher;
 
-public class StateTransitionRuleFrame extends JFrame {
+public class StateTransitionRuleEmFrame extends JFrame {
+	private StateTransitionCatcher catcher;
+
 	private SelectPanel panel;
 	private boolean end;
-	private StateGraphPanel graphPanel;
 	private HashMap<String,ArrayList<StateTransition>> rules = new HashMap<String,ArrayList<StateTransition>>();
 
-	public StateTransitionRuleFrame(StateGraphPanel graphPanel){
-		this.graphPanel = graphPanel;
+	public StateTransitionRuleEmFrame(StateGraphPanel graphPanel,StateTransitionCatcher catcher){
 
 		for(StateTransition t : graphPanel.getDrawNodes().getAllTransition()){
 			for(String r : t.getRules()){
@@ -145,7 +146,7 @@ public class StateTransitionRuleFrame extends JFrame {
 			Object src = e.getSource();
 			String rule = ((JButton)src).getText();
 			ArrayList<StateTransition> trans = rules.get(rule);
-			graphPanel.emTransitions(trans);
+			catcher.transitionCatch(rule,trans);
 			frame.dispose();
 		}
 

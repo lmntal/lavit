@@ -74,6 +74,7 @@ class StateNode implements Shape{
 	public int depth = 0;
 	public int nth = 0;
 	public String state;
+	public String label;
 	boolean accept;
 	boolean inCycle;
 
@@ -105,11 +106,12 @@ class StateNode implements Shape{
 		this.id = id;
 	}
 
-	void init(int no,String state,boolean accept,boolean inCycle){
+	void init(int no,String state,String label,boolean accept,boolean inCycle){
 		this.no = no;
 		this.depth = 0;
 		this.nth = 0;
 		this.state = state;
+		this.label = label;
 		this.accept = accept;
 		this.inCycle = inCycle;
 
@@ -304,10 +306,10 @@ class StateNode implements Shape{
 		((RectangularShape)shape).setFrame(x-radius, y-radius, radius*2, radius*2);
 	}
 
-	StateTransition addToNode(StateNode toNode,ArrayList<String> rules){
+	StateTransition addToNode(StateNode toNode,ArrayList<String> rules,boolean em){
 		if(isToNode(toNode)) return null;
 
-		StateTransition t = new StateTransition(this,toNode);
+		StateTransition t = new StateTransition(this,toNode,em);
 		t.addRules(rules);
 		toes.add(t);
 		return t;

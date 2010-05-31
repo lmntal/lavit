@@ -53,6 +53,8 @@ import lavit.FrontEnd;
 
 public class StateNodeSet {
 
+	public boolean global;
+
 	private HashMap<Long,StateNode> allNode = new HashMap<Long,StateNode>();
 	private ArrayList<StateTransition> allTransition = new ArrayList<StateTransition>();
 
@@ -70,6 +72,8 @@ public class StateNodeSet {
 	final String labelMarkString = "Labels";
 
 	public boolean setSlimNdResult(String str){
+		this.global = true;
+
 		HashMap<Long,TempNode> temps = new HashMap<Long,TempNode>();
 		int line=0;
 		TempNode startNode = null;
@@ -122,7 +126,10 @@ public class StateNodeSet {
 		if(startNode==null) return false;
 
 		setNodeFrom(temps);
+
+		// temp -> state
 		makeAllFromTemps(temps,startNode);
+
 		setTreeDepth();
 
 		resetOrder();
@@ -138,6 +145,7 @@ public class StateNodeSet {
 	}
 
 	public boolean setSlimLtlResult(String str){
+		this.global = true;
 
 		HashMap<Long,TempNode> temps = new HashMap<Long,TempNode>();
 		int line=0;
@@ -233,34 +241,27 @@ public class StateNodeSet {
 		if(startNode==null) return false;
 
 		setNodeFrom(temps);
+
+		for(int i=0;i<cycles.size()-1;++i){
+			TempNode node = temps.get(cycles.get(i));
+			node.setEmToId(cycles.get(i+1));
+		}
+
+		for(int i=cycles.size()-2;i>=0;--i){
+			TempNode endNode = temps.get(cycles.get(cycles.size()-1));
+			long nodeId = cycles.get(i);
+			if(endNode.isToNodeId(nodeId)){
+				endNode.setEmToId(nodeId);
+				break;
+			}
+		}
+
+		// temp -> state
 		makeAllFromTemps(temps,startNode);
+
 		setTreeDepth();
 
 		resetOrder();
-
-		for(int i=0;i<cycles.size()-1;++i){
-			StateNode node = allNode.get(cycles.get(i));
-			node.setEmToNode(allNode.get(cycles.get(i+1)), true);
-		}
-
-		/*
-		for(int i=0;i<cycles.size();++i){
-			StateNode endNode = allNode.get(cycles.get(cycles.size()-1));
-			StateNode node = allNode.get(cycles.get(i));
-			if(endNode.isToNode(node)){
-				endNode.setEmToNode(node, true);
-				break;
-			}
-		}*/
-
-		for(int i=cycles.size()-2;i>=0;--i){
-			StateNode endNode = allNode.get(cycles.get(cycles.size()-1));
-			StateNode node = allNode.get(cycles.get(i));
-			if(endNode.isToNode(node)){
-				endNode.setEmToNode(node, true);
-				break;
-			}
-		}
 
 		if(Env.is("SV_DUMMY")){
 			setFirstPositionReset();
@@ -286,6 +287,27 @@ public class StateNodeSet {
 		return true;
 	}
 
+	public boolean setTempNode(HashMap<Long,TempNode> temps,TempNode startNode){
+		this.global = false;
+
+		setNodeFrom(temps);
+
+		// temp -> state
+		makeAllFromTemps(temps,startNode);
+
+		setTreeDepth();
+
+		resetOrder();
+
+		if(Env.is("SV_DUMMY")){
+			setFirstPositionReset();
+			setDummy();
+		}
+
+		updateNodeLooks();
+
+		return true;
+	}
 
 	public String getDotString(){
 		StringBuffer str = new StringBuffer();
@@ -496,10 +518,7 @@ public class StateNodeSet {
 			removeTransition(from.removeToNode(removenode));
 			for(StateNode to : removenode.getToNodes()){
 				if(to==removenode){ continue; }
-				addTransition(from.addToNode(to,ruleNames));
-				if(removenode.isEmToNode(to)){
-					from.setEmToNode(to, true);
-				}
+				addTransition(from.addToNode(to,ruleNames,removenode.isEmToNode(to)));
 			}
 		}
 
@@ -613,11 +632,10 @@ public class StateNodeSet {
 					int startDepth = node.depth, endDepth = to.depth;
 					while(dummyDepth>to.depth){
 						double y = ((startY-endY)/(double)(startDepth-endDepth))*(double)(dummyDepth-endDepth)+endY;
-						StateNode dummy = makeDummyNode(++no,dummyDepth,node.accept,inCycle,y,node.weak);
+						StateNode dummy = makeDummyNode(++no,dummyDepth,node.label,node.accept,inCycle,y,node.weak);
 						newNode.add(dummy);
 
-						addTransition(dummy.addToNode(to,ruleNames));
-						if(from.isEmToNode(to)){ dummy.setEmToNode(to, true); }
+						addTransition(dummy.addToNode(to,ruleNames,from.isEmToNode(to)));
 						dummy.addFromNode(from);
 						if(from==node){
 							addToNodes.add(dummy);
@@ -625,8 +643,7 @@ public class StateNodeSet {
 							addToRuleNames.add(ruleNames);
 							removeToNodes.add(to);
 						}else{
-							addTransition(from.addToNode(dummy,ruleNames));
-							if(from.isEmToNode(to)){ from.setEmToNode(dummy, true); }
+							addTransition(from.addToNode(dummy,ruleNames,from.isEmToNode(to)));
 							removeTransition(from.removeToNode(to));
 						}
 						to.addFromNode(dummy);
@@ -659,10 +676,7 @@ public class StateNodeSet {
 				}
 			}
 			for(int i=0;i<addToNodes.size();++i){
-				addTransition(node.addToNode(addToNodes.get(i),addToRuleNames.get(i)));
-			}
-			for(int i=0;i<addEmToNodes.size();++i){
-				node.setEmToNode(addEmToNodes.get(i), true);
+				addTransition(node.addToNode(addToNodes.get(i),addToRuleNames.get(i),addEmToNodes.contains(addToNodes.get(i))));
 			}
 			for(StateNode to : removeToNodes){
 				removeTransition(node.removeToNode(to));
@@ -671,9 +685,6 @@ public class StateNodeSet {
 		for(StateNode dummy : newNode){
 			allNode.put(dummy.id,dummy);
 			drawNodeOrder.add(dummy);
-			//for(StateTransition t : dummy.getTransition()){
-			//	drawTransitionOrder.add(t);
-			//}
 			dummyNode.add(dummy);
 		}
 
@@ -693,14 +704,14 @@ public class StateNodeSet {
 		}
 	}
 
-	private StateNode makeDummyNode(int no,int depth,boolean accept,boolean inCycle,double y,boolean weak){
+	private StateNode makeDummyNode(int no,int depth,String label,boolean accept,boolean inCycle,double y,boolean weak){
 		long id;
 		for(id = no;true;++id){
 			if(!allNode.containsKey(id)) break;
 		}
 
 		StateNode dummy = new StateNode(id);
-		dummy.init(no,"",accept,inCycle);
+		dummy.init(no,"",label,accept,inCycle);
 		dummy.dummy = true;
 		dummy.weak = weak;
 
@@ -868,10 +879,10 @@ public class StateNodeSet {
 	private void makeAllFromTemps(HashMap<Long,TempNode> temps,TempNode startNode){
 		for(TempNode temp: temps.values()){
 			StateNode node = getNewNode(temp.id);
-			node.init(temp.no, temp.state, temp.accept, temp.inCycle);
+			node.init(temp.no, temp.state, temp.label, temp.accept, temp.inCycle);
 
 			for(TempTransition to : temp.toes){
-				addTransition(node.addToNode(getNewNode(to.node),to.rules));
+				addTransition(node.addToNode(getNewNode(to.node),to.rules,to.em));
 			}
 			for(Long from : temp.fromIds){
 				node.addFromNode(getNewNode(from));
@@ -932,7 +943,7 @@ public class StateNodeSet {
 		}
 	}
 
-	private class TempNode{
+	class TempNode{
 		long id = 0;
 		int no = 0;
 		String state = "";
@@ -984,10 +995,28 @@ public class StateNodeSet {
 			}
 		}
 
+		void setEmToId(long toId){
+			for(TempTransition t : toes){
+				if(t.node==toId){
+					t.em = true;
+				}
+			}
+		}
+
+		boolean isToNodeId(long toId){
+			for(TempTransition t : toes){
+				if(t.node==toId){
+					return true;
+				}
+			}
+			return false;
+		}
+
 	}
 
-	private class TempTransition{
+	class TempTransition{
 		Long node;
+		boolean em = false;
 		private ArrayList<String> rules = new ArrayList<String>();
 	}
 

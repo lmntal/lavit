@@ -125,19 +125,22 @@ public class LmntalRunner {
 
 				ProcessBuilder pb = new ProcessBuilder(strList(cmd));
 				Env.setProcessEnvironment(pb.environment());
-				pb.redirectErrorStream(true);
+				//pb.redirectErrorStream(true);
 				p = pb.start();
 				BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				ErrorStreamPrinter err = new ErrorStreamPrinter(p.getErrorStream());
 
 				if(buffer==null){
 					if(output==null){
 						output = FrontEnd.mainFrame.toolTab.systemPanel.outputPanel;
 					}
 					output.outputStart("lmntal", option, targetFile);
+					err.start();
 					String str;
 					while ((str=in.readLine())!=null) {
 						output.outputLine(str);
 					}
+					err.join();
 					output.outputEnd();
 				}else{
 					String str;

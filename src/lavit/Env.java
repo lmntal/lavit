@@ -49,15 +49,15 @@ import java.util.Properties;
 public class Env {
 
 	static public final String APP_NAME = "LaViT";
-	static public final String APP_VERSION = "2.0.0";
-	static public final String APP_DATE = "2010/4/22";
-	static public final String APP_HREF = "http://www.ueda.info.waseda.ac.jp/lmntal/lmntaleditor/";
+	static public final String APP_VERSION = "2.0.1";
+	static public final String APP_DATE = "2010/05/27";
+	static public final String APP_HREF = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
 
 	static public final String LMNTAL_VERSION = "LMNtal : 1.02 (2009/11/16)";
-	static public final String SLIM_VERSION = "SLIM : 1.0.0 r349 (2010/03/12)";
+	static public final String SLIM_VERSION = "SLIM : 1.0.0 r361 (2010/05/27)";
 	static public final String UNYO_VERSION = "UNYO UNYO : 1.1.1 (2010/03/07)";
 
-	static public final String DIR_NAME_SLIM = "slim349";
+	static public final String DIR_NAME_SLIM = "slim361";
 	static public final String DIR_NAME_UNYO = "unyo1_1_1";
 	static public final String DIR_NAME_LTL2BA = "ltl2ba-1.1";
 

@@ -167,9 +167,11 @@ public class SlimRunner {
 				ProcessBuilder pb = new ProcessBuilder(strList(cmd1));
 				pb.directory(new File("."));
 				Env.setProcessEnvironment(pb.environment());
-				pb.redirectErrorStream(redirectErrorStream);
+				//pb.redirectErrorStream(redirectErrorStream);
 				p1 = pb.start();
 				BufferedInputStream in1 = new BufferedInputStream(p1.getInputStream());
+				ErrorStreamPrinter err1 = new ErrorStreamPrinter(p1.getErrorStream());
+				err1.start();
 
 				// SLIM起動
 				//String cmd2 = slim_path+" -Ilmntal"+File.separator+Env.getDirNameOfSlim()+File.separator+"lib"+File.separator+" "+option;
@@ -193,10 +195,10 @@ public class SlimRunner {
 				pb = new ProcessBuilder(strList(cmd2));
 				pb.directory(new File("."));
 				Env.setProcessEnvironment(pb.environment());
-				pb.redirectErrorStream(true);
 				p2 = pb.start();
 				OutputStreamWriter out2 = new OutputStreamWriter(p2.getOutputStream());
 				BufferedReader in2 = new BufferedReader(new InputStreamReader(p2.getInputStream()));
+				ErrorStreamPrinter err2 = new ErrorStreamPrinter(p2.getErrorStream());
 
 				// SLIMへ流し込む
 				int b;
@@ -209,6 +211,7 @@ public class SlimRunner {
 
 				out2.close();
 				in1.close();
+				err1.join();
 				p1.waitFor();
 
 				// SLIMの出力を得る
@@ -217,10 +220,12 @@ public class SlimRunner {
 						output = FrontEnd.mainFrame.toolTab.systemPanel.outputPanel;
 					}
 					output.outputStart("slim", view_option, targetFile);
+					err2.start();
 					String str;
 					while ((str=in2.readLine())!=null) {
 						output.outputLine(str);
 					}
+					err2.join();
 					output.outputEnd();
 				}else{
 					String str;

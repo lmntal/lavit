@@ -57,7 +57,7 @@ import javax.swing.JPopupMenu;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.frame.StateTransitionRuleFrame;
+import lavit.frame.StateTransitionRuleEmFrame;
 
 class StateRightMenu extends JPopupMenu implements ActionListener{
 	private StateGraphPanel graphPanel;
@@ -365,7 +365,7 @@ class StateRightMenu extends JPopupMenu implements ActionListener{
 					JOptionPane.PLAIN_MESSAGE
 			);
 		}else if(src==ruleWindow){
-			new StateTransitionRuleFrame(graphPanel);
+			new StateTransitionRuleEmFrame(graphPanel,new StateTransitionEm(graphPanel));
 		}else if(src==backNs){
 			graphPanel.emBackNodes(graphPanel.getSelectNodes());
 		}else if(src==nextNs){

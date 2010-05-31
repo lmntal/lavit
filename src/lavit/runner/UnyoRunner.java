@@ -101,16 +101,19 @@ public class UnyoRunner {
 				ProcessBuilder pb = new ProcessBuilder(strList(cmd));
 				Env.setProcessEnvironment(pb.environment());
 				pb.directory(new File(Env.LMNTAL_LIBRARY_DIR+File.separator+Env.getDirNameOfUnyo()));
-				pb.redirectErrorStream(true);
+				//pb.redirectErrorStream(true);
 				p = pb.start();
 				BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				ErrorStreamPrinter err = new ErrorStreamPrinter(p.getErrorStream());
 
 				RunnerOutputGetter output = FrontEnd.mainFrame.toolTab.systemPanel.outputPanel;
 				output.outputStart("java -jar unyo.jar", option, targetFile);
+				err.start();
 				String str;
 				while ((str=in.readLine())!=null) {
 					output.outputLine(str);
 				}
+				err.join();
 				output.outputEnd();
 
 				in.close();

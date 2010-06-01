@@ -33,9 +33,10 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.worker;
 
 import lavit.*;
+import lavit.stateviewer.StateGraphPanel;
 
 public class StatePainter extends Thread {
 	private StateGraphPanel graphPanel;

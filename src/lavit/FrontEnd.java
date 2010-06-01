@@ -91,7 +91,7 @@ public class FrontEnd {
 		mainFrame.exit();
 		Env.save();
 		mainFrame.dispose();
-		System.out.println("LMNtal Editor reboot.");
+		System.out.println("LaViT reboot.");
 
 		RebootRunner rebootRunner = new RebootRunner("-Xms16M -Xmx"+Env.get("REBOOT_MAX_MEMORY"));
 		rebootRunner.run();
@@ -105,7 +105,7 @@ public class FrontEnd {
 		if(!mainFrame.editorPanel.closeFile()){return;}
 		mainFrame.exit();
 		Env.save();
-		System.out.println("LMNtal Editor end.");
+		System.out.println("LaViT end.");
 		System.exit(0);
 	}
 

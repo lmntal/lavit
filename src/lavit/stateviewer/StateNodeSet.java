@@ -50,10 +50,13 @@ import java.util.LinkedList;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.stateviewer.*;
+import lavit.stateviewer.worker.StatePositionSet;
 
 public class StateNodeSet {
 
-	public boolean global;
+	public StateNode parent;
+	private int generation;
 
 	private HashMap<Long,StateNode> allNode = new HashMap<Long,StateNode>();
 	private ArrayList<StateTransition> allTransition = new ArrayList<StateTransition>();
@@ -72,7 +75,8 @@ public class StateNodeSet {
 	final String labelMarkString = "Labels";
 
 	public boolean setSlimNdResult(String str){
-		this.global = true;
+		this.parent = null;
+		this.generation = 0;
 
 		HashMap<Long,TempNode> temps = new HashMap<Long,TempNode>();
 		int line=0;
@@ -145,7 +149,8 @@ public class StateNodeSet {
 	}
 
 	public boolean setSlimLtlResult(String str){
-		this.global = true;
+		this.parent = null;
+		this.generation = 0;
 
 		HashMap<Long,TempNode> temps = new HashMap<Long,TempNode>();
 		int line=0;
@@ -287,13 +292,47 @@ public class StateNodeSet {
 		return true;
 	}
 
-	public boolean setTempNode(HashMap<Long,TempNode> temps,TempNode startNode){
-		this.global = false;
+	public boolean setSubNode(StateNode parent, ArrayList<StateNode> nodes){
+		this.parent = parent;
+		this.generation = parent.getSubset().generation+1;
 
-		setNodeFrom(temps);
+		for(StateNode node : nodes){
+			allNode.put(node.id, node);
+		}
 
-		// temp -> state
-		makeAllFromTemps(temps,startNode);
+		for(StateNode node : nodes){
+			ArrayList<StateTransition> newTrans = new ArrayList<StateTransition>();
+			for(StateTransition trans : node.getTransition()){
+				StateNode t = allNode.get(trans.to.id);
+				if(t!=null){
+					newTrans.add(trans);
+					addTransition(trans);
+				}
+			}
+			node.setTransition(newTrans);
+			node.setFromNode(new ArrayList<StateNode>());
+		}
+		for(StateNode node : nodes){
+			for(StateNode to : node.getToNodes()){
+				to.addFromNode(node);
+			}
+		}
+
+		startNode = nodes.get(0);
+		for(StateNode node : nodes){
+			if(node.depth<startNode.depth){
+				startNode = node;
+			}
+			if(node.getFromNodes().size()==0){
+				startNode = node;
+				break;
+			}
+		}
+		for(StateNode node : nodes){
+			if(node.getToNodes().size()==0){
+				endNode.add(node);
+			}
+		}
 
 		setTreeDepth();
 
@@ -357,16 +396,6 @@ public class StateNodeSet {
 	}
 	*/
 
-	public void remove(StateNode node){
-		innerRemove(node);
-		updateNodeLooks();
-	}
-
-	public void remove(Long id){
-		innerRemove(allNode.get(id));
-		updateNodeLooks();
-	}
-
 	/*
 	public boolean isFlow(StateNode n1,StateNode n2){
 		if(cycleNode.size()==0||n1==n2) return true;
@@ -394,7 +423,7 @@ public class StateNodeSet {
 		return allNode.get(id);
 	}
 
-	int getDepth(){
+	public int getDepth(){
 		return depthNode.size();
 	}
 
@@ -427,6 +456,10 @@ public class StateNodeSet {
 		return dummy;
 	}
 
+	public void addNode(StateNode node){
+		allNode.put(node.id, node);
+	}
+
 	public Collection<StateNode> getAllNode(){
 		return allNode.values();
 	}
@@ -437,6 +470,10 @@ public class StateNodeSet {
 
 	public StateNode getStartNode(){
 		return startNode;
+	}
+
+	public void setStartNode(StateNode startNode){
+		this.startNode = startNode;
 	}
 
 	public ArrayList<StateNode> getEndNode(){
@@ -453,6 +490,16 @@ public class StateNodeSet {
 
 	public Collection<StateTransition> getAllTransitionDrawOrder(){
 		return drawTransitionOrder;
+	}
+
+	public StateNode getRepresentationNode(){
+		for(StateNode node : endNode){
+			return node;
+		}
+		if(startNode!=null){
+			return startNode;
+		}
+		return allNode.get(0);
 	}
 
 	public void resetOrder(){
@@ -501,8 +548,24 @@ public class StateNodeSet {
 	}
 	*/
 
-	private void innerRemove(StateNode removenode){
+	public void remove(StateNode node){
+		removeNode(node);
+		updateNodeLooks();
+	}
 
+	public void remove(Long id){
+		removeNode(allNode.get(id));
+		updateNodeLooks();
+	}
+
+	public void removeDummy(){
+		while(dummyNode.size()>0){
+			removeNode(dummyNode.get(0));
+		}
+		updateNodeLooks();
+	}
+
+	void removeNode(StateNode removenode){
 		for(StateNode to : removenode.getToNodes()){
 			if(to==removenode){ continue; }
 			to.removeFromNode(removenode);
@@ -522,15 +585,11 @@ public class StateNodeSet {
 			}
 		}
 
-		if(removenode==startNode){ startNode = null; }
-		endNode.remove(removenode);
-
-		allNode.remove(removenode.id);
-		drawNodeOrder.remove(removenode);
 		for(StateTransition t : removenode.getTransition()){
 			removeTransition(t);
 		}
-		dummyNode.remove(removenode);
+
+		removeInnerNodeData(removenode);
 
 		ArrayList<StateNode> sameDepth = depthNode.get(removenode.depth);
 		sameDepth.remove(removenode);
@@ -550,7 +609,16 @@ public class StateNodeSet {
 		}
 	}
 
-	private void setTreeDepth(){
+	void removeInnerNodeData(StateNode removenode){
+		if(removenode==startNode){ startNode = null; }
+		endNode.remove(removenode);
+
+		allNode.remove(removenode.id);
+		drawNodeOrder.remove(removenode);
+		dummyNode.remove(removenode);
+	}
+
+	void setTreeDepth(){
 		allNodeUnMark();
 		depthNode.clear();
 
@@ -568,19 +636,6 @@ public class StateNodeSet {
 			for(StateNode child : node.getToNodes()){
 				if(child.isMarked()){continue;}
 				child.mark();
-				/*
-				child.depth = node.depth+1;
-				if(depthNode.size()<=child.depth){
-					depthNode.add(child.depth,new ArrayList<StateNode>());
-				}
-				ArrayList<StateNode> dnodes = depthNode.get(child.depth);
-				if(dnodes==null){
-					dnodes = new ArrayList<StateNode>();
-					depthNode.add(child.depth,dnodes);
-				}
-				child.nth=dnodes.size();
-				dnodes.add(child);
-				*/
 				insertDepthNode(child,node.depth+1);
 				queue.add(child);
 			}
@@ -611,7 +666,13 @@ public class StateNodeSet {
 
 	public void setDummy(){
 
-		int no = allNode.size();
+		long newId = Long.MIN_VALUE;
+		for(StateNode node : getAllNode()){
+			if(node.id>newId){
+				newId = node.id;
+			}
+		}
+
 		ArrayList<StateNode> newNode = new ArrayList<StateNode>();
 
 		for(StateNode node : getAllNode()){
@@ -632,7 +693,7 @@ public class StateNodeSet {
 					int startDepth = node.depth, endDepth = to.depth;
 					while(dummyDepth>to.depth){
 						double y = ((startY-endY)/(double)(startDepth-endDepth))*(double)(dummyDepth-endDepth)+endY;
-						StateNode dummy = makeDummyNode(++no,dummyDepth,node.label,node.accept,inCycle,y,node.weak);
+						StateNode dummy = makeDummyNode(++newId,dummyDepth,node.label,node.accept,inCycle,y,node.weak);
 						newNode.add(dummy);
 
 						addTransition(dummy.addToNode(to,ruleNames,from.isEmToNode(to)));
@@ -690,28 +751,24 @@ public class StateNodeSet {
 
 	}
 
-	private void addTransition(StateTransition trans){
+	void addTransition(StateTransition trans){
 		if(trans!=null){
 			allTransition.add(trans);
 			drawTransitionOrder.add(trans);
 		}
 	}
 
-	private void removeTransition(StateTransition trans){
+	void removeTransition(StateTransition trans){
 		if(trans!=null){
 			allTransition.remove(trans);
 			drawTransitionOrder.remove(trans);
 		}
 	}
 
-	private StateNode makeDummyNode(int no,int depth,String label,boolean accept,boolean inCycle,double y,boolean weak){
-		long id;
-		for(id = no;true;++id){
-			if(!allNode.containsKey(id)) break;
-		}
+	private StateNode makeDummyNode(long id,int depth,String label,boolean accept,boolean inCycle,double y,boolean weak){
 
 		StateNode dummy = new StateNode(id);
-		dummy.init(no,"",label,accept,inCycle);
+		dummy.init("",label,accept,inCycle);
 		dummy.dummy = true;
 		dummy.weak = weak;
 
@@ -723,12 +780,6 @@ public class StateNodeSet {
 		insertDepthNode(dummy,depth);
 
 		return dummy;
-	}
-
-	public void removeDummy(){
-		while(dummyNode.size()>0){
-			innerRemove(dummyNode.get(0));
-		}
 	}
 
 	public Rectangle2D.Double getNodesDimension(){
@@ -765,7 +816,7 @@ public class StateNodeSet {
 		}
 	}
 
-	void allScaleCenterMove(double scaleX,double scaleY){
+	public void allScaleCenterMove(double scaleX,double scaleY){
 		Rectangle2D.Double d = getNodesDimension();
 		allScaleMove(scaleX,scaleY,d.getCenterX(),d.getCenterY());
 	}
@@ -806,7 +857,7 @@ public class StateNodeSet {
 		return sumLength;
 	}
 
-	void updateDefaultYOrder(){
+	public void updateDefaultYOrder(){
 		int no=0;
 		for(ArrayList<StateNode> dn : depthNode){
 			Collections.sort(dn, new Comparator<StateNode>() {
@@ -824,7 +875,6 @@ public class StateNodeSet {
 				}
 			});
 			for(int i=0;i<dn.size();++i){
-				dn.get(i).no = no;
 				dn.get(i).nth = i;
 				no++;
 			}
@@ -879,7 +929,7 @@ public class StateNodeSet {
 	private void makeAllFromTemps(HashMap<Long,TempNode> temps,TempNode startNode){
 		for(TempNode temp: temps.values()){
 			StateNode node = getNewNode(temp.id);
-			node.init(temp.no, temp.state, temp.label, temp.accept, temp.inCycle);
+			node.init(temp.state, temp.label, temp.accept, temp.inCycle);
 
 			for(TempTransition to : temp.toes){
 				addTransition(node.addToNode(getNewNode(to.node),to.rules,to.em));
@@ -890,7 +940,6 @@ public class StateNodeSet {
 			if(temp.toes.size()==0){
 				endNode.add(node);
 			}
-
 		}
 		this.startNode = getNewNode(startNode.id);
 	}
@@ -922,7 +971,7 @@ public class StateNodeSet {
 		}
 	}
 
-	private void setFirstPositionReset(){
+	void setFirstPositionReset(){
 		double w = 100.0;
 		double h = 100.0;
 

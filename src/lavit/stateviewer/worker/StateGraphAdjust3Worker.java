@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.worker;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,7 +43,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -59,14 +58,17 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.stateviewer.StateGraphPanel;
+import lavit.stateviewer.StateNode;
+import lavit.stateviewer.StateNodeSet;
 
-public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
+public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
 
 	private ProgressFrame frame;
 
-	public StateGraphAdjustWorker(StateGraphPanel panel){
+	public StateGraphAdjust3Worker(StateGraphPanel panel){
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
 	}
@@ -85,8 +87,6 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 
 	@Override
 	protected Object doInBackground(){
-
-		//System.out.println((new Date()));
 
 		int endNode = 0;
 		double w = (double)panel.getWidth();
@@ -110,18 +110,35 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 			node.setPosition((node.depth+1)*yInterval,node.getY());
 		}
 
+		//weakを抜く
+		ArrayList<ArrayList<StateNode>> depthNode = new ArrayList<ArrayList<StateNode>>();
+		for(ArrayList<StateNode> nodes : drawNodes.getDepthNode()){
+			ArrayList<StateNode> dNodes = new ArrayList<StateNode>();
+			for(StateNode node : nodes){
+				if(!node.weak){ dNodes.add(node); }
+			}
+			if(dNodes.size()>0){
+				depthNode.add(dNodes);
+			}
+		}
+
 		//初期状態からの遷移元平均値配置
-		ArrayList<ArrayList<StateNode>> depthNode = drawNodes.getDepthNode();
 		for(ArrayList<StateNode> nodes : depthNode){
 
 			//平均場所決定
 			for(StateNode node : nodes){
 				int c = 0;
 				double t = 0;
-				for(StateNode from : node.getFromNodes()){
+				for(StateNode from : node.getFromNoWeakNodes()){
 					if(from.depth<node.depth){
 						++c;
 						t += from.getY();
+					}
+				}
+				for(StateNode to : node.getToNodes()){
+					if(to.depth<node.depth){
+						++c;
+						t += to.getY();
 					}
 				}
 				if(c!=0){
@@ -136,7 +153,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 
 			//progress更新
 			endNode += nodes.size();
-			setProgress(100*endNode/(drawNodes.size()*3));
+			setProgress(100*endNode/(drawNodes.size()*6));
 			if(isCancelled()){ return null; }
 
 			/*
@@ -200,6 +217,132 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 			for(StateNode node : nodes){
 				int c = 0;
 				double t = 0;
+				for(StateNode from : node.getFromNoWeakNodes()){
+					if(node.depth<from.depth){
+						++c;
+						t += from.getY();
+					}
+				}
+				for(StateNode to : node.getToNoWeakNodes()){
+					if(node.depth<to.depth){
+						++c;
+						t += to.getY();
+					}
+				}
+				if(c!=0){
+					node.setPosition(node.getX(),t/c);
+				}
+			}
+
+			//ほぐす
+			detanglingNodes(nodes,yInterval);
+
+			//progress更新
+			endNode += nodes.size();
+			setProgress(100*endNode/(drawNodes.size()*6));
+			if(isCancelled()){ return null; }
+		}
+
+
+		//初期ノードからの遷移先・遷移元平均値配置
+		for(int i=0;i<depthNode.size();++i){
+
+			ArrayList<StateNode> nodes = depthNode.get(i);
+
+			//平均場所決定
+			for(StateNode node : nodes){
+				int c = 0;
+				double t = 0;
+				for(StateNode to : node.getToNoWeakNodes()){
+					if(to.depth-1==node.depth||to.depth+1==node.depth){
+						++c;
+						t += to.getY();
+					}
+				}
+				for(StateNode from : node.getFromNoWeakNodes()){
+					if(from.depth-1==node.depth||from.depth+1==node.depth){
+						++c;
+						t += from.getY();
+					}
+				}
+				if(c!=0){
+					node.setPosition(node.getX(),t/c);
+				}
+			}
+
+			//ほぐす
+			detanglingNodes(nodes,yInterval);
+
+			//progress更新
+			endNode += nodes.size();
+			setProgress(100*endNode/(drawNodes.size()*6));
+			if(isCancelled()){ return null; }
+		}
+
+
+		//weakだけにする
+		depthNode.clear();
+		for(ArrayList<StateNode> nodes : drawNodes.getDepthNode()){
+			ArrayList<StateNode> dNodes = new ArrayList<StateNode>();
+			for(StateNode node : nodes){
+				if(node.weak){ dNodes.add(node); }
+			}
+			if(dNodes.size()>0){
+				depthNode.add(dNodes);
+			}
+		}
+
+
+		//初期状態からの遷移元平均値配置
+		for(ArrayList<StateNode> nodes : depthNode){
+
+			//平均場所決定
+			for(StateNode node : nodes){
+				int c = 0;
+				double t = 0;
+				for(StateNode from : node.getFromNodes()){
+					if(from.depth<node.depth){
+						++c;
+						t += from.getY();
+					}
+				}
+				for(StateNode to : node.getToNodes()){
+					if(to.depth<node.depth){
+						++c;
+						t += to.getY();
+					}
+				}
+				if(c!=0){
+					node.setPosition(node.getX(),t/c);
+				}else{
+					node.setPosition(node.getX(),0);
+				}
+			}
+
+			//ほぐす
+			detanglingNodes(nodes,yInterval);
+
+			//progress更新
+			endNode += nodes.size();
+			setProgress(100*endNode/(drawNodes.size()*6));
+			if(isCancelled()){ return null; }
+		}
+
+		//最深ノードからの遷移先平均値配置
+		for(int i=depthNode.size()-1;i>=0;--i){
+
+			ArrayList<StateNode> nodes = depthNode.get(i);
+
+			//平均場所決定
+			for(StateNode node : nodes){
+				int c = 0;
+				double t = 0;
+				for(StateNode from : node.getFromNodes()){
+					if(node.depth<from.depth){
+						++c;
+						t += from.getY();
+					}
+				}
 				for(StateNode to : node.getToNodes()){
 					if(node.depth<to.depth){
 						++c;
@@ -216,7 +359,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 
 			//progress更新
 			endNode += nodes.size();
-			setProgress(100*endNode/(drawNodes.size()*3));
+			setProgress(100*endNode/(drawNodes.size()*6));
 			if(isCancelled()){ return null; }
 		}
 
@@ -231,13 +374,13 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 				int c = 0;
 				double t = 0;
 				for(StateNode to : node.getToNodes()){
-					if(to.depth-1==node.depth){
+					if(to.depth-1==node.depth||to.depth+1==node.depth){
 						++c;
 						t += to.getY();
 					}
 				}
 				for(StateNode from : node.getFromNodes()){
-					if(from.depth+1==node.depth){
+					if(from.depth-1==node.depth||from.depth+1==node.depth){
 						++c;
 						t += from.getY();
 					}
@@ -252,9 +395,10 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 
 			//progress更新
 			endNode += nodes.size();
-			setProgress(100*endNode/(drawNodes.size()*3));
+			setProgress(100*endNode/(drawNodes.size()*6));
 			if(isCancelled()){ return null; }
 		}
+
 
 		panel.autoCentering();
 
@@ -263,8 +407,6 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		for(StateNode node : drawNodes.getAllNode()){
 			node.setPosition((node.depth+1)*xInterval,node.getY());
 		}
-
-		//System.out.println((new Date()));
 
 		frame.end();
 		return null;
@@ -282,9 +424,9 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 				}else if(n1.getY()>n2.getY()){
 					return 1;
 				}else{
-					if(n1.no<n2.no){
+					if(n1.id<n2.id){
 						return -1;
-					}else if(n1.no>n2.no){
+					}else if(n1.id>n2.id){
 						return 1;
 					}else{
 						return 0;
@@ -370,9 +512,9 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		List<StateNode> list = new ArrayList<StateNode>(zeroDistances);
 		Collections.sort(list, new Comparator<StateNode>() {
 			public int compare(StateNode n1, StateNode n2) {
-				if(n1.no<n2.no){
+				if(n1.id<n2.id){
 					return -1;
-				}else if(n1.no>n2.no){
+				}else if(n1.id>n2.id){
 					return 1;
 				}else{
 					return 0;
@@ -584,9 +726,9 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 			List<StateNode> list = new ArrayList<StateNode>(zeroDistances);
 			Collections.sort(list, new Comparator<StateNode>() {
 				public int compare(StateNode n1, StateNode n2) {
-					if(n1.no<n2.no){
+					if(n1.id<n2.id){
 						return -1;
-					}else if(n1.no>n2.no){
+					}else if(n1.id>n2.id){
 						return 1;
 					}else{
 						return 0;

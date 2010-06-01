@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.controller;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -52,6 +52,11 @@ import javax.swing.JSlider;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.stateviewer.StateGraphPanel;
+import lavit.stateviewer.StateNode;
+import lavit.stateviewer.StatePanel;
+import lavit.stateviewer.StateTransitionAbstraction;
+import lavit.stateviewer.worker.StateGraphExchangeWorker;
 
 public class StateButtonPanel extends JPanel implements ActionListener {
 	private StatePanel statePanel;
@@ -61,6 +66,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	private JButton adjustReset = new JButton("Adjust Reset");
 	private JButton adjust2Reset = new JButton("Adjust(Backedge) Reset");
 	private JButton adjust3Reset = new JButton("Adjust(Find) Reset");
+	private JButton allReset = new JButton("All Reset");
 
 	private JPanel crossPanel = new JPanel();
 	private JButton crossInfo = new JButton("Cross Info");
@@ -80,19 +86,23 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	private JButton stretchMove = new JButton("Stretch Move");
 	private JButton autoCentering = new JButton("Auto Centering");
 
+	private JPanel transitionPanel = new JPanel();
+	private JButton transitionAbstraction = new JButton("Transition Abstraction");
+
 	private JComponent comps[] = {
-		posReset,adjustReset,adjust2Reset,adjust3Reset,
+		posReset,adjustReset,adjust2Reset,adjust3Reset,allReset,
 		crossInfo,geneticAlgorithm,exchangeReset,exchangeDummyOnly,
 		dummy,showdummy,dummyInfo,dummyCentering,dummySmoothing,
-		dynamicModeling,stretchMove,autoCentering
+		dynamicModeling,stretchMove,autoCentering,
+		transitionAbstraction
 	};
 
 	StateButtonPanel(StatePanel statePanel){
 		this.statePanel = statePanel;
 
-		setLayout(new GridLayout(4,1));
+		setLayout(new GridLayout(5,1));
 
-		resetPanel.setLayout(new GridLayout(1,3));
+		resetPanel.setLayout(new GridLayout(1,5));
 		posReset.addActionListener(this);
 		resetPanel.add(posReset);
 		adjustReset.addActionListener(this);
@@ -101,6 +111,8 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		resetPanel.add(adjust2Reset);
 		adjust3Reset.addActionListener(this);
 		resetPanel.add(adjust3Reset);
+		allReset.addActionListener(this);
+		resetPanel.add(allReset);
 		add(resetPanel);
 
 		crossPanel.setLayout(new GridLayout(1,4));
@@ -140,6 +152,10 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		dynamicPanel.add(autoCentering);
 		add(dynamicPanel);
 
+		transitionPanel.setLayout(new GridLayout(1,1));
+		transitionAbstraction.addActionListener(this);
+		transitionPanel.add(transitionAbstraction);
+		add(transitionPanel);
 	}
 
 	public void allSetEnabled(boolean enabled){
@@ -160,6 +176,8 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 			statePanel.stateGraphPanel.adjust2Reset();
 		}else if(src==adjust3Reset){
 			statePanel.stateGraphPanel.adjust3Reset();
+		}else if(src==allReset){
+			statePanel.reset();
 		}
 		else if(src==crossInfo){
 			JOptionPane.showMessageDialog(
@@ -222,6 +240,9 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 			statePanel.stateGraphPanel.stretchMove();
 		}else if(src==autoCentering){
 			statePanel.stateGraphPanel.autoCentering();
+		}else if(src==transitionAbstraction){
+			StateGraphPanel p = statePanel.stateGraphPanel;
+			new SelectStateTransitionRuleFrame(p,new StateTransitionAbstraction(p));
 		}
 	}
 

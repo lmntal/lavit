@@ -36,18 +36,34 @@
 package lavit.stateviewer;
 
 import java.util.ArrayList;
+import java.util.Collection;
+
 import lavit.util.StateTransitionCatcher;
 
 public class StateTransitionEm implements StateTransitionCatcher {
 	private StateGraphPanel graphPanel;
 
-	StateTransitionEm(StateGraphPanel graphPanel){
+	public StateTransitionEm(StateGraphPanel graphPanel){
 		this.graphPanel = graphPanel;
 	}
 
 	@Override
 	public void transitionCatch(String rule,ArrayList<StateTransition> trans) {
-		graphPanel.emTransitions(trans);
+		StateNodeSet drawNodes = graphPanel.getDrawNodes();
+		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
+
+		for(StateTransition t : trans){
+			t.from.inCycle = true;
+			weaks.remove(t.from);
+
+			t.to.inCycle = true;
+			weaks.remove(t.to);
+
+			t.from.setEmToNode(t.to, true);
+		}
+
+		for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
+		graphPanel.update();
 	}
 
 }

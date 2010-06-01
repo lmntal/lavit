@@ -85,6 +85,18 @@ import javax.swing.event.MouseInputListener;
 
 import lavit.*;
 import lavit.runner.LmntalRunner;
+import lavit.stateviewer.controller.StateNodeLabel;
+import lavit.stateviewer.controller.StateRightMenu;
+import lavit.stateviewer.worker.StateDynamicMover;
+import lavit.stateviewer.worker.StateGraphAdjust2Worker;
+import lavit.stateviewer.worker.StateGraphAdjust3Worker;
+import lavit.stateviewer.worker.StateGraphAdjustWorker;
+import lavit.stateviewer.worker.StateGraphDummySmoothingWorker;
+import lavit.stateviewer.worker.StateGraphExchangeWorker;
+import lavit.stateviewer.worker.StateGraphGeneticAlgorithmWorker;
+import lavit.stateviewer.worker.StateGraphRandomMoveWorker;
+import lavit.stateviewer.worker.StateGraphStretchMoveWorker;
+import lavit.stateviewer.worker.StatePainter;
 import lavit.util.CommonFontUser;
 
 public class StateGraphPanel extends JPanel implements MouseInputListener,MouseWheelListener,KeyListener,CommonFontUser{
@@ -92,6 +104,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	public StatePanel statePanel;
 
 	private StateNodeSet drawNodes;
+	private StateNodeSet rootDrawNodes;
 
 	private ArrayList<StateNode> selectNodes;
 	private boolean nodeSelected;
@@ -133,9 +146,13 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		FrontEnd.addFontUser(this);
 	}
 
-	public void init(StateNodeSet nodes){
+	public void init(StateNodeSet nodes, boolean rootSet){
 
 		this.drawNodes = nodes;
+
+		if(rootSet){
+			this.rootDrawNodes = nodes;
+		}
 
 		this.selectNodes.clear();
 		this.nodeSelected = false;
@@ -152,11 +169,11 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		//adjustReset();
 	}
 
-	void update(){
+	public void update(){
 		painter.update();
 	}
 
-	void setActive(boolean active){
+	public void setActive(boolean active){
 		if(painter.isActive()==active){ return; }
 		if(active){
 			addMouseListener(this);
@@ -180,11 +197,11 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		}
 	}
 
-	void setDynamicMoverActive(boolean active){
+	public void setDynamicMoverActive(boolean active){
 		mover.setActive(active);
 	}
 
-	StateDynamicMover getDynamicMover(){
+	public StateDynamicMover getDynamicMover(){
 		return mover;
 	}
 
@@ -194,7 +211,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		revalidate();
 	}
 
-	void setInnerZoom(double zoom){
+	public void setInnerZoom(double zoom){
 		if(zoom<0.0001){ zoom=0.0001; }else if(zoom>4.0){ zoom=4.0; }
 
 		double w = (double)getWidth() / 2;
@@ -207,6 +224,14 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		drawNodes.allMove(newW-oldW,newH-oldH);
 
 		this.zoom = zoom;
+	}
+
+	public void changeZoom(double dz){
+		double z = Math.sqrt(zoom*10000);
+		z -= dz;
+		if(z<0){ z=0; }
+		setZoom(z*z/10000.0);
+		update();
 	}
 
 	public void setZoom(double zoom){
@@ -288,7 +313,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 	*/
 
-	void positionReset(){
+	public void positionReset(){
 		double w = (double)getWidth();
 		double h = (double)getHeight();
 
@@ -321,43 +346,43 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		update();
 	}
 
-	void adjustReset(){
+	public void adjustReset(){
 		StateGraphAdjustWorker worker = new StateGraphAdjustWorker(this);
 		worker.ready();
 		worker.execute();
 	}
 
-	void adjust2Reset(){
+	public void adjust2Reset(){
 		StateGraphAdjust2Worker worker = new StateGraphAdjust2Worker(this);
 		worker.ready();
 		worker.execute();
 	}
 
-	void adjust3Reset(){
+	public void adjust3Reset(){
 		StateGraphAdjust3Worker worker = new StateGraphAdjust3Worker(this);
 		worker.ready();
 		worker.execute();
 	}
 
-	void exchangeReset(){
+	public void exchangeReset(){
 		StateGraphExchangeWorker worker = new StateGraphExchangeWorker(this);
 		worker.ready();
 		worker.execute();
 	}
 
-	void geneticAlgorithmLength(){
+	public void geneticAlgorithmLength(){
 		StateGraphGeneticAlgorithmWorker worker = new StateGraphGeneticAlgorithmWorker(this);
 		worker.ready();
 		worker.execute();
 	}
 
-	void stretchMove(){
+	public void stretchMove(){
 		StateGraphStretchMoveWorker worker = new StateGraphStretchMoveWorker(this);
 		worker.ready();
 		worker.execute();
 	}
 
-	void randomMove(){
+	public void randomMove(){
 		StateGraphRandomMoveWorker worker = new StateGraphRandomMoveWorker(this);
 		worker.ready();
 		worker.execute();
@@ -426,9 +451,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 					}else if(n1.getY()>n2.getY()){
 						return 1;
 					}else{
-						if(n1.no<n2.no){
+						if(n1.id<n2.id){
 							return -1;
-						}else if(n1.no>n2.no){
+						}else if(n1.id>n2.id){
 							return 1;
 						}else{
 							return 0;
@@ -490,10 +515,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	public int stateFind(String str){
+		selectNodeClear();
 
 		int match = 0;
-		selectNodes.clear();
-		nodeSelected = false;
 		for(StateNode node : drawNodes.getAllNode()){ node.weak = true; node.updateLooks(); }
 
 		if(str.equals("")){
@@ -514,10 +538,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	public int stateMatch(String head,String guard){
+		selectNodeClear();
 
 		int match = 0;
-		selectNodes.clear();
-		nodeSelected = false;
 		for(StateNode node : drawNodes.getAllNode()){ node.weak = true; node.updateLooks(); }
 
 		if(head.equals("")&&guard.equals("")){
@@ -569,7 +592,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		return match;
 	}
 
-	void searchShortCycle(){
+	public void searchShortCycle(){
 		ArrayList<StateNode> cycles = new ArrayList<StateNode>();
 		StateNode node = drawNodes.getStartNode();
 		StateNode cyclestart = null;
@@ -677,7 +700,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		update();
 	}
 
-	void searchReset(){
+	public void searchReset(){
 		for(StateNode node : drawNodes.getAllNode()){
 			node.weak = false;
 			node.inCycle = false;
@@ -687,7 +710,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		update();
 	}
 
-	void emBackNodes(ArrayList<StateNode> nodes){
+	public void emBackNodes(ArrayList<StateNode> nodes){
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 		drawNodes.allNodeUnMark();
 
@@ -712,7 +735,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		update();
 	}
 
-	void emFromNodes(ArrayList<StateNode> nodes){
+	public void emFromNodes(ArrayList<StateNode> nodes){
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 		drawNodes.allNodeUnMark();
 
@@ -737,7 +760,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		update();
 	}
 
-	void emNextNodes(ArrayList<StateNode> nodes){
+	public void emNextNodes(ArrayList<StateNode> nodes){
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 		drawNodes.allNodeUnMark();
 
@@ -762,7 +785,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		update();
 	}
 
-	void emToNodes(ArrayList<StateNode> nodes){
+	public void emToNodes(ArrayList<StateNode> nodes){
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 		drawNodes.allNodeUnMark();
 
@@ -783,23 +806,6 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				weaks.remove(n);
 			}
 		}
-		for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
-		update();
-	}
-
-	public void emTransitions(ArrayList<StateTransition> trans){
-		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
-
-		for(StateTransition t : trans){
-			t.from.inCycle = true;
-			weaks.remove(t.from);
-
-			t.to.inCycle = true;
-			weaks.remove(t.to);
-
-			t.from.setEmToNode(t.to, true);
-		}
-
 		for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
 		update();
 	}
@@ -1018,6 +1024,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				double r = node.getRadius()-2.0;
 				g2.draw(new RoundRectangle2D.Double(node.getX()-r,node.getY()-r,r*2,r*2,r*2,r*2));
 			}
+			if(Env.is("SV_SHOWID")){
+				g2.drawString(node.id+"",(int)(node.getX()),(int)(node.getY()));
+			}
 		}
 	}
 
@@ -1173,6 +1182,11 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		autoCentering();
 	}
 
+	public void selectNodeClear(){
+		selectNodes.clear();
+		nodeSelected = false;
+	}
+
 	public boolean isDragg(){
 		if(lastPoint==null){
 			return false;
@@ -1220,7 +1234,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 					selectNodes.clear();
 					selectNodes.add(selectNode);
 				}else if(e.getClickCount()==2){
-					selectNode.showFrame(e.getXOnScreen(), e.getYOnScreen());
+					selectNode.doubleClick(this);
 				}
 				nodeSelected = true;
 			}else{
@@ -1393,15 +1407,11 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		double z = Math.sqrt(zoom*10000);
 		double dz = (double)e.getWheelRotation()*5;
 		if(e.isControlDown()){
 			dz /= 5;
 		}
-		z -= dz;
-		if(z<0){ z=0; }
-		setZoom(z*z/10000.0);
-		update();
+		changeZoom(dz);
 	}
 
 
@@ -1478,10 +1488,32 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				drawNodes.remove(node);
 			}
 			selectNodes.clear();
+			nodeSelected=false;
 			update();
 			isUpdate = true;
 			break;
+		case KeyEvent.VK_SEMICOLON:
+		case KeyEvent.VK_ADD:
+		case KeyEvent.VK_PLUS:
+			if(e.isControlDown()){
+			changeZoom(-1);
+			}
+			break;
+		case KeyEvent.VK_MINUS:
+		case KeyEvent.VK_SUBTRACT:
+			if(e.isControlDown()){
+				changeZoom(1);
+			}
+			break;
+		case KeyEvent.VK_0:
+			if(e.isControlDown()){
+				setZoom(1);
+				update();
+			}
+			break;
 		}
+
+
 		if(isUpdate) update();
 	}
 

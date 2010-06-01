@@ -68,25 +68,24 @@ import lavit.frame.ChildWindowListener;
 import lavit.runner.LmntalRunner;
 import lavit.runner.UnyoRunner;
 
-class StateNode implements Shape{
+public class StateNode implements Shape{
 	public long id;
-	public int no;
-	public int depth = 0;
-	public int nth = 0;
+
 	public String state;
 	public String label;
 	boolean accept;
-	boolean inCycle;
+	public boolean inCycle;
 
-	boolean dummy;
-	boolean weak;
+	public int depth = 0;
+	public int nth = 0;
+
+	public boolean dummy;
+	public boolean weak;
 
 	private ArrayList<StateTransition> toes;
-
-	//private ArrayList<StateNode> toNodes;
 	private ArrayList<StateNode> fromNodes;
 
-	//private ArrayList<StateNode> emToNodes;
+	private StateNodeSet subset;
 
 	private boolean marked;
 	private boolean inFrame;
@@ -99,15 +98,14 @@ class StateNode implements Shape{
 	//enum ColorMode { normal, em, weak };
 
 	//物理モデル用変数
-	double dy;
-	double ddy;
+	public double dy;
+	public double ddy;
 
 	StateNode(long id){
 		this.id = id;
 	}
 
-	void init(int no,String state,String label,boolean accept,boolean inCycle){
-		this.no = no;
+	void init(String state,String label,boolean accept,boolean inCycle){
 		this.depth = 0;
 		this.nth = 0;
 		this.state = state;
@@ -121,6 +119,8 @@ class StateNode implements Shape{
 		//this.toNodes = new ArrayList<StateNode>();
 		this.toes = new ArrayList<StateTransition>();
 		this.fromNodes = new ArrayList<StateNode>();
+
+		this.subset = null;
 
 		//this.emToNodes = new ArrayList<StateNode>();
 
@@ -262,8 +262,11 @@ class StateNode implements Shape{
 			drawColor = Color.gray;
 		}
 
-		shape = new RoundRectangle2D.Double(getX()-radius,getY()-radius,radius*2,radius*2,radius*2,radius*2);
-
+		if(subset==null){
+			shape = new RoundRectangle2D.Double(getX()-radius,getY()-radius,radius*2,radius*2,radius*2,radius*2);
+		}else{
+			shape = new RoundRectangle2D.Double(getX()-radius,getY()-radius,radius*2,radius*2,radius/2,radius/2);
+		}
 		/*
 		if(toIds.size()==0){
 			color = Color.red;
@@ -281,27 +284,27 @@ class StateNode implements Shape{
 		*/
 	}
 
-	synchronized double getX(){
+	public synchronized double getX(){
 		return ((RectangularShape)shape).getCenterX();
 	}
 
-	synchronized double getY(){
+	public synchronized double getY(){
 		return ((RectangularShape)shape).getCenterY();
 	}
 
-	synchronized void setX(double x){
+	public synchronized void setX(double x){
 		setPosition(x,getY());
 	}
 
-	synchronized void setY(double y){
+	public synchronized void setY(double y){
 		setPosition(getX(),y);
 	}
 
-	synchronized void move(double dx, double dy){
+	public synchronized void move(double dx, double dy){
 		setPosition(getX()+dx, getY()+dy);
 	}
 
-	synchronized void setPosition(double x,double y){
+	public synchronized void setPosition(double x,double y){
 		if(!(-1000000000<y&&y<1000000000)){ y = 0; }
 		((RectangularShape)shape).setFrame(x-radius, y-radius, radius*2, radius*2);
 	}
@@ -313,7 +316,12 @@ class StateNode implements Shape{
 		t.addRules(rules);
 		toes.add(t);
 		return t;
+	}
 
+	StateTransition addTransition(StateTransition t){
+		if(isToNode(t.to)) return null;
+		toes.add(t);
+		return t;
 	}
 
 	StateTransition removeToNode(StateNode toNode){
@@ -333,7 +341,7 @@ class StateNode implements Shape{
 	}
 
 
-	ArrayList<StateNode> getToNodes(){
+	public ArrayList<StateNode> getToNodes(){
 		ArrayList<StateNode> toNodes = new ArrayList<StateNode>();
 		for(StateTransition t : toes){
 			toNodes.add(t.to);
@@ -364,7 +372,7 @@ class StateNode implements Shape{
 		return minNode;
 	}
 
-	ArrayList<StateNode> getToNoWeakNodes(){
+	public ArrayList<StateNode> getToNoWeakNodes(){
 		ArrayList<StateNode> toNodes = new ArrayList<StateNode>();
 		for(StateTransition t : toes){
 			if(!t.to.weak&&t.em){
@@ -372,6 +380,21 @@ class StateNode implements Shape{
 			}
 		}
 		return toNodes;
+	}
+
+	ArrayList<StateNode> getRuleNameGroupNodes(String ruleName){
+		ArrayList<StateNode> nodes = new ArrayList<StateNode>();
+		for(StateTransition t : toes){
+			if(t.getRules().contains(ruleName)){
+				nodes.add(t.to);
+			}
+		}
+		for(StateNode from : fromNodes){
+			if(from.getTransition(this).getRules().contains(ruleName)){
+				nodes.add(from);
+			}
+		}
+		return nodes;
 	}
 
 	ArrayList<String> getToRuleNames(StateNode toNode){
@@ -394,6 +417,10 @@ class StateNode implements Shape{
 
 	ArrayList<StateTransition> getTransition(){
 		return toes;
+	}
+
+	void setTransition(ArrayList<StateTransition> toes){
+		this.toes = toes;
 	}
 
 	String getToRuleName(StateNode toNode){
@@ -420,11 +447,15 @@ class StateNode implements Shape{
 		return fromNodes.contains(fromNode);
 	}
 
-	ArrayList<StateNode> getFromNodes(){
+	public ArrayList<StateNode> getFromNodes(){
 		return fromNodes;
 	}
 
-	ArrayList<StateNode> getFromNoWeakNodes(){
+	void setFromNode(ArrayList<StateNode> fromNodes){
+		this.fromNodes = fromNodes;
+	}
+
+	public ArrayList<StateNode> getFromNoWeakNodes(){
 		ArrayList<StateNode> fNodes = new ArrayList<StateNode>();
 		for(StateNode from : fromNodes){
 			if(!from.weak&&from.getTransition(this).em){
@@ -432,6 +463,22 @@ class StateNode implements Shape{
 			}
 		}
 		return fNodes;
+	}
+
+	public boolean hasSubset(){
+		if(subset==null){
+			return false;
+		}else{
+			return true;
+		}
+	}
+
+	public StateNodeSet getSubset(){
+		return subset;
+	}
+
+	void setSubset(StateNodeSet subset){
+		this.subset = subset;
 	}
 
 	/*
@@ -471,7 +518,7 @@ class StateNode implements Shape{
 		}
 	}
 
-	ArrayList<StateNode> getLayerFlowNodes(int layer){
+	public ArrayList<StateNode> getLayerFlowNodes(int layer){
 		ArrayList<StateNode> backs = new ArrayList<StateNode>();
 		for(StateNode from : getFromNodes()){
 			if(from.depth==layer){
@@ -486,7 +533,7 @@ class StateNode implements Shape{
 		return backs;
 	}
 
-	double getRadius(){
+	public double getRadius(){
 		return radius;
 	}
 
@@ -514,21 +561,24 @@ class StateNode implements Shape{
 		this.inFrame = inFrame;
 	}
 
-	void mark(){
+	public void mark(){
 		marked = true;
 	}
 
-	void unmark(){
+	public void unmark(){
 		marked = false;
 	}
 
-	boolean isMarked(){
+	public boolean isMarked(){
 		return marked;
 	}
 
 	void resetLocation(double xPosInterval,double[] yPosInterval){
 		double x = (depth+1)*xPosInterval;
-		double y = (nth+1)*yPosInterval[depth];
+		double y = yPosInterval[0];
+		if(depth<yPosInterval.length){
+			y = (nth+1)*yPosInterval[depth];
+		}
 		setPosition(x,y);
 	}
 
@@ -542,7 +592,7 @@ class StateNode implements Shape{
 		return str;
 	}
 
-	void runUnyo2(){
+	public void runUnyo2(){
 		File f = new File("temp.lmn");
 		try {
 			FileWriter fp = new FileWriter(f);
@@ -554,7 +604,7 @@ class StateNode implements Shape{
 		(new LmntalRunner("-g "+Env.get("UNYO_OPTION"),f)).run();
 	}
 
-	void runUnyo3(){
+	public void runUnyo3(){
 		File f = new File("temp.lmn");
 		try {
 			FileWriter fp = new FileWriter(f);
@@ -575,9 +625,22 @@ class StateNode implements Shape{
 		}
 	}
 
-	void showFrame(int x, int y){
+	void doubleClick(StateGraphPanel graphPanel){
+		if(subset==null){
 		TextFrame frame = new TextFrame(""+id,state);
-		//frame.setBounds(x,y,300,100);
+		}else{
+			graphPanel.init(subset, false);
+		}
+	}
+
+	public String toString(){
+		if(state!=null&&state.length()>0){
+			return state;
+		}
+		if(subset!=null&&subset.size()>0){
+			return subset.getRepresentationNode().toString();
+		}
+		return "";
 	}
 
 	private class TextFrame extends JFrame{

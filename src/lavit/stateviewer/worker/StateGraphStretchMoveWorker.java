@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.worker;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -66,106 +66,75 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.stateviewer.StateGraphPanel;
+import lavit.stateviewer.StateNodeSet;
 
-public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
+public class StateGraphStretchMoveWorker extends SwingWorker<Object,Integer>{
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
 
 	private ProgressFrame frame;
 
-	public StateGraphRandomMoveWorker(StateGraphPanel panel){
+	public StateGraphStretchMoveWorker(StateGraphPanel panel){
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
 	}
 
 	public void ready(){
-		panel.setActive(false);
 		frame = new ProgressFrame();
+		frame.lastParam = (new StateGraphExchangeWorker(panel)).getAllCross();
 	}
 
 	public void done() {
-		panel.autoCentering();
-		panel.setActive(true);
 		frame.dispose();
 	}
 
 	@Override
 	protected Object doInBackground(){
-
-		int size = 10;
-		ArrayList<StatePositionSet> sets = new ArrayList<StatePositionSet>(size);
-		StatePositionSet best = new StatePositionSet(drawNodes);
-		publish(best.getFromBestLength());
-
-		while(!isCancelled()){
-			sets.clear();
-			sets.add(best);
-			for(int i=1;i<size;++i){
-				best = new StatePositionSet(best);
-				best.mutation2();
-				best.randomMove();
-				sets.add(best);
-			}
-			best = sortSets(sets);
-			publish(best.getFromBestLength());
-		}
-
-		drawNodes.updatePosition(best);
-
-		double w = (double)panel.getWidth();
-		double h = (double)panel.getHeight();
-		double xInterval = w/(drawNodes.getDepth()+1);
-		double yInterval = h/(drawNodes.getHeight()+1);
-		if(xInterval>30){ xInterval=30; }else if(xInterval<10){ xInterval=10; }
-		if(yInterval>30){ yInterval=30; }else if(yInterval<10){ yInterval=10; }
-
-		//等間隔x配置
-		for(StateNode node : drawNodes.getAllNode()){
-			node.setX((node.depth+1)*xInterval);
-		}
-
+		int i = 0;
 		while(true){
-			Rectangle2D.Double d = drawNodes.getNodesDimension();
-			if(d.getHeight()<drawNodes.getHeight()*yInterval){
-				drawNodes.allScaleCenterMove(1, 1.1);
+			if(i<10){
+				drawNodes.allScaleCenterMove(1/0.8, 0.9);
+			}else if(i<20){
+				drawNodes.allScaleCenterMove(0.8, 1/0.8);
+			}else if(i<30){
+				drawNodes.allScaleCenterMove(1/0.9, 0.9);
+			}else if(i<40){
+				drawNodes.allScaleCenterMove(0.9, 1/0.8);
+			}else if(i==40){
+				panel.autoCentering();
+				sleep(5000);
+			}else if(drawNodes.getHeight()*30<drawNodes.getNodesDimension().getHeight()&&i<200){
+				drawNodes.allScaleCenterMove(1, 0.95);
 			}else{
-				break;
+				drawNodes.allScaleCenterMove(1.1, 1);
+				panel.autoCentering();
+				publish((new StateGraphExchangeWorker(panel)).getAllCross());
+				sleep(5000);
+				i=-1;
+				if(isCancelled()){ break; }
 			}
+			i++;
+			panel.update();
+			sleep(50);
 		}
-		while(true){
-			Rectangle2D.Double d = drawNodes.getNodesDimension();
-			if(d.getHeight()>drawNodes.getHeight()*yInterval){
-				drawNodes.allScaleCenterMove(1, 0.9);
-			}else{
-				break;
-			}
-		}
-
 		panel.autoCentering();
 		frame.end();
 		return null;
 	}
 
-	private StatePositionSet sortSets(ArrayList<StatePositionSet> sets){
-		Collections.sort(sets, new Comparator<StatePositionSet>() {
-			public int compare(StatePositionSet n1, StatePositionSet n2) {
-				double tl1 = n1.getFromBestLength();
-				double tl2 = n2.getFromBestLength();
-				if(tl1<tl2){
-					return -1;
-				}else if(tl1>tl2){
-					return 1;
-				}else{
-					return 0;
-				}
-			}
-		});
-		return sets.get(0);
+	private void sleep(int msec){
+		if(isCancelled()) return;
+		try {
+			Thread.sleep(msec);
+		} catch (InterruptedException e) {
+			FrontEnd.printException(e);
+		}
 	}
 
 	@Override
-    protected void process(List<Double> chunks) {
-        for (double number : chunks) {
+    protected void process(List<Integer> chunks) {
+        for (int number : chunks) {
             frame.setParam(number);
         }
     }
@@ -173,13 +142,11 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 	private class ProgressFrame extends JDialog implements ActionListener {
 		private JPanel panel;
 		private JLabel label;
-		private GraphPanel graph;
 		private JButton end;
-		private GraphPainter painter;
 
 		private int paramNum = 0;
-		private double lastParam = -1;
-		private ArrayList<Double> params = new ArrayList<Double>();
+		private int lastParam = -1;
+		private ArrayList<Integer> params = new ArrayList<Integer>();
 
 		private ProgressFrame(){
 			panel = new JPanel();
@@ -190,9 +157,6 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 			label.setHorizontalAlignment(JLabel.CENTER);
 			panel.add(label, BorderLayout.NORTH);
 
-			graph = new GraphPanel();
-			panel.add(graph, BorderLayout.CENTER);
-
 			end = new JButton(Lang.d[7]);
 			end.addActionListener(this);
 			panel.add(end, BorderLayout.SOUTH);
@@ -200,31 +164,30 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 			add(panel);
 
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			setTitle("Genetic Algorithm");
+			setTitle("Stretch Move");
 			setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 			setAlwaysOnTop(true);
 			setResizable(false);
+
+			label.setText(0+" : cross = "+0);
+			label.setPreferredSize(new Dimension(160,20));
 
 	        pack();
 	        setLocationRelativeTo(panel);
 	        addWindowListener(new ChildWindowListener(this));
 	        setVisible(true);
-
-	        painter = new GraphPainter();
-	        painter.start();
 		}
 
 		public void end(){
-			if(painter!=null){
-				painter.interrupt();
-				painter = null;
-			}
 		}
 
-		public void setParam(double param){
+		public void setParam(int param){
 			paramNum++;
+			params.add(param);
+			int s = param-lastParam;
+			label.setText(paramNum+" : cross = "+param+(lastParam>=0?" ("+(s>=0?"+":"")+s+")":""));
 			lastParam = param;
-			label.setText(paramNum+" : "+(new DecimalFormat("#.###")).format(param));
+			repaint();
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -232,53 +195,6 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 			if(src==end){
 				if(!isDone()){
 					cancel(true);
-				}
-			}
-		}
-
-		private class GraphPanel extends JPanel {
-
-			private GraphPanel(){
-				setPreferredSize(new Dimension(300, 100));
-			}
-
-			public void paintComponent(Graphics g){
-				Graphics2D g2 = (Graphics2D)g;
-
-				//フレームの初期化
-				g2.setColor(Color.white);
-				g2.fillRect(0, 0, getWidth(), getHeight());
-
-				g2.setColor(Color.black);
-				if(params.size()>=2){
-					double pw = params.size();
-					double base = params.get(0);
-					double ph = Math.abs(params.get(params.size()-1)-params.get(0));
-					double h = 1.0;
-					double w = 20.0;
-					int margin = 5;
-					while(w<pw) w *= 1.5;
-					while(h<ph) h *= 1.5;
-					for(int x=0;x<params.size()-1;++x){
-						g2.drawLine((int)(x*(getWidth()-margin*2)/w)+margin, (int)(Math.abs(params.get(x)-base)*(getHeight()-margin*2)/h)+margin, (int)((x+1)*(getWidth()-margin*2)/w)+margin, (int)(Math.abs(params.get(x+1)-base)*(getHeight()-margin*2)/h)+margin);
-					}
-				}
-			}
-
-		}
-
-		private class GraphPainter extends Thread {
-			public void run(){
-				while(true){
-					if(lastParam>=0){
-						params.add(lastParam);
-					}
-					repaint();
-					try {
-						sleep(200);
-					} catch (InterruptedException e) {
-						FrontEnd.printException(e);
-					}
 				}
 			}
 		}

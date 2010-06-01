@@ -33,31 +33,45 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.controller;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.stateviewer.StateNode;
 import lavit.util.CommonFontUser;
+import lavit.util.FixFlowLayout;
 
 public class StateNodeLabel extends JPanel implements CommonFontUser {
+	private JPanel stateStatus;
+	private JLabel stateNodenum;
 	private JLabel stateLabel;
+
 	private JTextField stateTextField;
 
 	private StateNode node;
 
-	StateNodeLabel(){
+	public StateNodeLabel(){
 
 		setLayout(new BorderLayout());
 
+		stateStatus = new JPanel();
+		stateStatus.setLayout(new GridLayout(1,2));
+		stateNodenum = new JLabel();
+		stateNodenum.setHorizontalAlignment(JLabel.LEFT);
+		stateStatus.add(stateNodenum);
 		stateLabel = new JLabel();
-		add(stateLabel, BorderLayout.WEST);
+		stateLabel.setHorizontalAlignment(JLabel.RIGHT);
+		stateStatus.add(stateLabel);
+		add(stateStatus, BorderLayout.NORTH);
 
 		stateTextField = new JTextField();
 		add(stateTextField, BorderLayout.CENTER);
@@ -75,8 +89,17 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 	}
 
 	public void setNode(StateNode node){
-		stateLabel.setText(node.label);
-		stateTextField.setText(node.state);
+		if(node.label.length()>0){
+			stateLabel.setText("Label: "+node.label);
+		}else{
+			stateLabel.setText("");
+		}
+		if(node.hasSubset()){
+			stateNodenum.setText("Node: "+node.getSubset().size());
+		}else{
+			stateNodenum.setText("");
+		}
+		stateTextField.setText(node.toString());
 	}
 
 }

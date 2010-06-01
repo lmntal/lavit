@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.worker;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +42,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import lavit.Env;
+import lavit.stateviewer.StateNode;
+import lavit.stateviewer.StateNodeSet;
 
 public class StatePositionSet {
 
@@ -355,7 +357,6 @@ class StatePosition{
 	StatePosition(StateNode node){
 		this.node = node;
 		this.id = node.id;
-		this.no = node.no;
 		this.depth = node.depth;
 		this.nth = node.nth;
 		this.x = node.getX();

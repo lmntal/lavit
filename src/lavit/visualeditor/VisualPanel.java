@@ -43,9 +43,9 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
-import lavit.stateviewer.StateControlPanel;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNodeSet;
+import lavit.stateviewer.controller.StateControlPanel;
 
 public class VisualPanel extends JPanel {
 

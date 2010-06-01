@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.worker;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -59,6 +59,9 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.stateviewer.StateGraphPanel;
+import lavit.stateviewer.StateNode;
+import lavit.stateviewer.StateNodeSet;
 
 public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 	private StateGraphPanel panel;
@@ -228,7 +231,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 		int cross = 0;
 		for(StateNode n : nodes){
 			for(StateNode to : n.getToNodes()){
-				if(n.depth==to.depth&&n.no!=to.no){
+				if(n.depth==to.depth&&n.id!=to.id){
 					double b,t;
 					if(n.getY()<to.getY()){
 						b = n.getY();

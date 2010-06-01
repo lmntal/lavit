@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.worker;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,6 +43,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -58,14 +59,17 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.stateviewer.StateGraphPanel;
+import lavit.stateviewer.StateNode;
+import lavit.stateviewer.StateNodeSet;
 
-public class StateGraphAdjust2Worker extends SwingWorker<Object,Object>{
+public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
 
 	private ProgressFrame frame;
 
-	public StateGraphAdjust2Worker(StateGraphPanel panel){
+	public StateGraphAdjustWorker(StateGraphPanel panel){
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
 	}
@@ -84,6 +88,8 @@ public class StateGraphAdjust2Worker extends SwingWorker<Object,Object>{
 
 	@Override
 	protected Object doInBackground(){
+
+		//System.out.println((new Date()));
 
 		int endNode = 0;
 		double w = (double)panel.getWidth();
@@ -119,12 +125,6 @@ public class StateGraphAdjust2Worker extends SwingWorker<Object,Object>{
 					if(from.depth<node.depth){
 						++c;
 						t += from.getY();
-					}
-				}
-				for(StateNode to : node.getToNodes()){
-					if(to.depth<node.depth){
-						++c;
-						t += to.getY();
 					}
 				}
 				if(c!=0){
@@ -203,12 +203,6 @@ public class StateGraphAdjust2Worker extends SwingWorker<Object,Object>{
 			for(StateNode node : nodes){
 				int c = 0;
 				double t = 0;
-				for(StateNode from : node.getFromNodes()){
-					if(node.depth<from.depth){
-						++c;
-						t += from.getY();
-					}
-				}
 				for(StateNode to : node.getToNodes()){
 					if(node.depth<to.depth){
 						++c;
@@ -240,13 +234,13 @@ public class StateGraphAdjust2Worker extends SwingWorker<Object,Object>{
 				int c = 0;
 				double t = 0;
 				for(StateNode to : node.getToNodes()){
-					if(to.depth-1==node.depth||to.depth+1==node.depth){
+					if(to.depth-1==node.depth){
 						++c;
 						t += to.getY();
 					}
 				}
 				for(StateNode from : node.getFromNodes()){
-					if(from.depth-1==node.depth||from.depth+1==node.depth){
+					if(from.depth+1==node.depth){
 						++c;
 						t += from.getY();
 					}
@@ -273,6 +267,8 @@ public class StateGraphAdjust2Worker extends SwingWorker<Object,Object>{
 			node.setPosition((node.depth+1)*xInterval,node.getY());
 		}
 
+		//System.out.println((new Date()));
+
 		frame.end();
 		return null;
 	}
@@ -289,9 +285,9 @@ public class StateGraphAdjust2Worker extends SwingWorker<Object,Object>{
 				}else if(n1.getY()>n2.getY()){
 					return 1;
 				}else{
-					if(n1.no<n2.no){
+					if(n1.id<n2.id){
 						return -1;
-					}else if(n1.no>n2.no){
+					}else if(n1.id>n2.id){
 						return 1;
 					}else{
 						return 0;
@@ -377,9 +373,9 @@ public class StateGraphAdjust2Worker extends SwingWorker<Object,Object>{
 		List<StateNode> list = new ArrayList<StateNode>(zeroDistances);
 		Collections.sort(list, new Comparator<StateNode>() {
 			public int compare(StateNode n1, StateNode n2) {
-				if(n1.no<n2.no){
+				if(n1.id<n2.id){
 					return -1;
-				}else if(n1.no>n2.no){
+				}else if(n1.id>n2.id){
 					return 1;
 				}else{
 					return 0;
@@ -591,9 +587,9 @@ public class StateGraphAdjust2Worker extends SwingWorker<Object,Object>{
 			List<StateNode> list = new ArrayList<StateNode>(zeroDistances);
 			Collections.sort(list, new Comparator<StateNode>() {
 				public int compare(StateNode n1, StateNode n2) {
-					if(n1.no<n2.no){
+					if(n1.id<n2.id){
 						return -1;
-					}else if(n1.no>n2.no){
+					}else if(n1.id>n2.id){
 						return 1;
 					}else{
 						return 0;

@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -57,9 +57,12 @@ import javax.swing.JPopupMenu;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.frame.StateTransitionRuleEmFrame;
+import lavit.stateviewer.StateGraphPanel;
+import lavit.stateviewer.StateNode;
+import lavit.stateviewer.StateTransitionEm;
+import lavit.stateviewer.worker.StateGraphExchangeWorker;
 
-class StateRightMenu extends JPopupMenu implements ActionListener{
+public class StateRightMenu extends JPopupMenu implements ActionListener{
 	private StateGraphPanel graphPanel;
 
 	private JMenu nodeSubmenu = new JMenu("Node");
@@ -98,6 +101,7 @@ class StateRightMenu extends JPopupMenu implements ActionListener{
 
 	private JMenu graphViewSubmenu = new JMenu("Graph View");
 	private JCheckBoxMenuItem backedge = new JCheckBoxMenuItem("Hide Backedge");
+	private JCheckBoxMenuItem showId = new JCheckBoxMenuItem("Show ID");
 	private JCheckBoxMenuItem showRule = new JCheckBoxMenuItem("Show Rule");
 	private JCheckBoxMenuItem showNoNameRule = new JCheckBoxMenuItem("Show No Name Rule");
 
@@ -129,7 +133,7 @@ class StateRightMenu extends JPopupMenu implements ActionListener{
 	private JMenuItem test = new JMenuItem("Test");
 
 
-	StateRightMenu(StateGraphPanel graphPanel){
+	public StateRightMenu(StateGraphPanel graphPanel){
 		this.graphPanel = graphPanel;
 
 		//Node
@@ -266,6 +270,10 @@ class StateRightMenu extends JPopupMenu implements ActionListener{
 		backedge.setSelected(Env.is("SV_HIDEBACKEDGE"));
 		graphViewSubmenu.add(backedge);
 
+		showId.addActionListener(this);
+		showId.setSelected(Env.is("SV_SHOWID"));
+		graphViewSubmenu.add(showId);
+
 		showRule.addActionListener(this);
 		showRule.setSelected(Env.is("SV_SHOWRULE"));
 		graphViewSubmenu.add(showRule);
@@ -324,8 +332,8 @@ class StateRightMenu extends JPopupMenu implements ActionListener{
 		updateDefaultYOrder.addActionListener(this);
 		add(updateDefaultYOrder);
 
-		allReset.addActionListener(this);
-		add(allReset);
+		//allReset.addActionListener(this);
+		//add(allReset);
 
 		allDelete.addActionListener(this);
 		add(allDelete);
@@ -365,7 +373,7 @@ class StateRightMenu extends JPopupMenu implements ActionListener{
 					JOptionPane.PLAIN_MESSAGE
 			);
 		}else if(src==ruleWindow){
-			new StateTransitionRuleEmFrame(graphPanel,new StateTransitionEm(graphPanel));
+			new SelectStateTransitionRuleFrame(graphPanel,new StateTransitionEm(graphPanel));
 		}else if(src==backNs){
 			graphPanel.emBackNodes(graphPanel.getSelectNodes());
 		}else if(src==nextNs){
@@ -428,6 +436,9 @@ class StateRightMenu extends JPopupMenu implements ActionListener{
 			graphPanel.repaint();
 		}else if(src==backedge){
 			Env.set("SV_HIDEBACKEDGE",!Env.is("SV_HIDEBACKEDGE"));
+			graphPanel.repaint();
+		}else if(src==showId){
+			Env.set("SV_SHOWID",!Env.is("SV_SHOWID"));
 			graphPanel.repaint();
 		}else if(src==showRule){
 			Env.set("SV_SHOWRULE",!Env.is("SV_SHOWRULE"));

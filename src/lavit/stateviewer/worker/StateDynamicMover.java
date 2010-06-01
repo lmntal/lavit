@@ -33,11 +33,14 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.worker;
 
 import java.util.ArrayList;
 
 import lavit.*;
+import lavit.stateviewer.StateGraphPanel;
+import lavit.stateviewer.StateNode;
+import lavit.stateviewer.StateNodeSet;
 
 public class StateDynamicMover extends Thread {
 	private StateGraphPanel panel;
@@ -54,23 +57,23 @@ public class StateDynamicMover extends Thread {
 		this.active = false;
 	}
 
-	void setInnerSpring(int k){
+	public void setInnerSpring(int k){
 		this.k = (double)k/100.0;
 	}
 
-	void setInnerNodeRepulsion(int nc){
+	public void setInnerNodeRepulsion(int nc){
 		this.nc = (double)nc*10.0;
 	}
 
-	void setInnerDummyRepulsion(int dc){
+	public void setInnerDummyRepulsion(int dc){
 		this.dc = (double)dc*10.0;
 	}
 
-	void setInnerInterval(int interval){
+	public void setInnerInterval(int interval){
 		this.interval = interval;
 	}
 
-	void setInnerMaxSpeed(int maxSpeed){
+	public void setInnerMaxSpeed(int maxSpeed){
 		this.maxSpeed = maxSpeed*10;
 	}
 

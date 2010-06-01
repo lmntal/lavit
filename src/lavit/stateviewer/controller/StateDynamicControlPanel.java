@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.controller;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -63,6 +63,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import lavit.*;
+import lavit.stateviewer.StatePanel;
+import lavit.stateviewer.worker.StateDynamicMover;
 import lavit.util.CommonFontUser;
 import lavit.util.FixFlowLayout;
 

@@ -49,6 +49,7 @@ import java.io.OutputStreamWriter;
 import javax.swing.JPanel;
 
 import lavit.*;
+import lavit.stateviewer.controller.StateControlPanel;
 
 public class StatePanel extends JPanel{
 
@@ -85,7 +86,7 @@ public class StatePanel extends JPanel{
 
 		if(res){
 			FrontEnd.println("(StateViewer) start! (state = "+drawNodes.size()+")");
-			stateGraphPanel.init(drawNodes);
+			stateGraphPanel.init(drawNodes, true);
 			FrontEnd.mainFrame.toolTab.setTab("StateViewer");
 		}else{
 			FrontEnd.println("(StateViewer) error.");

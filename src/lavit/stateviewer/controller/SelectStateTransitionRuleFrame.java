@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.frame;
+package lavit.stateviewer.controller;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -61,17 +61,20 @@ import javax.swing.JTextField;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
+import lavit.frame.ChildWindowListener;
 import lavit.stateviewer.*;
 import lavit.util.StateTransitionCatcher;
 
-public class StateTransitionRuleEmFrame extends JFrame {
+public class SelectStateTransitionRuleFrame extends JFrame {
 	private StateTransitionCatcher catcher;
 
 	private SelectPanel panel;
 	private boolean end;
 	private HashMap<String,ArrayList<StateTransition>> rules = new HashMap<String,ArrayList<StateTransition>>();
 
-	public StateTransitionRuleEmFrame(StateGraphPanel graphPanel,StateTransitionCatcher catcher){
+	public SelectStateTransitionRuleFrame(StateGraphPanel graphPanel,StateTransitionCatcher catcher){
+
+		this.catcher = catcher;
 
 		for(StateTransition t : graphPanel.getDrawNodes().getAllTransition()){
 			for(String r : t.getRules()){

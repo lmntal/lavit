@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.controller;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -65,6 +65,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import lavit.*;
+import lavit.stateviewer.StateGraphPanel;
+import lavit.stateviewer.StatePanel;
 import lavit.util.CommonFontUser;
 import lavit.util.FixFlowLayout;
 
@@ -101,7 +103,7 @@ public class StateControlPanel extends JPanel implements ChangeListener,ActionLi
     private JLabel zoomNum = new JLabel();
 	private JLabel stateNum = new JLabel();
 
-	StateControlPanel(StatePanel statePanel){
+	public StateControlPanel(StatePanel statePanel){
 
 		this.statePanel = statePanel;
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));

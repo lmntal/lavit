@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.stateviewer;
+package lavit.stateviewer.worker;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -66,6 +66,8 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.stateviewer.StateGraphPanel;
+import lavit.stateviewer.StateNodeSet;
 
 public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>{
 	private StateGraphPanel panel;

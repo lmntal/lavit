@@ -56,12 +56,13 @@ import lavit.stateviewer.worker.StatePositionSet;
 public class StateNodeSet {
 
 	public StateNode parent;
-	private int generation;
+	public int generation;
 
 	private HashMap<Long,StateNode> allNode = new HashMap<Long,StateNode>();
 	private ArrayList<StateTransition> allTransition = new ArrayList<StateTransition>();
 
-	private StateNode startNode;
+	//private StateNode startNode;
+	private ArrayList<StateNode> startNode =  new ArrayList<StateNode>();
 	private ArrayList<StateNode> endNode =  new ArrayList<StateNode>();
 
 	private ArrayList<ArrayList<StateNode>> depthNode = new ArrayList<ArrayList<StateNode>>();
@@ -298,6 +299,7 @@ public class StateNodeSet {
 
 		for(StateNode node : nodes){
 			allNode.put(node.id, node);
+			node.parent = this;
 		}
 
 		for(StateNode node : nodes){
@@ -318,21 +320,55 @@ public class StateNodeSet {
 			}
 		}
 
-		startNode = nodes.get(0);
 		for(StateNode node : nodes){
-			if(node.depth<startNode.depth){
-				startNode = node;
-			}
 			if(node.getFromNodes().size()==0){
-				startNode = node;
-				break;
+				startNode.add(node);
 			}
-		}
-		for(StateNode node : nodes){
 			if(node.getToNodes().size()==0){
 				endNode.add(node);
 			}
 		}
+		if(startNode.size()==0){
+			for(StateNode node : nodes){
+				if(node.getToNodes().size()>0){
+					startNode.add(node);
+					break;
+				}
+			}
+		}
+
+		//startNodeから全て遷移できるかチェック
+		ArrayList<StateNode> aN = new ArrayList<StateNode>(allNode.values());
+		while(aN.size()>0){
+			LinkedList<StateNode> queue = new LinkedList<StateNode>();
+			allNodeUnMark();
+			for(StateNode node : startNode){
+				node.mark();
+				aN.remove(node);
+				queue.add(node);
+			}
+			while(!queue.isEmpty()){
+				StateNode node = queue.remove();
+				for(StateNode child : node.getToNodes()){
+					if(child.isMarked()){continue;}
+					child.mark();
+					aN.remove(child);
+					queue.add(child);
+				}
+			}
+			if(aN.size()>0){
+				StateNode maxToNode = aN.get(0);
+				for(StateNode n : aN){
+					if(n.getTransition().size()>maxToNode.getTransition().size()){
+						maxToNode = n;
+					}
+				}
+				startNode.add(maxToNode);
+			}
+		}
+
+
+
 
 		setTreeDepth();
 
@@ -468,12 +504,13 @@ public class StateNodeSet {
 		return drawNodeOrder;
 	}
 
-	public StateNode getStartNode(){
+	public ArrayList<StateNode> getStartNode(){
 		return startNode;
 	}
 
-	public void setStartNode(StateNode startNode){
-		this.startNode = startNode;
+	public void setStartNode(StateNode sn){
+		startNode.clear();
+		startNode.add(sn);
 	}
 
 	public ArrayList<StateNode> getEndNode(){
@@ -496,8 +533,8 @@ public class StateNodeSet {
 		for(StateNode node : endNode){
 			return node;
 		}
-		if(startNode!=null){
-			return startNode;
+		for(StateNode node : startNode){
+			return node;
 		}
 		return allNode.get(0);
 	}
@@ -610,7 +647,7 @@ public class StateNodeSet {
 	}
 
 	void removeInnerNodeData(StateNode removenode){
-		if(removenode==startNode){ startNode = null; }
+		startNode.remove(removenode);
 		endNode.remove(removenode);
 
 		allNode.remove(removenode.id);
@@ -624,12 +661,15 @@ public class StateNodeSet {
 
 		LinkedList<StateNode> queue = new LinkedList<StateNode>();
 
-		startNode.mark();
-		startNode.depth=0;
-		startNode.nth=0;
 		depthNode.add(0,new ArrayList<StateNode>());
-		depthNode.get(0).add(startNode);
-		queue.add(startNode);
+		int startNth = 0;
+		for(StateNode node : startNode){
+			node.mark();
+			node.depth=0;
+			node.nth=startNth++;
+			depthNode.get(0).add(node);
+			queue.add(node);
+		}
 
 		while(!queue.isEmpty()){
 			StateNode node = queue.remove();
@@ -644,7 +684,7 @@ public class StateNodeSet {
 
 	private void insertDepthNode(StateNode node,int depth){
 		while(depthNode.size()<=depth){
-			depthNode.add(depth,new ArrayList<StateNode>());
+			depthNode.add(depthNode.size(),new ArrayList<StateNode>());
 		}
 		ArrayList<StateNode> dnodes= depthNode.get(depth);
 
@@ -767,7 +807,7 @@ public class StateNodeSet {
 
 	private StateNode makeDummyNode(long id,int depth,String label,boolean accept,boolean inCycle,double y,boolean weak){
 
-		StateNode dummy = new StateNode(id);
+		StateNode dummy = new StateNode(id,this);
 		dummy.init("",label,accept,inCycle);
 		dummy.dummy = true;
 		dummy.weak = weak;
@@ -941,13 +981,13 @@ public class StateNodeSet {
 				endNode.add(node);
 			}
 		}
-		this.startNode = getNewNode(startNode.id);
+		this.startNode.add(getNewNode(startNode.id));
 	}
 
 	private StateNode getNewNode(long id){
 		StateNode node = allNode.get(id);
 		if(node==null){
-			node = new StateNode(id);
+			node = new StateNode(id,this);
 			allNode.put(id,node);
 		}
 		return node;

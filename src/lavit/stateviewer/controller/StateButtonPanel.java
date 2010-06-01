@@ -88,13 +88,14 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 
 	private JPanel transitionPanel = new JPanel();
 	private JButton transitionAbstraction = new JButton("Transition Abstraction");
+	private JButton selectAbstraction = new JButton("Select Abstraction");
 
 	private JComponent comps[] = {
 		posReset,adjustReset,adjust2Reset,adjust3Reset,allReset,
 		crossInfo,geneticAlgorithm,exchangeReset,exchangeDummyOnly,
 		dummy,showdummy,dummyInfo,dummyCentering,dummySmoothing,
 		dynamicModeling,stretchMove,autoCentering,
-		transitionAbstraction
+		transitionAbstraction,selectAbstraction
 	};
 
 	StateButtonPanel(StatePanel statePanel){
@@ -152,9 +153,11 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		dynamicPanel.add(autoCentering);
 		add(dynamicPanel);
 
-		transitionPanel.setLayout(new GridLayout(1,1));
+		transitionPanel.setLayout(new GridLayout(1,2));
 		transitionAbstraction.addActionListener(this);
 		transitionPanel.add(transitionAbstraction);
+		selectAbstraction.addActionListener(this);
+		transitionPanel.add(selectAbstraction);
 		add(transitionPanel);
 	}
 
@@ -243,6 +246,8 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		}else if(src==transitionAbstraction){
 			StateGraphPanel p = statePanel.stateGraphPanel;
 			new SelectStateTransitionRuleFrame(p,new StateTransitionAbstraction(p));
+		}else if(src==selectAbstraction){
+			statePanel.stateGraphPanel.selectNodeAbstraction();
 		}
 	}
 

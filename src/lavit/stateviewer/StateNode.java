@@ -85,7 +85,8 @@ public class StateNode implements Shape{
 	private ArrayList<StateTransition> toes;
 	private ArrayList<StateNode> fromNodes;
 
-	private StateNodeSet subset;
+	public StateNodeSet subset;
+	public StateNodeSet parent;
 
 	private boolean marked;
 	private boolean inFrame;
@@ -101,8 +102,9 @@ public class StateNode implements Shape{
 	public double dy;
 	public double ddy;
 
-	StateNode(long id){
+	StateNode(long id,StateNodeSet parent){
 		this.id = id;
+		this.parent = parent;
 	}
 
 	void init(String state,String label,boolean accept,boolean inCycle){
@@ -627,10 +629,37 @@ public class StateNode implements Shape{
 
 	void doubleClick(StateGraphPanel graphPanel){
 		if(subset==null){
-		TextFrame frame = new TextFrame(""+id,state);
+			new TextFrame(""+id,state);
 		}else{
 			graphPanel.init(subset, false);
 		}
+	}
+
+	void debugFrame(StateGraphPanel graphPanel){
+		StringBuffer buf = new StringBuffer();
+		buf.append("id:"+id+"\n");
+		buf.append("state:"+toString()+"\n");
+		buf.append("label:"+label+"\n");
+		buf.append("accept:"+accept+"\n");
+		buf.append("inCycle:"+inCycle+"\n");
+		buf.append("depth:"+depth+"\n");
+		buf.append("nth:"+nth+"\n");
+		buf.append("dummy:"+dummy+"\n");
+		buf.append("weak:"+weak+"\n");
+		buf.append("x:"+getX()+"\n");
+		buf.append("y:"+getY()+"\n");
+
+		buf.append("subset:"+(subset==null?"null":subset.size())+"\n");
+		buf.append("parent:"+(parent==null?"null":parent.size())+"\n");
+
+		buf.append("to:");
+		for(StateNode n : getToNodes()){ buf.append(n.id+", "); }
+		buf.append("\n");
+		buf.append("from:");
+		for(StateNode n : getFromNodes()){ buf.append(n.id+", "); }
+		buf.append("\n");
+
+		new TextFrame(""+id, buf.toString());
 	}
 
 	public String toString(){

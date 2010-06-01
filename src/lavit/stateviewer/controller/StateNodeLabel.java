@@ -38,6 +38,7 @@ package lavit.stateviewer.controller;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -57,18 +58,20 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 
 	private JTextField stateTextField;
 
-	private StateNode node;
-
 	public StateNodeLabel(){
 
 		setLayout(new BorderLayout());
+		setOpaque(false);
 
 		stateStatus = new JPanel();
 		stateStatus.setLayout(new GridLayout(1,2));
+		stateStatus.setOpaque(false);
 		stateNodenum = new JLabel();
+		stateNodenum.setOpaque(false);
 		stateNodenum.setHorizontalAlignment(JLabel.LEFT);
 		stateStatus.add(stateNodenum);
 		stateLabel = new JLabel();
+		stateLabel.setOpaque(false);
 		stateLabel.setHorizontalAlignment(JLabel.RIGHT);
 		stateStatus.add(stateLabel);
 		add(stateStatus, BorderLayout.NORTH);
@@ -83,7 +86,6 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 
 	public void loadFont(){
 		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
-		stateLabel.setFont(font);
 		stateTextField.setFont(font);
 		revalidate();
 	}
@@ -100,6 +102,33 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			stateNodenum.setText("");
 		}
 		stateTextField.setText(node.toString());
+	}
+
+	public void setNode(ArrayList<StateNode> nodes){
+		if(nodes.size()==1){
+			StateNode node = nodes.get(0);
+			if(node.hasSubset()){
+				stateNodenum.setText("Node: "+node.getSubset().size());
+			}else{
+				stateNodenum.setText("");
+			}
+			if(node.label.length()>0){
+				stateLabel.setText("Label: "+node.label);
+			}else{
+				stateLabel.setText("");
+			}
+			stateTextField.setText(node.toString());
+			stateTextField.setVisible(true);
+			setVisible(true);
+		}else if(nodes.size()>1){
+			stateNodenum.setText("Node: "+nodes.size());
+			stateLabel.setText("");
+			stateTextField.setText("");
+			stateTextField.setVisible(false);
+			setVisible(true);
+		}else{
+			setVisible(false);
+		}
 	}
 
 }

@@ -22,9 +22,10 @@ public class StateTransitionAbstraction implements StateTransitionCatcher {
 		while(true){
 
 			drawNodes.allNodeUnMark();
-			ArrayList<StateNode> nodes = new ArrayList<StateNode>(drawNodes.getAllNode());
+			LinkedList<StateNode> nodes = new LinkedList<StateNode>(drawNodes.getAllNode());
 			ArrayList<StateNode> transitionGroup = new ArrayList<StateNode>();
 			while(nodes.size()>0){
+
 				transitionGroup.clear();
 				LinkedList<StateNode> queue = new LinkedList<StateNode>();
 
@@ -34,8 +35,11 @@ public class StateTransitionAbstraction implements StateTransitionCatcher {
 				nodes.remove(nodes.get(0));
 
 				while(!queue.isEmpty()){
+
 					StateNode node = queue.remove();
-					for(StateNode n : node.getRuleNameGroupNodes(ruleName)){
+					ArrayList<StateNode> ns = node.getRuleNameGroupNodes(ruleName);
+
+					for(StateNode n : ns){
 						if(n.isMarked()){continue;}
 						queue.add(n);
 						transitionGroup.add(n);
@@ -43,6 +47,7 @@ public class StateTransitionAbstraction implements StateTransitionCatcher {
 						nodes.remove(n);
 					}
 				}
+
 				if(transitionGroup.size()>=2){
 					break;
 				}
@@ -51,6 +56,7 @@ public class StateTransitionAbstraction implements StateTransitionCatcher {
 			if(transitionGroup.size()<=1){ break; }
 
 			maker.makeNode(transitionGroup);
+
 		}
 
 		maker.end();

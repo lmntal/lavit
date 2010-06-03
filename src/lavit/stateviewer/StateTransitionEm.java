@@ -48,7 +48,7 @@ public class StateTransitionEm implements StateTransitionCatcher {
 	}
 
 	@Override
-	public void transitionCatch(String rule,ArrayList<StateTransition> trans) {
+	public void transitionCatch(Collection<String> rules, Collection<StateTransition> trans) {
 		StateNodeSet drawNodes = graphPanel.getDrawNodes();
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 

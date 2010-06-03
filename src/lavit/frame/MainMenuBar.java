@@ -58,6 +58,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
     private JMenuItem iOpen;
     private JMenuItem iSave;
     private JMenuItem iSaveAs;
+    private JMenuItem iSVOpen;
     private JMenuItem iExit;
 
     private JMenu edit;
@@ -115,6 +116,12 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         file.add(iSaveAs);
         iSaveAs.addActionListener(this);
         iSaveAs.setMnemonic(KeyEvent.VK_A);
+
+        file.addSeparator();
+
+        iSVOpen  = new JMenuItem(Lang.m[30]);
+        file.add(iSVOpen);
+        iSVOpen.addActionListener(this);
 
         file.addSeparator();
 
@@ -266,6 +273,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         	FrontEnd.mainFrame.editorPanel.fileSave();
         }else if(src == iSaveAs) {
         	FrontEnd.mainFrame.editorPanel.fileSaveAs();
+        }else if(src == iSVOpen){
+        	FrontEnd.mainFrame.toolTab.statePanel.loadFile();
         }else if(src == iExit) {
         	FrontEnd.frontEnd.exit();
         }else if(src == iCopy) {

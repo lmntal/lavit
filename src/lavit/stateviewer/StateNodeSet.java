@@ -46,6 +46,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import lavit.Env;
@@ -59,16 +60,16 @@ public class StateNodeSet {
 	public int generation;
 
 	private HashMap<Long,StateNode> allNode = new HashMap<Long,StateNode>();
-	private ArrayList<StateTransition> allTransition = new ArrayList<StateTransition>();
+	private LinkedHashSet<StateTransition> allTransition = new LinkedHashSet<StateTransition>();
 
 	//private StateNode startNode;
 	private ArrayList<StateNode> startNode =  new ArrayList<StateNode>();
 	private ArrayList<StateNode> endNode =  new ArrayList<StateNode>();
 
 	private ArrayList<ArrayList<StateNode>> depthNode = new ArrayList<ArrayList<StateNode>>();
-	private ArrayList<StateNode> drawNodeOrder = new ArrayList<StateNode>();
-	private ArrayList<StateTransition> drawTransitionOrder = new ArrayList<StateTransition>();
-	private ArrayList<StateNode> dummyNode = new ArrayList<StateNode>();
+	private LinkedHashSet<StateNode> drawNodeOrder = new LinkedHashSet<StateNode>();
+	private LinkedHashSet<StateTransition> drawTransitionOrder = new LinkedHashSet<StateTransition>();
+	private LinkedHashSet<StateNode> dummyNode = new LinkedHashSet<StateNode>();
 
 	final String stateMarkString = "States";
 	final String graphMarkString = "Transitions";
@@ -101,7 +102,6 @@ public class StateNodeSet {
 			temps.put(id,node);
 		}
 
-
 		// Transitions探し
 		for(;line<strs.length;++line){
 			if(strs[line].equals(graphMarkString)) break;
@@ -130,6 +130,8 @@ public class StateNodeSet {
 		//エラー
 		if(startNode==null) return false;
 
+
+
 		setNodeFrom(temps);
 
 		// temp -> state
@@ -138,9 +140,9 @@ public class StateNodeSet {
 		setTreeDepth();
 
 		resetOrder();
+		positionReset();
 
 		if(Env.is("SV_DUMMY")){
-			setFirstPositionReset();
 			setDummy();
 		}
 
@@ -269,8 +271,9 @@ public class StateNodeSet {
 
 		resetOrder();
 
+		positionReset();
+
 		if(Env.is("SV_DUMMY")){
-			setFirstPositionReset();
 			setDummy();
 		}
 
@@ -367,21 +370,48 @@ public class StateNodeSet {
 			}
 		}
 
-
-
-
 		setTreeDepth();
 
 		resetOrder();
+		positionReset();
 
 		if(Env.is("SV_DUMMY")){
-			setFirstPositionReset();
 			setDummy();
 		}
 
 		updateNodeLooks();
 
 		return true;
+	}
+
+	public void positionReset(){
+		double w = FrontEnd.mainFrame.toolTab.statePanel.stateGraphPanel.getWidth();
+		double h = FrontEnd.mainFrame.toolTab.statePanel.stateGraphPanel.getHeight();
+		double z;
+		double minLength = w/(getDepth()+1);
+		for(int i=0;i<getDepth();++i){
+			double d = h/(getSameDepthSize(i)+1);
+			if(d<minLength) minLength = d;
+		}
+		if(minLength/30>1){
+			z = minLength/30;
+		}else{
+			z = 1.0;
+		}
+
+		double xPosInterval;
+		xPosInterval = w/(getDepth()+1);
+		xPosInterval /= z;
+
+		double[] yPosInterval = new double[getDepth()];
+		for(int i=0;i<getDepth();++i){
+			yPosInterval[i] = h/(getSameDepthSize(i)+1);
+			yPosInterval[i] /= z;
+		}
+
+		for(StateNode node : getAllNode()){
+			node.resetLocation(xPosInterval,yPosInterval);
+		}
 	}
 
 	public String getDotString(){
@@ -513,15 +543,23 @@ public class StateNodeSet {
 		startNode.add(sn);
 	}
 
+	public void addStartNode(StateNode sn){
+		startNode.add(sn);
+	}
+
 	public ArrayList<StateNode> getEndNode(){
 		return endNode;
+	}
+
+	public void addEndNode(StateNode en){
+		endNode.add(en);
 	}
 
 	public ArrayList<ArrayList<StateNode>> getDepthNode(){
 		return depthNode;
 	}
 
-	public ArrayList<StateTransition> getAllTransition(){
+	public Collection<StateTransition> getAllTransition(){
 		return allTransition;
 	}
 
@@ -597,7 +635,12 @@ public class StateNodeSet {
 
 	public void removeDummy(){
 		while(dummyNode.size()>0){
-			removeNode(dummyNode.get(0));
+			StateNode dummy=null;
+			for(StateNode d : dummyNode){
+				dummy = d;
+				break;
+			}
+			removeNode(dummy);
 		}
 		updateNodeLooks();
 	}
@@ -681,17 +724,20 @@ public class StateNodeSet {
 				queue.add(child);
 			}
 		}
+
 	}
 
 	private void insertDepthNode(StateNode node,int depth){
+
 		while(depthNode.size()<=depth){
 			depthNode.add(depthNode.size(),new ArrayList<StateNode>());
 		}
 		ArrayList<StateNode> dnodes= depthNode.get(depth);
 
+		/*
 		int i;
 		for(i=0;i<dnodes.size();++i){
-			if(dnodes.get(i).getY()>node.getY()){
+			if(dnodes.get(i).getY()>=node.getY()){
 				break;
 			}
 		}
@@ -701,6 +747,29 @@ public class StateNodeSet {
 		node.nth = i;
 		for(;i<dnodes.size();++i){
 			dnodes.get(i).nth = i;
+		}
+		*/
+
+		dnodes.add(node);
+		node.depth = depth;
+		node.nth = dnodes.size()-1;
+	}
+
+	private class NodeYComparator implements Comparator<StateNode> {
+		public int compare(StateNode n1, StateNode n2) {
+			if(n1.getY()<n2.getY()){
+				return -1;
+			}else if(n1.getY()>n2.getY()){
+				return 1;
+			}else{
+				if(n1.id<n2.id){
+					return -1;
+				}else if(n1.id>n2.id){
+					return 1;
+				}else{
+					return 0;
+				}
+			}
 		}
 	}
 
@@ -789,6 +858,12 @@ public class StateNodeSet {
 			drawNodeOrder.add(dummy);
 			dummyNode.add(dummy);
 		}
+		for(ArrayList<StateNode> dnodes : depthNode){
+			Collections.sort(dnodes, new NodeYComparator());
+			for(int i=0;i<dnodes.size();++i){
+				dnodes.get(i).nth = i;
+			}
+		}
 
 	}
 
@@ -803,6 +878,13 @@ public class StateNodeSet {
 		if(trans!=null){
 			allTransition.remove(trans);
 			drawTransitionOrder.remove(trans);
+		}
+	}
+
+	void removeTransitions(LinkedList<StateTransition> transes){
+		if(transes!=null){
+			allTransition.removeAll(transes);
+			drawTransitionOrder.removeAll(transes);
 		}
 	}
 
@@ -1009,27 +1091,6 @@ public class StateNodeSet {
 	public void allNodeUnMark(){
 		for(StateNode node : getAllNode()){
 			node.unmark();
-		}
-	}
-
-	void setFirstPositionReset(){
-		double w = 100.0;
-		double h = 100.0;
-
-		double minLength = w/(getDepth()+1);
-		for(int i=0;i<getDepth();++i){
-			double d = h/(getSameDepthSize(i)+1);
-			if(d<minLength) minLength = d;
-		}
-
-		double xPosInterval = w/(getDepth()+1);
-		double[] yPosInterval = new double[getDepth()];
-		for(int i=0;i<getDepth();++i){
-			yPosInterval[i] = h/(getSameDepthSize(i)+1);
-		}
-
-		for(StateNode node : getAllNode()){
-			node.resetLocation(xPosInterval,yPosInterval);
 		}
 	}
 

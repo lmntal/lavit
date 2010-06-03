@@ -33,6 +33,7 @@
 <entry key="m27">Reboot</entry>
 <entry key="m28">LaViT Web Page</entry>
 <entry key="m29">General Setting</entry>
+<entry key="m30">Open StateViewer File</entry>
 
 <entry key="d0">Yes</entry>
 <entry key="d1">No</entry>
@@ -42,6 +43,7 @@
 <entry key="d5">file</entry>
 <entry key="d6">OK</entry>
 <entry key="d7">END</entry>
+<entry key="d8">Reverse</entry>
 
 <entry key="f0"> is already exists. Do you want to overwrite this file ?</entry>
 <entry key="f1">overwrite</entry>

@@ -1,6 +1,7 @@
 package lavit.stateviewer;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import lavit.Env;
 
@@ -9,6 +10,7 @@ public class StateAbstractionMaker {
 	private StateGraphPanel graphPanel;
 	StateNodeSet drawNodes;
 	boolean dummy;
+	long maxId;
 
 	public StateAbstractionMaker(StateGraphPanel graphPanel){
 		this.graphPanel = graphPanel;
@@ -18,15 +20,16 @@ public class StateAbstractionMaker {
 		Env.set("SV_DUMMY",false);
 		drawNodes.removeDummy();
 		graphPanel.selectNodeClear();
-	}
 
-	public void makeNode(ArrayList<StateNode> groupNodes){
-		long maxId = Long.MIN_VALUE;
+		maxId = Long.MIN_VALUE;
 		for(StateNode node : drawNodes.getAllNode()){
 			if(node.id>maxId){
 				maxId = node.id;
 			}
 		}
+	}
+
+	public void makeNode(ArrayList<StateNode> groupNodes){
 
 		long id = ++maxId;
 		boolean accept = false;
@@ -34,9 +37,12 @@ public class StateAbstractionMaker {
 		boolean start = false;
 		ArrayList<StateTransition> toes = new ArrayList<StateTransition>();
 		ArrayList<StateNode> fromNodes = new ArrayList<StateNode>();
+		LinkedList<StateTransition> removeTrans = new LinkedList<StateTransition>();
 
 		StateNode newNode = new StateNode(id, drawNodes);
 		for(StateNode node : groupNodes){
+			if(node.dummy){ continue; }
+
 			if(node.accept){ accept = true; }
 			if(node.inCycle){ inCycle = true; }
 			if(node.depth==0){ start = true; }
@@ -45,6 +51,7 @@ public class StateAbstractionMaker {
 
 			for(StateTransition t : node.getTransition()){
 				if(!groupNodes.contains(t.to)){
+
 					//新しいtransを追加
 					StateTransition existTrans = getInTransition(toes, t.to);
 					if(existTrans==null){
@@ -65,9 +72,11 @@ public class StateAbstractionMaker {
 					removeToes.add(t.to);
 					t.to.removeFromNode(node);
 				}
-				drawNodes.removeTransition(t);
+				removeTrans.add(t);
 			}
+
 			for(StateNode f : node.getFromNodes()){
+
 				StateTransition t =  f.getTransition(node);
 				if(!groupNodes.contains(f)){
 					//新しいfromを追加
@@ -79,8 +88,9 @@ public class StateAbstractionMaker {
 					removeFroms.add(f);
 					f.removeToNode(node);
 				}
-				drawNodes.removeTransition(t);
+				removeTrans.add(t);
 			}
+
 			for(StateNode to : removeToes){
 				node.removeToNode(to);
 			}
@@ -89,6 +99,8 @@ public class StateAbstractionMaker {
 			}
 			drawNodes.removeInnerNodeData(node);
 		}
+
+		drawNodes.removeTransitions(removeTrans);
 
 		newNode.init("","", accept, inCycle);
 
@@ -117,6 +129,7 @@ public class StateAbstractionMaker {
 
 		drawNodes.addNode(newNode);
 		if(start){ drawNodes.setStartNode(newNode); }
+		if(newNode.getToNodes().size()==0){ drawNodes.addEndNode(newNode); }
 	}
 
 	public void end(){

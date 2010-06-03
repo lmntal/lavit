@@ -78,7 +78,7 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 		frame = new ProgressFrame();
 	}
 
-	public void done() {
+	public void end() {
 		panel.autoCentering();
 		panel.setActive(true);
 		frame.dispose();
@@ -112,11 +112,12 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 							move = true;
 						}
 					}
-					if(isCancelled()){ return null; }
+					if(isCancelled()){ end(); return null; }
 				}
 			}
 		}
 
+		end();
 		return null;
 	}
 
@@ -167,7 +168,7 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 			Object src = e.getSource();
 			if(src==cancel){
 				if(!isDone()){
-					cancel(true);
+					cancel(false);
 				}
 			}
 		}

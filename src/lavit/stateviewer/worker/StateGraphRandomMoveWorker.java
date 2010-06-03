@@ -86,7 +86,7 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 		frame = new ProgressFrame();
 	}
 
-	public void done() {
+	public void end() {
 		panel.autoCentering();
 		panel.setActive(true);
 		frame.dispose();
@@ -146,6 +146,7 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 
 		panel.autoCentering();
 		frame.end();
+		end();
 		return null;
 	}
 
@@ -234,7 +235,7 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 			Object src = e.getSource();
 			if(src==end){
 				if(!isDone()){
-					cancel(true);
+					cancel(false);
 				}
 			}
 		}

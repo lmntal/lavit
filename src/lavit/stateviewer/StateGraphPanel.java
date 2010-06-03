@@ -178,9 +178,11 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			generalControlPanel.setVisible(false);
 		}
 
-		positionReset();
+		if(rootSet){
+			positionReset();
+		}
+		autoCentering();
 		setActive(true);
-		//adjustReset();
 	}
 
 	public void generationReset(){
@@ -338,54 +340,37 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	*/
 
 	public void positionReset(){
-		double w = (double)getWidth();
-		double h = (double)getHeight();
-
-		double minLength = w/(drawNodes.getDepth()+1);
-		for(int i=0;i<drawNodes.getDepth();++i){
-			double d = h/(drawNodes.getSameDepthSize(i)+1);
-			if(d<minLength) minLength = d;
-		}
-		if(minLength/30>1){
-			setZoom(minLength/30);
-		}else{
-			setZoom(1.0);
-		}
-
-		double xPosInterval;
-		xPosInterval = w/(drawNodes.getDepth()+1);
-		xPosInterval /= zoom;
-
-		double[] yPosInterval = new double[drawNodes.getDepth()];
-		for(int i=0;i<drawNodes.getDepth();++i){
-			yPosInterval[i] = h/(drawNodes.getSameDepthSize(i)+1);
-			yPosInterval[i] /= zoom;
-		}
-
-		for(StateNode node : drawNodes.getAllNode()){
-			node.resetLocation(xPosInterval,yPosInterval);
-		}
-		//cross = (new StateGraphExchangeWorker(this)).getAllCross();
-		autoCentering();
-		update();
+		drawNodes.positionReset();
 	}
 
 	public void adjustReset(){
 		StateGraphAdjustWorker worker = new StateGraphAdjustWorker(this);
-		worker.ready();
-		worker.execute();
+		if(drawNodes.size()<1000){
+			worker.atomic();
+		}else{
+			worker.ready();
+			worker.execute();
+		}
 	}
 
 	public void adjust2Reset(){
 		StateGraphAdjust2Worker worker = new StateGraphAdjust2Worker(this);
-		worker.ready();
-		worker.execute();
+		if(drawNodes.size()<1000){
+			worker.atomic();
+		}else{
+			worker.ready();
+			worker.execute();
+		}
 	}
 
 	public void adjust3Reset(){
 		StateGraphAdjust3Worker worker = new StateGraphAdjust3Worker(this);
-		worker.ready();
-		worker.execute();
+		if(drawNodes.size()<1000){
+			worker.atomic();
+		}else{
+			worker.ready();
+			worker.execute();
+		}
 	}
 
 	public void exchangeReset(){

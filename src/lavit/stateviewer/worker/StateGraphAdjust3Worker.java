@@ -68,21 +68,41 @@ public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 
 	private ProgressFrame frame;
 
+	private double xInterval;
+	private double yInterval;
+
 	public StateGraphAdjust3Worker(StateGraphPanel panel){
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
 	}
 
-	public void ready(){
-		panel.setActive(false);
-		frame = new ProgressFrame();
-		addPropertyChangeListener(frame);
+	public void atomic(){
+		ready(false);
+		doInBackground();
+		done();
 	}
 
-	public void done() {
+	public void ready(){
+		ready(true);
+	}
+
+	public void ready(boolean open){
+		panel.setActive(false);
+		if(open){
+			frame = new ProgressFrame();
+			addPropertyChangeListener(frame);
+		}
+	}
+
+	public void end() {
+		panel.autoCentering();
+		if(xInterval==0){ xInterval = (double)panel.getWidth()/(drawNodes.getDepth()+1)/panel.getZoom(); }
+		for(StateNode node : drawNodes.getAllNode()){
+			node.setPosition((node.depth+1)*xInterval,node.getY());
+		}
 		panel.autoCentering();
 		panel.setActive(true);
-		frame.dispose();
+		if(frame!=null) frame.dispose();
 	}
 
 	@Override
@@ -94,8 +114,8 @@ public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 
 		panel.setZoom(1.0);
 
-		double xInterval = 0;
-		double yInterval = Double.MAX_VALUE;
+		xInterval = 0;
+		yInterval = Double.MAX_VALUE;
 		for(int i=0;i<drawNodes.getDepth();++i){
 			double t = h/(drawNodes.getSameDepthSize(i)+1);
 			if(t<yInterval){
@@ -154,7 +174,7 @@ public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 			//progress更新
 			endNode += nodes.size();
 			setProgress(100*endNode/(drawNodes.size()*6));
-			if(isCancelled()){ return null; }
+			if(isCancelled()){ end(); return null; }
 
 			/*
 			//高さを取得し保存
@@ -240,7 +260,7 @@ public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 			//progress更新
 			endNode += nodes.size();
 			setProgress(100*endNode/(drawNodes.size()*6));
-			if(isCancelled()){ return null; }
+			if(isCancelled()){ end(); return null; }
 		}
 
 
@@ -276,7 +296,7 @@ public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 			//progress更新
 			endNode += nodes.size();
 			setProgress(100*endNode/(drawNodes.size()*6));
-			if(isCancelled()){ return null; }
+			if(isCancelled()){ end(); return null; }
 		}
 
 
@@ -325,7 +345,7 @@ public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 			//progress更新
 			endNode += nodes.size();
 			setProgress(100*endNode/(drawNodes.size()*6));
-			if(isCancelled()){ return null; }
+			if(isCancelled()){ end(); return null; }
 		}
 
 		//最深ノードからの遷移先平均値配置
@@ -360,7 +380,7 @@ public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 			//progress更新
 			endNode += nodes.size();
 			setProgress(100*endNode/(drawNodes.size()*6));
-			if(isCancelled()){ return null; }
+			if(isCancelled()){ end(); return null; }
 		}
 
 
@@ -396,19 +416,11 @@ public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 			//progress更新
 			endNode += nodes.size();
 			setProgress(100*endNode/(drawNodes.size()*6));
-			if(isCancelled()){ return null; }
+			if(isCancelled()){ end(); return null; }
 		}
 
-
-		panel.autoCentering();
-
-		if(xInterval==0){ xInterval = w/(drawNodes.getDepth()+1)/panel.getZoom(); }
-
-		for(StateNode node : drawNodes.getAllNode()){
-			node.setPosition((node.depth+1)*xInterval,node.getY());
-		}
-
-		frame.end();
+		if(frame!=null) frame.end();
+		end();
 		return null;
 	}
 
@@ -866,7 +878,7 @@ public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 			Object src = e.getSource();
 			if(src==cancel){
 				if(!isDone()){
-					cancel(true);
+					cancel(false);
 				}
 			}
 		}

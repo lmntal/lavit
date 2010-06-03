@@ -45,7 +45,7 @@ public class Lang {
 
 	static final String LANG_DIR = "lang";
 	static final String LANG_EXT = ".xml";
-	public static String[] m = new String[30];
+	public static String[] m = new String[40];
 	public static String[] d = new String[30];
 	public static String[] f = new String[30];
 	public static String[] w = new String[30];

@@ -38,8 +38,8 @@ package lavit.stateviewer;
 import java.util.ArrayList;
 
 public class StateTransition{
-	StateNode from;
-	StateNode to;
+	public StateNode from;
+	public StateNode to;
 	boolean em = false;
 
 	private ArrayList<String> rules = new ArrayList<String>();

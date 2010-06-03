@@ -35,29 +35,23 @@
 
 package lavit.stateviewer.worker;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
@@ -66,112 +60,148 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
-import lavit.stateviewer.StateGraphPanel;
-import lavit.stateviewer.StateNodeSet;
+import lavit.stateviewer.*;
 
-public class StateGraphStretchMoveWorker extends SwingWorker<Object,Integer>{
-	private StateGraphPanel panel;
-	private StateNodeSet drawNodes;
+public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>{
+	private StateGraphPanel graphPanel;
 
 	private ProgressFrame frame;
 
-	public StateGraphStretchMoveWorker(StateGraphPanel panel){
-		this.panel = panel;
-		this.drawNodes = panel.getDrawNodes();
+	private StateAbstractionMaker maker;
+	private Collection<String> ruleNames;
+	private Collection<StateTransition> trans;
+
+	public StateTransitionAbstractionWorker(StateGraphPanel panel){
+		this.graphPanel = panel;
 	}
 
-	public void ready(){
-		frame = new ProgressFrame();
-		frame.lastParam = (new StateGraphExchangeWorker(panel)).getAllCross();
+	public void atomic(Collection<String> ruleNames, Collection<StateTransition> trans){
+		ready(ruleNames, trans, false);
+		doInBackground();
+		done();
+	}
+
+	public void ready(Collection<String> ruleNames, Collection<StateTransition> trans){
+		ready(ruleNames, trans, true);
+	}
+
+	public void ready(Collection<String> ruleNames, Collection<StateTransition> trans, boolean open){
+		graphPanel.setActive(false);
+
+		if(open){
+			frame = new ProgressFrame();
+			addPropertyChangeListener(frame);
+		}
+
+		maker = new StateAbstractionMaker(graphPanel);
+		this.ruleNames = ruleNames;
+		this.trans = trans;
 	}
 
 	public void end() {
-		frame.dispose();
+		maker.end();
+		graphPanel.setActive(true);
+		if(frame!=null) frame.dispose();
 	}
 
 	@Override
 	protected Object doInBackground(){
-		int i = 0;
-		while(true){
-			if(i<10){
-				drawNodes.allScaleCenterMove(1/0.8, 0.9);
-			}else if(i<20){
-				drawNodes.allScaleCenterMove(0.8, 1/0.8);
-			}else if(i<30){
-				drawNodes.allScaleCenterMove(1/0.9, 0.9);
-			}else if(i<40){
-				drawNodes.allScaleCenterMove(0.9, 1/0.8);
-			}else if(i==40){
-				panel.autoCentering();
-				sleep(5000);
-			}else if(drawNodes.getHeight()*30<drawNodes.getNodesDimension().getHeight()&&i<200){
-				drawNodes.allScaleCenterMove(1, 0.95);
-			}else{
-				drawNodes.allScaleCenterMove(1.1, 1);
-				panel.autoCentering();
-				publish((new StateGraphExchangeWorker(panel)).getAllCross());
-				sleep(5000);
-				i=-1;
-				if(isCancelled()){ break; }
+
+		StateNodeSet drawNodes = graphPanel.getDrawNodes();
+
+		drawNodes.allNodeUnMark();
+		LinkedList<StateNode> nodes = new LinkedList<StateNode>();
+		for(StateTransition t : trans){
+			if(!t.from.isMarked()&&!t.from.dummy){
+				nodes.add(t.from);
+				t.from.mark();
 			}
-			i++;
-			panel.update();
-			sleep(50);
+			if(!t.to.isMarked()&&!t.to.dummy){
+				nodes.add(t.to);
+				t.to.mark();
+			}
 		}
-		panel.autoCentering();
-		frame.end();
+
+		int allNum = nodes.size();
+		drawNodes.allNodeUnMark();
+
+		while(true){
+
+			ArrayList<StateNode> transitionGroup = new ArrayList<StateNode>();
+			while(nodes.size()>0){
+
+				transitionGroup.clear();
+				LinkedList<StateNode> queue = new LinkedList<StateNode>();
+
+				queue.add(nodes.get(0));
+				transitionGroup.add(nodes.get(0));
+				nodes.get(0).mark();
+				nodes.remove(nodes.get(0));
+
+				while(!queue.isEmpty()){
+
+					StateNode node = queue.remove();
+
+					for(StateNode n : node.getRuleNameGroupNodes(ruleNames)){
+						if(n.isMarked()){continue;}
+						queue.add(n);
+						transitionGroup.add(n);
+						n.mark();
+						nodes.remove(n);
+					}
+				}
+
+				if(transitionGroup.size()>=2){
+					break;
+				}
+			}
+
+			if(transitionGroup.size()<=1){ break; }
+
+			maker.makeNode(transitionGroup);
+
+			setProgress((int)(100*(1-((double)nodes.size())/((double)allNum))));
+			if(isCancelled()){ end();return null; }
+
+		}
+
+		if(frame!=null) frame.end();
 		end();
 		return null;
 	}
 
-	private void sleep(int msec){
-		if(isCancelled()) return;
-		try {
-			Thread.sleep(msec);
-		} catch (InterruptedException e) {
-			FrontEnd.printException(e);
+	StateTransition getInTransition(ArrayList<StateTransition> toes,StateNode toNode){
+		for(StateTransition trans : toes){
+			if(trans.to==toNode){
+				return trans;
+			}
 		}
+		return null;
 	}
 
-	@Override
-    protected void process(List<Integer> chunks) {
-        for (int number : chunks) {
-            frame.setParam(number);
-        }
-    }
-
-	private class ProgressFrame extends JDialog implements ActionListener {
+	private class ProgressFrame extends JDialog implements PropertyChangeListener,ActionListener {
 		private JPanel panel;
-		private JLabel label;
-		private JButton end;
-
-		private int paramNum = 0;
-		private int lastParam = -1;
-		private ArrayList<Integer> params = new ArrayList<Integer>();
+		private JProgressBar bar;
+		private JButton cancel;
 
 		private ProgressFrame(){
 			panel = new JPanel();
 
-			panel.setLayout(new BorderLayout());
+			bar = new JProgressBar(0,100);
+			bar.setStringPainted(true);
+			panel.add(bar);
 
-			label = new JLabel("");
-			label.setHorizontalAlignment(JLabel.CENTER);
-			panel.add(label, BorderLayout.NORTH);
-
-			end = new JButton(Lang.d[7]);
-			end.addActionListener(this);
-			panel.add(end, BorderLayout.SOUTH);
+			cancel = new JButton(Lang.d[2]);
+			cancel.addActionListener(this);
+			panel.add(cancel);
 
 			add(panel);
 
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			setTitle("Stretch Move");
+			setTitle("Transition Abstraction");
 			setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 			setAlwaysOnTop(true);
 			setResizable(false);
-
-			label.setText(0+" : cross = "+0);
-			label.setPreferredSize(new Dimension(160,20));
 
 	        pack();
 	        setLocationRelativeTo(panel);
@@ -180,24 +210,24 @@ public class StateGraphStretchMoveWorker extends SwingWorker<Object,Integer>{
 		}
 
 		public void end(){
+			bar.setValue(100);
 		}
 
-		public void setParam(int param){
-			paramNum++;
-			params.add(param);
-			int s = param-lastParam;
-			label.setText(paramNum+" : cross = "+param+(lastParam>=0?" ("+(s>=0?"+":"")+s+")":""));
-			lastParam = param;
-			repaint();
+		public void propertyChange(PropertyChangeEvent evt) {
+			if ("progress".equals(evt.getPropertyName())) {
+				bar.setValue((Integer)evt.getNewValue());
+			}
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
-			if(src==end){
+			if(src==cancel){
 				if(!isDone()){
 					cancel(false);
 				}
 			}
 		}
 	}
+
+
 }

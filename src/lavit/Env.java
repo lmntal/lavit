@@ -43,6 +43,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -354,6 +356,44 @@ public class Env {
 
     static public boolean isWindows(){
     	return File.pathSeparatorChar==';';
+    }
+
+
+    static HashMap<Integer,Long> watchNowTimes = new HashMap<Integer,Long>();
+    static HashMap<Integer,Long> watchSumTimes = new HashMap<Integer,Long>();
+
+    static public void startWatch(int key){
+    	watchNowTimes.put(key, System.currentTimeMillis());
+    }
+
+    static public void stopWatch(int key){
+    	long t;
+    	if(watchNowTimes.containsKey(key)){
+    		t = System.currentTimeMillis() - watchNowTimes.get(key);
+    	}else{
+    		t = 0;
+    	}
+    	if(watchSumTimes.containsKey(key)){
+    		long sum = watchSumTimes.get(key);
+    		watchSumTimes.put(key, sum+t);
+    	}else{
+    		watchSumTimes.put(key, t);
+    	}
+    }
+
+    static public void dumpWatch(){
+    	DecimalFormat f = new DecimalFormat("####.##");
+    	if(watchSumTimes.size()>0){
+    		System.out.println("---- watch = "+watchSumTimes.size()+" ----");
+    	}
+    	for(int key : watchSumTimes.keySet()){
+    		double t = watchSumTimes.get(key)/1000.0;
+    		System.out.println("watch[" + key + "] : " + f.format(t));
+    	}
+    	if(watchSumTimes.size()>0){
+    		System.out.println();
+    	}
+    	watchSumTimes.clear();
     }
 
 }

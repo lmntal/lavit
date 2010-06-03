@@ -80,7 +80,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 		addPropertyChangeListener(frame);
 	}
 
-	public void done() {
+	public void end() {
 		panel.autoCentering();
 		panel.setActive(true);
 		frame.dispose();
@@ -98,13 +98,13 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 
 		//前から後ろへ
 		res = reduction(depthNode.get(0).size(), 1, depthNode.size(), -1, 0);
-		if(!res) return null;
+		if(!res){ end(); return null; }
 		int rightNum = getAllCross();
 		StatePositionSet right = new StatePositionSet(drawNodes);
 
 		//後ろから前へ
 		res = reduction(depthNode.get(depthNode.size()-1).size(), depthNode.size()-2, -1, 1, 50);
-		if(!res) return null;
+		if(!res){ end(); return null; }
 		int leftNum = getAllCross();
 
 		if(originalNum<Math.min(rightNum, leftNum)){
@@ -118,6 +118,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 		//System.out.println((new Date()));
 
 		frame.end();
+		end();
 		return null;
 	}
 
@@ -305,7 +306,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 			Object src = e.getSource();
 			if(src==cancel){
 				if(!isDone()){
-					cancel(true);
+					cancel(false);
 				}
 			}
 		}

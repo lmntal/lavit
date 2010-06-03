@@ -124,7 +124,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 	private JMenu fileSubmenu = new JMenu("File");
 	private JMenuItem dotFile = new JMenuItem("Save Dot File");
 	private JMenuItem saveSlimOutput = new JMenuItem("Save Slim Output File");
-	private JMenuItem loadSlimOutput = new JMenuItem("Load Slim Output File");
+	//private JMenuItem loadSlimOutput = new JMenuItem("Load Slim Output File");
 
 	private JMenuItem updateDefaultYOrder = new JMenuItem("Update Default Y Order");
 	private JMenuItem allReset = new JMenuItem("All Reset");
@@ -322,8 +322,8 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 		saveSlimOutput.addActionListener(this);
 		fileSubmenu.add(saveSlimOutput);
 
-		loadSlimOutput.addActionListener(this);
-		fileSubmenu.add(loadSlimOutput);
+		//loadSlimOutput.addActionListener(this);
+		//fileSubmenu.add(loadSlimOutput);
 
 		add(fileSubmenu);
 		addSeparator();
@@ -388,6 +388,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 			graphPanel.searchReset();
 		}else if(src==posReset){
 			graphPanel.positionReset();
+			graphPanel.autoCentering();
 		}else if(src==adjustReset){
 			graphPanel.adjustReset();
 		}else if(src==adjust2Reset){
@@ -492,11 +493,6 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 			File file = chooseOpenFile();
 			if(file!=null){
 				graphPanel.statePanel.savaFile(file);
-			}
-		}else if(src==loadSlimOutput){
-			File file = chooseOpenFile();
-			if(file!=null){
-				graphPanel.statePanel.loadFile(file);
 			}
 		}else if(src==allReset){
 			graphPanel.statePanel.reset();

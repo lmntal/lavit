@@ -53,6 +53,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -384,17 +387,29 @@ public class StateNode implements Shape{
 		return toNodes;
 	}
 
-	ArrayList<StateNode> getRuleNameGroupNodes(String ruleName){
-		ArrayList<StateNode> nodes = new ArrayList<StateNode>();
+	public Collection<StateNode> getRuleNameGroupNodes(String ruleName){
+		HashSet<StateNode> nodes = new HashSet<StateNode>();
 		for(StateTransition t : toes){
 			if(t.getRules().contains(ruleName)){
 				nodes.add(t.to);
 			}
 		}
 		for(StateNode from : fromNodes){
-			if(from.getTransition(this).getRules().contains(ruleName)){
-				nodes.add(from);
+			try{
+				if(from.getTransition(this).getRules().contains(ruleName)){
+					nodes.add(from);
+				}
+			}catch(Exception e){
+				FrontEnd.printException(e);
 			}
+		}
+		return nodes;
+	}
+
+	public Collection<StateNode> getRuleNameGroupNodes(Collection<String> ruleNames){
+		HashSet<StateNode> nodes = new HashSet<StateNode>();
+		for(String ruleName : ruleNames){
+			nodes.addAll(getRuleNameGroupNodes(ruleName));
 		}
 		return nodes;
 	}

@@ -105,6 +105,7 @@ public class FrontEnd {
 		if(!mainFrame.editorPanel.closeFile()){return;}
 		mainFrame.exit();
 		Env.save();
+		Env.dumpWatch();
 		System.out.println("LaViT end.");
 		System.exit(0);
 	}
@@ -125,6 +126,7 @@ public class FrontEnd {
 		javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
 			mainFrame.toolTab.systemPanel.logPanel.printException(e);
 		}});
+		e.printStackTrace();
 	}
 
 	static public void sleep(long millis){

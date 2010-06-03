@@ -173,6 +173,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 
 		if(src==posReset){
 			statePanel.stateGraphPanel.positionReset();
+			statePanel.stateGraphPanel.autoCentering();
 		}else if(src==adjustReset){
 			statePanel.stateGraphPanel.adjustReset();
 		}else if(src==adjust2Reset){

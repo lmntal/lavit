@@ -35,6 +35,8 @@
 
 package lavit.stateviewer.controller;
 
+import java.awt.BorderLayout;
+import java.awt.Checkbox;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -51,6 +53,7 @@ import java.util.Set;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -65,10 +68,16 @@ import lavit.frame.ChildWindowListener;
 import lavit.stateviewer.*;
 import lavit.util.StateTransitionCatcher;
 
-public class SelectStateTransitionRuleFrame extends JFrame {
+public class SelectStateTransitionRuleFrame extends JFrame implements ActionListener {
 	private StateTransitionCatcher catcher;
 
-	private SelectPanel panel;
+	private JPanel panel;
+	private SelectPanel rulePanel;
+
+	private JPanel btnPanel;
+	private JButton ok;
+	private JButton rev;
+
 	private boolean end;
 	private HashMap<String,ArrayList<StateTransition>> rules = new HashMap<String,ArrayList<StateTransition>>();
 
@@ -91,7 +100,26 @@ public class SelectStateTransitionRuleFrame extends JFrame {
         setAlwaysOnTop(true);
         setResizable(false);
 
-        panel = new SelectPanel(this);
+        panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
+        rulePanel = new SelectPanel();
+        panel.add(rulePanel, BorderLayout.CENTER);
+
+
+        btnPanel =  new JPanel();
+        btnPanel.setLayout(new GridLayout(1,2));
+
+        ok = new JButton(Lang.d[6]);
+        ok.addActionListener(this);
+        btnPanel.add(ok);
+
+        rev = new JButton(Lang.d[8]);
+        rev.addActionListener(this);
+        btnPanel.add(rev);
+
+        panel.add(btnPanel, BorderLayout.SOUTH);
+
         add(panel);
 
         addWindowListener(new ChildWindowListener(this));
@@ -103,6 +131,20 @@ public class SelectStateTransitionRuleFrame extends JFrame {
         end = false;
 	}
 
+	public void actionPerformed(ActionEvent e) {
+		Object src = e.getSource();
+		if(src==ok){
+			ArrayList<StateTransition> trans = new ArrayList<StateTransition>();
+			for(String ruleName : rulePanel.getSelectedRuleNames()){
+				trans.addAll(rules.get(ruleName));
+			}
+			catcher.transitionCatch(rulePanel.getSelectedRuleNames(), trans);
+			dispose();
+		}else if(src==rev){
+			rulePanel.selectReverse();
+		}
+	}
+
 	public boolean isEnd(){
 		return end;
 	}
@@ -111,12 +153,10 @@ public class SelectStateTransitionRuleFrame extends JFrame {
 		end = true;
 	}
 
-	private class SelectPanel extends JPanel implements ActionListener {
-		private JFrame frame;
-		private JButton[] ruleButtons;
+	private class SelectPanel extends JPanel {
+		private JCheckBox[] ruleCheckBoxes;
 
-		SelectPanel(JFrame frame){
-			this.frame = frame;
+		SelectPanel(){
 
 			//ルール名の集合
 			ArrayList<String> rs = new ArrayList<String>(rules.keySet());
@@ -124,11 +164,10 @@ public class SelectStateTransitionRuleFrame extends JFrame {
 
 			setLayout(new GridLayout(rs.size(),2));
 
-			ruleButtons = new JButton[rs.size()];
+			ruleCheckBoxes = new JCheckBox[rs.size()];
 			for(int i=0;i<rs.size();++i){
-				ruleButtons[i] = new JButton(rs.get(i));
-				ruleButtons[i].addActionListener(this);
-				add(ruleButtons[i]);
+				ruleCheckBoxes[i] = new JCheckBox(rs.get(i));
+				add(ruleCheckBoxes[i]);
 
 				int c = 0;
 				for(StateTransition t : rules.get(rs.get(i))){
@@ -145,12 +184,20 @@ public class SelectStateTransitionRuleFrame extends JFrame {
 
 		}
 
-		public void actionPerformed(ActionEvent e) {
-			Object src = e.getSource();
-			String rule = ((JButton)src).getText();
-			ArrayList<StateTransition> trans = rules.get(rule);
-			catcher.transitionCatch(rule,trans);
-			frame.dispose();
+		ArrayList<String> getSelectedRuleNames(){
+			ArrayList<String> ruleNames = new ArrayList<String>();
+			for(JCheckBox cb : ruleCheckBoxes){
+				if(cb.isSelected()){
+					ruleNames.add(cb.getText());
+				}
+			}
+			return ruleNames;
+		}
+
+		void selectReverse(){
+			for(JCheckBox cb : ruleCheckBoxes){
+				cb.setSelected(!cb.isSelected());
+			}
 		}
 
 	}

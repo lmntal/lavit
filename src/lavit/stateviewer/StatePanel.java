@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
 import lavit.*;
@@ -72,7 +73,7 @@ public class StatePanel extends JPanel{
 
 	public void start(String str,boolean ltl){
 
-		//System.out.println("SV  _START="+System.currentTimeMillis());
+		FrontEnd.println("(StateViewer) parsing.");
 
 		originalString = str;
 		ltlMode = ltl;
@@ -103,7 +104,7 @@ public class StatePanel extends JPanel{
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsolutePath())));
 			writer.write(originalString);
 			writer.close();
-			FrontEnd.println("(StateViewer) save "+file.getName()+" ]");
+			FrontEnd.println("(StateViewer) save [ "+file.getName()+" ]");
 		} catch (IOException e) {
 			FrontEnd.printException(e);
 		}
@@ -118,11 +119,39 @@ public class StatePanel extends JPanel{
 				buf.append("\n" + strLine);
 			}
 			reader.close();
-			FrontEnd.println("(StateViewer) load "+file.getName()+" ]");
-			start(buf.toString(),false);
+			FrontEnd.println("(StateViewer) load [ "+file.getName()+" ]");
+
+			final String str = buf.toString();
+			(new Thread(new Runnable() { public void run() {
+				start(str, false);
+			}})).start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	public void loadFile(){
+		File file = chooseOpenFile();
+		if(file!=null){
+			loadFile(file);
+		}
+	}
+
+	private File chooseOpenFile(){
+		String chooser_dir = Env.get("SV_FILE_LAST_CHOOSER_DIR");
+		if(chooser_dir==null){
+			chooser_dir=new File("demo").getAbsolutePath();
+		}else if(!new File(chooser_dir).exists()&&new File("demo").exists()){
+			chooser_dir=new File("demo").getAbsolutePath();
+		}
+		JFileChooser jfc = new JFileChooser(chooser_dir);
+		int r = jfc.showOpenDialog(FrontEnd.mainFrame);
+		if (r != JFileChooser.APPROVE_OPTION) {
+			return null;
+		}
+		File file = jfc.getSelectedFile();
+		Env.set("SV_FILE_LAST_CHOOSER_DIR",file.getParent());
+		return file;
 	}
 
 	public boolean isLtl(){

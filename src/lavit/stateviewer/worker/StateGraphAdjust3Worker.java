@@ -419,6 +419,7 @@ public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 			if(isCancelled()){ end(); return null; }
 		}
 
+
 		if(frame!=null) frame.end();
 		end();
 		return null;

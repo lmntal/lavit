@@ -45,6 +45,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -75,17 +76,17 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 		this.graphPanel = panel;
 	}
 
-	public void atomic(Collection<String> ruleNames, Collection<StateTransition> trans){
-		ready(ruleNames, trans, false);
+	public void atomic(Collection<String> ruleNames){
+		ready(ruleNames, false);
 		doInBackground();
 		done();
 	}
 
-	public void ready(Collection<String> ruleNames, Collection<StateTransition> trans){
-		ready(ruleNames, trans, true);
+	public void ready(Collection<String> ruleNames){
+		ready(ruleNames, true);
 	}
 
-	public void ready(Collection<String> ruleNames, Collection<StateTransition> trans, boolean open){
+	public void ready(Collection<String> ruleNames, boolean open){
 		graphPanel.setActive(false);
 
 		if(open){
@@ -93,9 +94,19 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 			addPropertyChangeListener(frame);
 		}
 
-		maker = new StateAbstractionMaker(graphPanel);
+		this.maker = new StateAbstractionMaker(graphPanel);
 		this.ruleNames = ruleNames;
-		this.trans = trans;
+		this.trans = new LinkedHashSet<StateTransition>();
+
+		//ダミーが含まれるため再構築
+		for(StateTransition t : graphPanel.getDrawNodes().getAllTransition()){
+			rule: for(String r : t.getRules()){
+				if(ruleNames.contains(r)){
+					trans.add(t);
+					break rule;
+				}
+			}
+		}
 	}
 
 	public void end() {
@@ -112,11 +123,11 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 		drawNodes.allNodeUnMark();
 		LinkedList<StateNode> nodes = new LinkedList<StateNode>();
 		for(StateTransition t : trans){
-			if(!t.from.isMarked()&&!t.from.dummy){
+			if(!t.from.isMarked()){
 				nodes.add(t.from);
 				t.from.mark();
 			}
-			if(!t.to.isMarked()&&!t.to.dummy){
+			if(!t.to.isMarked()){
 				nodes.add(t.to);
 				t.to.mark();
 			}
@@ -130,6 +141,7 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 			ArrayList<StateNode> transitionGroup = new ArrayList<StateNode>();
 			while(nodes.size()>0){
 
+				//drawNodes.allNodeUnMark();
 				transitionGroup.clear();
 				LinkedList<StateNode> queue = new LinkedList<StateNode>();
 

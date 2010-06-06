@@ -35,11 +35,11 @@ public class StateGeneralControlPanel extends JPanel implements ActionListener {
 	}
 
 	public void updateLabel(StateNodeSet nodes){
-		StateNode node = nodes.parent;
+		StateNode node = nodes.parentNode;
 		String str = "";
 		while(node!=null){
 			str = node.id + (str.length()>0?" -> ":"") + str;
-			node = node.parent.parent;
+			node = node.parentSet.parentNode;
 		}
 		ancestors.setText(str);
 	}

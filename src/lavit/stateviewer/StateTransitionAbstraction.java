@@ -22,9 +22,9 @@ public class StateTransitionAbstraction implements StateTransitionCatcher {
 
 		StateTransitionAbstractionWorker worker = new StateTransitionAbstractionWorker(graphPanel);
 		if(trans.size()<500){
-			worker.atomic(rules, trans);
+			worker.atomic(rules);
 		}else{
-			worker.ready(rules, trans);
+			worker.ready(rules);
 			worker.execute();
 		}
 

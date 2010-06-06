@@ -97,7 +97,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			stateLabel.setText("");
 		}
 		if(node.hasSubset()){
-			stateNodenum.setText("Node: "+node.getSubset().size());
+			stateNodenum.setText("Node: "+node.getChildSet().size());
 		}else{
 			stateNodenum.setText("");
 		}
@@ -108,7 +108,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 		if(nodes.size()==1){
 			StateNode node = nodes.get(0);
 			if(node.hasSubset()){
-				stateNodenum.setText("Node: "+node.getSubset().size());
+				stateNodenum.setText("Node: "+node.getChildSet().size());
 			}else{
 				stateNodenum.setText("");
 			}

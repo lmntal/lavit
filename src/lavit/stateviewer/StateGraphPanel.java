@@ -67,9 +67,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -171,11 +174,11 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		this.lastPoint = null;
 
-		if(nodes.generation>0){
+		if(nodes.parentNode==null){
+			generalControlPanel.setVisible(false);
+		}else{
 			generalControlPanel.setVisible(true);
 			generalControlPanel.updateLabel(nodes);
-		}else{
-			generalControlPanel.setVisible(false);
 		}
 
 		if(rootSet){
@@ -185,13 +188,20 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		setActive(true);
 	}
 
+	public void init(StateNodeSet nodes, boolean rootSet, StateNode selectNode){
+		init(nodes, rootSet);
+		if(nodes.getAllNode().contains(selectNode)){
+			selectNodes.add(selectNode);
+		}
+	}
+
 	public void generationReset(){
 		init(rootDrawNodes, false);
 	}
 
 	public void generationUp(){
-		if(drawNodes.parent!=null){
-			init(drawNodes.parent.parent, false);
+		if(drawNodes.parentNode!=null){
+			init(drawNodes.parentNode.parentSet, false, drawNodes.parentNode);
 		}
 	}
 
@@ -536,7 +546,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		for(StateNode node : drawNodes.getAllNode()){
 			if(node.isMatch(str)){
-				drawNodes.setOrderEnd(node);
+				drawNodes.setLastOrder(node);
 				node.weak = false;
 				node.updateLooks();
 				match++;
@@ -586,7 +596,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				for(String s: strs){
 					long id = Long.parseLong(s.substring(s.indexOf("(")+1,s.indexOf(")")));
 					StateNode node = drawNodes.get(id);
-					drawNodes.setOrderEnd(node);
+					drawNodes.setLastOrder(node);
 					node.weak = false;
 					node.updateLooks();
 					match++;
@@ -603,7 +613,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 	public void searchShortCycle(){
 		ArrayList<StateNode> cycles = new ArrayList<StateNode>();
-		StateNode node = drawNodes.getStartNode().get(0);
+		StateNode node = drawNodes.getStartNodeOne();
 		for(StateNode sn : drawNodes.getStartNode()){
 			if(sn.inCycle){
 				node = sn;
@@ -686,11 +696,11 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		}
 
 		//ループ中以外は不受理化
-		for(StateNode n : drawNodes.getAllNode()){
+		for(StateNode n : new LinkedList<StateNode>(drawNodes.getAllNode())){
 			if(loopNodes.contains(n)){
 				n.inCycle = true;
 				n.weak = false;
-				drawNodes.setOrderEnd(n);
+				drawNodes.setLastOrder(n);
 			}else{
 				n.inCycle = false;
 				n.weak = true;
@@ -707,7 +717,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			node.weak = false;
 			node.setEmToNode(tn,true);
 			node.updateLooks();
-			drawNodes.setOrderEnd(node);
+			drawNodes.setLastOrder(node);
 			tn = node;
 			node = node.getOneFromNode();
 		}
@@ -847,7 +857,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		//描写対象の決定
 		double minX=-10/zoom,maxX=(getWidth()+10)/zoom;
 		double minY=-10/zoom,maxY=(getHeight()+10)/zoom;
-		for(StateNode node : drawNodes.getAllNodeDrawOrder()){
+		for(StateNode node : drawNodes.getAllNode()){
 			node.setInFrame(false);
 			if(minX<node.getX()&&node.getX()<maxX&&minY<node.getY()&&node.getY()<maxY){
 				node.setInFrame(true);
@@ -857,13 +867,55 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		g2.scale(zoom,zoom);
 
 		//初期状態の矢印の描写
-		drawStartArrow(g2);
+		if(!Env.is("SV_SHOWOUTTRANS")||drawNodes.getAllOutTransition().size()==0){
+			drawStartArrow(g2);
+		}
+
+		if(Env.is("SV_SHOWOUTTRANS")){
+			g2.setColor(Color.gray);
+			drawNodes.updateOutTransition();
+
+			Collection<StateNode> all = drawNodes.getAllNode();
+			HashMap<StateNode,LinkedHashSet<StateNode>> outFrom = new HashMap<StateNode,LinkedHashSet<StateNode>>();
+			HashMap<StateNode,LinkedHashSet<StateNode>> outTo = new HashMap<StateNode,LinkedHashSet<StateNode>>();
+			for(StateTransition t : drawNodes.getAllOutTransition()){
+				if(!all.contains(t.from)&&all.contains(t.to)){
+					if(!outFrom.containsKey(t.from)){
+						outFrom.put(t.from, new LinkedHashSet<StateNode>());
+					}
+					outFrom.get(t.from).add(t.to);
+				}
+				if(all.contains(t.from)&&!all.contains(t.to)){
+					if(!outTo.containsKey(t.to)){
+						outTo.put(t.to, new LinkedHashSet<StateNode>());
+					}
+					outTo.get(t.to).add(t.from);
+				}
+			}
+			int i=2;
+			for(StateNode from : outFrom.keySet()){
+				double y = (getHeight()/zoom)*((double)i/(double)(outFrom.size()+2));
+				for(StateNode to : outFrom.get(from)){
+					drawNodeArrow(g2,0,y,0,to.getX(),to.getY(),to.getRadius(),5);
+				}
+				i++;
+			}
+			i=2;
+			for(StateNode to : outTo.keySet()){
+				double y = (getHeight()/zoom)*((double)i/(double)(outTo.size()+2));
+				for(StateNode from : outTo.get(to)){
+					drawNodeArrow(g2,from.getX(),from.getY(),from.getRadius(),getWidth()/zoom,y,0,5);
+				}
+				i++;
+			}
+
+		}
 
 		//線の描写
 		//for(StateNode node : drawNodes.getAllNodeDrawOrder()){
 		//	drawArrow(g2,node);
 		//}
-		for(StateTransition t : drawNodes.getAllTransitionDrawOrder()){
+		for(StateTransition t : drawNodes.getAllTransition()){
 			drawTransition(g2,t);
 		}
 
@@ -882,7 +934,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		*/
 
 		//ノードの描写
-		for(StateNode node : drawNodes.getAllNodeDrawOrder()){
+		for(StateNode node : drawNodes.getAllNode()){
 			drawNode(g2,node);
 		}
 
@@ -911,18 +963,18 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	private void drawStartArrow(Graphics2D g2){
-		for(StateNode node : drawNodes.getStartNode()){
-			if(node==null){ continue; }
-			if(!node.isInFrame()){ continue; }
+		if(drawNodes.getStartNode().size()!=1){ return; }
 
-			if(node.weak){
-				g2.setColor(Color.lightGray);
-			}else{
-				g2.setColor(Color.black);
-			}
+		StateNode node = drawNodes.getStartNodeOne();
+		if(!node.isInFrame()){ return; }
 
-			drawNodeArrow(g2,node.getX()-30,node.getY(),node.getRadius(),node.getX()-7,node.getY(),node.getRadius(),5);
+		if(node.weak){
+			g2.setColor(Color.lightGray);
+		}else{
+			g2.setColor(Color.black);
 		}
+
+		drawNodeArrow(g2,node.getX()-30,node.getY(),node.getRadius(),node.getX()-7,node.getY(),node.getRadius(),5);
 	}
 
 	private void drawArrow(Graphics2D g2,StateNode node){
@@ -1051,7 +1103,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			if(from.dummy){
 				while(from.dummy){
 					to = from;
-					from = from.getFromNodes().get(0);
+					from = from.getFromNode();
 				}
 				while(to.dummy){
 					drawNodeLine(g2,from.getX(),from.getY(),from.getRadius(),to.getX(),to.getY(),to.getRadius());
@@ -1399,7 +1451,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				double maxX = Math.max(p1.x, p2.x);
 				double maxY = Math.max(p1.y, p2.y);
 				selectNodes.clear();
-				for(StateNode node : drawNodes.getAllNodeDrawOrder()){
+				for(StateNode node : drawNodes.getAllNode()){
 					if(minX<node.getX()&&node.getX()<maxX&&minY<node.getY()&&node.getY()<maxY){
 						selectNodes.add(node);
 					}

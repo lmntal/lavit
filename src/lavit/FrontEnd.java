@@ -104,8 +104,8 @@ public class FrontEnd {
 	static public void exit(){
 		if(!mainFrame.editorPanel.closeFile()){return;}
 		mainFrame.exit();
+		if(Env.is("WATCH_DUMP")) Env.dumpWatch();
 		Env.save();
-		Env.dumpWatch();
 		System.out.println("LaViT end.");
 		System.exit(0);
 	}

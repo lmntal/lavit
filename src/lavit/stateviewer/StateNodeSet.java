@@ -46,6 +46,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
@@ -56,35 +57,46 @@ import lavit.stateviewer.worker.StatePositionSet;
 
 public class StateNodeSet {
 
-	public StateNode parent;
+	public StateNode parentNode;
 	public int generation;
+	public long maxNodeId;
 
-	private HashMap<Long,StateNode> allNode = new HashMap<Long,StateNode>();
+	private LinkedHashMap<Long,StateNode> allNode = new LinkedHashMap<Long,StateNode>();
 	private LinkedHashSet<StateTransition> allTransition = new LinkedHashSet<StateTransition>();
+	private LinkedHashSet<StateTransition> outTrans = new LinkedHashSet<StateTransition>();
 
-	//private StateNode startNode;
-	private ArrayList<StateNode> startNode =  new ArrayList<StateNode>();
-	private ArrayList<StateNode> endNode =  new ArrayList<StateNode>();
+	private LinkedHashSet<StateNode> startNode =  new LinkedHashSet<StateNode>();
+	private LinkedHashSet<StateNode> endNode =  new LinkedHashSet<StateNode>();
+	private LinkedHashSet<StateNode> dummyNode = new LinkedHashSet<StateNode>();
 
 	private ArrayList<ArrayList<StateNode>> depthNode = new ArrayList<ArrayList<StateNode>>();
-	private LinkedHashSet<StateNode> drawNodeOrder = new LinkedHashSet<StateNode>();
-	private LinkedHashSet<StateTransition> drawTransitionOrder = new LinkedHashSet<StateTransition>();
-	private LinkedHashSet<StateNode> dummyNode = new LinkedHashSet<StateNode>();
 
 	final String stateMarkString = "States";
 	final String graphMarkString = "Transitions";
 	final String initStartMarkString = "init:";
 	final String labelMarkString = "Labels";
 
-	public boolean setSlimNdResult(String str){
-		this.parent = null;
+	public StateNodeSet(){
+		this.parentNode = null;
 		this.generation = 0;
+	}
+
+	public StateNodeSet(StateNode parent){
+		this.parentNode = parent;
+		this.generation = parent.parentSet.generation+1;
+	}
+
+	public boolean setSlimNdResult(String str){
+		Env.startWatch("parsing[1]");
 
 		HashMap<Long,TempNode> temps = new HashMap<Long,TempNode>();
 		int line=0;
 		TempNode startNode = null;
 
 		String[] strs = str.split("\n");
+
+		Env.stopWatch("parsing[1]");
+		Env.startWatch("parsing[2]");
 
 		// States探し
 		for(;line<strs.length;++line){
@@ -131,6 +143,9 @@ public class StateNodeSet {
 		if(startNode==null) return false;
 
 
+		Env.stopWatch("parsing[2]");
+		Env.startWatch("buliding");
+
 
 		setNodeFrom(temps);
 
@@ -148,13 +163,14 @@ public class StateNodeSet {
 
 		updateNodeLooks();
 
+
+		Env.stopWatch("buliding");
+
+
 		return true;
 	}
 
 	public boolean setSlimLtlResult(String str){
-		this.parent = null;
-		this.generation = 0;
-
 		HashMap<Long,TempNode> temps = new HashMap<Long,TempNode>();
 		int line=0;
 		TempNode startNode = null;
@@ -288,7 +304,7 @@ public class StateNodeSet {
 		Collections.reverse(cycles);
 
 		for(Long id : cycles){
-			setOrderEnd(allNode.get(id));
+			setLastOrder(allNode.get(id));
 		}
 
 		updateNodeLooks();
@@ -296,17 +312,16 @@ public class StateNodeSet {
 		return true;
 	}
 
-	public boolean setSubNode(StateNode parent, ArrayList<StateNode> nodes){
-		this.parent = parent;
-		this.generation = parent.getSubset().generation+1;
+	public boolean setSubNode(ArrayList<StateNode> nodes, LinkedHashSet<StateTransition> outTrans){
+		this.outTrans = outTrans;
 
 		for(StateNode node : nodes){
 			allNode.put(node.id, node);
-			node.parent = this;
+			node.parentSet = this;
 		}
 
 		for(StateNode node : nodes){
-			ArrayList<StateTransition> newTrans = new ArrayList<StateTransition>();
+			LinkedHashSet<StateTransition> newTrans = new LinkedHashSet<StateTransition>();
 			for(StateTransition trans : node.getTransition()){
 				StateNode t = allNode.get(trans.to.id);
 				if(t!=null){
@@ -315,7 +330,7 @@ public class StateNodeSet {
 				}
 			}
 			node.setTransition(newTrans);
-			node.setFromNode(new ArrayList<StateNode>());
+			node.setFromNode(new LinkedHashSet<StateNode>());
 		}
 		for(StateNode node : nodes){
 			for(StateNode to : node.getToNodes()){
@@ -331,6 +346,16 @@ public class StateNodeSet {
 				endNode.add(node);
 			}
 		}
+
+		/*
+		for(StateTransition t : outTrans){
+			if(!nodes.contains(t.from)&&nodes.contains(t.to)){
+				startNode.add(t.to);
+			}
+		}
+		*/
+
+
 		if(startNode.size()==0){
 			for(StateNode node : nodes){
 				if(node.getToNodes().size()>0){
@@ -341,7 +366,7 @@ public class StateNodeSet {
 		}
 
 		//startNodeから全て遷移できるかチェック
-		ArrayList<StateNode> aN = new ArrayList<StateNode>(allNode.values());
+		ArrayList<StateNode> aN = new ArrayList<StateNode>(getAllNode());
 		while(aN.size()>0){
 			LinkedList<StateNode> queue = new LinkedList<StateNode>();
 			allNodeUnMark();
@@ -452,39 +477,6 @@ public class StateNodeSet {
 		return str.toString();
 	}
 
-	/*
-	public void reduction(){
-		StateNode removenode;
-		while((removenode=getToOneFromOne())!=null){
-			innerRemove(removenode);
-		}
-		updateNodeLooks();
-	}
-	*/
-
-	/*
-	public boolean isFlow(StateNode n1,StateNode n2){
-		if(cycleNode.size()==0||n1==n2) return true;
-		for(int i=0;i<cycleNode.size();++i){
-			if(cycleNode.get(i)==n1){
-				if(i>0&&cycleNode.get(i-1)==n2) return true;
-				if(i<(cycleNode.size()-1)&&cycleNode.get(i+1)==n2) return true;
-			}
-			if(cycleNode.get(i)==n2){
-				if(i>0&&cycleNode.get(i-1)==n1) return true;
-				if(i<(cycleNode.size()-1)&&cycleNode.get(i+1)==n1) return true;
-			}
-		}
-		if(n1==acceptStartNode){
-			if(n2==cycleNode.get(cycleNode.size()-1)) return true;
-		}else if(n2==acceptStartNode){
-			if(n1==cycleNode.get(cycleNode.size()-1)) return true;
-		}
-
-		return false;
-	}
-	*/
-
 	public StateNode get(long id){
 		return allNode.get(id);
 	}
@@ -530,12 +522,15 @@ public class StateNodeSet {
 		return allNode.values();
 	}
 
-	public Collection<StateNode> getAllNodeDrawOrder(){
-		return drawNodeOrder;
+	public Collection<StateNode> getStartNode(){
+		return startNode;
 	}
 
-	public ArrayList<StateNode> getStartNode(){
-		return startNode;
+	public StateNode getStartNodeOne(){
+		for(StateNode node : startNode){
+			return node;
+		}
+		return null;
 	}
 
 	public void setStartNode(StateNode sn){
@@ -547,7 +542,7 @@ public class StateNodeSet {
 		startNode.add(sn);
 	}
 
-	public ArrayList<StateNode> getEndNode(){
+	public Collection<StateNode> getEndNode(){
 		return endNode;
 	}
 
@@ -563,8 +558,38 @@ public class StateNodeSet {
 		return allTransition;
 	}
 
-	public Collection<StateTransition> getAllTransitionDrawOrder(){
-		return drawTransitionOrder;
+	public Collection<StateTransition> getAllOutTransition(){
+		return outTrans;
+	}
+
+	public void updateOutTransition(){
+		Collection<StateNode> all = allNode.values();
+		boolean check = true;
+		while(check){
+			check = false;
+			for(StateTransition t : new LinkedList<StateTransition>(outTrans)){
+				if(!all.contains(t.from)&&all.contains(t.to)){
+					if(this.generation-1!=t.from.parentSet.generation){
+						if(t.from.parentSet.parentNode!=null){
+							t.from = t.from.parentSet.parentNode;
+							check = true;
+						}else{
+							outTrans.remove(t);
+						}
+					}
+				}
+				if(all.contains(t.from)&&!all.contains(t.to)){
+					if(this.generation-1!=t.to.parentSet.generation){
+						if(t.to.parentSet.parentNode!=null){
+							t.to = t.to.parentSet.parentNode;
+							check = true;
+						}else{
+							outTrans.remove(t);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public StateNode getRepresentationNode(){
@@ -578,50 +603,41 @@ public class StateNodeSet {
 	}
 
 	public void resetOrder(){
-		drawNodeOrder.clear();
-		for(StateNode node : getAllNode()){
-			drawNodeOrder.add(node);
+		for(StateNode node : new LinkedList<StateNode>(getAllNode())){
+			allNode.remove(node.id);
+			allNode.put(node.id, node);
+			for(StateTransition t : node.getTransition()){
+				allTransition.remove(t);
+				allTransition.add(t);
+			}
 		}
 		for(StateNode node : endNode){
-			setOrderEnd(node);
-		}
-
-		drawTransitionOrder.clear();
-		for(StateNode node : drawNodeOrder){
-			for(StateTransition t : node.getTransition()){
-				drawTransitionOrder.add(t);
-			}
+			setLastOrder(node);
 		}
 	}
 
-	public void setOrderEnd(StateNode node){
-		drawNodeOrder.remove(node);
-		drawNodeOrder.add(node);
+	public void setLastOrder(StateNode node){
+		allNode.remove(node.id);
+		allNode.put(node.id, node);
 		for(StateTransition t : node.getTransition()){
 			if(t.em){
-				drawTransitionOrder.remove(t);
-				drawTransitionOrder.add(t);
+				allTransition.remove(t);
+				allTransition.add(t);
 			}
 		}
 	}
 
-	/*
-	private StateNode getToOneFromOne(){
-	    if(allNode.size()<=1) return null;
-		for(StateNode node : getAllNode()){
-	    	ArrayList<StateNode> toes = node.getToNodes();
-			if(toes.size()==1){
-				ArrayList<StateNode> froms = node.getFromNodes();
-				if(froms.size()==1){
-					if(froms.get(0).getToNodes().size()==1){
-						return node;
-					}
-				}
-			}
+	StateNodeSet getRootStateNodeSet(){
+		StateNodeSet root = this;
+		while(root.generation!=0){
+			root = root.getParentNode().parentSet;
 		}
-	    return null;
+		return root;
 	}
-	*/
+
+	StateNode getParentNode(){
+		return parentNode;
+	}
 
 	public void remove(StateNode node){
 		removeNode(node);
@@ -634,18 +650,38 @@ public class StateNodeSet {
 	}
 
 	public void removeDummy(){
-		while(dummyNode.size()>0){
-			StateNode dummy=null;
-			for(StateNode d : dummyNode){
-				dummy = d;
-				break;
-			}
-			removeNode(dummy);
+		for(StateNode dummy : new LinkedList<StateNode>(dummyNode)){
+			removeInnerTransitionData(dummy);
+			removeInnerNodeData(dummy);
 		}
+		setTreeDepth();
 		updateNodeLooks();
 	}
 
 	void removeNode(StateNode removenode){
+		removeInnerTransitionData(removenode);
+		removeInnerNodeData(removenode);
+
+		ArrayList<StateNode> sameDepth = depthNode.get(removenode.depth);
+		sameDepth.remove(removenode);
+		for(StateNode node : sameDepth){
+			if(node.nth>removenode.nth){
+				node.nth--;
+			}
+		}
+
+		if(sameDepth.size()==0){
+			depthNode.remove(removenode.depth);
+			for(StateNode node : getAllNode()){
+				if(node.depth>removenode.depth){
+					node.depth--;
+				}
+			}
+		}
+
+	}
+
+	void removeInnerTransitionData(StateNode removenode){
 		for(StateNode to : removenode.getToNodes()){
 			if(to==removenode){ continue; }
 			to.removeFromNode(removenode);
@@ -668,34 +704,12 @@ public class StateNodeSet {
 		for(StateTransition t : removenode.getTransition()){
 			removeTransition(t);
 		}
-
-		removeInnerNodeData(removenode);
-
-		ArrayList<StateNode> sameDepth = depthNode.get(removenode.depth);
-		sameDepth.remove(removenode);
-		for(StateNode node : sameDepth){
-			if(node.nth>removenode.nth){
-				node.nth--;
-			}
-		}
-
-		if(sameDepth.size()==0){
-			depthNode.remove(removenode.depth);
-			for(StateNode node : getAllNode()){
-				if(node.depth>removenode.depth){
-					node.depth--;
-				}
-			}
-		}
-
 	}
 
 	void removeInnerNodeData(StateNode removenode){
+		allNode.remove(removenode.id);
 		startNode.remove(removenode);
 		endNode.remove(removenode);
-
-		allNode.remove(removenode.id);
-		drawNodeOrder.remove(removenode);
 		dummyNode.remove(removenode);
 	}
 
@@ -720,7 +734,7 @@ public class StateNodeSet {
 			for(StateNode child : node.getToNodes()){
 				if(child.isMarked()){continue;}
 				child.mark();
-				insertDepthNode(child,node.depth+1);
+				insertDepthNode(child, node.depth+1);
 				queue.add(child);
 			}
 		}
@@ -734,25 +748,9 @@ public class StateNodeSet {
 		}
 		ArrayList<StateNode> dnodes= depthNode.get(depth);
 
-		/*
-		int i;
-		for(i=0;i<dnodes.size();++i){
-			if(dnodes.get(i).getY()>=node.getY()){
-				break;
-			}
-		}
-
-		dnodes.add(i,node);
 		node.depth = depth;
-		node.nth = i;
-		for(;i<dnodes.size();++i){
-			dnodes.get(i).nth = i;
-		}
-		*/
-
+		node.nth = dnodes.size();
 		dnodes.add(node);
-		node.depth = depth;
-		node.nth = dnodes.size()-1;
 	}
 
 	private class NodeYComparator implements Comparator<StateNode> {
@@ -776,12 +774,7 @@ public class StateNodeSet {
 
 	public void setDummy(){
 
-		long newId = Long.MIN_VALUE;
-		for(StateNode node : getAllNode()){
-			if(node.id>newId){
-				newId = node.id;
-			}
-		}
+		long newId = getMaxNodeId();
 
 		ArrayList<StateNode> newNode = new ArrayList<StateNode>();
 
@@ -820,26 +813,6 @@ public class StateNodeSet {
 						to.addFromNode(dummy);
 						to.removeFromNode(from);
 
-						/*
-						if(from.isEmToNode(to)){
-							from.removeEmToNode(to);
-							from.addEmToNode(dummy);
-							dummy.addEmToNode(to);
-						}
-						*/
-						/*
-						if(from.isEmToNode(to)||(from==node&&addEmToNodes.contains(to))){
-							dummy.addEmToNode(to);
-							if(from==node){
-								removeEmToNodes.add(to);
-								addEmToNodes.add(dummy);
-							}else{
-								from.removeEmToNode(to);
-								from.addEmToNode(dummy);
-							}
-						}
-						*/
-
 						//次のループの準備
 						from = dummy;
 						dummyDepth--;
@@ -855,7 +828,6 @@ public class StateNodeSet {
 		}
 		for(StateNode dummy : newNode){
 			allNode.put(dummy.id,dummy);
-			drawNodeOrder.add(dummy);
 			dummyNode.add(dummy);
 		}
 		for(ArrayList<StateNode> dnodes : depthNode){
@@ -864,33 +836,30 @@ public class StateNodeSet {
 				dnodes.get(i).nth = i;
 			}
 		}
-
+		updateMaxNodeId();
 	}
 
 	void addTransition(StateTransition trans){
 		if(trans!=null){
 			allTransition.add(trans);
-			drawTransitionOrder.add(trans);
 		}
 	}
 
 	void removeTransition(StateTransition trans){
 		if(trans!=null){
 			allTransition.remove(trans);
-			drawTransitionOrder.remove(trans);
 		}
 	}
 
-	void removeTransitions(LinkedList<StateTransition> transes){
+	void removeTransitions(Collection<StateTransition> transes){
 		if(transes!=null){
 			allTransition.removeAll(transes);
-			drawTransitionOrder.removeAll(transes);
 		}
 	}
 
 	private StateNode makeDummyNode(long id,int depth,String label,boolean accept,boolean inCycle,double y,boolean weak){
 
-		StateNode dummy = new StateNode(id,this);
+		StateNode dummy = new StateNode(id, this);
 		dummy.init("",label,accept,inCycle);
 		dummy.dummy = true;
 		dummy.weak = weak;
@@ -1004,19 +973,6 @@ public class StateNodeSet {
 		}
 	}
 
-/*
-	double getSumLength(int id,double x,double y){
-		double sumLength = 0;
-		for(StateNode node : getAllNode()){
-			if(node.id!=id){
-				double dx = x-node.getX();
-				double dy = y-node.getY();
-				sumLength += dx*dx+dy*dy;
-			}
-		}
-		return sumLength;
-	}
-*/
 	private void setNodeFrom(HashMap<Long,TempNode> temps){
 		for(TempNode node : temps.values()){
 			for(TempTransition to : node.toes){
@@ -1027,7 +983,7 @@ public class StateNodeSet {
 
 	StateNode pickANode(Point p){
 		StateNode pick = null;
-		for(StateNode node : drawNodeOrder){
+		for(StateNode node : getAllNode()){
 			if(node == null){ continue; }
 			if(node.contains(p)){
 				pick = node;
@@ -1065,6 +1021,7 @@ public class StateNodeSet {
 			}
 		}
 		this.startNode.add(getNewNode(startNode.id));
+		updateMaxNodeId();
 	}
 
 	private StateNode getNewNode(long id){
@@ -1074,6 +1031,20 @@ public class StateNodeSet {
 			allNode.put(id,node);
 		}
 		return node;
+	}
+
+	long getMaxNodeId(){
+		return getRootStateNodeSet().maxNodeId;
+	}
+
+	void updateMaxNodeId(){
+		long max = getRootStateNodeSet().maxNodeId;
+		for(StateNode node : getAllNode()){
+			if(node.id>max){
+				max = node.id;
+			}
+		}
+		getRootStateNodeSet().maxNodeId = max;
 	}
 
 	public void updatePosition(StatePositionSet statePositionSet){
@@ -1171,5 +1142,38 @@ public class StateNodeSet {
 		private ArrayList<String> rules = new ArrayList<String>();
 	}
 
+
+	/*
+	public void reduction(){
+		StateNode removenode;
+		while((removenode=getToOneFromOne())!=null){
+			innerRemove(removenode);
+		}
+		updateNodeLooks();
+	}
+	*/
+
+	/*
+	public boolean isFlow(StateNode n1,StateNode n2){
+		if(cycleNode.size()==0||n1==n2) return true;
+		for(int i=0;i<cycleNode.size();++i){
+			if(cycleNode.get(i)==n1){
+				if(i>0&&cycleNode.get(i-1)==n2) return true;
+				if(i<(cycleNode.size()-1)&&cycleNode.get(i+1)==n2) return true;
+			}
+			if(cycleNode.get(i)==n2){
+				if(i>0&&cycleNode.get(i-1)==n1) return true;
+				if(i<(cycleNode.size()-1)&&cycleNode.get(i+1)==n1) return true;
+			}
+		}
+		if(n1==acceptStartNode){
+			if(n2==cycleNode.get(cycleNode.size()-1)) return true;
+		}else if(n2==acceptStartNode){
+			if(n1==cycleNode.get(cycleNode.size()-1)) return true;
+		}
+
+		return false;
+	}
+	*/
 
 }

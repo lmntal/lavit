@@ -359,14 +359,15 @@ public class Env {
     }
 
 
-    static HashMap<Integer,Long> watchNowTimes = new HashMap<Integer,Long>();
-    static HashMap<Integer,Long> watchSumTimes = new HashMap<Integer,Long>();
+    static HashMap<String,Long> watchNowTimes = new HashMap<String,Long>();
+    static HashMap<String,Long> watchSumTimes = new HashMap<String,Long>();
+    static HashMap<String,Integer> watchCount = new HashMap<String,Integer>();
 
-    static public void startWatch(int key){
+    static public void startWatch(String key){
     	watchNowTimes.put(key, System.currentTimeMillis());
     }
 
-    static public void stopWatch(int key){
+    static public void stopWatch(String key){
     	long t;
     	if(watchNowTimes.containsKey(key)){
     		t = System.currentTimeMillis() - watchNowTimes.get(key);
@@ -376,8 +377,10 @@ public class Env {
     	if(watchSumTimes.containsKey(key)){
     		long sum = watchSumTimes.get(key);
     		watchSumTimes.put(key, sum+t);
+    		watchCount.put(key, watchCount.get(key)+1);
     	}else{
     		watchSumTimes.put(key, t);
+    		watchCount.put(key, 1);
     	}
     }
 
@@ -386,9 +389,9 @@ public class Env {
     	if(watchSumTimes.size()>0){
     		System.out.println("---- watch = "+watchSumTimes.size()+" ----");
     	}
-    	for(int key : watchSumTimes.keySet()){
+    	for(String key : watchSumTimes.keySet()){
     		double t = watchSumTimes.get(key)/1000.0;
-    		System.out.println("watch[" + key + "] : " + f.format(t));
+    		System.out.println("watch[" + key + "] : " + f.format(t) + " ("+watchCount.get(key)+")");
     	}
     	if(watchSumTimes.size()>0){
     		System.out.println();

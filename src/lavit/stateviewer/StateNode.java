@@ -56,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -85,11 +86,11 @@ public class StateNode implements Shape{
 	public boolean dummy;
 	public boolean weak;
 
-	private ArrayList<StateTransition> toes;
-	private ArrayList<StateNode> fromNodes;
+	private LinkedHashSet<StateTransition> toes;
+	private LinkedHashSet<StateNode> fromNodes;
 
-	public StateNodeSet subset;
-	public StateNodeSet parent;
+	public StateNodeSet childSet;
+	public StateNodeSet parentSet;
 
 	private boolean marked;
 	private boolean inFrame;
@@ -105,9 +106,9 @@ public class StateNode implements Shape{
 	public double dy;
 	public double ddy;
 
-	StateNode(long id,StateNodeSet parent){
+	StateNode(long id, StateNodeSet parent){
 		this.id = id;
-		this.parent = parent;
+		this.parentSet = parent;
 	}
 
 	void init(String state,String label,boolean accept,boolean inCycle){
@@ -122,10 +123,10 @@ public class StateNode implements Shape{
 		this.weak = false;
 
 		//this.toNodes = new ArrayList<StateNode>();
-		this.toes = new ArrayList<StateTransition>();
-		this.fromNodes = new ArrayList<StateNode>();
+		this.toes = new LinkedHashSet<StateTransition>();
+		this.fromNodes = new LinkedHashSet<StateNode>();
 
-		this.subset = null;
+		this.childSet = null;
 
 		//this.emToNodes = new ArrayList<StateNode>();
 
@@ -267,7 +268,7 @@ public class StateNode implements Shape{
 			drawColor = Color.gray;
 		}
 
-		if(subset==null){
+		if(childSet==null){
 			shape = new RoundRectangle2D.Double(getX()-radius,getY()-radius,radius*2,radius*2,radius*2,radius*2);
 		}else{
 			shape = new RoundRectangle2D.Double(getX()-radius,getY()-radius,radius*2,radius*2,radius/2,radius/2);
@@ -432,11 +433,11 @@ public class StateNode implements Shape{
 		return null;
 	}
 
-	ArrayList<StateTransition> getTransition(){
+	public Collection<StateTransition> getTransition(){
 		return toes;
 	}
 
-	void setTransition(ArrayList<StateTransition> toes){
+	void setTransition(LinkedHashSet<StateTransition> toes){
 		this.toes = toes;
 	}
 
@@ -464,11 +465,18 @@ public class StateNode implements Shape{
 		return fromNodes.contains(fromNode);
 	}
 
-	public ArrayList<StateNode> getFromNodes(){
+	public Collection<StateNode> getFromNodes(){
 		return fromNodes;
 	}
 
-	void setFromNode(ArrayList<StateNode> fromNodes){
+	public StateNode getFromNode(){
+		for(StateNode from : fromNodes){
+			return from;
+		}
+		return null;
+	}
+
+	void setFromNode(LinkedHashSet<StateNode> fromNodes){
 		this.fromNodes = fromNodes;
 	}
 
@@ -483,19 +491,19 @@ public class StateNode implements Shape{
 	}
 
 	public boolean hasSubset(){
-		if(subset==null){
+		if(childSet==null){
 			return false;
 		}else{
 			return true;
 		}
 	}
 
-	public StateNodeSet getSubset(){
-		return subset;
+	public StateNodeSet getChildSet(){
+		return childSet;
 	}
 
-	void setSubset(StateNodeSet subset){
-		this.subset = subset;
+	void setChildSet(StateNodeSet subset){
+		this.childSet = subset;
 	}
 
 	/*
@@ -643,10 +651,10 @@ public class StateNode implements Shape{
 	}
 
 	void doubleClick(StateGraphPanel graphPanel){
-		if(subset==null){
+		if(childSet==null){
 			new TextFrame(""+id,state);
 		}else{
-			graphPanel.init(subset, false);
+			graphPanel.init(childSet, false);
 		}
 	}
 
@@ -664,8 +672,8 @@ public class StateNode implements Shape{
 		buf.append("x:"+getX()+"\n");
 		buf.append("y:"+getY()+"\n");
 
-		buf.append("subset:"+(subset==null?"null":subset.size())+"\n");
-		buf.append("parent:"+(parent==null?"null":parent.size())+"\n");
+		buf.append("subset:"+(childSet==null?"null":childSet.size())+"\n");
+		buf.append("parent:"+(parentSet==null?"null":parentSet.size())+"\n");
 
 		buf.append("to:");
 		for(StateNode n : getToNodes()){ buf.append(n.id+", "); }
@@ -681,8 +689,8 @@ public class StateNode implements Shape{
 		if(state!=null&&state.length()>0){
 			return state;
 		}
-		if(subset!=null&&subset.size()>0){
-			return subset.getRepresentationNode().toString();
+		if(childSet!=null&&childSet.size()>0){
+			return childSet.getRepresentationNode().toString();
 		}
 		return "";
 	}

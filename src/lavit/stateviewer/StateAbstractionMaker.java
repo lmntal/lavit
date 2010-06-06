@@ -1,6 +1,7 @@
 package lavit.stateviewer;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import lavit.Env;
@@ -10,7 +11,7 @@ public class StateAbstractionMaker {
 	private StateGraphPanel graphPanel;
 	StateNodeSet drawNodes;
 	boolean dummy;
-	long maxId;
+	long newId;
 
 	public StateAbstractionMaker(StateGraphPanel graphPanel){
 		this.graphPanel = graphPanel;
@@ -21,23 +22,18 @@ public class StateAbstractionMaker {
 		drawNodes.removeDummy();
 		graphPanel.selectNodeClear();
 
-		maxId = Long.MIN_VALUE;
-		for(StateNode node : drawNodes.getAllNode()){
-			if(node.id>maxId){
-				maxId = node.id;
-			}
-		}
+		newId = drawNodes.getMaxNodeId();
 	}
 
 	public void makeNode(ArrayList<StateNode> groupNodes){
 
-		long id = ++maxId;
+		long id = ++newId;
 		boolean accept = false;
 		boolean inCycle = false;
 		boolean start = false;
-		ArrayList<StateTransition> toes = new ArrayList<StateTransition>();
-		ArrayList<StateNode> fromNodes = new ArrayList<StateNode>();
-		LinkedList<StateTransition> removeTrans = new LinkedList<StateTransition>();
+		LinkedHashSet<StateTransition> toes = new LinkedHashSet<StateTransition>();
+		LinkedHashSet<StateNode> fromNodes = new LinkedHashSet<StateNode>();
+		LinkedHashSet<StateTransition> removeTrans = new LinkedHashSet<StateTransition>();
 
 		StateNode newNode = new StateNode(id, drawNodes);
 		for(StateNode node : groupNodes){
@@ -121,9 +117,12 @@ public class StateAbstractionMaker {
 				minD = d;
 			}
 		}
+
+		StateNodeSet child = new StateNodeSet(newNode);
+		child.setSubNode(groupNodes, removeTrans);
+		newNode.setChildSet(child);
+
 		newNode.setPosition(bestX, y);
-		newNode.setSubset(new StateNodeSet());
-		newNode.getSubset().setSubNode(newNode, groupNodes);
 		newNode.setTransition(toes);
 		newNode.setFromNode(fromNodes);
 
@@ -135,18 +134,18 @@ public class StateAbstractionMaker {
 	public void end(){
 		drawNodes.setTreeDepth();
 		drawNodes.resetOrder();
+		drawNodes.updateMaxNodeId();
 
 		Env.set("SV_DUMMY",dummy);
 		if(Env.is("SV_DUMMY")){
 			drawNodes.setDummy();
 		}
-
 		drawNodes.updateNodeLooks();
 
 		graphPanel.update();
 	}
 
-	StateTransition getInTransition(ArrayList<StateTransition> toes,StateNode toNode){
+	StateTransition getInTransition(LinkedHashSet<StateTransition> toes,StateNode toNode){
 		for(StateTransition trans : toes){
 			if(trans.to==toNode){
 				return trans;

@@ -39,6 +39,7 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -203,10 +204,10 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 				statePanel.stateGraphPanel.getDrawNodes().setDummy();
 				statePanel.stateGraphPanel.dummyCentering();
 				if(statePanel.stateGraphPanel.statePanel.isLtl()){
-					for(StateNode node : statePanel.stateGraphPanel.getDrawNodes().getAllNode()){
+					for(StateNode node : new LinkedList<StateNode>(statePanel.stateGraphPanel.getDrawNodes().getAllNode())){
 						if(node.inCycle){
 							node.weak = false;
-							statePanel.stateGraphPanel.getDrawNodes().setOrderEnd(node);
+							statePanel.stateGraphPanel.getDrawNodes().setLastOrder(node);
 						}else{
 							node.weak = true;
 						}

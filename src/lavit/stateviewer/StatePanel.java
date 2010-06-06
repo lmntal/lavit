@@ -58,7 +58,7 @@ public class StatePanel extends JPanel{
 	public StateControlPanel stateControlPanel;
 
 	private String originalString;
-	private boolean ltlMode;
+	private boolean cycleMode;
 	private StateNodeSet drawNodes;
 
 	public StatePanel(){
@@ -71,15 +71,15 @@ public class StatePanel extends JPanel{
 		add(stateControlPanel, BorderLayout.SOUTH);
 	}
 
-	public void start(String str,boolean ltl){
+	public void start(String str,boolean cycle){
+
+		this.originalString = str;
+		this.cycleMode = cycle;
+		this.drawNodes = new StateNodeSet();
 
 		FrontEnd.println("(StateViewer) parsing.");
-
-		originalString = str;
-		ltlMode = ltl;
-		drawNodes = new StateNodeSet();
 		boolean res;
-		if(ltlMode){
+		if(cycleMode){
 			res = drawNodes.setSlimLtlResult(str);
 		}else{
 			res = drawNodes.setSlimNdResult(str);
@@ -96,7 +96,7 @@ public class StatePanel extends JPanel{
 	}
 
 	public void reset(){
-		start(originalString,ltlMode);
+		start(originalString, cycleMode);
 	}
 
 	public void savaFile(File file){
@@ -112,6 +112,7 @@ public class StatePanel extends JPanel{
 
 	public void loadFile(File file){
 		try {
+			FrontEnd.println("(StateViewer) load [ "+file.getName()+" ]");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			StringBuffer buf = new StringBuffer("");
 			String strLine;
@@ -119,21 +120,24 @@ public class StatePanel extends JPanel{
 				buf.append("\n" + strLine);
 			}
 			reader.close();
-			FrontEnd.println("(StateViewer) load [ "+file.getName()+" ]");
 
-			final String str = buf.toString();
-			(new Thread(new Runnable() { public void run() {
+			String str = buf.toString();
+			if(str.indexOf("no cycles found")>=0){
+				start(str, true);
+			}else{
 				start(str, false);
-			}})).start();
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
 
 	public void loadFile(){
-		File file = chooseOpenFile();
+		final File file = chooseOpenFile();
 		if(file!=null){
-			loadFile(file);
+			(new Thread(new Runnable() { public void run() {
+				loadFile(file);
+			}})).start();
 		}
 	}
 
@@ -155,7 +159,7 @@ public class StatePanel extends JPanel{
 	}
 
 	public boolean isLtl(){
-		return ltlMode;
+		return cycleMode;
 	}
 
 }

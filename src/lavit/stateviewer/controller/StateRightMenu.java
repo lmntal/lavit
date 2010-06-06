@@ -104,6 +104,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 	private JCheckBoxMenuItem showId = new JCheckBoxMenuItem("Show ID");
 	private JCheckBoxMenuItem showRule = new JCheckBoxMenuItem("Show Rule");
 	private JCheckBoxMenuItem showNoNameRule = new JCheckBoxMenuItem("Show No Name Rule");
+	private JCheckBoxMenuItem showOutTransition = new JCheckBoxMenuItem("Show Out Transition");
 
 	private JMenuItem autoCentering = new JMenuItem("Auto Centering");
 	private JMenuItem stretchMove = new JMenuItem("Stretch Move");
@@ -282,6 +283,10 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 		showNoNameRule.setSelected(Env.is("SV_SHOWNONAMERULE"));
 		graphViewSubmenu.add(showNoNameRule);
 
+		showOutTransition.addActionListener(this);
+		showOutTransition.setSelected(Env.is("SV_SHOWOUTTRANS"));
+		graphViewSubmenu.add(showOutTransition);
+
 		add(graphViewSubmenu);
 
 
@@ -423,7 +428,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 					for(StateNode node : graphPanel.getDrawNodes().getAllNode()){
 						if(node.inCycle){
 							node.weak = false;
-							graphPanel.getDrawNodes().setOrderEnd(node);
+							graphPanel.getDrawNodes().setLastOrder(node);
 						}else{
 							node.weak = true;
 						}
@@ -446,6 +451,9 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 			graphPanel.repaint();
 		}else if(src==showNoNameRule){
 			Env.set("SV_SHOWNONAMERULE",!Env.is("SV_SHOWNONAMERULE"));
+			graphPanel.repaint();
+		}else if(src==showOutTransition){
+			Env.set("SV_SHOWOUTTRANS",!Env.is("SV_SHOWOUTTRANS"));
 			graphPanel.repaint();
 		}else if(src==dynamicModeling){
 			Env.set("SV_DYNAMIC_MOVER",!Env.is("SV_DYNAMIC_MOVER"));

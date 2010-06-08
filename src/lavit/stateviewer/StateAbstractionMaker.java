@@ -1,6 +1,7 @@
 package lavit.stateviewer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
@@ -25,7 +26,7 @@ public class StateAbstractionMaker {
 		newId = drawNodes.getMaxNodeId();
 	}
 
-	public void makeNode(ArrayList<StateNode> groupNodes){
+	public void makeNode(Collection<StateNode> groupNodes){
 
 		long id = ++newId;
 		boolean accept = false;
@@ -42,8 +43,10 @@ public class StateAbstractionMaker {
 			if(node.accept){ accept = true; }
 			if(node.inCycle){ inCycle = true; }
 			if(node.depth==0){ start = true; }
-			ArrayList<StateNode> removeToes = new ArrayList<StateNode>();
-			ArrayList<StateNode> removeFroms = new ArrayList<StateNode>();
+			LinkedList<StateNode> removeToes = new LinkedList<StateNode>();
+			LinkedList<StateNode> removeFroms = new LinkedList<StateNode>();
+
+			Env.startWatch("Worker[2-1]");
 
 			for(StateTransition t : node.getTransition()){
 				if(!groupNodes.contains(t.to)){
@@ -71,6 +74,9 @@ public class StateAbstractionMaker {
 				removeTrans.add(t);
 			}
 
+			Env.stopWatch("Worker[2-1]");
+			Env.startWatch("Worker[2-2]");
+
 			for(StateNode f : node.getFromNodes()){
 
 				StateTransition t =  f.getTransition(node);
@@ -87,6 +93,9 @@ public class StateAbstractionMaker {
 				removeTrans.add(t);
 			}
 
+			Env.stopWatch("Worker[2-2]");
+			Env.startWatch("Worker[2-3]");
+
 			for(StateNode to : removeToes){
 				node.removeToNode(to);
 			}
@@ -94,6 +103,8 @@ public class StateAbstractionMaker {
 				node.removeFromNode(from);
 			}
 			drawNodes.removeInnerNodeData(node);
+
+			Env.stopWatch("Worker[2-3]");
 		}
 
 		drawNodes.removeTransitions(removeTrans);
@@ -109,7 +120,7 @@ public class StateAbstractionMaker {
 		x/=(double)(groupNodes.size());
 		y/=(double)(groupNodes.size());
 		double minD = Double.MAX_VALUE;
-		double bestX = groupNodes.get(0).getX();
+		double bestX = 0;
 		for(StateNode node : groupNodes){
 			double d = Math.abs(node.getX()-x);
 			if(d<minD){

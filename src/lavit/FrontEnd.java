@@ -64,8 +64,13 @@ public class FrontEnd {
 
         sleep(500);
 
-        //起動オプションの反映
-        for(int i=0;i<args.length;i++){
+        loadArgs(args); //起動オプションの読み込み
+
+        println("(SYSTEM) Ready.");
+	}
+
+	void loadArgs(String[] args){
+		for(int i=0;i<args.length;i++){
 			if(args[i].length()==0){ continue; }
 			if(args[i].charAt(0)!='-'){ continue; }
 
@@ -81,9 +86,6 @@ public class FrontEnd {
 				println("invalid option: " + args[i]);
 			}
 		}
-
-        println("(SYSTEM) Ready.");
-
 	}
 
 	static public void reboot(){

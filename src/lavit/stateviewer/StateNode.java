@@ -396,12 +396,8 @@ public class StateNode implements Shape{
 			}
 		}
 		for(StateNode from : fromNodes){
-			try{
-				if(from.getTransition(this).getRules().contains(ruleName)){
-					nodes.add(from);
-				}
-			}catch(Exception e){
-				FrontEnd.printException(e);
+			if(from.getTransition(this).getRules().contains(ruleName)){
+				nodes.add(from);
 			}
 		}
 		return nodes;
@@ -654,11 +650,13 @@ public class StateNode implements Shape{
 		if(childSet==null){
 			new TextFrame(""+id,state);
 		}else{
-			graphPanel.init(childSet, false);
+			graphPanel.init(childSet);
 		}
 	}
 
 	void debugFrame(StateGraphPanel graphPanel){
+		Object o = this;
+
 		StringBuffer buf = new StringBuffer();
 		buf.append("id:"+id+"\n");
 		buf.append("state:"+toString()+"\n");
@@ -672,8 +670,8 @@ public class StateNode implements Shape{
 		buf.append("x:"+getX()+"\n");
 		buf.append("y:"+getY()+"\n");
 
-		buf.append("subset:"+(childSet==null?"null":childSet.size())+"\n");
-		buf.append("parent:"+(parentSet==null?"null":parentSet.size())+"\n");
+		buf.append("childSet:"+(childSet==null?"null":childSet.size())+"\n");
+		buf.append("parentSet:"+(parentSet==null?"null":parentSet.size())+"\n");
 
 		buf.append("to:");
 		for(StateNode n : getToNodes()){ buf.append(n.id+", "); }
@@ -697,7 +695,7 @@ public class StateNode implements Shape{
 
 	private class TextFrame extends JFrame{
 
-		TextFrame(String title,String state){
+		TextFrame(String title,String str){
 
 			int width = FrontEnd.mainFrame.getWidth()/2;
 			int height = FrontEnd.mainFrame.getHeight()/2;
@@ -719,7 +717,7 @@ public class StateNode implements Shape{
 			//editor.setEditorKit(new NoWrapEditorKit());
 			editor.setDocument(doc);
 			editor.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")));
-			editor.setText(state);
+			editor.setText(str);
 			doc.colorChange();
 			doc.end();
 

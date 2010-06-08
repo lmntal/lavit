@@ -102,6 +102,7 @@ import lavit.stateviewer.worker.StateGraphRandomMoveWorker;
 import lavit.stateviewer.worker.StateGraphStretchMoveWorker;
 import lavit.stateviewer.worker.StatePainter;
 import lavit.util.CommonFontUser;
+import lavit.util.NodeYComparator;
 
 public class StateGraphPanel extends JPanel implements MouseInputListener,MouseWheelListener,KeyListener,CommonFontUser{
 
@@ -156,11 +157,10 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		FrontEnd.addFontUser(this);
 	}
 
-	public void init(StateNodeSet nodes, boolean rootSet){
+	public void init(StateNodeSet nodes){
 
 		this.drawNodes = nodes;
-
-		if(rootSet){
+		if(nodes.generation==0){
 			this.rootDrawNodes = nodes;
 		}
 
@@ -181,27 +181,24 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			generalControlPanel.updateLabel(nodes);
 		}
 
-		if(rootSet){
-			positionReset();
-		}
 		autoCentering();
 		setActive(true);
 	}
 
-	public void init(StateNodeSet nodes, boolean rootSet, StateNode selectNode){
-		init(nodes, rootSet);
+	public void init(StateNodeSet nodes, StateNode selectNode){
+		init(nodes);
 		if(nodes.getAllNode().contains(selectNode)){
 			selectNodes.add(selectNode);
 		}
 	}
 
 	public void generationReset(){
-		init(rootDrawNodes, false);
+		init(rootDrawNodes);
 	}
 
 	public void generationUp(){
 		if(drawNodes.parentNode!=null){
-			init(drawNodes.parentNode.parentSet, false, drawNodes.parentNode);
+			init(drawNodes.parentNode.parentSet, drawNodes.parentNode);
 		}
 	}
 
@@ -463,23 +460,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			StateNode startNode = null;
 
 			nodes = new ArrayList<StateNode>(nodes);
-			Collections.sort(nodes, new Comparator<StateNode>() {
-				public int compare(StateNode n1, StateNode n2) {
-					if(n1.getY()<n2.getY()){
-						return -1;
-					}else if(n1.getY()>n2.getY()){
-						return 1;
-					}else{
-						if(n1.id<n2.id){
-							return -1;
-						}else if(n1.id>n2.id){
-							return 1;
-						}else{
-							return 0;
-						}
-					}
-				}
-			});
+			Collections.sort(nodes, new NodeYComparator());
 
 			for(StateNode node : nodes){
 				if(node.dummy){
@@ -544,7 +525,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			return 0;
 		}
 
-		for(StateNode node : drawNodes.getAllNode()){
+		for(StateNode node : new LinkedList<StateNode>(drawNodes.getAllNode())){
 			if(node.isMatch(str)){
 				drawNodes.setLastOrder(node);
 				node.weak = false;

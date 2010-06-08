@@ -61,6 +61,7 @@ import lavit.frame.ChildWindowListener;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
+import lavit.util.NodeYComparator;
 
 public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 	private StateGraphPanel panel;
@@ -430,23 +431,7 @@ public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 
 		//ソートする
 		ArrayList<StateNode> sortNodes = new ArrayList<StateNode>(nodes);
-		Collections.sort(sortNodes, new Comparator<StateNode>() {
-			public int compare(StateNode n1, StateNode n2) {
-				if(n1.getY()<n2.getY()){
-					return -1;
-				}else if(n1.getY()>n2.getY()){
-					return 1;
-				}else{
-					if(n1.id<n2.id){
-						return -1;
-					}else if(n1.id>n2.id){
-						return 1;
-					}else{
-						return 0;
-					}
-				}
-			}
-		});
+		Collections.sort(sortNodes, new NodeYComparator());
 
 		ArrayList<StateNode> revsortNodes = new ArrayList<StateNode>(sortNodes);
 		Collections.reverse(revsortNodes);

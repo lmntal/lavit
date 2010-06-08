@@ -54,6 +54,7 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.stateviewer.*;
 import lavit.stateviewer.worker.StatePositionSet;
+import lavit.util.NodeYComparator;
 
 public class StateNodeSet {
 
@@ -63,11 +64,10 @@ public class StateNodeSet {
 
 	private LinkedHashMap<Long,StateNode> allNode = new LinkedHashMap<Long,StateNode>();
 	private LinkedHashSet<StateTransition> allTransition = new LinkedHashSet<StateTransition>();
-	private LinkedHashSet<StateTransition> outTrans = new LinkedHashSet<StateTransition>();
+	private LinkedHashSet<StateTransition> outTransition = new LinkedHashSet<StateTransition>();
 
 	private LinkedHashSet<StateNode> startNode =  new LinkedHashSet<StateNode>();
 	private LinkedHashSet<StateNode> endNode =  new LinkedHashSet<StateNode>();
-	private LinkedHashSet<StateNode> dummyNode = new LinkedHashSet<StateNode>();
 
 	private ArrayList<ArrayList<StateNode>> depthNode = new ArrayList<ArrayList<StateNode>>();
 
@@ -286,7 +286,6 @@ public class StateNodeSet {
 		setTreeDepth();
 
 		resetOrder();
-
 		positionReset();
 
 		if(Env.is("SV_DUMMY")){
@@ -304,16 +303,25 @@ public class StateNodeSet {
 		Collections.reverse(cycles);
 
 		for(Long id : cycles){
-			setLastOrder(allNode.get(id));
+			StateNode node = allNode.get(id);
+			setLastOrder(node);
 		}
+
 
 		updateNodeLooks();
 
 		return true;
 	}
 
-	public boolean setSubNode(ArrayList<StateNode> nodes, LinkedHashSet<StateTransition> outTrans){
-		this.outTrans = outTrans;
+	public boolean setSubNode(Collection<StateNode> nodes, LinkedHashSet<StateTransition> outTrans){
+		//抽象化状態へのtransitionは削除
+		for(StateTransition t : new LinkedList<StateTransition>(outTrans)){
+			if(t.from.childSet!=null||t.to.childSet!=null){
+				outTrans.remove(t);
+			}
+		}
+		this.outTransition = outTrans;
+
 
 		for(StateNode node : nodes){
 			allNode.put(node.id, node);
@@ -355,15 +363,6 @@ public class StateNodeSet {
 		}
 		*/
 
-
-		if(startNode.size()==0){
-			for(StateNode node : nodes){
-				if(node.getToNodes().size()>0){
-					startNode.add(node);
-					break;
-				}
-			}
-		}
 
 		//startNodeから全て遷移できるかチェック
 		ArrayList<StateNode> aN = new ArrayList<StateNode>(getAllNode());
@@ -559,7 +558,7 @@ public class StateNodeSet {
 	}
 
 	public Collection<StateTransition> getAllOutTransition(){
-		return outTrans;
+		return outTransition;
 	}
 
 	public void updateOutTransition(){
@@ -567,14 +566,14 @@ public class StateNodeSet {
 		boolean check = true;
 		while(check){
 			check = false;
-			for(StateTransition t : new LinkedList<StateTransition>(outTrans)){
+			for(StateTransition t : new LinkedList<StateTransition>(outTransition)){
 				if(!all.contains(t.from)&&all.contains(t.to)){
 					if(this.generation-1!=t.from.parentSet.generation){
 						if(t.from.parentSet.parentNode!=null){
 							t.from = t.from.parentSet.parentNode;
 							check = true;
 						}else{
-							outTrans.remove(t);
+							outTransition.remove(t);
 						}
 					}
 				}
@@ -584,7 +583,7 @@ public class StateNodeSet {
 							t.to = t.to.parentSet.parentNode;
 							check = true;
 						}else{
-							outTrans.remove(t);
+							outTransition.remove(t);
 						}
 					}
 				}
@@ -650,9 +649,11 @@ public class StateNodeSet {
 	}
 
 	public void removeDummy(){
-		for(StateNode dummy : new LinkedList<StateNode>(dummyNode)){
-			removeInnerTransitionData(dummy);
-			removeInnerNodeData(dummy);
+		for(StateNode node : new LinkedList<StateNode>(getAllNode())){
+			if(node.dummy){
+				removeInnerTransitionData(node);
+				removeInnerNodeData(node);
+			}
 		}
 		setTreeDepth();
 		updateNodeLooks();
@@ -710,7 +711,6 @@ public class StateNodeSet {
 		allNode.remove(removenode.id);
 		startNode.remove(removenode);
 		endNode.remove(removenode);
-		dummyNode.remove(removenode);
 	}
 
 	void setTreeDepth(){
@@ -734,7 +734,11 @@ public class StateNodeSet {
 			for(StateNode child : node.getToNodes()){
 				if(child.isMarked()){continue;}
 				child.mark();
-				insertDepthNode(child, node.depth+1);
+				if(child.dummy){
+					insertDepthNode(child, node.depth-1);
+				}else{
+					insertDepthNode(child, node.depth+1);
+				}
 				queue.add(child);
 			}
 		}
@@ -742,7 +746,6 @@ public class StateNodeSet {
 	}
 
 	private void insertDepthNode(StateNode node,int depth){
-
 		while(depthNode.size()<=depth){
 			depthNode.add(depthNode.size(),new ArrayList<StateNode>());
 		}
@@ -752,25 +755,6 @@ public class StateNodeSet {
 		node.nth = dnodes.size();
 		dnodes.add(node);
 	}
-
-	private class NodeYComparator implements Comparator<StateNode> {
-		public int compare(StateNode n1, StateNode n2) {
-			if(n1.getY()<n2.getY()){
-				return -1;
-			}else if(n1.getY()>n2.getY()){
-				return 1;
-			}else{
-				if(n1.id<n2.id){
-					return -1;
-				}else if(n1.id>n2.id){
-					return 1;
-				}else{
-					return 0;
-				}
-			}
-		}
-	}
-
 
 	public void setDummy(){
 
@@ -827,8 +811,7 @@ public class StateNodeSet {
 			}
 		}
 		for(StateNode dummy : newNode){
-			allNode.put(dummy.id,dummy);
-			dummyNode.add(dummy);
+			allNode.put(dummy.id, dummy);
 		}
 		for(ArrayList<StateNode> dnodes : depthNode){
 			Collections.sort(dnodes, new NodeYComparator());

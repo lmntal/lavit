@@ -103,20 +103,26 @@ public class StateGraphStretchMoveWorker extends SwingWorker<Object,Integer>{
 				drawNodes.allScaleCenterMove(0.9, 1/0.8);
 			}else if(i==40){
 				panel.autoCentering();
-				sleep(5000);
+				for(int count=0;count<10;++count){
+					sleep(500);
+					if(isCancelled()){ break; }
+				}
 			}else if(drawNodes.getHeight()*30<drawNodes.getNodesDimension().getHeight()&&i<200){
 				drawNodes.allScaleCenterMove(1, 0.95);
 			}else{
 				drawNodes.allScaleCenterMove(1.1, 1);
 				panel.autoCentering();
 				publish((new StateGraphExchangeWorker(panel)).getAllCross());
-				sleep(5000);
 				i=-1;
-				if(isCancelled()){ break; }
+				for(int count=0;count<10;++count){
+					sleep(500);
+					if(isCancelled()){ break; }
+				}
 			}
 			i++;
 			panel.update();
 			sleep(50);
+			if(isCancelled()){ break; }
 		}
 		panel.autoCentering();
 		frame.end();

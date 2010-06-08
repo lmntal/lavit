@@ -121,7 +121,7 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 		StateNodeSet drawNodes = graphPanel.getDrawNodes();
 
 		drawNodes.allNodeUnMark();
-		LinkedList<StateNode> nodes = new LinkedList<StateNode>();
+		LinkedHashSet<StateNode> nodes = new LinkedHashSet<StateNode>();
 		for(StateTransition t : trans){
 			if(!t.from.isMarked()){
 				nodes.add(t.from);
@@ -138,23 +138,34 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 
 		while(true){
 
-			ArrayList<StateNode> transitionGroup = new ArrayList<StateNode>();
+			Env.startWatch("Worker[1]");
+
+			LinkedHashSet<StateNode> transitionGroup = new LinkedHashSet<StateNode>();
 			while(nodes.size()>0){
 
-				//drawNodes.allNodeUnMark();
 				transitionGroup.clear();
 				LinkedList<StateNode> queue = new LinkedList<StateNode>();
 
-				queue.add(nodes.get(0));
-				transitionGroup.add(nodes.get(0));
-				nodes.get(0).mark();
-				nodes.remove(nodes.get(0));
+				StateNode firstNode = null;
+				for(StateNode node : nodes){
+					firstNode = node;
+					break;
+				}
+
+				queue.add(firstNode);
+				transitionGroup.add(firstNode);
+				firstNode.mark();
+				nodes.remove(firstNode);
 
 				while(!queue.isEmpty()){
 
 					StateNode node = queue.remove();
 
-					for(StateNode n : node.getRuleNameGroupNodes(ruleNames)){
+					Env.startWatch("Worker[1-1]");
+					Collection<StateNode> ns = node.getRuleNameGroupNodes(ruleNames);
+					Env.stopWatch("Worker[1-1]");
+
+					for(StateNode n : ns){
 						if(n.isMarked()){continue;}
 						queue.add(n);
 						transitionGroup.add(n);
@@ -170,7 +181,12 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 
 			if(transitionGroup.size()<=1){ break; }
 
+			Env.stopWatch("Worker[1]");
+			Env.startWatch("Worker[2]");
+
 			maker.makeNode(transitionGroup);
+
+			Env.stopWatch("Worker[2]");
 
 			setProgress((int)(100*(1-((double)nodes.size())/((double)allNum))));
 			if(isCancelled()){ end();return null; }

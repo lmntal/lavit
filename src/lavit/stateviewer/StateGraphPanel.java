@@ -845,6 +845,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			}
 		}
 
+		if(Env.is("SV_VERTICAL_VIEW")){ g2.rotate(90 * Math.PI/180,getWidth()/2, getHeight()/2); }
 		g2.scale(zoom,zoom);
 
 		//½é´ü¾õÂÖ¤ÎÌð°õ¤ÎÉÁ¼Ì
@@ -935,6 +936,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		}
 
 		g2.scale(1.0/zoom, 1.0/zoom);
+		if(Env.is("SV_VERTICAL_VIEW")){ g2.rotate(-90 * Math.PI/180,getWidth()/2, getHeight()/2); }
 
 		drawTime = System.currentTimeMillis()-startTime;
 		statePanel.stateControlPanel.updateInfo();

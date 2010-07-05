@@ -626,6 +626,15 @@ public class StateNodeSet {
 		}
 	}
 
+	public void setLastOrder(StateTransition t){
+		allNode.remove(t.from.id);
+		allNode.put(t.from.id, t.from);
+		allNode.remove(t.to.id);
+		allNode.put(t.to.id, t.to);
+		allTransition.remove(t);
+		allTransition.add(t);
+	}
+
 	StateNodeSet getRootStateNodeSet(){
 		StateNodeSet root = this;
 		while(root.generation!=0){

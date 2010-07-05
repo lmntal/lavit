@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Class-Path: lmntal/lib/ant.jar
+Class-Path: lib/ant.jar
 Main-Class: lavit.FrontEnd
 

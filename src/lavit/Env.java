@@ -37,13 +37,19 @@ package lavit;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.LineNumberReader;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -51,7 +57,7 @@ import java.util.Properties;
 public class Env {
 
 	static public final String APP_NAME = "LaViT";
-	static public final String APP_VERSION = "2.1.0";
+	static public final String APP_VERSION = "2.1.1";
 	static public final String APP_DATE = "2010/06/10";
 	static public final String APP_HREF = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
 
@@ -121,9 +127,25 @@ public class Env {
 
     static public void save(){
 		try {
+			//普通に保存
 			FileOutputStream out = new FileOutputStream(ENV_FILE);
 			prop.store(out, APP_NAME+" "+APP_VERSION);
 	        out.close();
+
+	        //ソートで再保存
+	        LineNumberReader reader = new LineNumberReader(new FileReader(ENV_FILE));
+			ArrayList<String> lines = new ArrayList<String>();
+			String line = null;
+			while((line = reader.readLine())!=null){
+				lines.add(line);
+			}
+			reader.close();
+			Collections.sort(lines);
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(ENV_FILE)));
+			for(String str : lines){
+				writer.write(str+"\n");
+			}
+			writer.close();
 		} catch (IOException e) {
 			System.err.println("save error. check "+ENV_FILE);
 		}

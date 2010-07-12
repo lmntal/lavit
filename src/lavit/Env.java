@@ -58,7 +58,7 @@ public class Env {
 
 	static public final String APP_NAME = "LaViT";
 	static public final String APP_VERSION = "2.1.1";
-	static public final String APP_DATE = "2010/06/10";
+	static public final String APP_DATE = "2010/07/12";
 	static public final String APP_HREF = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
 
 	static public final String LMNTAL_VERSION = "LMNtal : 1.02 (2009/11/16)";

@@ -184,10 +184,12 @@ public class FrontEnd {
 		try{
 			FrontEnd.sf = new StartupFrame();
 		}catch(Exception e){
+			FrontEnd.printException(e);
 			Env.set("LookAndFeel","Metal");
 			FrontEnd.updateLookAndFeel();
 			FrontEnd.sf = new StartupFrame();
 		}
+
 		FrontEnd.sf.startEnvSet();
 
 		javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){

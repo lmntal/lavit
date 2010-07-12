@@ -655,7 +655,6 @@ public class StateNode implements Shape{
 	}
 
 	void debugFrame(StateGraphPanel graphPanel){
-		Object o = this;
 
 		StringBuffer buf = new StringBuffer();
 		buf.append("id:"+id+"\n");

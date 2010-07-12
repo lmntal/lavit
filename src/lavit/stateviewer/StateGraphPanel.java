@@ -183,6 +183,16 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		autoCentering();
 		setActive(true);
+
+		if(Env.is("SV_AUTO_ADJUST_STARTUP")){
+			if(drawNodes.size()<=Env.getInt("SV_AUTO_ADJUST_STARTUP_LIMIT")){
+				FrontEnd.println("(StateViewer) Auto Adjust");
+				autoAdjust();
+			}else{
+				FrontEnd.println("(StateViewer) "+drawNodes.size()+" state > Auto Adjust Limit ("+Env.getInt("SV_AUTO_ADJUST_STARTUP_LIMIT")+" state)");
+				FrontEnd.sleep(300);
+			}
+		}
 	}
 
 	public void init(StateNodeSet nodes, StateNode selectNode){
@@ -346,6 +356,45 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 	*/
 
+	public void dummyMixAdjust(){
+
+		if(Env.is("SV_DUMMY")) getDrawNodes().removeDummy();
+
+		(new StateGraphAdjustWorker(this)).atomic();
+
+		Env.set("SV_DUMMY",true);
+		getDrawNodes().setDummy();
+		dummyCentering();
+		getDrawNodes().updateNodeLooks();
+
+		Env.set("SV_CROSSREDUCTION_DUMMYONLY",true);
+		(new StateGraphExchangeWorker(this)).atomic();
+		(new StateGraphDummySmoothingWorker(this)).atomic();
+
+		getDrawNodes().updateNodeLooks();
+
+		update();
+	}
+
+	public void autoAdjust(){
+
+		if(Env.is("SV_DUMMY")) getDrawNodes().removeDummy();
+
+		Env.set("SV_DUMMY",true);
+		getDrawNodes().setDummy();
+		dummyCentering();
+		getDrawNodes().updateNodeLooks();
+
+		(new StateGraphAdjust2Worker(this)).atomic();
+
+		Env.set("SV_CROSSREDUCTION_DUMMYONLY",false);
+		(new StateGraphExchangeWorker(this)).atomic();
+
+		getDrawNodes().updateNodeLooks();
+
+		update();
+	}
+
 	public void positionReset(){
 		drawNodes.positionReset();
 	}
@@ -380,10 +429,24 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		}
 	}
 
+	public void dummySmoothing(){
+		StateGraphDummySmoothingWorker worker = new StateGraphDummySmoothingWorker(this);
+		if(drawNodes.size()<1000){
+			worker.atomic();
+		}else{
+			worker.ready();
+			worker.execute();
+		}
+	}
+
 	public void exchangeReset(){
 		StateGraphExchangeWorker worker = new StateGraphExchangeWorker(this);
-		worker.ready();
-		worker.execute();
+		if(drawNodes.size()<1000){
+			worker.atomic();
+		}else{
+			worker.ready();
+			worker.execute();
+		}
 	}
 
 	public void geneticAlgorithmLength(){
@@ -497,12 +560,6 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		}
 		update();
-	}
-
-	public void dummySmoothing(){
-		StateGraphDummySmoothingWorker worker = new StateGraphDummySmoothingWorker(this);
-		worker.ready();
-		worker.execute();
 	}
 
 	public Rectangle2D.Double getNodesWindowDimension(){

@@ -74,16 +74,28 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 		this.drawNodes = panel.getDrawNodes();
 	}
 
+	public void atomic(){
+		ready(false);
+		doInBackground();
+		done();
+	}
+
 	public void ready(){
+		ready(true);
+	}
+
+	public void ready(boolean open){
 		panel.setActive(false);
-		frame = new ProgressFrame();
-		addPropertyChangeListener(frame);
+		if(open){
+			frame = new ProgressFrame();
+			addPropertyChangeListener(frame);
+		}
 	}
 
 	public void end() {
 		panel.autoCentering();
 		panel.setActive(true);
-		frame.dispose();
+		if(frame!=null) frame.dispose();
 	}
 
 	@Override
@@ -115,9 +127,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 			drawNodes.updatePosition(right);
 		}
 
-		//System.out.println((new Date()));
-
-		frame.end();
+		if(frame!=null) frame.end();
 		end();
 		return null;
 	}

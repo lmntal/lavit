@@ -85,7 +85,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 
     private JMenu help;
     private JMenuItem iVersion;
-    private JMenuItem iMemory;
+    private JMenuItem iRuntime;
     private JMenuItem iBrowse;
 
     public MainMenuBar(){
@@ -247,9 +247,9 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         help.add(iVersion);
         iVersion.addActionListener(this);
 
-        iMemory = new JMenuItem(Lang.m[26]);
-        help.add(iMemory);
-        iMemory.addActionListener(this);
+        iRuntime = new JMenuItem(Lang.m[26]);
+        help.add(iRuntime);
+        iRuntime.addActionListener(this);
 
         iBrowse = new JMenuItem(Lang.m[28]);
         help.add(iBrowse);
@@ -323,12 +323,16 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         		JOptionPane.PLAIN_MESSAGE
         	);
         	*/
-        }else if(src == iMemory) {
+        }else if(src == iRuntime) {
         	JOptionPane.showMessageDialog(
         			FrontEnd.mainFrame,
         			"Max Memory : "+(int)(Runtime.getRuntime().maxMemory()/(1024*1024))+" MB\n"+
-        			"Use Memory : "+(int)(Runtime.getRuntime().totalMemory()/(1024*1024))+" MB\n",
-        			"Memory Info",
+        			"Use Memory : "+(int)(Runtime.getRuntime().totalMemory()/(1024*1024))+" MB\n"+
+        			"Available Processors : "+Runtime.getRuntime().availableProcessors()+" \n"+
+        			"Java Version : "+System.getProperty("java.version")+" \n"+
+        			"Java Runtime Version : "+System.getProperty("java.runtime.version")+" \n"+
+        			"Java VM Version : "+System.getProperty("java.vm.version")+" \n",
+        			"Java Runtime Info",
         		JOptionPane.PLAIN_MESSAGE
         	);
         }else if(src == iBrowse){

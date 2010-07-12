@@ -73,15 +73,27 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 		this.drawNodes = panel.getDrawNodes();
 	}
 
+	public void atomic(){
+		ready(false);
+		doInBackground();
+		done();
+	}
+
 	public void ready(){
+		ready(true);
+	}
+
+	public void ready(boolean open){
 		panel.setActive(false);
-		frame = new ProgressFrame();
+		if(open){
+			frame = new ProgressFrame();
+		}
 	}
 
 	public void end() {
 		panel.autoCentering();
 		panel.setActive(true);
-		frame.dispose();
+		if(frame!=null) frame.dispose();
 	}
 
 	@Override

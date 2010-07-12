@@ -57,7 +57,7 @@ public class OptionLtlPanel extends JPanel implements ActionListener,DocumentLis
 	OptionLtlPanel(){
 
 		setLayout(new FixFlowLayout());
-		setBorder(new TitledBorder("LTL Model Check Option"));
+		setBorder(new TitledBorder("LTL Model Check SLIM Option"));
 
 		for(int i=0;i<majorOption.length;++i){
 			optionCheckBox[i] = new JCheckBox(majorOption[i]);

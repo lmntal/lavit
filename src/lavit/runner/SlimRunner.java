@@ -67,7 +67,6 @@ public class SlimRunner {
 	private boolean success;
 
 	private boolean quiet;
-	private boolean redirectErrorStream;
 
 	public SlimRunner(String option){
 		this(option,FrontEnd.mainFrame.editorPanel.getFile());
@@ -84,7 +83,6 @@ public class SlimRunner {
 		this.ncFile = null;
 		this.success = false;
 		this.quiet = false;
-		this.redirectErrorStream = true;
 	}
 
 	public void run() {
@@ -113,10 +111,6 @@ public class SlimRunner {
 
 	public void setQuiet(boolean quiet){
 		this.quiet = quiet;
-	}
-
-	public void setRedirectErrorStream(boolean redirectErrorStream){
-		this.redirectErrorStream = redirectErrorStream;
 	}
 
 	public String getBufferString(){

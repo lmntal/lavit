@@ -59,7 +59,7 @@ public class OptionSVDepthPanel extends JPanel implements ActionListener{
 	OptionSVDepthPanel(){
 
 		setLayout(new FixFlowLayout());
-		setBorder(new TitledBorder("Depth Limit"));
+		setBorder(new TitledBorder("StateViewer Depth Limit"));
 
 		add(new JLabel("--bfs_depth"));
 		comboBox = new JComboBox(depthList);

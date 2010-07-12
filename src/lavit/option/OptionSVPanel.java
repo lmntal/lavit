@@ -58,7 +58,7 @@ public class OptionSVPanel extends JPanel implements ActionListener,DocumentList
 	OptionSVPanel(){
 
 		setLayout(new FixFlowLayout());
-		setBorder(new TitledBorder("StateViewer Option"));
+		setBorder(new TitledBorder("StateViewer SLIM Option"));
 
 		for(int i=0;i<majorOption.length;++i){
 			optionCheckBox[i] = new JCheckBox(majorOption[i]);

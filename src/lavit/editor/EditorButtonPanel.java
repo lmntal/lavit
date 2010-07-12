@@ -295,7 +295,6 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 			}
 			slimRunner = new SlimRunner(opt);
 			slimRunner.setBuffering(true);
-			slimRunner.setRedirectErrorStream(false);
 			slimRunner.run();
 			(new Thread(new Runnable() { public void run() {
 				while(slimRunner.isRunning()){

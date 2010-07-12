@@ -74,10 +74,10 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	private JButton crossInfo = new JButton("Cross Info");
 	private JButton geneticAlgorithm = new JButton("Genetic Algorithm");
 	private JButton exchangeReset = new JButton("Adjacent Exchange");
-	private JCheckBox exchangeDummyOnly = new JCheckBox("Dummy Only");
+	public JCheckBox exchangeDummyOnly = new JCheckBox("Dummy Only");
 
 	private JPanel dummyPanel = new JPanel();
-	private JCheckBox dummy = new JCheckBox("Set Dummy");
+	public JCheckBox dummy = new JCheckBox("Set Dummy");
 	private JCheckBox showdummy = new JCheckBox("Show Dummy");
 	private JButton dummyInfo = new JButton("Dummy Info");
 	private JButton dummyCentering = new JButton("Dummy Centering");
@@ -191,8 +191,6 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 
 		if(src==autoAdjust){
 			statePanel.stateGraphPanel.autoAdjust();
-			dummy.setSelected(true);
-			exchangeDummyOnly.setSelected(false);
 		}else if(src==startupAutoAdjust){
 			Env.set("SV_AUTO_ADJUST_STARTUP",!Env.is("SV_AUTO_ADJUST_STARTUP"));
 		}else if(src==posReset){
@@ -206,8 +204,6 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 			statePanel.stateGraphPanel.adjust3Reset();
 		}else if(src==dummyMixAdjust){
 			statePanel.stateGraphPanel.dummyMixAdjust();
-			dummy.setSelected(true);
-			exchangeDummyOnly.setSelected(true);
 		}else if(src==allReset){
 			statePanel.reset();
 		}

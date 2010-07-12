@@ -358,6 +358,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 	public void dummyMixAdjust(){
 
+		statePanel.stateControlPanel.buttonPanel.dummy.setSelected(true);
+		statePanel.stateControlPanel.buttonPanel.exchangeDummyOnly.setSelected(true);
+
 		if(Env.is("SV_DUMMY")) getDrawNodes().removeDummy();
 
 		(new StateGraphAdjustWorker(this)).atomic();
@@ -377,6 +380,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	public void autoAdjust(){
+
+		statePanel.stateControlPanel.buttonPanel.dummy.setSelected(true);
+		statePanel.stateControlPanel.buttonPanel.exchangeDummyOnly.setSelected(false);
 
 		if(Env.is("SV_DUMMY")) getDrawNodes().removeDummy();
 

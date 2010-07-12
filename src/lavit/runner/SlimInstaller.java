@@ -49,7 +49,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -241,6 +243,29 @@ public class SlimInstaller {
 		private JTextArea text;
 		private JButton button;
 
+		private String[] progressMatchString = {
+				"checking for a BSD-compatible install",
+				"checking for style of include used by make",
+				"checking for suffix of object files",
+				"checking whether we are using the GNU C++ compiler",
+				"checking lex library",
+				"checking for C/C++ restrict keyword",
+				"checking for egrep",
+				"checking for memory.h",
+				"checking for unistd.h",
+				"checking for int64_t",
+				"checking for uint16_t",
+				"checking for void*",
+				"checking for strchr",
+				"config.status: creating src/Makefile",
+				"config.status: executing depfiles commands",
+				"configure end.",
+				"gcc: unrecognized option",
+				"make end.",
+				"Making install in doc",
+				"make install end"
+		};
+
 		InstallWindow(){
 
 			ImageIcon image = new ImageIcon(Env.getImageOfFile("img/slim_c_s.png"));
@@ -261,7 +286,8 @@ public class SlimInstaller {
 			panel.add(icon);
 
 
-			bar = new JProgressBar();
+			bar = new JProgressBar(0,100);
+			//bar.setStringPainted(true);
 			bar.setIndeterminate(true);
 			panel.add(bar);
 
@@ -288,8 +314,24 @@ public class SlimInstaller {
 		}
 
 		private void println(String str){
+			//progress bar¤Î½èÍý
+			for(int i=0;i<progressMatchString.length;++i){
+				if(str.startsWith(progressMatchString[i])){
+					bar.setIndeterminate(false);
+					final int progress = (i+1)*5;
+					javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){
+						bar.setValue(progress);
+					}});
+				}
+			}
+
+			SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+			String date = dateFormat.format(new Date());
+			if(str.length()>0){ str = "["+date+"] "+str; }
+
 			text.append(str+"\n");
 			text.setCaretPosition(text.getText().length()-1);
+
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -298,7 +340,8 @@ public class SlimInstaller {
 
 		public void exit(){
 			javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){
-				bar.setIndeterminate(false);
+				//bar.setIndeterminate(false);
+				bar.setValue(100);
 				button.setEnabled(true);
 			}});
 		}

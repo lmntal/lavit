@@ -95,7 +95,7 @@ public class StateControlPanel extends JPanel implements ChangeListener,ActionLi
 
     private StateDynamicControlPanel dynamicPanel;
 
-    private StateButtonPanel buttonPanel;
+    public StateButtonPanel buttonPanel;
 
     private JSlider zoomSlider = new JSlider(1,399);
 

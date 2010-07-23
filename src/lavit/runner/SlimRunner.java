@@ -222,10 +222,15 @@ public class SlimRunner {
 					err2.join();
 					output.outputEnd();
 				}else{
+					if(output==null){
+						output = FrontEnd.mainFrame.toolTab.systemPanel.outputPanel;
+					}
+					err2.start();
 					String str;
 					while ((str=in2.readLine())!=null) {
 						buffer.append(str+"\n");
 					}
+					err2.join();
 				}
 
 				in2.close();

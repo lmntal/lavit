@@ -33,60 +33,55 @@
  *
  */
 
-package lavit.visualeditor;
+package lavit.oldstateviewer.worker;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import lavit.Env;
+import lavit.*;
 import lavit.oldstateviewer.StateGraphPanel;
 
-public class VisualControlPanel extends JPanel implements ChangeListener,ActionListener{
-	VisualPanel visualPanel;
+public class StatePainter extends Thread {
+	private StateGraphPanel graphPanel;
+	private boolean active;
+	private boolean update;
 
-	private JSlider zoomSlider = new JSlider(1,39);
-
-	VisualControlPanel(VisualPanel visualPanel){
-		this.visualPanel = visualPanel;
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-
-		zoomSlider.addChangeListener(this);
-		add(zoomSlider);
+	public StatePainter(StateGraphPanel stateGraphPanel){
+		this.graphPanel = stateGraphPanel;
+		this.active = false;
+		this.update = false;
 	}
 
-	public void allButtonSetEnabled(boolean enabled){
-		zoomSlider.setEnabled(enabled);
+	public void run(){
+		while(true){
+			if(active){
+				if(update){
+					update = false;
+					graphPanel.repaint();
+				}else{
+					try {
+						sleep(100);
+					} catch (InterruptedException e) {
+						FrontEnd.printException(e);
+					}
+				}
+			}else{
+				try {
+					sleep(100);
+				} catch (InterruptedException e) {
+					FrontEnd.printException(e);
+				}
+			}
+		}
 	}
 
-	public void setSliderPos(double z){
-		int pos = (int)(Math.sqrt(z*100)*2-1);
-		if(pos<1){ pos=1; }else if(pos>39){ pos=39; }
-		zoomSlider.removeChangeListener(this);
-		zoomSlider.setValue(pos);
-		zoomSlider.addChangeListener(this);
-	}
-	public void toggleZoomSliderVisible(){
-		zoomSlider.setVisible(!zoomSlider.isVisible());
+	public void update(){
+		this.update = true;
 	}
 
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		double z = (zoomSlider.getValue()+1)/2.0;
-		visualPanel.drawPanel.setZoom(z*z/100.0);
-		visualPanel.drawPanel.update();
+	public void setActive(boolean active){
+		this.active = active;
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO 自動生成されたメソッド・スタブ
-
+	public boolean isActive(){
+		return active;
 	}
 
 }

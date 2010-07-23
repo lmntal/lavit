@@ -33,60 +33,61 @@
  *
  */
 
-package lavit.visualeditor;
+package lavit.oldstateviewer.controller;
 
-import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import lavit.Env;
-import lavit.oldstateviewer.StateGraphPanel;
+import lavit.oldstateviewer.*;
 
-public class VisualControlPanel extends JPanel implements ChangeListener,ActionListener{
-	VisualPanel visualPanel;
+public class StateGeneralControlPanel extends JPanel implements ActionListener {
 
-	private JSlider zoomSlider = new JSlider(1,39);
+	private StateGraphPanel graphPanel;
 
-	VisualControlPanel(VisualPanel visualPanel){
-		this.visualPanel = visualPanel;
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+	JButton rootButton = new JButton("root");
+	JButton upButton = new JButton("up");
+	JLabel ancestors = new JLabel();
 
-		zoomSlider.addChangeListener(this);
-		add(zoomSlider);
+	public StateGeneralControlPanel(StateGraphPanel graphPanel){
+		this.graphPanel = graphPanel;
+
+		setLayout(new FlowLayout(FlowLayout.LEFT));
+		setOpaque(false);
+
+		rootButton.addActionListener(this);
+		add(rootButton);
+
+		upButton.addActionListener(this);
+		add(upButton);
+
+		add(ancestors);
+
 	}
 
-	public void allButtonSetEnabled(boolean enabled){
-		zoomSlider.setEnabled(enabled);
-	}
-
-	public void setSliderPos(double z){
-		int pos = (int)(Math.sqrt(z*100)*2-1);
-		if(pos<1){ pos=1; }else if(pos>39){ pos=39; }
-		zoomSlider.removeChangeListener(this);
-		zoomSlider.setValue(pos);
-		zoomSlider.addChangeListener(this);
-	}
-	public void toggleZoomSliderVisible(){
-		zoomSlider.setVisible(!zoomSlider.isVisible());
-	}
-
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		double z = (zoomSlider.getValue()+1)/2.0;
-		visualPanel.drawPanel.setZoom(z*z/100.0);
-		visualPanel.drawPanel.update();
+	public void updateLabel(StateNodeSet nodes){
+		StateNode node = nodes.parentNode;
+		String str = "";
+		while(node!=null){
+			str = node.id + (str.length()>0?" -> ":"") + str;
+			node = node.parentSet.parentNode;
+		}
+		ancestors.setText(str);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO 自動生成されたメソッド・スタブ
+		Object src = e.getSource();
 
+		if(src==rootButton){
+			graphPanel.generationReset();
+		}else if(src==upButton){
+			graphPanel.generationUp();
+		}
 	}
 
 }

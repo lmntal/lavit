@@ -33,60 +33,44 @@
  *
  */
 
-package lavit.visualeditor;
+package lavit.oldstateviewer;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+public class StateTransition{
+	public StateNode from;
+	public StateNode to;
+	public boolean em = false;
 
-import lavit.Env;
-import lavit.oldstateviewer.StateGraphPanel;
+	private ArrayList<String> rules = new ArrayList<String>();
 
-public class VisualControlPanel extends JPanel implements ChangeListener,ActionListener{
-	VisualPanel visualPanel;
-
-	private JSlider zoomSlider = new JSlider(1,39);
-
-	VisualControlPanel(VisualPanel visualPanel){
-		this.visualPanel = visualPanel;
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-
-		zoomSlider.addChangeListener(this);
-		add(zoomSlider);
+	StateTransition(StateNode from,StateNode to,boolean em){
+		this.from = from;
+		this.to = to;
+		this.em = em;
 	}
 
-	public void allButtonSetEnabled(boolean enabled){
-		zoomSlider.setEnabled(enabled);
+	String getRuleNameString(){
+		StringBuffer buf = new StringBuffer();
+		for(String s : rules){
+			if(buf.length()>0){ buf.append(" "); }
+			buf.append(s);
+		}
+		return buf.toString();
 	}
 
-	public void setSliderPos(double z){
-		int pos = (int)(Math.sqrt(z*100)*2-1);
-		if(pos<1){ pos=1; }else if(pos>39){ pos=39; }
-		zoomSlider.removeChangeListener(this);
-		zoomSlider.setValue(pos);
-		zoomSlider.addChangeListener(this);
-	}
-	public void toggleZoomSliderVisible(){
-		zoomSlider.setVisible(!zoomSlider.isVisible());
+	public ArrayList<String> getRules(){
+		return rules;
 	}
 
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		double z = (zoomSlider.getValue()+1)/2.0;
-		visualPanel.drawPanel.setZoom(z*z/100.0);
-		visualPanel.drawPanel.update();
+	public boolean isToDummy(){
+		return to.dummy;
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO 自動生成されたメソッド・スタブ
-
+	void addRules(ArrayList<String> rs){
+		if(rs==null){ return; }
+		for(String r : rs){
+			rules.add(r);
+		}
 	}
-
 }

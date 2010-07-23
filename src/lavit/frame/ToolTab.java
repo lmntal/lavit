@@ -40,9 +40,9 @@ import java.awt.Dimension;
 import javax.swing.JTabbedPane;
 
 import lavit.ltl.LtlPanel;
+import lavit.oldstateviewer.StatePanel;
 import lavit.option.OptionPanel;
 import lavit.stateprofiler.StateProfilePanel;
-import lavit.stateviewer.StatePanel;
 import lavit.system.SystemPanel;
 import lavit.visualeditor.VisualPanel;
 

@@ -38,7 +38,7 @@ package lavit.util;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import lavit.stateviewer.StateTransition;
+import lavit.oldstateviewer.StateTransition;
 
 public interface StateTransitionCatcher {
 	public void transitionCatch(Collection<String> rules, Collection<StateTransition> trans);

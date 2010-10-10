@@ -45,7 +45,7 @@ import javax.swing.JPanel;
 
 import lavit.oldstateviewer.*;
 
-public class StateGeneralControlPanel extends JPanel implements ActionListener {
+public class StateGenerationControlPanel extends JPanel implements ActionListener {
 
 	private StateGraphPanel graphPanel;
 
@@ -53,7 +53,7 @@ public class StateGeneralControlPanel extends JPanel implements ActionListener {
 	JButton upButton = new JButton("up");
 	JLabel ancestors = new JLabel();
 
-	public StateGeneralControlPanel(StateGraphPanel graphPanel){
+	public StateGenerationControlPanel(StateGraphPanel graphPanel){
 		this.graphPanel = graphPanel;
 
 		setLayout(new FlowLayout(FlowLayout.LEFT));

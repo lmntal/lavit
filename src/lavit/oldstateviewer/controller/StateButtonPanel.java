@@ -224,8 +224,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 			Env.set("SV_DUMMY",!Env.is("SV_DUMMY"));
 			if(Env.is("SV_DUMMY")){
 				statePanel.stateGraphPanel.getDrawNodes().setDummy();
-				statePanel.stateGraphPanel.dummyCentering();
-
+				statePanel.stateGraphPanel.getDrawNodes().dummyCentering();
 			}else{
 				statePanel.stateGraphPanel.getDrawNodes().removeDummy();
 			}
@@ -246,7 +245,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 					JOptionPane.PLAIN_MESSAGE
 			);
 		}else if(src==dummyCentering){
-			statePanel.stateGraphPanel.dummyCentering();
+			statePanel.stateGraphPanel.getDrawNodes().dummyCentering();
 		}else if(src==dummySmoothing){
 			statePanel.stateGraphPanel.dummySmoothing();
 		}else if(src==dynamicModeling){

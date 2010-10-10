@@ -81,6 +81,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 	private JMenuItem searchShortCycle = new JMenuItem("Search Short Cycle");
 	private JMenuItem searchReset = new JMenuItem("Search Reset");
 
+	/*
 	private JMenu resetSubmenu = new JMenu("Graph Reset");
 	private JMenuItem posReset = new JMenuItem("Position Reset");
 	private JMenuItem adjustReset = new JMenuItem("Adjust Reset");
@@ -98,6 +99,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 	private JMenuItem dummyInfo = new JMenuItem("Dummy Info");
 	private JMenuItem dummyCentering = new JMenuItem("Dummy Centering");
 	private JMenuItem dummySmoothing = new JMenuItem("Dummy Smoothing");
+	*/
 
 	private JMenu graphViewSubmenu = new JMenu("Graph View");
 	private JCheckBoxMenuItem backedge = new JCheckBoxMenuItem("Hide Backedge");
@@ -353,9 +355,10 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		JMenuItem src = (JMenuItem)e.getSource();
 		if(src==remove){
-			for(StateNode node : graphPanel.getSelectNodes()){
-				graphPanel.getDrawNodes().remove(node);
-			}
+			//for(StateNode node : graphPanel.getSelectNodes()){
+			//	graphPanel.getDrawNodes().remove(node);
+			//}
+			graphPanel.getDrawNodes().remove(graphPanel.getSelectNodes());
 			graphPanel.getSelectNodes().clear();
 			graphPanel.repaint();
 		}else if(src==unyo2){
@@ -391,6 +394,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 			graphPanel.searchShortCycle();
 		}else if(src==searchReset){
 			graphPanel.searchReset();
+/*
 		}else if(src==posReset){
 			graphPanel.positionReset();
 			graphPanel.autoCentering();
@@ -409,7 +413,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 		}else if(src==stretchMove){
 			graphPanel.stretchMove();
 		}else if(src==dummyCentering){
-			graphPanel.dummyCentering();
+			//graphPanel.dummyCentering();
 		}else if(src==dummySmoothing){
 			graphPanel.dummySmoothing();
 		}else if(src==shakeMove){
@@ -423,10 +427,10 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 			Env.set("SV_DUMMY",!Env.is("SV_DUMMY"));
 			if(Env.is("SV_DUMMY")){
 				graphPanel.getDrawNodes().setDummy();
-				graphPanel.dummyCentering();
+				graphPanel.getDrawNodes().dummyCentering();
 				if(graphPanel.statePanel.isLtl()){
 					for(StateNode node : graphPanel.getDrawNodes().getAllNode()){
-						if(node.inCycle){
+						if(node.cycle){
 							node.weak = false;
 							graphPanel.getDrawNodes().setLastOrder(node);
 						}else{
@@ -494,6 +498,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 					"Dummy Info",
 					JOptionPane.PLAIN_MESSAGE
 			);
+			*/
 		}else if(src==dotFile){
 			dotfileSave();
 			FrontEnd.mainFrame.toolTab.setTab("System");

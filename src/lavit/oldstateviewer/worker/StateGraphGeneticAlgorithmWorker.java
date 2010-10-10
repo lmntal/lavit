@@ -456,7 +456,6 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 					try {
 						sleep(200);
 					} catch (InterruptedException e) {
-						FrontEnd.printException(e);
 					}
 				}
 			}

@@ -118,7 +118,7 @@ public class StateGraphAdjust2Worker extends SwingWorker<Object,Object>{
 		xInterval = 0;
 		yInterval = Double.MAX_VALUE;
 		for(int i=0;i<drawNodes.getDepth();++i){
-			double t = h/(drawNodes.getSameDepthSize(i)+1);
+			double t = h/(drawNodes.getSizeOfDepth(i)+1);
 			if(t<yInterval){
 				yInterval = t;
 			}

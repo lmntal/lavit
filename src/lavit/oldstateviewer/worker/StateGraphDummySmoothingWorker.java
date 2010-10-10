@@ -107,7 +107,7 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 				for(StateNode node : nodes){
 					if(node.dummy){
 						double y = node.getY();
-						double ay = (node.getFromNode().getY()+node.getToNodes().get(0).getY())/2;
+						double ay = (node.getFromNodes().get(0).getY()+node.getToNodes().get(0).getY())/2;
 						node.setY(ay);
 						if(rideOtherNode(nodes,node)){
 							if(ay>y){

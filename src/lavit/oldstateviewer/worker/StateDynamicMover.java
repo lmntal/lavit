@@ -79,48 +79,49 @@ public class StateDynamicMover extends Thread {
 
 	public void run(){
 		while(true){
-			StateNodeSet drawNodes = panel.getDrawNodes();
-			if(active){
-				double springLength = 30;
-				if(drawNodes.getDepth()>=2){
-					springLength = drawNodes.getDepthNode().get(1).get(0).getX() - drawNodes.getDepthNode().get(0).get(0).getX();
-				}
-
-				//ばね
-				for(StateNode node : drawNodes.getAllNode()){
-					for(StateNode to : node.getToNodes()){
-						double l = Math.sqrt((node.getX()-to.getX())*(node.getX()-to.getX())+(node.getY()-to.getY())*(node.getY()-to.getY()));
-						if(l==0){ continue; }
-						double f = -1.0 * (l-springLength)*k;
-						double rateY = (node.getY()-to.getY())/l;
-						node.ddy += f*rateY;
+			try{
+				StateNodeSet drawNodes = panel.getDrawNodes();
+				if(active){
+					double springLength = 30;
+					if(drawNodes.getDepth()>=2){
+						springLength = drawNodes.getDepthNode().get(1).get(0).getX() - drawNodes.getDepthNode().get(0).get(0).getX();
 					}
-					for(StateNode from : node.getFromNodes()){
-						double l = Math.sqrt((node.getX()-from.getX())*(node.getX()-from.getX())+(node.getY()-from.getY())*(node.getY()-from.getY()));
-						if(l==0){ continue; }
-						double f = -1.0 * (l-springLength)*k;
-						double rateY = (node.getY()-from.getY())/l;
-						node.ddy += f*rateY;
-					}
-				}
 
-				//斥力
-				int d = 10;
-				for(ArrayList<StateNode> nodes : drawNodes.getDepthNode()){
-					for(StateNode node : nodes){
-						for(StateNode n : nodes){
-							if(node.id==n.id) continue;
-							double r = node.getY()-n.getY();
-							if(r==0) continue;
-							if(0<r&&r<d){ r=d; }
-							if(-d<r&&r<0){ r=-d; }
-							double f;
-							if(r>0){
-								f = ((node.dummy?dc:nc)+(n.dummy?dc:nc))/(r*r);
-							}else{
-								f = -((node.dummy?dc:nc)+(n.dummy?dc:nc))/(r*r);
-							}
-							/*
+					//ばね
+					for(StateNode node : drawNodes.getAllNode()){
+						for(StateNode to : node.getToNodes()){
+							double l = Math.sqrt((node.getX()-to.getX())*(node.getX()-to.getX())+(node.getY()-to.getY())*(node.getY()-to.getY()));
+							if(l==0){ continue; }
+							double f = -1.0 * (l-springLength)*k;
+							double rateY = (node.getY()-to.getY())/l;
+							node.ddy += f*rateY;
+						}
+						for(StateNode from : node.getFromNodes()){
+							double l = Math.sqrt((node.getX()-from.getX())*(node.getX()-from.getX())+(node.getY()-from.getY())*(node.getY()-from.getY()));
+							if(l==0){ continue; }
+							double f = -1.0 * (l-springLength)*k;
+							double rateY = (node.getY()-from.getY())/l;
+							node.ddy += f*rateY;
+						}
+					}
+
+					//斥力
+					int d = 10;
+					for(ArrayList<StateNode> nodes : drawNodes.getDepthNode()){
+						for(StateNode node : nodes){
+							for(StateNode n : nodes){
+								if(node.id==n.id) continue;
+								double r = node.getY()-n.getY();
+								if(r==0) continue;
+								if(0<r&&r<d){ r=d; }
+								if(-d<r&&r<0){ r=-d; }
+								double f;
+								if(r>0){
+									f = ((node.dummy?dc:nc)+(n.dummy?dc:nc))/(r*r);
+								}else{
+									f = -((node.dummy?dc:nc)+(n.dummy?dc:nc))/(r*r);
+								}
+								/*
 							r/=20;
 							if(-1<r&&r<0){
 								f = -1*(5*r*r*r/4-19*r*r/8+9/8);
@@ -129,50 +130,42 @@ public class StateDynamicMover extends Thread {
 							}else{
 								f = 0;
 							}
-							*/
-							node.ddy += f;
+								 */
+								node.ddy += f;
+							}
 						}
 					}
-				}
 
-				//摩擦力
-				for(StateNode node : drawNodes.getAllNode()){
-					node.ddy += -0.5 * (node.dy+node.ddy);
-				}
-
-				//移動
-				for(StateNode node : drawNodes.getAllNode()){
-					if(panel.getSelectNodes().contains(node)&&panel.isDragg()) continue;
-					node.dy += node.ddy;
-					if(node.dy>maxSpeed){
-						node.move(0,maxSpeed);
-					}else if(node.dy<-maxSpeed){
-						node.move(0,-maxSpeed);
-					}else{
-						//dyがおかしくなった場合は0にする
-						if(!(-1000000000<node.dy&&node.dy<1000000000)){ node.dy=0; node.ddy=0; }
-						node.move(0,node.dy);
+					//摩擦力
+					for(StateNode node : drawNodes.getAllNode()){
+						node.ddy += -0.5 * (node.dy+node.ddy);
 					}
-				}
-				panel.repaint();
 
-			}else{
-				try {
+					//移動
+					for(StateNode node : drawNodes.getAllNode()){
+						if(panel.getSelectNodes().contains(node)&&panel.isDragg()) continue;
+						node.dy += node.ddy;
+						if(node.dy>maxSpeed){
+							node.move(0,maxSpeed);
+						}else if(node.dy<-maxSpeed){
+							node.move(0,-maxSpeed);
+						}else{
+							//dyがおかしくなった場合は0にする
+							if(!(-1000000000<node.dy&&node.dy<1000000000)){ node.dy=0; node.ddy=0; }
+							node.move(0,node.dy);
+						}
+					}
+					panel.repaint();
+				}else{
 					sleep(100);
-				} catch (InterruptedException e) {
-					FrontEnd.printException(e);
 				}
-			}
-
-			if(interval>0){
-				try {
+				if(interval>0){
 					sleep(interval);
-				} catch (InterruptedException e) {
-					FrontEnd.printException(e);
 				}
+			} catch (Exception e) {
 			}
-
 		}
+
 	}
 
 	public void setActive(boolean active){

@@ -2,7 +2,7 @@ package lavit.util;
 
 import java.util.Comparator;
 
-import lavit.oldstateviewer.StateNode;
+import lavit.stateviewer.StateNode;
 
 public class NodeYComparator implements Comparator<StateNode> {
 	public int compare(StateNode n1, StateNode n2) {

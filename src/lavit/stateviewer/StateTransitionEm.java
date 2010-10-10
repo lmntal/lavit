@@ -33,40 +33,54 @@
  *
  */
 
-package lavit.visualeditor;
+package lavit.stateviewer;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
+import lavit.util.StateTransitionCatcher;
 
-import lavit.stateviewer.StateGraphPanel;
-import lavit.stateviewer.StateNodeSet;
-import lavit.stateviewer.controller.StateControlPanel;
+public class StateTransitionEm implements StateTransitionCatcher {
+	private StateGraphPanel graphPanel;
 
-public class VisualPanel extends JPanel {
-
-	public VisualToolBar toolBar;
-	public VisualDrawPanel drawPanel;
-	public VisualControlPanel controlPanel;
-
-	public VisualPanel(){
-		setLayout(new BorderLayout());
-
-		toolBar = new VisualToolBar(this);
-		add(toolBar, BorderLayout.PAGE_START);
-
-		drawPanel = new VisualDrawPanel(this);
-		add(drawPanel, BorderLayout.CENTER);
-
-		controlPanel = new VisualControlPanel(this);
-		add(controlPanel, BorderLayout.SOUTH);
-
-		drawPanel.init();
-
+	public StateTransitionEm(StateGraphPanel graphPanel){
+		this.graphPanel = graphPanel;
 	}
 
+	@Override
+	public void transitionCatch(Collection<String> rules, Collection<StateTransition> trans) {
+		/*
+		StateNodeSet drawNodes = graphPanel.getDrawNodes();
+		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
+
+		for(StateTransition t : trans){
+			t.from.inCycle = true;
+			weaks.remove(t.from);
+
+			t.to.inCycle = true;
+			weaks.remove(t.to);
+
+			t.from.setEmToNode(t.to, true);
+		}
+
+		for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
+		graphPanel.update();
+		*/
+
+		StateNodeSet drawNodes = graphPanel.getDrawNodes();
+		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
+
+		for(StateTransition t : trans){
+			t.from.cycle = true;
+			weaks.remove(t.from);
+			t.to.cycle = true;
+			weaks.remove(t.to);
+			t.cycle = true;
+			drawNodes.setLastOrder(t);
+		}
+
+		for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
+		graphPanel.update();
+	}
 }

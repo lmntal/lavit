@@ -46,7 +46,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import lavit.Env;
-import lavit.oldstateviewer.StateGraphPanel;
+import lavit.stateviewer.StateGraphPanel;
 
 public class VisualControlPanel extends JPanel implements ChangeListener,ActionListener{
 	VisualPanel visualPanel;

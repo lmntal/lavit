@@ -33,40 +33,55 @@
  *
  */
 
-package lavit.visualeditor;
+package lavit.stateviewer.worker;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-
+import lavit.*;
 import lavit.stateviewer.StateGraphPanel;
-import lavit.stateviewer.StateNodeSet;
-import lavit.stateviewer.controller.StateControlPanel;
 
-public class VisualPanel extends JPanel {
+public class StatePainter extends Thread {
+	private StateGraphPanel graphPanel;
+	private boolean active;
+	private boolean update;
 
-	public VisualToolBar toolBar;
-	public VisualDrawPanel drawPanel;
-	public VisualControlPanel controlPanel;
+	public StatePainter(StateGraphPanel stateGraphPanel){
+		this.graphPanel = stateGraphPanel;
+		this.active = false;
+		this.update = false;
+	}
 
-	public VisualPanel(){
-		setLayout(new BorderLayout());
+	public void run(){
+		while(true){
+			if(active){
+				if(update){
+					update = false;
+					graphPanel.repaint();
+				}else{
+					try {
+						sleep(100);
+					} catch (InterruptedException e) {
+						FrontEnd.printException(e);
+					}
+				}
+			}else{
+				try {
+					sleep(100);
+				} catch (InterruptedException e) {
+					FrontEnd.printException(e);
+				}
+			}
+		}
+	}
 
-		toolBar = new VisualToolBar(this);
-		add(toolBar, BorderLayout.PAGE_START);
+	public void update(){
+		this.update = true;
+	}
 
-		drawPanel = new VisualDrawPanel(this);
-		add(drawPanel, BorderLayout.CENTER);
+	public void setActive(boolean active){
+		this.active = active;
+	}
 
-		controlPanel = new VisualControlPanel(this);
-		add(controlPanel, BorderLayout.SOUTH);
-
-		drawPanel.init();
-
+	public boolean isActive(){
+		return active;
 	}
 
 }

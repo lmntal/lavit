@@ -33,39 +33,35 @@
  *
  */
 
-package lavit.visualeditor;
+package lavit.stateviewer;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
+import lavit.Env;
+import lavit.stateviewer.worker.StateGraphStretchMoveWorker;
+import lavit.stateviewer.worker.StateTransitionAbstractionWorker;
+import lavit.util.StateTransitionCatcher;
 
-import lavit.stateviewer.StateGraphPanel;
-import lavit.stateviewer.StateNodeSet;
-import lavit.stateviewer.controller.StateControlPanel;
+public class StateTransitionAbstraction implements StateTransitionCatcher {
 
-public class VisualPanel extends JPanel {
+	private StateGraphPanel graphPanel;
 
-	public VisualToolBar toolBar;
-	public VisualDrawPanel drawPanel;
-	public VisualControlPanel controlPanel;
+	public StateTransitionAbstraction(StateGraphPanel graphPanel){
+		this.graphPanel = graphPanel;
+	}
 
-	public VisualPanel(){
-		setLayout(new BorderLayout());
+	@Override
+	public void transitionCatch(Collection<String> rules, Collection<StateTransition> trans) {
 
-		toolBar = new VisualToolBar(this);
-		add(toolBar, BorderLayout.PAGE_START);
-
-		drawPanel = new VisualDrawPanel(this);
-		add(drawPanel, BorderLayout.CENTER);
-
-		controlPanel = new VisualControlPanel(this);
-		add(controlPanel, BorderLayout.SOUTH);
-
-		drawPanel.init();
+		StateTransitionAbstractionWorker worker = new StateTransitionAbstractionWorker(graphPanel);
+		if(trans.size()<500){
+			worker.atomic(rules);
+		}else{
+			worker.ready(rules);
+			worker.execute();
+		}
 
 	}
 

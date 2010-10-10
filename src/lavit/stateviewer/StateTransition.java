@@ -33,40 +33,71 @@
  *
  */
 
-package lavit.visualeditor;
+package lavit.stateviewer;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.Color;
+import java.awt.geom.RoundRectangle2D;
+import java.util.ArrayList;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
+import lavit.Env;
 
-import lavit.stateviewer.StateGraphPanel;
-import lavit.stateviewer.StateNodeSet;
-import lavit.stateviewer.controller.StateControlPanel;
+public class StateTransition{
+	public StateNode from;
+	public StateNode to;
+	public boolean cycle;
+	public boolean weak;
 
-public class VisualPanel extends JPanel {
+	private ArrayList<String> rules = new ArrayList<String>();
 
-	public VisualToolBar toolBar;
-	public VisualDrawPanel drawPanel;
-	public VisualControlPanel controlPanel;
+	Color color;
 
-	public VisualPanel(){
-		setLayout(new BorderLayout());
-
-		toolBar = new VisualToolBar(this);
-		add(toolBar, BorderLayout.PAGE_START);
-
-		drawPanel = new VisualDrawPanel(this);
-		add(drawPanel, BorderLayout.CENTER);
-
-		controlPanel = new VisualControlPanel(this);
-		add(controlPanel, BorderLayout.SOUTH);
-
-		drawPanel.init();
-
+	StateTransition(){
+		this.cycle = false;
+		this.weak = false;
 	}
 
+	StateTransition(StateNode from, StateNode to, boolean cycle, boolean weak){
+		this.from = from;
+		this.to = to;
+		this.cycle = cycle;
+		this.weak = weak;
+	}
+
+	/*
+	StateTransition(StateNode from,StateNode to,boolean cycle){
+		this.from = from;
+		this.to = to;
+		this.cycle = cycle;
+	}
+	*/
+
+	String getRuleNameString(){
+		StringBuffer buf = new StringBuffer();
+		for(String s : rules){
+			if(buf.length()>0){ buf.append(" "); }
+			buf.append(s);
+		}
+		return buf.toString();
+	}
+
+	public ArrayList<String> getRules(){
+		return rules;
+	}
+
+	public boolean isToDummy(){
+		return to.dummy;
+	}
+
+	void addRules(String str){
+		for(String s : str.split(" ")){
+			rules.add(s);
+		}
+	}
+
+	void addRules(ArrayList<String> rs){
+		if(rs==null){ return; }
+		for(String r : rs){
+			rules.add(r);
+		}
+	}
 }

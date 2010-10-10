@@ -33,40 +33,61 @@
  *
  */
 
-package lavit.visualeditor;
+package lavit.stateviewer.controller;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 
-import lavit.stateviewer.StateGraphPanel;
-import lavit.stateviewer.StateNodeSet;
-import lavit.stateviewer.controller.StateControlPanel;
+import lavit.stateviewer.*;
 
-public class VisualPanel extends JPanel {
+public class StateGenerationControlPanel extends JPanel implements ActionListener {
 
-	public VisualToolBar toolBar;
-	public VisualDrawPanel drawPanel;
-	public VisualControlPanel controlPanel;
+	private StateGraphPanel graphPanel;
 
-	public VisualPanel(){
-		setLayout(new BorderLayout());
+	JButton rootButton = new JButton("root");
+	JButton upButton = new JButton("up");
+	JLabel ancestors = new JLabel();
 
-		toolBar = new VisualToolBar(this);
-		add(toolBar, BorderLayout.PAGE_START);
+	public StateGenerationControlPanel(StateGraphPanel graphPanel){
+		this.graphPanel = graphPanel;
 
-		drawPanel = new VisualDrawPanel(this);
-		add(drawPanel, BorderLayout.CENTER);
+		setLayout(new FlowLayout(FlowLayout.LEFT));
+		setOpaque(false);
 
-		controlPanel = new VisualControlPanel(this);
-		add(controlPanel, BorderLayout.SOUTH);
+		rootButton.addActionListener(this);
+		add(rootButton);
 
-		drawPanel.init();
+		upButton.addActionListener(this);
+		add(upButton);
 
+		add(ancestors);
+
+	}
+
+	public void updateLabel(StateNodeSet nodes){
+		StateNode node = nodes.parentNode;
+		String str = "";
+		while(node!=null){
+			str = node.id + (str.length()>0?" -> ":"") + str;
+			node = node.parentSet.parentNode;
+		}
+		ancestors.setText(str);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object src = e.getSource();
+
+		if(src==rootButton){
+			graphPanel.generationReset();
+		}else if(src==upButton){
+			graphPanel.generationUp();
+		}
 	}
 
 }

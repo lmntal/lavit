@@ -47,7 +47,6 @@ public class StateAbstractionMaker {
 	private StateGraphPanel graphPanel;
 	StateNodeSet drawNodes;
 	boolean dummy;
-	long newId;
 
 	public StateAbstractionMaker(StateGraphPanel graphPanel){
 		this.graphPanel = graphPanel;
@@ -57,18 +56,106 @@ public class StateAbstractionMaker {
 		Env.set("SV_DUMMY",false);
 		drawNodes.removeDummy();
 		graphPanel.selectNodeClear();
-
-		newId = drawNodes.getMaxNodeId();
 	}
 
 	public void makeNode(Collection<StateNode> groupNodes){
 
-		long id = ++newId;
+		long id = drawNodes.publishNodeId();
+		StateNode newNode = new StateNode(id, drawNodes);
+		newNode.depth = Integer.MAX_VALUE;
+		LinkedHashSet<StateTransition> allTrans = new LinkedHashSet<StateTransition>();
+		LinkedHashSet<StateTransition> outTrans = new LinkedHashSet<StateTransition>();
+
+		for(StateNode node : groupNodes){
+			if(node.dummy){ continue; }
+
+			if(node.accept){ newNode.accept = true; }
+			if(node.cycle){ newNode.cycle = true; }
+			if(newNode.depth>node.depth){ newNode.depth = node.depth; }
+
+			for(StateTransition t : new LinkedList<StateTransition>(node.getToTransitions())){
+				if(!groupNodes.contains(t.to)){
+					//グループ外への遷移
+					if(!newNode.isToNode(t.to)){
+						StateTransition newTrans = new StateTransition(newNode, t.to, t.cycle, t.weak);
+						newTrans.addRules(t.getRules());
+						newTrans.from.addToTransition(newTrans);
+						newTrans.to.addFromTransition(newTrans);
+						drawNodes.addTransition(newTrans);
+					}
+
+					t.from.removeToTransition(t);
+					t.to.removeFromTransition(t);
+					drawNodes.removeTransition(t);
+					outTrans.add(t);
+				}else{
+					//グループ内への遷移
+					drawNodes.removeTransition(t);
+					allTrans.add(t);
+				}
+			}
+
+			for(StateTransition t : new LinkedList<StateTransition>(node.getFromTransitions())){
+				if(!groupNodes.contains(t.from)){
+					//グループ外への遷移
+					if(!newNode.isFromNode(t.from)){
+						StateTransition newTrans = new StateTransition(t.from, newNode, t.cycle, t.weak);
+						newTrans.addRules(t.getRules());
+						newTrans.from.addToTransition(newTrans);
+						newTrans.to.addFromTransition(newTrans);
+						drawNodes.addTransition(newTrans);
+					}
+
+					t.from.removeToTransition(t);
+					t.to.removeFromTransition(t);
+					drawNodes.removeTransition(t);
+					outTrans.add(t);
+				}else{
+					//グループ内への遷移
+					drawNodes.removeTransition(t);
+					allTrans.add(t);
+				}
+			}
+			drawNodes.removeInnerNodeData(node);
+		}
+
+		//サイクル系もちゃんと処理する
+
+		//新しい位置の決定
+		double x=0,y=0;
+		for(StateNode node : groupNodes){
+			x+=node.getX();
+			y+=node.getY();
+		}
+		x/=(double)(groupNodes.size());
+		y/=(double)(groupNodes.size());
+		double minD = Double.MAX_VALUE;
+		double bestX = 0;
+		for(StateNode node : groupNodes){
+			double d = Math.abs(node.getX()-x);
+			if(d<minD){
+				bestX = node.getX();
+				minD = d;
+			}
+		}
+
+		StateNodeSet child = new StateNodeSet(newNode);
+		child.setSubNode(groupNodes, allTrans, outTrans);
+		newNode.setChildSet(child);
+		newNode.setPosition(bestX, y);
+
+		drawNodes.addNode(newNode);
+		//if(newNode.getFromNodes().size()==0){ drawNodes.setStartNode(newNode); }
+		if(newNode.depth==0){ drawNodes.setStartNode(newNode); }
+		if(newNode.getToNodes().size()==0){ drawNodes.addEndNode(newNode); }
+
+		/*
 		boolean accept = false;
 		boolean inCycle = false;
 		boolean start = false;
 		LinkedHashSet<StateTransition> toes = new LinkedHashSet<StateTransition>();
-		LinkedHashSet<StateNode> fromNodes = new LinkedHashSet<StateNode>();
+		LinkedHashSet<StateTransition> froms = new LinkedHashSet<StateTransition>();
+		//LinkedHashSet<StateNode> fromNodes = new LinkedHashSet<StateNode>();
 		LinkedHashSet<StateTransition> removeTrans = new LinkedHashSet<StateTransition>();
 
 		StateNode newNode = new StateNode(id, drawNodes);
@@ -83,11 +170,11 @@ public class StateAbstractionMaker {
 
 			Env.startWatch("Worker[2-1]");
 
-			for(StateTransition t : node.getTransition()){
+			for(StateTransition t : node.getToTransition()){
 				if(!groupNodes.contains(t.to)){
 
 					//新しいtransを追加
-					StateTransition existTrans = getInTransition(toes, t.to);
+					StateTransition existTrans = getInToTransition(toes, t.to);
 					if(existTrans==null){
 						StateTransition newTrans = new StateTransition(newNode, t.to, t.em);
 						newTrans.addRules(t.getRules());
@@ -114,7 +201,7 @@ public class StateAbstractionMaker {
 
 			for(StateNode f : node.getFromNodes()){
 
-				StateTransition t =  f.getTransition(node);
+				StateTransition t =  f.getToTransition(node);
 				if(!groupNodes.contains(f)){
 					//新しいfromを追加
 					if(!fromNodes.contains(f)){
@@ -169,18 +256,17 @@ public class StateAbstractionMaker {
 		newNode.setChildSet(child);
 
 		newNode.setPosition(bestX, y);
-		newNode.setTransition(toes);
+		newNode.setToTransition(toes);
 		newNode.setFromNode(fromNodes);
 
 		drawNodes.addNode(newNode);
 		if(start){ drawNodes.setStartNode(newNode); }
-		if(newNode.getToNodes().size()==0){ drawNodes.addEndNode(newNode); }
+		if(newNode.getToNodes().size()==0){ drawNodes.addEndNode(newNode); }*/
 	}
 
 	public void end(){
 		drawNodes.setTreeDepth();
 		drawNodes.resetOrder();
-		drawNodes.updateMaxNodeId();
 
 		Env.set("SV_DUMMY",dummy);
 		if(Env.is("SV_DUMMY")){
@@ -190,8 +276,8 @@ public class StateAbstractionMaker {
 
 		if(graphPanel.statePanel.isLtl()){
 			for(StateTransition t : graphPanel.getDrawNodes().getAllTransition()){
-				if(t.from.inCycle&&t.to.inCycle){
-					t.em = true;
+				if(t.from.cycle&&t.to.cycle){
+					t.cycle = true;
 				}
 			}
 			graphPanel.statePanel.stateGraphPanel.searchShortCycle();
@@ -200,9 +286,18 @@ public class StateAbstractionMaker {
 		graphPanel.update();
 	}
 
-	StateTransition getInTransition(LinkedHashSet<StateTransition> toes,StateNode toNode){
+	StateTransition getInToTransition(LinkedHashSet<StateTransition> toes,StateNode toNode){
 		for(StateTransition trans : toes){
 			if(trans.to==toNode){
+				return trans;
+			}
+		}
+		return null;
+	}
+
+	StateTransition getInFromTransition(LinkedHashSet<StateTransition> froms,StateNode fromNode){
+		for(StateTransition trans : froms){
+			if(trans.from==fromNode){
 				return trans;
 			}
 		}

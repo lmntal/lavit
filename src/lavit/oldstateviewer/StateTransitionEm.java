@@ -72,11 +72,11 @@ public class StateTransitionEm implements StateTransitionCatcher {
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 
 		for(StateTransition t : trans){
-			t.from.inCycle = true;
+			t.from.cycle = true;
 			weaks.remove(t.from);
-			t.to.inCycle = true;
+			t.to.cycle = true;
 			weaks.remove(t.to);
-			t.em = true;
+			t.cycle = true;
 			drawNodes.setLastOrder(t);
 		}
 

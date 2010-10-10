@@ -35,20 +35,41 @@
 
 package lavit.oldstateviewer;
 
+import java.awt.Color;
+import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
+
+import lavit.Env;
 
 public class StateTransition{
 	public StateNode from;
 	public StateNode to;
-	public boolean em = false;
+	public boolean cycle;
+	public boolean weak;
 
 	private ArrayList<String> rules = new ArrayList<String>();
 
-	StateTransition(StateNode from,StateNode to,boolean em){
+	Color color;
+
+	StateTransition(){
+		this.cycle = false;
+		this.weak = false;
+	}
+
+	StateTransition(StateNode from, StateNode to, boolean cycle, boolean weak){
 		this.from = from;
 		this.to = to;
-		this.em = em;
+		this.cycle = cycle;
+		this.weak = weak;
 	}
+
+	/*
+	StateTransition(StateNode from,StateNode to,boolean cycle){
+		this.from = from;
+		this.to = to;
+		this.cycle = cycle;
+	}
+	*/
 
 	String getRuleNameString(){
 		StringBuffer buf = new StringBuffer();
@@ -65,6 +86,12 @@ public class StateTransition{
 
 	public boolean isToDummy(){
 		return to.dummy;
+	}
+
+	void addRules(String str){
+		for(String s : str.split(" ")){
+			rules.add(s);
+		}
 	}
 
 	void addRules(ArrayList<String> rs){

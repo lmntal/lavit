@@ -75,40 +75,58 @@ import lavit.runner.UnyoRunner;
 public class StateNode implements Shape {
 	public long id;
 
+	public StateNodeSet parentSet;
+	public StateNodeSet childSet;
+
 	public String state;
 	public String label;
 	boolean accept;
-	public boolean inCycle;
+	public boolean cycle;
 
-	public int depth = 0;
-	public int nth = 0;
+	public int depth;
+	public int nth;
 
 	public boolean dummy;
 	public boolean weak;
 
-	private LinkedHashSet<StateTransition> toes;
-	private LinkedHashSet<StateNode> fromNodes;
-
-	public StateNodeSet childSet;
-	public StateNodeSet parentSet;
+	private LinkedHashSet<StateTransition> toes = new LinkedHashSet<StateTransition>();
+	private LinkedHashSet<StateTransition> froms = new LinkedHashSet<StateTransition>();
 
 	private boolean marked;
 	private boolean inFrame;
 
 	private Shape shape;
 	private double radius;
-	private Color fillColor;
-	private Color drawColor;
-	//private ColorMode colorMode;
-	//enum ColorMode { normal, em, weak };
+	private Color color;
 
 	//物理モデル用変数
 	public double dy;
 	public double ddy;
 
-	StateNode(long id, StateNodeSet parent){
+	StateNode(long id, StateNodeSet parentSet){
 		this.id = id;
-		this.parentSet = parent;
+		this.parentSet = parentSet;
+
+		this.state = "";
+		this.label = "";
+		this.accept = false;
+		this.cycle = false;
+
+		this.depth = 0;
+		this.nth = 0;
+
+		this.dummy = false;
+		this.weak = false;
+
+		this.toes = new LinkedHashSet<StateTransition>();
+		this.froms = new LinkedHashSet<StateTransition>();
+
+		this.marked = false;
+		this.inFrame = false;
+
+		this.shape = new RoundRectangle2D.Double(0,0,0,0,0,0);
+
+		updateLooks();
 	}
 
 	void init(String state,String label,boolean accept,boolean inCycle){
@@ -117,17 +135,18 @@ public class StateNode implements Shape {
 		this.state = state;
 		this.label = label;
 		this.accept = accept;
-		this.inCycle = inCycle;
+		this.cycle = inCycle;
 
 		this.dummy = false;
 		this.weak = false;
 
-		//this.toNodes = new ArrayList<StateNode>();
 		this.toes = new LinkedHashSet<StateTransition>();
-		this.fromNodes = new LinkedHashSet<StateNode>();
+		this.froms = new LinkedHashSet<StateTransition>();
 
 		this.childSet = null;
 
+		//this.toNodes = new ArrayList<StateNode>();
+		//this.fromNodes = new LinkedHashSet<StateNode>();
 		//this.emToNodes = new ArrayList<StateNode>();
 
 		this.marked = false;
@@ -138,37 +157,12 @@ public class StateNode implements Shape {
 
 	void updateLooks(){
 
-		//double to = toNodes.size();
+		//色の決定
 		double to = toes.size();
-
-		double from = fromNodes.size();
-
+		double from = froms.size();
 		double r = 0;
 		double g = 0;
 		double b = 0;
-
-		/*
-		if(to<from){
-			if(to*2<from){
-				r = 255;
-				g = 255*Math.sqrt(to*2/from);
-			}else{
-				g = 255;
-				r = 255*Math.sqrt(to/from);
-			}
-		}else if(to>from){
-			if(to>from*2){
-				b = 255;
-				g = 255*Math.sqrt(from*2/to);
-			}else{
-				g = 255;
-				b = 255*Math.sqrt(from/to);
-			}
-		}else{
-			g = 255;
-		}
-		*/
-
 
 		if(from<to){
 			if(from*2<to){
@@ -203,6 +197,55 @@ public class StateNode implements Shape {
 				b = 0;
 			}
 		}
+
+		//色の設定
+		if(dummy){
+			color = Color.gray;
+		}else{
+			color = new Color((int)r,(int)g,(int)b);
+		}
+
+		//大きさの設定
+		if(dummy){
+			if(Env.is("SV_SHOW_DUMMY")){
+				radius = 2.0;
+			}else{
+				radius = 0.0;
+			}
+		}else if(weak){
+			radius = 3.0;
+		}else{
+			radius = 5.0;
+		}
+
+		//形の設定
+		if(childSet==null){
+			shape = new RoundRectangle2D.Double(getX()-radius,getY()-radius,radius*2,radius*2,radius*2,radius*2);
+		}else{
+			shape = new RoundRectangle2D.Double(getX()-radius,getY()-radius,radius*2,radius*2,radius/2,radius/2);
+		}
+
+		/*
+		if(to<from){
+			if(to*2<from){
+				r = 255;
+				g = 255*Math.sqrt(to*2/from);
+			}else{
+				g = 255;
+				r = 255*Math.sqrt(to/from);
+			}
+		}else if(to>from){
+			if(to>from*2){
+				b = 255;
+				g = 255*Math.sqrt(from*2/to);
+			}else{
+				g = 255;
+				b = 255*Math.sqrt(from/to);
+			}
+		}else{
+			g = 255;
+		}
+		*/
 
 /*
 		if(from<to){
@@ -249,30 +292,6 @@ public class StateNode implements Shape {
 				break;
 		}
 		*/
-
-		if(dummy){
-			if(Env.is("SV_SHOW_DUMMY")){
-				radius = 2.0;
-			}else{
-				radius = 0.0;
-			}
-			fillColor = Color.white;
-			drawColor = Color.gray;
-		}else if(weak){
-			radius = 3.0;
-			fillColor = Color.white;
-			drawColor = new Color((int)r,(int)g,(int)b);
-		}else{
-			radius = 5.0;
-			fillColor = new Color((int)r,(int)g,(int)b);
-			drawColor = Color.gray;
-		}
-
-		if(childSet==null){
-			shape = new RoundRectangle2D.Double(getX()-radius,getY()-radius,radius*2,radius*2,radius*2,radius*2);
-		}else{
-			shape = new RoundRectangle2D.Double(getX()-radius,getY()-radius,radius*2,radius*2,radius/2,radius/2);
-		}
 		/*
 		if(toIds.size()==0){
 			color = Color.red;
@@ -288,6 +307,7 @@ public class StateNode implements Shape {
 			color = Color.cyan;
 		}
 		*/
+
 	}
 
 	public synchronized double getX(){
@@ -315,6 +335,7 @@ public class StateNode implements Shape {
 		((RectangularShape)shape).setFrame(x-radius, y-radius, radius*2, radius*2);
 	}
 
+	/*
 	StateTransition addToNode(StateNode toNode,ArrayList<String> rules,boolean em){
 		if(isToNode(toNode)) return null;
 
@@ -323,71 +344,7 @@ public class StateNode implements Shape {
 		toes.add(t);
 		return t;
 	}
-
-	StateTransition addTransition(StateTransition t){
-		if(isToNode(t.to)) return null;
-		toes.add(t);
-		return t;
-	}
-
-	StateTransition removeToNode(StateNode toNode){
-		StateTransition r = null;
-		for(StateTransition t : toes){
-			if(t.to==toNode){
-				r = t;
-				break;
-			}
-		}
-		toes.remove(r);
-		return r;
-	}
-
-	boolean isToNode(StateNode toNode){
-		return getToNodes().contains(toNode);
-	}
-
-
-	public ArrayList<StateNode> getToNodes(){
-		ArrayList<StateNode> toNodes = new ArrayList<StateNode>();
-		for(StateTransition t : toes){
-			toNodes.add(t.to);
-		}
-		return toNodes;
-	}
-
-	StateNode getEmToNode(){
-		for(StateTransition t : toes){
-			if(t.em){
-				return t.to;
-			}
-		}
-		return null;
-	}
-
-	StateNode getOneFromNode(){
-		double minDis = Double.MAX_VALUE;
-		StateNode minNode = null;
-		for(StateNode node : fromNodes){
-			if(node.depth!=this.depth-1){ continue; }
-			if(minNode==null){ minNode=node; continue; }
-			double dis = Math.abs(getY()-node.getY());
-			if(dis<minDis){
-				minDis = dis;
-				minNode = node;
-			}
-		}
-		return minNode;
-	}
-
-	public ArrayList<StateNode> getToNoWeakNodes(){
-		ArrayList<StateNode> toNodes = new ArrayList<StateNode>();
-		for(StateTransition t : toes){
-			if(!t.to.weak&&t.em){
-				toNodes.add(t.to);
-			}
-		}
-		return toNodes;
-	}
+	*/
 
 	public Collection<StateNode> getRuleNameGroupNodes(String ruleName){
 		HashSet<StateNode> nodes = new HashSet<StateNode>();
@@ -396,9 +353,9 @@ public class StateNode implements Shape {
 				nodes.add(t.to);
 			}
 		}
-		for(StateNode from : fromNodes){
-			if(from.getTransition(this).getRules().contains(ruleName)){
-				nodes.add(from);
+		for(StateTransition f : froms){
+			if(f.getRules().contains(ruleName)){
+				nodes.add(f.from);
 			}
 		}
 		return nodes;
@@ -412,6 +369,80 @@ public class StateNode implements Shape {
 		return nodes;
 	}
 
+
+	/*
+	 * to系メソッド
+	 */
+
+	StateTransition addToTransition(StateTransition t){
+		if(isToNode(t.to)) return null;
+		toes.add(t);
+		return t;
+	}
+
+	StateTransition removeToTransition(StateTransition t){
+		toes.remove(t);
+		return t;
+	}
+
+	public Collection<StateTransition> getToTransitions(){
+		return toes;
+	}
+
+	/*
+	StateTransition removeToNode(StateNode toNode){
+		StateTransition r = null;
+		for(StateTransition t : toes){
+			if(t.to==toNode){
+				r = t;
+				break;
+			}
+		}
+		toes.remove(r);
+		return r;
+	}
+	*/
+
+	boolean isToNode(StateNode toNode){
+		return getToNodes().contains(toNode);
+	}
+
+	public ArrayList<StateNode> getToNodes(){
+		ArrayList<StateNode> toNodes = new ArrayList<StateNode>();
+		for(StateTransition t : toes){
+			toNodes.add(t.to);
+		}
+		return toNodes;
+	}
+
+	public StateNode getToCycleNode(){
+		for(StateTransition t : toes){
+			if(t.cycle){
+				return t.to;
+			}
+		}
+		return null;
+	}
+
+	public StateTransition getToCycleTransition(){
+		for(StateTransition t : toes){
+			if(t.cycle){
+				return t;
+			}
+		}
+		return null;
+	}
+
+	public ArrayList<StateNode> getToNoWeakNodes(){
+		ArrayList<StateNode> toNodes = new ArrayList<StateNode>();
+		for(StateTransition t : toes){
+			if(!t.to.weak&&t.cycle){
+				toNodes.add(t.to);
+			}
+		}
+		return toNodes;
+	}
+
 	ArrayList<String> getToRuleNames(StateNode toNode){
 		for(StateTransition t : toes){
 			if(t.to==toNode){
@@ -421,7 +452,7 @@ public class StateNode implements Shape {
 		return null;
 	}
 
-	StateTransition getTransition(StateNode toNode){
+	StateTransition getToTransition(StateNode toNode){
 		for(StateTransition t : toes){
 			if(t.to==toNode){
 				return t;
@@ -430,11 +461,14 @@ public class StateNode implements Shape {
 		return null;
 	}
 
-	public Collection<StateTransition> getTransition(){
-		return toes;
+	StateTransition getToTransition(){
+		for(StateTransition t : toes){
+			return t;
+		}
+		return null;
 	}
 
-	void setTransition(LinkedHashSet<StateTransition> toes){
+	void setToTransition(LinkedHashSet<StateTransition> toes){
 		this.toes = toes;
 	}
 
@@ -448,8 +482,99 @@ public class StateNode implements Shape {
 		return "";
 	}
 
+	/*
+	 * from系メソッド
+	 */
+
+	StateTransition addFromTransition(StateTransition f){
+		if(isFromNode(f.from)) return null;
+		froms.add(f);
+		return f;
+	}
+
+	StateTransition removeFromTransition(StateTransition f){
+		froms.remove(f);
+		return f;
+	}
+
+	public Collection<StateTransition> getFromTransitions(){
+		return froms;
+	}
+
+	StateTransition getFromTransition(StateNode fromNode){
+		for(StateTransition f : froms){
+			if(f.from==fromNode){
+				return f;
+			}
+		}
+		return null;
+	}
+
+	StateTransition getFromTransition(){
+		for(StateTransition f : froms){
+			return f;
+		}
+		return null;
+	}
+
+	/*
+	StateTransition removeFromNode(StateNode fromNode){
+		StateTransition r = null;
+		for(StateTransition f : froms){
+			if(f.from==fromNode){
+				r = f;
+				break;
+			}
+		}
+		froms.remove(r);
+		return r;
+	}
+	*/
+
+	boolean isFromNode(StateNode fromNode){
+		return getFromNodes().contains(fromNode);
+	}
+
+	public ArrayList<StateNode> getFromNodes(){
+		ArrayList<StateNode> fromNodes = new ArrayList<StateNode>();
+		for(StateTransition f : froms){
+			fromNodes.add(f.from);
+		}
+		return fromNodes;
+	}
+
+	StateNode getFromNearNode(){
+		double minDis = Double.MAX_VALUE;
+		StateNode minNode = null;
+		for(StateNode node : getFromNodes()){
+			if(node.depth!=this.depth-1){ continue; }
+			if(minNode==null){ minNode=node; continue; }
+			double dis = Math.abs(getY()-node.getY());
+			if(dis<minDis){
+				minDis = dis;
+				minNode = node;
+			}
+		}
+		return minNode;
+	}
+
+	public ArrayList<StateNode> getFromNoWeakNodes(){
+		ArrayList<StateNode> fNodes = new ArrayList<StateNode>();
+		for(StateNode from : getFromNodes()){
+			if(!from.weak&&from.getToTransition(this).cycle){
+				fNodes.add(from);
+			}
+		}
+		return fNodes;
+	}
+
+	public void resetFromTransition(){
+		froms.clear();
+	}
+
+	/*
 	void addFromNode(StateNode fromNode){
-		if(!fromNodes.contains(fromNode)){
+		if(!getFromNodes().contains(fromNode)){
 			fromNodes.add(fromNode);
 		}
 	}
@@ -459,7 +584,7 @@ public class StateNode implements Shape {
 	}
 
 	boolean isFromNode(StateNode fromNode){
-		return fromNodes.contains(fromNode);
+		return getFromNodes().contains(fromNode);
 	}
 
 	public Collection<StateNode> getFromNodes(){
@@ -480,12 +605,13 @@ public class StateNode implements Shape {
 	public ArrayList<StateNode> getFromNoWeakNodes(){
 		ArrayList<StateNode> fNodes = new ArrayList<StateNode>();
 		for(StateNode from : fromNodes){
-			if(!from.weak&&from.getTransition(this).em){
+			if(!from.weak&&from.getToTransition(this).em){
 				fNodes.add(from);
 			}
 		}
 		return fNodes;
 	}
+	*/
 
 	public boolean hasSubset(){
 		if(childSet==null){
@@ -519,24 +645,24 @@ public class StateNode implements Shape {
 	}
 	*/
 
-	void setEmToNode(StateNode toNode,boolean em){
-		StateTransition t = getTransition(toNode);
+	void setCycleToNode(StateNode toNode, boolean cycle){
+		StateTransition t = getToTransition(toNode);
 		if(t!=null){
-			t.em = em;
+			t.cycle = cycle;
 		}
 	}
 
 	boolean isEmToNode(StateNode toNode){
-		StateTransition t = getTransition(toNode);
+		StateTransition t = getToTransition(toNode);
 		if(t!=null){
-			return t.em;
+			return t.cycle;
 		}
 		return false;
 	}
 
 	void resetEmToNode(){
 		for(StateTransition t : toes){
-			t.em = false;
+			t.cycle = false;
 		}
 	}
 
@@ -559,12 +685,8 @@ public class StateNode implements Shape {
 		return radius;
 	}
 
-	Color getDrawColor(){
-		return drawColor;
-	}
-
-	Color getFillColor(){
-		return fillColor;
+	Color getColor(){
+		return color;
 	}
 
 	boolean isAccept(){
@@ -605,7 +727,7 @@ public class StateNode implements Shape {
 	}
 
 	String getStringTo(int no){
-		String fillcolor = Integer.toHexString((getFillColor().getRGB())&0xffffff);
+		String fillcolor = Integer.toHexString((getColor().getRGB())&0xffffff);
 		while(fillcolor.length()<6){ fillcolor = "0"+fillcolor; }
 		String str = id+" [fillcolor=\"#"+fillcolor+"\",label=\""+no+"\"];\n";
 		for(StateNode to : getToNodes()){
@@ -662,7 +784,7 @@ public class StateNode implements Shape {
 		buf.append("state:"+toString()+"\n");
 		buf.append("label:"+label+"\n");
 		buf.append("accept:"+accept+"\n");
-		buf.append("inCycle:"+inCycle+"\n");
+		buf.append("inCycle:"+cycle+"\n");
 		buf.append("depth:"+depth+"\n");
 		buf.append("nth:"+nth+"\n");
 		buf.append("dummy:"+dummy+"\n");

@@ -58,7 +58,7 @@ public class StatePanel extends JPanel{
 	public StateControlPanel stateControlPanel;
 
 	private String originalString;
-	private boolean cycleMode;
+	private boolean ltlMode;
 	private StateNodeSet drawNodes;
 
 	public StatePanel(){
@@ -71,23 +71,19 @@ public class StatePanel extends JPanel{
 		add(stateControlPanel, BorderLayout.SOUTH);
 	}
 
-	public void start(String str,boolean cycle){
+	public void start(String str, boolean ltlMode){
 
 		this.originalString = str;
-		this.cycleMode = cycle;
+		this.ltlMode = ltlMode;
 		this.drawNodes = new StateNodeSet();
 
 		FrontEnd.println("(StateViewer) parsing.");
-		boolean res;
-		if(cycleMode){
-			res = drawNodes.setSlimLtlResult(str);
-		}else{
-			res = drawNodes.setSlimNdResult(str);
-		}
+		boolean res = drawNodes.setSlimResult(str, ltlMode);
 
 		if(res){
 			FrontEnd.println("(StateViewer) start! (state = "+drawNodes.size()+")");
 			stateGraphPanel.init(drawNodes);
+			stateGraphPanel.setCycleMode(ltlMode);
 			FrontEnd.mainFrame.toolTab.setTab("StateViewer");
 		}else{
 			FrontEnd.println("(StateViewer) error.");
@@ -96,7 +92,7 @@ public class StatePanel extends JPanel{
 	}
 
 	public void reset(){
-		start(originalString, cycleMode);
+		start(originalString, ltlMode);
 	}
 
 	public void savaFile(File file){
@@ -159,7 +155,7 @@ public class StatePanel extends JPanel{
 	}
 
 	public boolean isLtl(){
-		return cycleMode;
+		return ltlMode;
 	}
 
 }

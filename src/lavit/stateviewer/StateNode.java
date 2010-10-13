@@ -87,6 +87,7 @@ public class StateNode implements Shape {
 	public int nth;
 
 	public boolean dummy;
+	public boolean backDummy; //dummy=trueの場合のみtrueになる可能性がある
 	public boolean weak;
 
 	private LinkedHashSet<StateTransition> toes = new LinkedHashSet<StateTransition>();
@@ -103,6 +104,7 @@ public class StateNode implements Shape {
 	public double dy;
 	public double ddy;
 
+
 	StateNode(long id, StateNodeSet parentSet){
 		this.id = id;
 		this.parentSet = parentSet;
@@ -116,6 +118,7 @@ public class StateNode implements Shape {
 		this.nth = 0;
 
 		this.dummy = false;
+		this.backDummy = false;
 		this.weak = false;
 
 		this.toes = new LinkedHashSet<StateTransition>();
@@ -129,6 +132,7 @@ public class StateNode implements Shape {
 		updateLooks();
 	}
 
+	/*
 	void init(String state,String label,boolean accept,boolean inCycle){
 		this.depth = 0;
 		this.nth = 0;
@@ -154,6 +158,7 @@ public class StateNode implements Shape {
 
 		updateLooks();
 	}
+	 */
 
 	void updateLooks(){
 
@@ -245,9 +250,9 @@ public class StateNode implements Shape {
 		}else{
 			g = 255;
 		}
-		*/
+		 */
 
-/*
+		/*
 		if(from<to){
 			r = 0;
 			g = 255*Math.sqrt(from/to);
@@ -261,7 +266,7 @@ public class StateNode implements Shape {
 			g = 255*Math.sqrt(to/from);
 			b = 0;
 		}
-*/
+		 */
 
 		/*
 		switch(colorMode){
@@ -291,7 +296,7 @@ public class StateNode implements Shape {
 				drawColor = Color.gray;
 				break;
 		}
-		*/
+		 */
 		/*
 		if(toIds.size()==0){
 			color = Color.red;
@@ -306,7 +311,7 @@ public class StateNode implements Shape {
 		}else{
 			color = Color.cyan;
 		}
-		*/
+		 */
 
 	}
 
@@ -344,7 +349,7 @@ public class StateNode implements Shape {
 		toes.add(t);
 		return t;
 	}
-	*/
+	 */
 
 	public Collection<StateNode> getRuleNameGroupNodes(String ruleName){
 		HashSet<StateNode> nodes = new HashSet<StateNode>();
@@ -401,7 +406,7 @@ public class StateNode implements Shape {
 		toes.remove(r);
 		return r;
 	}
-	*/
+	 */
 
 	boolean isToNode(StateNode toNode){
 		return getToNodes().contains(toNode);
@@ -413,6 +418,13 @@ public class StateNode implements Shape {
 			toNodes.add(t.to);
 		}
 		return toNodes;
+	}
+
+	public StateNode getToNode(){
+		for(StateTransition t : toes){
+			return t.to;
+		}
+		return null;
 	}
 
 	public StateNode getToCycleNode(){
@@ -529,7 +541,7 @@ public class StateNode implements Shape {
 		froms.remove(r);
 		return r;
 	}
-	*/
+	 */
 
 	boolean isFromNode(StateNode fromNode){
 		return getFromNodes().contains(fromNode);
@@ -541,6 +553,13 @@ public class StateNode implements Shape {
 			fromNodes.add(f.from);
 		}
 		return fromNodes;
+	}
+
+	public StateNode getFromNode(){
+		for(StateTransition f : froms){
+			return f.from;
+		}
+		return null;
 	}
 
 	StateNode getFromNearNode(){
@@ -611,7 +630,7 @@ public class StateNode implements Shape {
 		}
 		return fNodes;
 	}
-	*/
+	 */
 
 	public boolean hasSubset(){
 		if(childSet==null){
@@ -629,6 +648,13 @@ public class StateNode implements Shape {
 		this.childSet = subset;
 	}
 
+	void setCycleToNode(StateNode toNode, boolean cycle){
+		StateTransition t = getToTransition(toNode);
+		if(t!=null){
+			t.cycle = cycle;
+		}
+	}
+
 	/*
 	void addEmToNode(StateNode toNode){
 		StateTransition t = getTransition(toNode);
@@ -641,14 +667,6 @@ public class StateNode implements Shape {
 		StateTransition t = getTransition(toNode);
 		if(t!=null){
 			t.em = false;
-		}
-	}
-	*/
-
-	void setCycleToNode(StateNode toNode, boolean cycle){
-		StateTransition t = getToTransition(toNode);
-		if(t!=null){
-			t.cycle = cycle;
 		}
 	}
 
@@ -665,6 +683,7 @@ public class StateNode implements Shape {
 			t.cycle = false;
 		}
 	}
+	*/
 
 	public ArrayList<StateNode> getLayerFlowNodes(int layer){
 		ArrayList<StateNode> backs = new ArrayList<StateNode>();
@@ -741,7 +760,7 @@ public class StateNode implements Shape {
 		try {
 			FileWriter fp = new FileWriter(f);
 			fp.write(state);
-            fp.close();
+			fp.close();
 		} catch (IOException e) {
 			FrontEnd.printException(e);
 		}
@@ -753,7 +772,7 @@ public class StateNode implements Shape {
 		try {
 			FileWriter fp = new FileWriter(f);
 			fp.write(state);
-            fp.close();
+			fp.close();
 		} catch (IOException e) {
 			FrontEnd.printException(e);
 		}
@@ -815,44 +834,6 @@ public class StateNode implements Shape {
 		return "";
 	}
 
-	private class TextFrame extends JFrame{
-
-		TextFrame(String title,String str){
-
-			int width = FrontEnd.mainFrame.getWidth()/2;
-			int height = FrontEnd.mainFrame.getHeight()/2;
-			int x = FrontEnd.mainFrame.getX();
-			int y = FrontEnd.mainFrame.getY();
-
-			setSize(width,height);
-			setLocation(x,y);
-			setTitle(title);
-			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-			/*
-			JTextArea text = new JTextArea(state);
-			text.setLineWrap(true);
-			text.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")));
-			*/
-			AutoStyledDocument doc = new AutoStyledDocument();
-			JTextPane editor = new JTextPane();
-			//editor.setEditorKit(new NoWrapEditorKit());
-			editor.setDocument(doc);
-			editor.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")));
-			editor.setText(str);
-			doc.colorChange();
-			doc.end();
-
-		    add(new JScrollPane(editor));
-
-		    addWindowListener(new ChildWindowListener(this));
-
-		    setVisible(true);
-
-		}
-
-	}
-
 	@Override
 	public boolean contains(Point2D p) {
 		return shape.contains(p);
@@ -903,28 +884,7 @@ public class StateNode implements Shape {
 		return shape.getBounds();
 	}
 
-	/*
-	private class TextDialog extends JDialog{
-
-		TextDialog(String title,String state){
-
-			super(FrontEnd.mainFrame);
-
-			setTitle(title);
-
-			JTextArea text = new JTextArea(state);
-			text.setLineWrap(true);
-			text.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")));
-
-		    add(text);
-
-		    setVisible(true);
-
-		}
-	}
-	*/
-
-	/*
+/*
 	boolean isLmntalMatch(String head,String guard){
 		File f = new File("temp.lmn");
 		try {
@@ -954,5 +914,64 @@ public class StateNode implements Shape {
 		return false;
 	}
 	*/
+
+	private class TextFrame extends JFrame{
+
+		TextFrame(String title,String str){
+
+			int width = FrontEnd.mainFrame.getWidth()/2;
+			int height = FrontEnd.mainFrame.getHeight()/2;
+			int x = FrontEnd.mainFrame.getX();
+			int y = FrontEnd.mainFrame.getY();
+
+			setSize(width,height);
+			setLocation(x,y);
+			setTitle(title);
+			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+			/*
+			JTextArea text = new JTextArea(state);
+			text.setLineWrap(true);
+			text.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")));
+			 */
+			AutoStyledDocument doc = new AutoStyledDocument();
+			JTextPane editor = new JTextPane();
+			//editor.setEditorKit(new NoWrapEditorKit());
+			editor.setDocument(doc);
+			editor.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")));
+			editor.setText(str);
+			doc.colorChange();
+			doc.end();
+
+			add(new JScrollPane(editor));
+
+			addWindowListener(new ChildWindowListener(this));
+
+			setVisible(true);
+
+		}
+
+	}
+
+	/*
+	private class TextDialog extends JDialog{
+
+		TextDialog(String title,String state){
+
+			super(FrontEnd.mainFrame);
+
+			setTitle(title);
+
+			JTextArea text = new JTextArea(state);
+			text.setLineWrap(true);
+			text.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")));
+
+		    add(text);
+
+		    setVisible(true);
+
+		}
+	}
+	 */
 
 }

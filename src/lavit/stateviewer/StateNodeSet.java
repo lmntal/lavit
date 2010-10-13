@@ -96,7 +96,7 @@ public class StateNodeSet {
 		StateNode node = allNode.get(id);
 		if(node==null){
 			node = new StateNode(id, this);
-			allNode.put(id, node);
+			addNode(node);
 		}
 		return node;
 	}
@@ -174,7 +174,7 @@ public class StateNodeSet {
 			StateNode node = getNodeInMaking(id);
 			startNode.add(node);
 		}else{
-			 return false; //エラー
+			return false; //エラー
 		}
 
 		// Transitions解析
@@ -274,8 +274,8 @@ public class StateNodeSet {
 		resetOrder();
 		positionReset();
 
-		if(Env.is("SV_DUMMY")){
-			setDummy();
+		if(Env.is("SV_STARTUP_SET_BACKDUMMY")){
+			setBackDummy();
 			dummyCentering();
 		}
 
@@ -407,7 +407,7 @@ public class StateNodeSet {
 
 		//nodeの登録
 		for(StateNode node : nodes){
-			allNode.put(node.id, node);
+			addNode(node);
 			node.parentSet = this;
 		}
 
@@ -478,8 +478,8 @@ public class StateNodeSet {
 		resetOrder();
 		positionReset();
 
-		if(Env.is("SV_DUMMY")){
-			setDummy();
+		if(Env.is("SV_STARTUP_SET_BACKDUMMY")){
+			setBackDummy();
 			dummyCentering();
 		}
 
@@ -582,7 +582,7 @@ public class StateNodeSet {
 		resetOrder();
 		positionReset();
 
-		if(Env.is("SV_DUMMY")){
+		if(Env.is("SV_STARTUP_SET_BACKDUMMY")){
 			setDummy();
 			dummyCentering();
 		}
@@ -590,7 +590,7 @@ public class StateNodeSet {
 		updateNodeLooks();
 
 		return true;
-		*/
+		 */
 	}
 
 	public void positionReset(){
@@ -914,7 +914,7 @@ public class StateNodeSet {
 		}
 		updateNodeLooks();
 	}
-	*/
+	 */
 
 	public void remove(Collection<StateNode> nodes){
 		for(StateNode node : nodes){
@@ -1073,8 +1073,10 @@ public class StateNodeSet {
 			for(StateNode child : node.getToNodes()){
 				if(child.isMarked()){continue;}
 				child.mark();
-				if(child.dummy){
-					insertDepthNode(child, node.depth-1);
+				if(child.backDummy){
+					int d = node.depth-1;
+					if(d<1){ d=1; }
+					insertDepthNode(child, d);
 				}else{
 					insertDepthNode(child, node.depth+1);
 				}
@@ -1095,7 +1097,44 @@ public class StateNodeSet {
 		dnodes.add(node);
 	}
 
-	public void setDummy(){
+	public StateNode makeDummyFromTransition(StateTransition trans){
+		StateNode from=trans.from, to=trans.to;
+
+		long id = publishNodeId();
+		double x = ((from.getX()+to.getX())/2);
+		double y = ((from.getY()+to.getY())/2);
+		StateNode dummy = new StateNode(id, this);
+		dummy.setPosition(x, y);
+		dummy.dummy = true;
+		if(from.depth>to.depth){
+			dummy.backDummy = true;
+		}
+		dummy.depth = to.depth;
+		addNode(dummy);
+		dummy.updateLooks();
+
+		StateTransition t1 = new StateTransition(from, dummy, trans.cycle, trans.weak);
+		t1.addRules(trans.getRules());
+		t1.from.addToTransition(t1);
+		t1.to.addFromTransition(t1);
+		addTransition(t1);
+
+		StateTransition t2 = new StateTransition(dummy, to, trans.cycle, trans.weak);
+		t2.addRules(trans.getRules());
+		t2.from.addToTransition(t2);
+		t2.to.addFromTransition(t2);
+		addTransition(t2);
+
+		from.removeToTransition(trans);
+		to.removeFromTransition(trans);
+		removeTransition(trans);
+
+		setTreeDepth();
+
+		return dummy;
+	}
+
+	public void setBackDummy(){
 
 		for(StateTransition trans : new ArrayList<StateTransition>(getAllTransition())){
 			if(!(trans.from.depth-1>trans.to.depth)){ continue; }
@@ -1112,8 +1151,9 @@ public class StateNodeSet {
 				StateNode toDummy = new StateNode(id, this);
 				toDummy.setPosition(x, y);
 				toDummy.dummy = true;
+				toDummy.backDummy = true;
 				toDummy.depth = dummyDepth;
-				allNode.put(id, toDummy);
+				addNode(toDummy);
 
 				StateTransition t = new StateTransition(fromDummy, toDummy, trans.cycle, trans.weak);
 				t.addRules(trans.getRules());
@@ -1140,7 +1180,6 @@ public class StateNodeSet {
 
 
 		/*
-
 		long newId = getMaxNodeId();
 
 		ArrayList<StateNode> newNode = new ArrayList<StateNode>();
@@ -1214,7 +1253,8 @@ public class StateNodeSet {
 				}
 			}
 		}
-		updateNodeLooks();*/
+		updateNodeLooks();
+		 */
 	}
 
 	void addTransition(StateTransition trans){
@@ -1345,6 +1385,17 @@ public class StateNodeSet {
 		return pick;
 	}
 
+	StateTransition pickATransition(Point p){
+		StateTransition pick = null;
+		for(StateTransition trans : getAllTransition()){
+			if(trans == null){ continue; }
+			if(trans.contains(p)){
+				pick = trans;
+			}
+		}
+		return pick;
+	}
+
 	boolean rideOtherNode(StateNode node){
 		for(StateNode n : getAllNode()){
 			if(n==node) continue;
@@ -1453,7 +1504,7 @@ public class StateNodeSet {
 		resetOrder();
 		positionReset();
 
-		if(Env.is("SV_DUMMY")){
+		if(Env.is("SV_STARTUP_SET_BACKDUMMY")){
 			setDummy();
 		}
 
@@ -1584,7 +1635,7 @@ public class StateNodeSet {
 		resetOrder();
 		positionReset();
 
-		if(Env.is("SV_DUMMY")){
+		if(Env.is("SV_STARTUP_SET_BACKDUMMY")){
 			setDummy();
 		}
 
@@ -1608,7 +1659,7 @@ public class StateNodeSet {
 
 		return true;
 	}
-	*/
+	 */
 
 	/*
 	private StateNode makeDummyNode(long id,int depth,String label,boolean accept,boolean inCycle,double y,boolean weak){
@@ -1664,6 +1715,42 @@ public class StateNodeSet {
 		updateMaxNodeId();
 	}
 
+	 */
+
+	/*
+	public void reduction(){
+		StateNode removenode;
+		while((removenode=getToOneFromOne())!=null){
+			innerRemove(removenode);
+		}
+		updateNodeLooks();
+	}
+	 */
+
+	/*
+	public boolean isFlow(StateNode n1,StateNode n2){
+		if(cycleNode.size()==0||n1==n2) return true;
+		for(int i=0;i<cycleNode.size();++i){
+			if(cycleNode.get(i)==n1){
+				if(i>0&&cycleNode.get(i-1)==n2) return true;
+				if(i<(cycleNode.size()-1)&&cycleNode.get(i+1)==n2) return true;
+			}
+			if(cycleNode.get(i)==n2){
+				if(i>0&&cycleNode.get(i-1)==n1) return true;
+				if(i<(cycleNode.size()-1)&&cycleNode.get(i+1)==n1) return true;
+			}
+		}
+		if(n1==acceptStartNode){
+			if(n2==cycleNode.get(cycleNode.size()-1)) return true;
+		}else if(n2==acceptStartNode){
+			if(n1==cycleNode.get(cycleNode.size()-1)) return true;
+		}
+
+		return false;
+	}
+	 */
+
+	/*
 	class TempNode{
 		long id = 0;
 		int no = 0;
@@ -1740,39 +1827,6 @@ public class StateNodeSet {
 		boolean em = false;
 		private ArrayList<String> rules = new ArrayList<String>();
 	}
-	*/
-
-	/*
-	public void reduction(){
-		StateNode removenode;
-		while((removenode=getToOneFromOne())!=null){
-			innerRemove(removenode);
-		}
-		updateNodeLooks();
-	}
-	*/
-
-	/*
-	public boolean isFlow(StateNode n1,StateNode n2){
-		if(cycleNode.size()==0||n1==n2) return true;
-		for(int i=0;i<cycleNode.size();++i){
-			if(cycleNode.get(i)==n1){
-				if(i>0&&cycleNode.get(i-1)==n2) return true;
-				if(i<(cycleNode.size()-1)&&cycleNode.get(i+1)==n2) return true;
-			}
-			if(cycleNode.get(i)==n2){
-				if(i>0&&cycleNode.get(i-1)==n1) return true;
-				if(i<(cycleNode.size()-1)&&cycleNode.get(i+1)==n1) return true;
-			}
-		}
-		if(n1==acceptStartNode){
-			if(n2==cycleNode.get(cycleNode.size()-1)) return true;
-		}else if(n2==acceptStartNode){
-			if(n1==cycleNode.get(cycleNode.size()-1)) return true;
-		}
-
-		return false;
-	}
-	*/
+	 */
 
 }

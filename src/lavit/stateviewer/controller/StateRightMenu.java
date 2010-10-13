@@ -108,13 +108,14 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 	private JCheckBoxMenuItem showNoNameRule = new JCheckBoxMenuItem("Show No Name Rule");
 	private JCheckBoxMenuItem showOutTransition = new JCheckBoxMenuItem("Show Out Transition");
 
+	/*
 	private JMenuItem autoCentering = new JMenuItem("Auto Centering");
 	private JMenuItem stretchMove = new JMenuItem("Stretch Move");
 	private JMenuItem shakeMove = new JMenuItem("Shake Move");
 	//private JMenuItem groupMove = new JMenuItem("Group Move");
 
-
 	private JCheckBoxMenuItem dynamicModeling = new JCheckBoxMenuItem("Dynamic Modeling");
+*/
 
 	private JMenu controlViewSubmenu = new JMenu("Control View");
 	private JCheckBoxMenuItem match = new JCheckBoxMenuItem("Match State");
@@ -239,7 +240,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 		//dummy
 
 		dummy.addActionListener(this);
-		dummy.setSelected(Env.is("SV_DUMMY"));
+		dummy.setSelected(Env.is("SV_STARTUP_SET_BACKDUMMY"));
 		dummySubmenu.add(dummy);
 
 		showdummy.addActionListener(this);
@@ -424,8 +425,8 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 		//}else if(src==groupMove){
 		//	graphPanel.groupMove();
 		}else if(src==dummy){
-			Env.set("SV_DUMMY",!Env.is("SV_DUMMY"));
-			if(Env.is("SV_DUMMY")){
+			Env.set("SV_STARTUP_SET_BACKDUMMY",!Env.is("SV_STARTUP_SET_BACKDUMMY"));
+			if(Env.is("SV_STARTUP_SET_BACKDUMMY")){
 				graphPanel.getDrawNodes().setDummy();
 				graphPanel.getDrawNodes().dummyCentering();
 				if(graphPanel.statePanel.isLtl()){
@@ -444,27 +445,32 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 				graphPanel.getDrawNodes().removeDummy();
 			}
 			graphPanel.repaint();
-		}else if(src==backedge){
-			Env.set("SV_HIDEBACKEDGE",!Env.is("SV_HIDEBACKEDGE"));
-			graphPanel.repaint();
-		}else if(src==showId){
-			Env.set("SV_SHOWID",!Env.is("SV_SHOWID"));
-			graphPanel.repaint();
-		}else if(src==showRule){
-			Env.set("SV_SHOWRULE",!Env.is("SV_SHOWRULE"));
-			graphPanel.repaint();
-		}else if(src==showNoNameRule){
-			Env.set("SV_SHOWNONAMERULE",!Env.is("SV_SHOWNONAMERULE"));
-			graphPanel.repaint();
-		}else if(src==showOutTransition){
-			Env.set("SV_SHOWOUTTRANS",!Env.is("SV_SHOWOUTTRANS"));
-			graphPanel.repaint();
 		}else if(src==dynamicModeling){
 			Env.set("SV_DYNAMIC_MOVER",!Env.is("SV_DYNAMIC_MOVER"));
 			graphPanel.setDynamicMoverActive(Env.is("SV_DYNAMIC_MOVER"));
 		}else if(src==showdummy){
 			Env.set("SV_SHOW_DUMMY",!Env.is("SV_SHOW_DUMMY"));
 			graphPanel.getDrawNodes().updateNodeLooks();
+			graphPanel.repaint();
+*/
+		}else if(src==backedge){
+			Env.set("SV_HIDEBACKEDGE",!Env.is("SV_HIDEBACKEDGE"));
+			graphPanel.setHideBackEdgeMode(Env.is("SV_HIDEBACKEDGE"));
+			graphPanel.repaint();
+		}else if(src==showId){
+			Env.set("SV_SHOWID",!Env.is("SV_SHOWID"));
+			graphPanel.setShowIdMode(Env.is("SV_SHOWID"));
+			graphPanel.repaint();
+		}else if(src==showRule){
+			Env.set("SV_SHOWRULE",!Env.is("SV_SHOWRULE"));
+			graphPanel.setShowRuleMode(Env.is("SV_SHOWRULE"));
+			graphPanel.repaint();
+		}else if(src==showNoNameRule){
+			Env.set("SV_SHOWNONAMERULE",!Env.is("SV_SHOWNONAMERULE"));
+			graphPanel.setShowNoNameRuleMode(Env.is("SV_SHOWNONAMERULE"));
+			graphPanel.repaint();
+		}else if(src==showOutTransition){
+			Env.set("SV_SHOWOUTTRANS",!Env.is("SV_SHOWOUTTRANS"));
 			graphPanel.repaint();
 		}else if(src==info){
 			graphPanel.statePanel.stateControlPanel.toggleInfoVisible();
@@ -478,7 +484,8 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 			graphPanel.statePanel.stateControlPanel.toggleDynamicVisible();
 		}else if(src==zoomSlider){
 			graphPanel.statePanel.stateControlPanel.toggleZoomSliderVisible();
-		//}else if(src==reduction){
+/*
+			//}else if(src==reduction){
 		//	graphPanel.reduction();
 		}else if(src==crossInfo){
 			JOptionPane.showMessageDialog(

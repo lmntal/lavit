@@ -64,7 +64,8 @@ import lavit.frame.ChildWindowListener;
 import lavit.stateviewer.*;
 
 public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>{
-	private StateGraphPanel graphPanel;
+	private StateGraphPanel panel;
+	private boolean endFlag;
 
 	private ProgressFrame frame;
 
@@ -73,7 +74,26 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 	private Collection<StateTransition> trans;
 
 	public StateTransitionAbstractionWorker(StateGraphPanel panel){
-		this.graphPanel = panel;
+		this.panel = panel;
+		this.endFlag = false;
+	}
+
+	public void waitExecute(Collection<String> ruleNames){
+		selectExecute(ruleNames);
+		while(!endFlag){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {}
+		}
+	}
+
+	public void selectExecute(Collection<String> ruleNames){
+		if(panel.getSelectNodes().size()<1000){
+			atomic(ruleNames);
+		}else{
+			ready(ruleNames);
+			execute();
+		}
 	}
 
 	public void atomic(Collection<String> ruleNames){
@@ -87,19 +107,19 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 	}
 
 	public void ready(Collection<String> ruleNames, boolean open){
-		graphPanel.setActive(false);
+		panel.setActive(false);
 
 		if(open){
 			frame = new ProgressFrame();
 			addPropertyChangeListener(frame);
 		}
 
-		this.maker = new StateAbstractionMaker(graphPanel);
+		this.maker = new StateAbstractionMaker(panel);
 		this.ruleNames = ruleNames;
 		this.trans = new LinkedHashSet<StateTransition>();
 
 		//ダミーが含まれるため再構築
-		for(StateTransition t : graphPanel.getDrawNodes().getAllTransition()){
+		for(StateTransition t : panel.getDrawNodes().getAllTransition()){
 			rule: for(String r : t.getRules()){
 				if(ruleNames.contains(r)){
 					trans.add(t);
@@ -111,14 +131,15 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 
 	public void end() {
 		maker.end();
-		graphPanel.setActive(true);
+		panel.setActive(true);
 		if(frame!=null) frame.dispose();
+		this.endFlag = true;
 	}
 
 	@Override
 	protected Object doInBackground(){
 
-		StateNodeSet drawNodes = graphPanel.getDrawNodes();
+		StateNodeSet drawNodes = panel.getDrawNodes();
 
 		drawNodes.allNodeUnMark();
 		LinkedHashSet<StateNode> nodes = new LinkedHashSet<StateNode>();

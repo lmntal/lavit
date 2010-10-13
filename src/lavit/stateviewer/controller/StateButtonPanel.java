@@ -67,6 +67,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	private JButton adjustReset = new JButton("Adjust Reset");
 	private JButton adjust2Reset = new JButton("Adjust(Backedge) Reset");
 	private JButton adjust3Reset = new JButton("Adjust(Find) Reset");
+	private JButton simpleMixAdjust = new JButton("Simple Mix Adjust");
 	private JButton dummyMixAdjust = new JButton("Dummy Mix Adjust");
 	private JButton allReset = new JButton("All Reset");
 
@@ -77,11 +78,13 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	public JCheckBox exchangeDummyOnly = new JCheckBox("Dummy Only");
 
 	private JPanel dummyPanel = new JPanel();
-	public JCheckBox dummy = new JCheckBox("Set Dummy");
+	public JCheckBox startupSetBackDummy = new JCheckBox("StartUp Set Back Dummy");
 	private JCheckBox showdummy = new JCheckBox("Show Dummy");
-	private JButton dummyInfo = new JButton("Dummy Info");
+	private JButton setBackDummy = new JButton("Set Back Dummy");
+	private JButton removeDummy = new JButton("Remove Dummy");
 	private JButton dummyCentering = new JButton("Dummy Centering");
 	private JButton dummySmoothing = new JButton("Dummy Smoothing");
+	private JButton dummyInfo = new JButton("Dummy Info");
 
 	private JPanel dynamicPanel = new JPanel();
 	private JCheckBox dynamicModeling = new JCheckBox("Dynamic Modeling");
@@ -92,15 +95,10 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	private JButton transitionAbstraction = new JButton("Transition Abstraction");
 	private JButton selectAbstraction = new JButton("Select Abstraction");
 
-	private JPanel autoPanel = new JPanel();
-	private JButton autoAdjust = new JButton("Auto Adjust");
-	private JCheckBox startupAutoAdjust = new JCheckBox("Start up Auto Adjust");
-
 	private JComponent comps[] = {
-		autoAdjust,startupAutoAdjust,
-		posReset,adjustReset,adjust2Reset,adjust3Reset,dummyMixAdjust,allReset,
+		posReset,adjustReset,adjust2Reset,adjust3Reset,simpleMixAdjust,dummyMixAdjust,allReset,
 		crossInfo,geneticAlgorithm,exchangeReset,exchangeDummyOnly,
-		dummy,showdummy,dummyInfo,dummyCentering,dummySmoothing,
+		startupSetBackDummy,showdummy,setBackDummy,removeDummy,dummyCentering,dummySmoothing,dummyInfo,
 		dynamicModeling,stretchMove,autoCentering,
 		transitionAbstraction,selectAbstraction
 	};
@@ -108,9 +106,9 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	StateButtonPanel(StatePanel statePanel){
 		this.statePanel = statePanel;
 
-		setLayout(new GridLayout(6,1));
+		setLayout(new GridLayout(5,1));
 
-		resetPanel.setLayout(new GridLayout(1,6));
+		resetPanel.setLayout(new GridLayout(1,7));
 		posReset.addActionListener(this);
 		resetPanel.add(posReset);
 		adjustReset.addActionListener(this);
@@ -119,6 +117,8 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		resetPanel.add(adjust2Reset);
 		adjust3Reset.addActionListener(this);
 		resetPanel.add(adjust3Reset);
+		simpleMixAdjust.addActionListener(this);
+		resetPanel.add(simpleMixAdjust);
 		dummyMixAdjust.addActionListener(this);
 		resetPanel.add(dummyMixAdjust);
 		allReset.addActionListener(this);
@@ -137,19 +137,23 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		crossPanel.add(exchangeDummyOnly);
 		add(crossPanel);
 
-		dummyPanel.setLayout(new GridLayout(1,5));
-		dummy.addActionListener(this);
-		dummy.setSelected(Env.is("SV_DUMMY"));
-		dummyPanel.add(dummy);
+		dummyPanel.setLayout(new GridLayout(1,7));
+		startupSetBackDummy.addActionListener(this);
+		startupSetBackDummy.setSelected(Env.is("SV_STARTUP_SET_BACKDUMMY"));
+		dummyPanel.add(startupSetBackDummy);
 		showdummy.addActionListener(this);
 		showdummy.setSelected(Env.is("SV_SHOW_DUMMY"));
 		dummyPanel.add(showdummy);
-		dummyInfo.addActionListener(this);
-		dummyPanel.add(dummyInfo);
+		setBackDummy.addActionListener(this);
+		dummyPanel.add(setBackDummy);
+		removeDummy.addActionListener(this);
+		dummyPanel.add(removeDummy);
 		dummyCentering.addActionListener(this);
 		dummyPanel.add(dummyCentering);
 		dummySmoothing.addActionListener(this);
 		dummyPanel.add(dummySmoothing);
+		dummyInfo.addActionListener(this);
+		dummyPanel.add(dummyInfo);
 		add(dummyPanel);
 
 		dynamicPanel.setLayout(new GridLayout(1,3));
@@ -169,14 +173,6 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		transitionPanel.add(selectAbstraction);
 		add(transitionPanel);
 
-		autoPanel.setLayout(new GridLayout(1,2));
-		autoAdjust.addActionListener(this);
-		autoPanel.add(autoAdjust);
-		startupAutoAdjust.addActionListener(this);
-		startupAutoAdjust.setSelected(Env.is("SV_AUTO_ADJUST_STARTUP"));
-		autoPanel.add(startupAutoAdjust);
-		add(autoPanel);
-
 	}
 
 	public void allSetEnabled(boolean enabled){
@@ -189,11 +185,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 
-		if(src==autoAdjust){
-			statePanel.stateGraphPanel.autoAdjust();
-		}else if(src==startupAutoAdjust){
-			Env.set("SV_AUTO_ADJUST_STARTUP",!Env.is("SV_AUTO_ADJUST_STARTUP"));
-		}else if(src==posReset){
+		if(src==posReset){
 			statePanel.stateGraphPanel.positionReset();
 			statePanel.stateGraphPanel.autoCentering();
 		}else if(src==adjustReset){
@@ -202,6 +194,8 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 			statePanel.stateGraphPanel.adjust2Reset();
 		}else if(src==adjust3Reset){
 			statePanel.stateGraphPanel.adjust3Reset();
+		}else if(src==simpleMixAdjust){
+			statePanel.stateGraphPanel.simpleMixAdjust();
 		}else if(src==dummyMixAdjust){
 			statePanel.stateGraphPanel.dummyMixAdjust();
 		}else if(src==allReset){
@@ -220,18 +214,28 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 			statePanel.stateGraphPanel.exchangeReset();
 		}else if(src==exchangeDummyOnly){
 			Env.set("SV_CROSSREDUCTION_DUMMYONLY",!Env.is("SV_CROSSREDUCTION_DUMMYONLY"));
-		}else if(src==dummy){
-			Env.set("SV_DUMMY",!Env.is("SV_DUMMY"));
-			if(Env.is("SV_DUMMY")){
-				statePanel.stateGraphPanel.getDrawNodes().setDummy();
-				statePanel.stateGraphPanel.getDrawNodes().dummyCentering();
-			}else{
-				statePanel.stateGraphPanel.getDrawNodes().removeDummy();
-			}
-			statePanel.stateGraphPanel.repaint();
+		}else if(src==startupSetBackDummy){
+			Env.set("SV_STARTUP_SET_BACKDUMMY",!Env.is("SV_STARTUP_SET_BACKDUMMY"));
 		}else if(src==showdummy){
 			Env.set("SV_SHOW_DUMMY",!Env.is("SV_SHOW_DUMMY"));
+			statePanel.stateGraphPanel.setShowDummyMode(Env.is("SV_SHOW_DUMMY"));
 			statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
+			statePanel.stateGraphPanel.repaint();
+		}else if(src==setBackDummy){
+			statePanel.stateGraphPanel.getDrawNodes().setBackDummy();
+			statePanel.stateGraphPanel.getDrawNodes().dummyCentering();
+			statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
+			statePanel.stateGraphPanel.repaint();
+		}else if(src==removeDummy){
+			statePanel.stateGraphPanel.getDrawNodes().removeDummy();
+			statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
+			statePanel.stateGraphPanel.selectClear();
+			statePanel.stateGraphPanel.repaint();
+		}else if(src==dummyCentering){
+			statePanel.stateGraphPanel.getDrawNodes().dummyCentering();
+			statePanel.stateGraphPanel.repaint();
+		}else if(src==dummySmoothing){
+			statePanel.stateGraphPanel.dummySmoothing();
 			statePanel.stateGraphPanel.repaint();
 		}else if(src==dummyInfo){
 			int size = statePanel.stateGraphPanel.getDrawNodes().size();
@@ -244,10 +248,6 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 					"Dummy Info",
 					JOptionPane.PLAIN_MESSAGE
 			);
-		}else if(src==dummyCentering){
-			statePanel.stateGraphPanel.getDrawNodes().dummyCentering();
-		}else if(src==dummySmoothing){
-			statePanel.stateGraphPanel.dummySmoothing();
 		}else if(src==dynamicModeling){
 			Env.set("SV_DYNAMIC_MOVER",!Env.is("SV_DYNAMIC_MOVER"));
 			statePanel.stateGraphPanel.setDynamicMoverActive(Env.is("SV_DYNAMIC_MOVER"));

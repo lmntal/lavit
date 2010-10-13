@@ -66,12 +66,32 @@ import lavit.stateviewer.StateNodeSet;
 public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
+	private boolean endFlag;
 
 	private ProgressFrame frame;
 
 	public StateGraphExchangeWorker(StateGraphPanel panel){
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
+		this.endFlag = false;
+	}
+
+	public void waitExecute(){
+		selectExecute();
+		while(!endFlag){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {}
+		}
+	}
+
+	public void selectExecute(){
+		if(drawNodes.size()<1000){
+			atomic();
+		}else{
+			ready();
+			execute();
+		}
 	}
 
 	public void atomic(){
@@ -96,6 +116,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 		panel.autoCentering();
 		panel.setActive(true);
 		if(frame!=null) frame.dispose();
+		this.endFlag = true;
 	}
 
 	@Override
@@ -157,6 +178,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 							if(c1>c2) swapY(n1,n2);
 						}
 					}
+					if(isCancelled()){ return false; }
 				}
 				int cross = getLayerCross(i+cmp,i);
 				if(cross>=backCross){ break; }
@@ -216,7 +238,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 	}
 	*/
 
-
+	// TODO ¹âÂ®²½
 	private int getLayerCross(int layer1,int layer2){
 		ArrayList<StateNode> nodes = drawNodes.getDepthNode().get(layer1);
 		int cross = 0;

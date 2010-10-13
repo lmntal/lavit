@@ -55,7 +55,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Arc2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
@@ -72,6 +74,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -95,10 +98,12 @@ import lavit.stateviewer.worker.StateDynamicMover;
 import lavit.stateviewer.worker.StateGraphAdjust2Worker;
 import lavit.stateviewer.worker.StateGraphAdjust3Worker;
 import lavit.stateviewer.worker.StateGraphAdjustWorker;
+import lavit.stateviewer.worker.StateGraphDummyMixAdjustWorker;
 import lavit.stateviewer.worker.StateGraphDummySmoothingWorker;
 import lavit.stateviewer.worker.StateGraphExchangeWorker;
 import lavit.stateviewer.worker.StateGraphGeneticAlgorithmWorker;
 import lavit.stateviewer.worker.StateGraphRandomMoveWorker;
+import lavit.stateviewer.worker.StateGraphSimpleMixAdjustWorker;
 import lavit.stateviewer.worker.StateGraphStretchMoveWorker;
 import lavit.stateviewer.worker.StatePainter;
 import lavit.util.CommonFontUser;
@@ -115,11 +120,18 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	private double drawTime;
 
 	private boolean simpleMode;
+	private boolean hideBackEdgeMode;
+	private boolean showIdMode;
+	private boolean showRuleMode;
+	private boolean showNoNameRuleMode;
+	private boolean showDummyMode;
+
 	private boolean cycleMode;
 	private boolean searchMode;
 
 	private ArrayList<StateNode> selectNodes;
 	private boolean nodeSelected;
+	private StateTransition selectTransition;
 
 	private Point lastPoint;
 	private Point startPoint;
@@ -168,11 +180,22 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		this.selectNodes.clear();
 		this.nodeSelected = false;
+		this.selectTransition = null;
 
 		this.zoom = 1.0;
 		this.drawTime = 0.0;
 
-		this.simpleMode = false;
+		if(Env.get("SV_SIMPLE_MODE").equals("auto")){
+			this.simpleMode = false;
+		}else{
+			this.simpleMode = Env.is("SV_SIMPLE_MODE");
+		}
+		this.hideBackEdgeMode = Env.is("SV_HIDEBACKEDGE");
+		this.showIdMode = Env.is("SV_SHOWID");
+		this.showRuleMode = Env.is("SV_SHOWRULE");
+		this.showNoNameRuleMode = Env.is("SV_SHOWNONAMERULE");
+		this.showDummyMode = Env.is("SV_SHOW_DUMMY");
+
 		//this.cycleMode = false;
 		this.searchMode = false;
 
@@ -188,15 +211,17 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		autoCentering();
 		setActive(true);
 
+		/*
 		if(Env.is("SV_AUTO_ADJUST_STARTUP")){
 			if(drawNodes.size()<=Env.getInt("SV_AUTO_ADJUST_STARTUP_LIMIT")){
 				FrontEnd.println("(StateViewer) Auto Adjust");
-				autoAdjust();
+				simpleMixAdjust();
 			}else{
 				FrontEnd.println("(StateViewer) "+drawNodes.size()+" state > Auto Adjust Limit ("+Env.getInt("SV_AUTO_ADJUST_STARTUP_LIMIT")+" state)");
 				FrontEnd.sleep(300);
 			}
 		}
+		*/
 	}
 
 	public void init(StateNodeSet nodes, StateNode selectNode){
@@ -271,6 +296,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		drawNodes.allMove(newW-oldW,newH-oldH);
 
 		this.zoom = zoom;
+		if(Env.get("SV_SIMPLE_MODE").equals("auto")){
+			this.simpleMode = zoom<=0.7;
+		}
 	}
 
 	public void changeZoom(double dz){
@@ -325,6 +353,30 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		this.searchMode = searchMode;
 	}
 
+	public void setSimpleMode(boolean simpleMode){
+		this.simpleMode = simpleMode;
+	}
+
+	public void setHideBackEdgeMode(boolean hideBackEdgeMode){
+		this.hideBackEdgeMode = hideBackEdgeMode;
+	}
+
+	public void setShowIdMode(boolean showIdMode){
+		this.showIdMode = showIdMode;
+	}
+
+	public void setShowRuleMode(boolean showRuleMode){
+		this.showRuleMode = showRuleMode;
+	}
+
+	public void setShowNoNameRuleMode(boolean showNoNameRuleMode){
+		this.showNoNameRuleMode = showNoNameRuleMode;
+	}
+
+	public void setShowDummyMode(boolean showDummyMode){
+		this.showDummyMode = showDummyMode;
+	}
+
 	/*
 	void oldPositionReset(){
 		double w = (double)getWidth();
@@ -369,52 +421,11 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	*/
 
 	public void dummyMixAdjust(){
-
-		statePanel.stateControlPanel.buttonPanel.dummy.setSelected(true);
-		statePanel.stateControlPanel.buttonPanel.exchangeDummyOnly.setSelected(true);
-
-		if(Env.is("SV_DUMMY")) getDrawNodes().removeDummy();
-
-		(new StateGraphAdjustWorker(this)).atomic();
-
-		Env.set("SV_DUMMY",true);
-		getDrawNodes().setDummy();
-		getDrawNodes().dummyCentering();
-		getDrawNodes().updateNodeLooks();
-
-		Env.set("SV_CROSSREDUCTION_DUMMYONLY",true);
-		(new StateGraphExchangeWorker(this)).atomic();
-		(new StateGraphDummySmoothingWorker(this)).atomic();
-
-		getDrawNodes().updateNodeLooks();
-
-		update();
+		(new StateGraphDummyMixAdjustWorker(this)).selectExecute();
 	}
 
-	public void autoAdjust(){
-
-		statePanel.stateControlPanel.buttonPanel.dummy.setSelected(true);
-		statePanel.stateControlPanel.buttonPanel.exchangeDummyOnly.setSelected(false);
-
-		if(Env.is("SV_DUMMY")) getDrawNodes().removeDummy();
-
-		Env.set("SV_DUMMY",true);
-		getDrawNodes().setDummy();
-		getDrawNodes().dummyCentering();
-		getDrawNodes().updateNodeLooks();
-
-		(new StateGraphAdjust2Worker(this)).atomic();
-
-		Env.set("SV_CROSSREDUCTION_DUMMYONLY",false);
-		(new StateGraphExchangeWorker(this)).atomic();
-
-		if(statePanel.isLtl()){
-			searchShortCycle();
-		}
-
-		getDrawNodes().updateNodeLooks();
-
-		update();
+	public void simpleMixAdjust(){
+		(new StateGraphSimpleMixAdjustWorker(this)).selectExecute();
 	}
 
 	public void positionReset(){
@@ -422,53 +433,23 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	public void adjustReset(){
-		StateGraphAdjustWorker worker = new StateGraphAdjustWorker(this);
-		if(drawNodes.size()<1000){
-			worker.atomic();
-		}else{
-			worker.ready();
-			worker.execute();
-		}
+		(new StateGraphAdjustWorker(this)).selectExecute();
 	}
 
 	public void adjust2Reset(){
-		StateGraphAdjust2Worker worker = new StateGraphAdjust2Worker(this);
-		if(drawNodes.size()<1000){
-			worker.atomic();
-		}else{
-			worker.ready();
-			worker.execute();
-		}
+		(new StateGraphAdjust2Worker(this)).selectExecute();
 	}
 
 	public void adjust3Reset(){
-		StateGraphAdjust3Worker worker = new StateGraphAdjust3Worker(this);
-		if(drawNodes.size()<1000){
-			worker.atomic();
-		}else{
-			worker.ready();
-			worker.execute();
-		}
+		(new StateGraphAdjust3Worker(this)).selectExecute();
 	}
 
 	public void dummySmoothing(){
-		StateGraphDummySmoothingWorker worker = new StateGraphDummySmoothingWorker(this);
-		if(drawNodes.size()<1000){
-			worker.atomic();
-		}else{
-			worker.ready();
-			worker.execute();
-		}
+		(new StateGraphDummySmoothingWorker(this)).selectExecute();
 	}
 
 	public void exchangeReset(){
-		StateGraphExchangeWorker worker = new StateGraphExchangeWorker(this);
-		if(drawNodes.size()<1000){
-			worker.atomic();
-		}else{
-			worker.ready();
-			worker.execute();
-		}
+		(new StateGraphExchangeWorker(this)).selectExecute();
 	}
 
 	public void geneticAlgorithmLength(){
@@ -596,7 +577,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	public int stateFind(String str){
-		selectNodeClear();
+		selectClear();
 		drawNodes.setAllWeak(true);
 
 		if(str.equals("")){
@@ -632,7 +613,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	public int stateMatch(String head,String guard){
-		selectNodeClear();
+		selectClear();
 		drawNodes.setAllWeak(true);
 
 		if(head.equals("")){
@@ -701,11 +682,14 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	public void searchShortCycle(){
-
 		drawNodes.updateShortCycle();
 		update();
+	}
 
-		/*
+	/*
+	public void searchShortCycle(){
+
+
 		ArrayList<StateNode> cycles = new ArrayList<StateNode>();
 		StateNode node = drawNodes.getStartNodeOne();
 		for(StateNode sn : drawNodes.getStartNode()){
@@ -824,8 +808,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		}
 
 		update();
-		*/
+
 	}
+	*/
 
 	public void searchReset(){
 		drawNodes.setAllWeak(false);
@@ -951,7 +936,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		if(!painter.isActive()){ return; }
 
 		double startTime = System.currentTimeMillis();
-		this.simpleMode = zoom<=0.7;
+		//this.simpleMode = zoom<=0.7;
 
 		//描写対象の決定
 		double minX=-10/zoom,maxX=(getWidth()+10)/zoom;
@@ -1032,8 +1017,20 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		*/
 
 		//線の描写
-		for(StateTransition t : drawNodes.getAllTransition()){
-			drawTransition(g2, t, null);
+		if(simpleMode){
+			//すべて直線で描画
+			for(StateTransition t : drawNodes.getAllTransition()){
+				drawTransition(g2, t, null);
+			}
+		}else{
+			//ダミー以外を描画
+			for(StateTransition t : drawNodes.getAllTransition()){
+				if(t.from.dummy||t.to.dummy){ continue; }
+				drawTransition(g2, t, null);
+			}
+			//ダミーカーブ
+			ArrayList<ArrayList<StateNode>> dummyGroups = getDummyGroups(drawNodes.getDepthNode());
+			drawDummyCurve(g2, dummyGroups, null);
 		}
 
 		//ノードの描写
@@ -1055,10 +1052,27 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		//選択しているノードの描写
 		for(StateNode node : selectNodes){
-			drawSelectNodeAndLink(g2,node);
+			drawSelectNode(g2,node);
 		}
 		nodeLabel.setNode(selectNodes);
 		validate();
+
+		//選択トランジションの描画
+		if(selectTransition!=null){
+			drawSelectTransition(g2, selectTransition);
+		}
+
+		//debug:トランジション選択範囲の描画
+		/*
+		g2.setColor(Color.LIGHT_GRAY);
+		for(StateTransition t : drawNodes.getAllTransition()){
+			t.draw(g2);
+		}
+		if(selectTransition!=null){
+			g2.setColor(Color.RED);
+			selectTransition.draw(g2);
+		}
+		*/
 
 		//選択時の四角の表示
 		if(selectSquare&&lastPoint!=null&&startPoint!=null){
@@ -1099,7 +1113,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		//遷移先への矢印を表示
 		for(StateNode to : node.getToNodes()){
-			if(Env.is("SV_HIDEBACKEDGE")&&to.depth<node.depth){ continue; }
+			if(hideBackEdgeMode&&to.depth<node.depth){ continue; }
 			if(!node.isInFrame()&&!to.isInFrame()){ continue; }
 			if(node.weak||to.weak){
 				g2.setColor(Color.lightGray);
@@ -1119,10 +1133,10 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 					drawSelfArrow(g2,node);
 				}
 
-				if((Env.is("SV_SHOWRULE")||Env.is("SV_SHOWNONAMERULE"))&&!node.dummy){
+				if((showRuleMode||showNoNameRuleMode)&&!node.dummy){
 					String str = node.getToRuleName(to);
 					if(str.length()>0){
-						if((!str.substring(0, 1).equals("_")&&Env.is("SV_SHOWRULE"))||(str.substring(0, 1).equals("_")&&Env.is("SV_SHOWNONAMERULE"))){
+						if((!str.substring(0, 1).equals("_")&&showRuleMode)||(str.substring(0, 1).equals("_")&&showNoNameRuleMode)){
 							FontMetrics fm = g2.getFontMetrics();
 							int h = 0;
 							if(node.depth>to.depth){
@@ -1147,7 +1161,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		StateNode from = t.from;
 		StateNode to = t.to;
 
-		if(Env.is("SV_HIDEBACKEDGE")&&to.depth<from.depth){ return; }
+		if(hideBackEdgeMode&&to.depth<from.depth){ return; }
 		if(!from.isInFrame()&&!to.isInFrame()){ return; }
 
 		if(color==null){
@@ -1157,7 +1171,6 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				color = Color.black;
 			}
 		}
-
 		g2.setColor(color);
 
 		if(!simpleMode){
@@ -1176,10 +1189,10 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				drawSelfArrow(g2,from);
 			}
 			//ルール名の表示
-			if((Env.is("SV_SHOWRULE")||Env.is("SV_SHOWNONAMERULE"))&&!from.dummy){
+			if((showRuleMode||showNoNameRuleMode)&&!from.dummy){
 				String str = from.getToRuleName(to);
 				if(str.length()>0){
-					if((!str.substring(0, 1).equals("_")&&Env.is("SV_SHOWRULE"))||(str.substring(0, 1).equals("_")&&Env.is("SV_SHOWNONAMERULE"))){
+					if((!str.substring(0, 1).equals("_")&&showRuleMode)||(str.substring(0, 1).equals("_")&&showNoNameRuleMode)){
 						FontMetrics fm = g2.getFontMetrics();
 						int h = 0;
 						if(from.depth>to.depth){
@@ -1196,8 +1209,167 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		}
 	}
 
+	private ArrayList<ArrayList<StateNode>> getDummyGroups(ArrayList<ArrayList<StateNode>> depthNode){
+		ArrayList<ArrayList<StateNode>> dummyGroups = new ArrayList<ArrayList<StateNode>>();
+		LinkedHashSet<StateNode> dummys = new LinkedHashSet<StateNode>();
+		for(ArrayList<StateNode> nodes : depthNode){
+			for(StateNode node : nodes){
+				if(node.dummy){
+					dummys.add(node);
+				}
+			}
+		}
+		while(dummys.size()>0){
+			ArrayList<StateNode> dummyGroup = new ArrayList<StateNode>();
+			StateNode node = null;
+			for(StateNode tempNode : dummys){
+				node = tempNode;
+				break;
+			}
+			while(node.dummy){
+				dummyGroup.add(node);
+				dummys.remove(node);
+				node = node.getFromNodes().get(0);
+			}
+			dummyGroups.add(dummyGroup);
+		}
+
+		return dummyGroups;
+	}
+
+	private void drawDummyCurve(Graphics2D g2, ArrayList<ArrayList<StateNode>> dummyGroups,  Color color){
+		for(ArrayList<StateNode> dummyGroup : dummyGroups){
+			/*
+			StateNode sN = dummyGroup.get(0).getToNodes().get(0);
+			StateNode n1 = dummyGroup.get(0);
+			StateNode n2 = n1.getFromNodes().get(0);
+			if(color==null){
+				if(searchMode&&n1.weak||!searchMode&&cycleMode&&!n1.cycle){
+					color = Color.lightGray;
+				}else{
+					color = Color.black;
+				}
+			}
+			dummyGroup.remove(n1);
+			dummyGroup.remove(n2);
+
+			GeneralPath p = new GeneralPath();
+			p.moveTo(sN.getX(), sN.getY());
+
+			while(dummyGroup.size()>=1){
+				p.quadTo(n1.getX(), n1.getY(), n2.getX(), n2.getY());
+				n1 = dummyGroup.get(0);
+				n2 = n1.getFromNodes().get(0);
+				dummyGroup.remove(n1);
+				dummyGroup.remove(n2);
+			}
+
+			if(!n2.dummy){
+				p.quadTo(n1.getX(), n1.getY(), n2.getX(), n2.getY());
+			}else{
+				StateNode n3 = n2.getFromNodes().get(0);
+				p.curveTo(n1.getX(), n1.getY(), n2.getX(), n2.getY(), n3.getX(), n3.getY());
+			}
+			g2.draw(p);
+			*/
+/*
+			ArrayList<Point2D> points = new ArrayList<Point2D>();
+			StateNode n0 = dummyGroup.get(0).getToNodes().get(0);
+			StateNode n = n0;
+			for(StateNode node : dummyGroup){
+				points.add(new Point2D.Double((n.getX()+node.getX())/2,(n.getY()+node.getY())/2));
+				points.add(new Point2D.Double(node.getX(),node.getY()));
+				n = node;
+			}
+			StateNode nN = n.getFromNodes().get(0);
+			points.add(new Point2D.Double((n.getX()+nN.getX())/2,(n.getY()+nN.getY())/2));
+
+			GeneralPath p = new GeneralPath();
+			p.moveTo(n0.getX(), n0.getY());
+			p.lineTo(points.get(0).getX(), points.get(0).getY());
+			for(int i=1;(i+1)<points.size();i+=2){
+				p.quadTo(points.get(i).getX(), points.get(i).getY(), points.get(i+1).getX(), points.get(i+1).getY());
+			}
+			p.lineTo(nN.getX(), nN.getY());
+			g2.draw(p);
+			*/
+			drawDummyCurve(g2, dummyGroup.get(0), null);
+		}
+	}
+
+	//ダミーカーブの描画
+	private void drawDummyCurve(Graphics2D g2, StateNode dummy, Color color){
+		if(color==null){
+			if(searchMode&&dummy.weak||!searchMode&&cycleMode&&!dummy.cycle){
+				color = Color.lightGray;
+			}else{
+				color = Color.black;
+			}
+		}
+		g2.setColor(color);
+
+		//ダミーのリストの作成
+		ArrayList<StateNode> dummyGroup = new ArrayList<StateNode>();
+		StateNode n = dummy;
+		while(n.getFromNode().dummy){
+			n = n.getFromNode();
+		}
+		while(n.dummy){
+			dummyGroup.add(n);
+			n = n.getToNode();
+		}
+
+		//ダミーの中間点を作成
+		ArrayList<Point2D> points = new ArrayList<Point2D>();
+		StateNode n0 = dummyGroup.get(0).getFromNode();
+		n = n0;
+		for(StateNode node : dummyGroup){
+			points.add(new Point2D.Double((n.getX()+node.getX())/2,(n.getY()+node.getY())/2));
+			points.add(new Point2D.Double(node.getX(),node.getY()));
+			n = node;
+		}
+		StateNode nN = n.getToNode();
+		points.add(new Point2D.Double((n.getX()+nN.getX())/2,(n.getY()+nN.getY())/2));
+
+		if(hideBackEdgeMode&&nN.depth<n0.depth){ return; }
+		if(!n0.isInFrame()&&!nN.isInFrame()){ return; }
+
+		//パスの作成、直線、曲線描画
+		GeneralPath p = new GeneralPath();
+		Point2D fP = points.get(0);
+		drawNodeLine(g2,n0.getX(), n0.getY(), n0.getRadius(), fP.getX(), fP.getY(), 0);
+
+		p.moveTo(fP.getX(), fP.getY());
+		for(int i=1;(i+1)<points.size();i+=2){
+			p.quadTo(points.get(i).getX(), points.get(i).getY(), points.get(i+1).getX(), points.get(i+1).getY());
+		}
+		g2.draw(p);
+
+		//矢印の描画
+		Point2D lP = points.get(points.size()-1);
+		drawNodeArrow(g2, lP.getX(), lP.getY(), 0, nN.getX(), nN.getY(), nN.getRadius(), 5);
+
+
+		//ルール名の表示
+		if(showRuleMode||showNoNameRuleMode){
+			String str = n0.getToRuleName(dummyGroup.get(0));
+			if(str.length()>0){
+				if((!str.substring(0, 1).equals("_")&&showRuleMode)||(str.substring(0, 1).equals("_")&&showNoNameRuleMode)){
+					FontMetrics fm = g2.getFontMetrics();
+					int h = 0;
+					if(n0.depth>dummyGroup.get(0).depth){
+						h = fm.getHeight();
+					}
+					g2.drawString(str,(int)((n0.getX()+dummyGroup.get(0).getX())/2)-fm.stringWidth(str)/2,(int)((n0.getY()+dummyGroup.get(0).getY())/2)+h);
+				}
+			}
+		}
+	}
+
 	private void drawNode(Graphics2D g2, StateNode node, Color fillColor, Color drawColor){
 		if(!node.isInFrame()){ return; }
+
+		if(hideBackEdgeMode&&node.backDummy||!showDummyMode&&node.dummy){ return; }
 
 		if(fillColor==null||drawColor==null){
 			if(searchMode&&node.weak||!searchMode&&cycleMode&&!node.cycle){
@@ -1219,33 +1391,53 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				double r = node.getRadius()-2.0;
 				g2.draw(new RoundRectangle2D.Double(node.getX()-r,node.getY()-r,r*2,r*2,r*2,r*2));
 			}
-			if(Env.is("SV_SHOWID")){
+			if(showIdMode){
 				g2.drawString(node.id+"",(int)(node.getX()),(int)(node.getY()));
 			}
 		}
 	}
 
-	private void drawSelectNodeAndLink(Graphics2D g2,StateNode node){
+	private void drawSelectNode(Graphics2D g2, StateNode node){
 
 		// 遷移元の描画
 		for(StateTransition f : node.getFromTransitions()){
-			drawTransition(g2, f, Color.BLUE);
-			while(f.from.dummy){
-				f = f.from.getFromTransition();
+			if(!f.from.dummy){
 				drawTransition(g2, f, Color.BLUE);
+			}else{
+				if(!simpleMode){
+					drawDummyCurve(g2, f.from, Color.BLUE);
+				}else{
+					while(f.from.dummy){
+						f = f.from.getFromTransition();
+						drawTransition(g2, f, Color.BLUE);
+					}
+				}
+			}
+			if(node.dummy){
+				drawTransition(g2, f, Color.GRAY);
 			}
 		}
 
 		// 遷移先の描画
 		for(StateTransition t : node.getToTransitions()){
-			drawTransition(g2,t,Color.RED);
 			StateTransition f = t.to.getToTransition(node);
+			if(!t.to.dummy){
+				drawTransition(g2,t,Color.RED);
+			}else{
+				if(!simpleMode){
+					drawDummyCurve(g2, t.to, Color.RED);
+				}else{
+					while(t.to.dummy){
+						t = t.to.getToTransition();
+						drawTransition(g2,t,Color.RED);
+					}
+				}
+			}
+			if(node.dummy){
+				drawTransition(g2, t, Color.GRAY);
+			}
 			if(f!=null){
 				drawTransition(g2,f,Color.RED);
-			}
-			while(t.to.dummy){
-				t = t.to.getToTransition();
-				drawTransition(g2,t,Color.RED);
 			}
 		}
 
@@ -1324,6 +1516,15 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		g2.setColor(Color.RED);
 		g2.draw(node);
 		*/
+	}
+
+	private void drawSelectTransition(Graphics2D g2, StateTransition trans){
+
+		drawTransition(g2, trans, Color.RED);
+
+		// 状態の描画
+		drawNode(g2, trans.from, trans.from.getColor(), Color.BLUE);
+		drawNode(g2, trans.to, trans.to.getColor(), Color.RED);
 	}
 
 	private void drawSelfArrow(Graphics2D g2,StateNode node){
@@ -1425,9 +1626,10 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		maker.end();
 	}
 
-	public void selectNodeClear(){
+	public void selectClear(){
 		selectNodes.clear();
 		nodeSelected = false;
+		selectTransition = null;
 	}
 
 	public boolean isDragg(){
@@ -1457,7 +1659,15 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		startPoint = e.getPoint();
 
 		Point p = new Point((int)((double)e.getX()/zoom), (int)((double)e.getY()/zoom));
-		StateNode selectNode = drawNodes.pickANode(p);
+
+
+		//ノードの選択
+
+		//ある程度拡大していないと選択できない
+		StateNode selectNode = null;
+		if(zoom>0.3){
+			selectNode = drawNodes.pickANode(p);
+		}
 
 		if(e.isControlDown()){
 			if(selectNode!=null){
@@ -1489,6 +1699,20 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				nodeSelected = false;
 			}
 		}
+
+
+		//トランジションの選択
+		if(selectNode==null&&selectNodes.size()==0){
+			if(zoom>0.3){
+				selectTransition = drawNodes.pickATransition(p);
+			}else{
+				selectTransition = null;
+			}
+		}else{
+			selectTransition = null;
+		}
+
+		//右クリック制御
 		if(SwingUtilities.isRightMouseButton(e)){
 			(new StateRightMenu(this)).show(e.getComponent(), e.getX(), e.getY());
 		}
@@ -1526,6 +1750,12 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				for(StateNode node : selectNodes){
 					node.move(dx, dy);
 				}
+			}
+		}else if(selectTransition!=null){
+			if(!e.isAltDown()){ dx = 0; }
+			selectTransition.from.move(dx, dy);
+			if(selectTransition.from!=selectTransition.to){
+				selectTransition.to.move(dx, dy);
 			}
 		}else{
 
@@ -1620,6 +1850,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				double maxY = Math.max(p1.y, p2.y);
 				selectNodes.clear();
 				for(StateNode node : drawNodes.getAllNode()){
+					if(!showDummyMode&&node.dummy){ continue; }
 					if(minX<node.getX()&&node.getX()<maxX&&minY<node.getY()&&node.getY()<maxY){
 						selectNodes.add(node);
 					}
@@ -1760,8 +1991,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			//	drawNodes.remove(node);
 			//}
 			drawNodes.remove(selectNodes);
-			selectNodes.clear();
-			nodeSelected=false;
+			selectClear();
 			update();
 			isUpdate = true;
 			break;
@@ -1781,6 +2011,13 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		case KeyEvent.VK_0:
 			if(e.isControlDown()){
 				setZoom(1);
+				update();
+			}
+			break;
+		case KeyEvent.VK_SPACE:
+			if(selectTransition!=null){
+				selectTransition.separateTransition(drawNodes);
+				selectTransition = null;
 				update();
 			}
 			break;

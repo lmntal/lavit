@@ -67,6 +67,7 @@ import lavit.util.NodeYComparator;
 public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
+	private boolean endFlag;
 
 	private ProgressFrame frame;
 
@@ -76,6 +77,25 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 	public StateGraphAdjustWorker(StateGraphPanel panel){
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
+		this.endFlag = false;
+	}
+
+	public void waitExecute(){
+		selectExecute();
+		while(!endFlag){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {}
+		}
+	}
+
+	public void selectExecute(){
+		if(drawNodes.size()<1000){
+			atomic();
+		}else{
+			ready();
+			execute();
+		}
 	}
 
 	public void atomic(){
@@ -105,6 +125,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		panel.autoCentering();
 		panel.setActive(true);
 		if(frame!=null) frame.dispose();
+		this.endFlag = true;
 	}
 
 	@Override

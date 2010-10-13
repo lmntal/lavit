@@ -36,12 +36,21 @@
 package lavit.stateviewer;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 
 import lavit.Env;
 
-public class StateTransition{
+public class StateTransition {
 	public StateNode from;
 	public StateNode to;
 	public boolean cycle;
@@ -69,7 +78,7 @@ public class StateTransition{
 		this.to = to;
 		this.cycle = cycle;
 	}
-	*/
+	 */
 
 	String getRuleNameString(){
 		StringBuffer buf = new StringBuffer();
@@ -100,4 +109,85 @@ public class StateTransition{
 			rules.add(r);
 		}
 	}
+
+	public String toString(){
+		return from.id+" -> "+to.id;
+	}
+
+	private Shape getShape(){
+		if(to==from){
+			RoundRectangle2D.Double shape = new RoundRectangle2D.Double(to.getX()-10,to.getY()-10,10,10,10,10);
+			return shape;
+		}else{
+			Polygon shape = new Polygon();
+			if(Math.abs(to.getX()-from.getX())>Math.abs(to.getY()-from.getY())){
+				shape.addPoint((int)to.getX(), (int)to.getY()+2);
+				shape.addPoint((int)to.getX(), (int)to.getY()-2);
+				shape.addPoint((int)from.getX(), (int)from.getY()-2);
+				shape.addPoint((int)from.getX(), (int)from.getY()+2);
+			}else{
+				shape.addPoint((int)to.getX()+2, (int)to.getY());
+				shape.addPoint((int)to.getX()-2, (int)to.getY());
+				shape.addPoint((int)from.getX()-2, (int)from.getY());
+				shape.addPoint((int)from.getX()+2, (int)from.getY());
+			}
+			return shape;
+		}
+	}
+
+	void separateTransition(StateNodeSet drawNodes){
+		if(to==from){
+			StateNode dummy1 = drawNodes.makeDummyFromTransition(this);
+			StateNode dummy2 = drawNodes.makeDummyFromTransition(dummy1.getFromTransition());
+			dummy1.setX(to.getX()-10);
+			dummy1.setY(to.getY()-20);
+			dummy2.setX(to.getX()+10);
+			dummy2.setY(to.getY()-20);
+		}else{
+			drawNodes.makeDummyFromTransition(this);
+		}
+		/*
+		StateNodeSet nodeSet = graphPanel.getDrawNodes();
+
+		long id = nodeSet.publishNodeId();
+		double x = ((from.getX()+to.getX())/2);
+		double y = ((from.getY()+to.getY())/2);
+		StateNode dummy = new StateNode(id, nodeSet);
+		dummy.setPosition(x, y);
+		dummy.dummy = true;
+		if(from.depth>to.depth){
+			dummy.backDummy = true;
+		}
+		dummy.depth = to.depth;
+		nodeSet.addNode(dummy);
+		dummy.updateLooks();
+
+		StateTransition t1 = new StateTransition(from, dummy, cycle, weak);
+		t1.addRules(getRules());
+		t1.from.addToTransition(t1);
+		t1.to.addFromTransition(t1);
+		nodeSet.addTransition(t1);
+
+		StateTransition t2 = new StateTransition(dummy, to, cycle, weak);
+		t2.addRules(getRules());
+		t2.from.addToTransition(t2);
+		t2.to.addFromTransition(t2);
+		nodeSet.addTransition(t2);
+
+		from.removeToTransition(this);
+		to.removeFromTransition(this);
+		nodeSet.removeTransition(this);
+
+		nodeSet.setTreeDepth();
+		*/
+	}
+
+	public boolean contains(Point2D p) {
+		return getShape().contains(p);
+	}
+
+	public void draw(Graphics2D g2){
+		g2.draw(getShape());
+	}
+
 }

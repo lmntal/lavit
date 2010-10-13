@@ -46,16 +46,13 @@ public class StateAbstractionMaker {
 
 	private StateGraphPanel graphPanel;
 	StateNodeSet drawNodes;
-	boolean dummy;
 
 	public StateAbstractionMaker(StateGraphPanel graphPanel){
 		this.graphPanel = graphPanel;
 		this.drawNodes = graphPanel.getDrawNodes();
-		this.dummy = Env.is("SV_DUMMY");
 
-		Env.set("SV_DUMMY",false);
 		drawNodes.removeDummy();
-		graphPanel.selectNodeClear();
+		graphPanel.selectClear();
 	}
 
 	public void makeNode(Collection<StateNode> groupNodes){
@@ -148,8 +145,11 @@ public class StateAbstractionMaker {
 		//if(newNode.getFromNodes().size()==0){ drawNodes.setStartNode(newNode); }
 		if(newNode.depth==0){ drawNodes.setStartNode(newNode); }
 		if(newNode.getToNodes().size()==0){ drawNodes.addEndNode(newNode); }
+	}
 
-		/*
+	/*
+	public void makeNode(Collection<StateNode> groupNodes){
+
 		boolean accept = false;
 		boolean inCycle = false;
 		boolean start = false;
@@ -261,16 +261,16 @@ public class StateAbstractionMaker {
 
 		drawNodes.addNode(newNode);
 		if(start){ drawNodes.setStartNode(newNode); }
-		if(newNode.getToNodes().size()==0){ drawNodes.addEndNode(newNode); }*/
+		if(newNode.getToNodes().size()==0){ drawNodes.addEndNode(newNode); }
 	}
+	*/
 
 	public void end(){
 		drawNodes.setTreeDepth();
 		drawNodes.resetOrder();
 
-		Env.set("SV_DUMMY",dummy);
-		if(Env.is("SV_DUMMY")){
-			drawNodes.setDummy();
+		if(Env.is("SV_STARTUP_SET_BACKDUMMY")){
+			drawNodes.setBackDummy();
 		}
 		drawNodes.updateNodeLooks();
 

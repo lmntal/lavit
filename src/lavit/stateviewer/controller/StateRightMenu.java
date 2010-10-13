@@ -118,10 +118,6 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 */
 
 	private JMenu controlViewSubmenu = new JMenu("Control View");
-	private JCheckBoxMenuItem match = new JCheckBoxMenuItem("Match State");
-	private JCheckBoxMenuItem find = new JCheckBoxMenuItem("Find State");
-	private JCheckBoxMenuItem dynamicControl = new  JCheckBoxMenuItem("Dynamic Control");
-	private JCheckBoxMenuItem shortcut = new JCheckBoxMenuItem("Control Button");
 	private JCheckBoxMenuItem zoomSlider = new  JCheckBoxMenuItem("Show Zoom Slider");
 	private JCheckBoxMenuItem info = new JCheckBoxMenuItem("Show Info");
 
@@ -295,22 +291,6 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 
 		//view
 
-		match.addActionListener(this);
-		match.setSelected(Env.is("SV_MATCH"));
-		controlViewSubmenu.add(match);
-
-		find.addActionListener(this);
-		find.setSelected(Env.is("SV_FIND"));
-		controlViewSubmenu.add(find);
-
-		dynamicControl.addActionListener(this);
-		dynamicControl.setSelected(Env.is("SV_DYNAMIC_CONTROL"));
-		controlViewSubmenu.add(dynamicControl);
-
-		shortcut.addActionListener(this);
-		shortcut.setSelected(Env.is("SV_BUTTON"));
-		controlViewSubmenu.add(shortcut);
-
 		zoomSlider.addActionListener(this);
 		zoomSlider.setSelected(Env.is("SV_ZOOMSLIDER"));
 		controlViewSubmenu.add(zoomSlider);
@@ -474,14 +454,6 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 			graphPanel.repaint();
 		}else if(src==info){
 			graphPanel.statePanel.stateControlPanel.toggleInfoVisible();
-		}else if(src==shortcut){
-			graphPanel.statePanel.stateControlPanel.toggleButtonVisible();
-		}else if(src==match){
-			graphPanel.statePanel.stateControlPanel.toggleMatchVisible();
-		}else if(src==find){
-			graphPanel.statePanel.stateControlPanel.toggleFindVisible();
-		}else if(src==dynamicControl){
-			graphPanel.statePanel.stateControlPanel.toggleDynamicVisible();
 		}else if(src==zoomSlider){
 			graphPanel.statePanel.stateControlPanel.toggleZoomSliderVisible();
 /*

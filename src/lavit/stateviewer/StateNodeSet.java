@@ -751,6 +751,12 @@ public class StateNodeSet {
 		return allNode.values();
 	}
 
+	//beforeノードのあとに追加する
+	public void addCycleNode(StateNode node, StateNode before){
+		int pos = cycleNode.indexOf(before);
+		cycleNode.add(pos+1, node);
+	}
+
 	public ArrayList<StateNode> getCycleNode(){
 		return cycleNode;
 	}
@@ -1111,6 +1117,10 @@ public class StateNodeSet {
 		}
 		dummy.depth = to.depth;
 		addNode(dummy);
+		if(trans.cycle){
+			dummy.cycle = true;
+			addCycleNode(dummy, trans.from);
+		}
 		dummy.updateLooks();
 
 		StateTransition t1 = new StateTransition(from, dummy, trans.cycle, trans.weak);
@@ -1154,6 +1164,10 @@ public class StateNodeSet {
 				toDummy.backDummy = true;
 				toDummy.depth = dummyDepth;
 				addNode(toDummy);
+				if(trans.cycle){
+					toDummy.cycle = true;
+					addCycleNode(toDummy, fromDummy);
+				}
 
 				StateTransition t = new StateTransition(fromDummy, toDummy, trans.cycle, trans.weak);
 				t.addRules(trans.getRules());

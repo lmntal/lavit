@@ -95,7 +95,8 @@ public class StateDynamicControlPanel extends JPanel implements ChangeListener {
 
 		this.statePanel = statePanel;
 		this.mover = statePanel.stateGraphPanel.getDynamicMover();
-		setLayout(new GridLayout(labels.length,2));
+		//setLayout(new GridLayout(labels.length,2));
+		setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
 
 		springSlider.setValue(Env.getInt("SV_DYNAMIC_SPRING"));
 		nodeRepulsionSlider.setValue(Env.getInt("SV_DYNAMIC_NODE_REPULSION"));
@@ -113,7 +114,8 @@ public class StateDynamicControlPanel extends JPanel implements ChangeListener {
 
 	}
 
-	public void allSetEnabled(boolean enabled){
+	public void setEnabled(boolean enabled){
+		super.setEnabled(enabled);
 		for(JSlider slider : sliders){
 			slider.setEnabled(enabled);
 		}

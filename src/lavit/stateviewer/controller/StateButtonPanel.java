@@ -41,6 +41,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
@@ -50,6 +51,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.border.TitledBorder;
 
 import lavit.Env;
 import lavit.FrontEnd;
@@ -69,7 +71,6 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	private JButton adjust3Reset = new JButton("Adjust(Find) Reset");
 	private JButton simpleMixAdjust = new JButton("Simple Mix Adjust");
 	private JButton dummyMixAdjust = new JButton("Dummy Mix Adjust");
-	private JButton allReset = new JButton("All Reset");
 
 	private JPanel crossPanel = new JPanel();
 	private JButton crossInfo = new JButton("Cross Info");
@@ -89,11 +90,15 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	private JPanel dynamicPanel = new JPanel();
 	private JCheckBox dynamicModeling = new JCheckBox("Dynamic Modeling");
 	private JButton stretchMove = new JButton("Stretch Move");
-	private JButton autoCentering = new JButton("Auto Centering");
 
-	private JPanel transitionPanel = new JPanel();
+
+	private JPanel abstractionPanel = new JPanel();
 	private JButton transitionAbstraction = new JButton("Transition Abstraction");
 	private JButton selectAbstraction = new JButton("Select Abstraction");
+
+	private JPanel basicPanel = new JPanel();
+	private JButton autoCentering = new JButton("Auto Centering");
+	private JButton allReset = new JButton("All Reset");
 
 	private JComponent comps[] = {
 		posReset,adjustReset,adjust2Reset,adjust3Reset,simpleMixAdjust,dummyMixAdjust,allReset,
@@ -106,9 +111,11 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	StateButtonPanel(StatePanel statePanel){
 		this.statePanel = statePanel;
 
-		setLayout(new GridLayout(5,1));
+		//setLayout(new GridLayout(5,1));
+		setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
 
-		resetPanel.setLayout(new GridLayout(1,7));
+		resetPanel.setLayout(new GridLayout(2,3));
+		resetPanel.setBorder(new TitledBorder("Transformation"));
 		posReset.addActionListener(this);
 		resetPanel.add(posReset);
 		adjustReset.addActionListener(this);
@@ -121,11 +128,10 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		resetPanel.add(simpleMixAdjust);
 		dummyMixAdjust.addActionListener(this);
 		resetPanel.add(dummyMixAdjust);
-		allReset.addActionListener(this);
-		resetPanel.add(allReset);
 		add(resetPanel);
 
 		crossPanel.setLayout(new GridLayout(1,4));
+		crossPanel.setBorder(new TitledBorder("Cross Reduction"));
 		crossInfo.addActionListener(this);
 		crossPanel.add(crossInfo);
 		geneticAlgorithm.addActionListener(this);
@@ -137,7 +143,8 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		crossPanel.add(exchangeDummyOnly);
 		add(crossPanel);
 
-		dummyPanel.setLayout(new GridLayout(1,7));
+		dummyPanel.setLayout(new GridLayout(2,4));
+		dummyPanel.setBorder(new TitledBorder("Dummy Control"));
 		startupSetBackDummy.addActionListener(this);
 		startupSetBackDummy.setSelected(Env.is("SV_STARTUP_SET_BACKDUMMY"));
 		dummyPanel.add(startupSetBackDummy);
@@ -156,26 +163,34 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		dummyPanel.add(dummyInfo);
 		add(dummyPanel);
 
-		dynamicPanel.setLayout(new GridLayout(1,3));
+		dynamicPanel.setLayout(new GridLayout(1,2));
+		dynamicPanel.setBorder(new TitledBorder("Dynamic Modeling"));
 		dynamicModeling.addActionListener(this);
 		dynamicModeling.setSelected(Env.is("SV_DYNAMIC_MOVER"));
 		dynamicPanel.add(dynamicModeling);
 		stretchMove.addActionListener(this);
 		dynamicPanel.add(stretchMove);
-		autoCentering.addActionListener(this);
-		dynamicPanel.add(autoCentering);
 		add(dynamicPanel);
 
-		transitionPanel.setLayout(new GridLayout(1,2));
+		abstractionPanel.setLayout(new GridLayout(1,2));
+		abstractionPanel.setBorder(new TitledBorder("Abstraction"));
 		transitionAbstraction.addActionListener(this);
-		transitionPanel.add(transitionAbstraction);
+		abstractionPanel.add(transitionAbstraction);
 		selectAbstraction.addActionListener(this);
-		transitionPanel.add(selectAbstraction);
-		add(transitionPanel);
+		abstractionPanel.add(selectAbstraction);
+		add(abstractionPanel);
+
+		basicPanel.setLayout(new GridLayout(1,2));
+		autoCentering.addActionListener(this);
+		basicPanel.add(autoCentering);
+		allReset.addActionListener(this);
+		basicPanel.add(allReset);
+		add(basicPanel);
 
 	}
 
-	public void allSetEnabled(boolean enabled){
+	public void setEnabled(boolean enabled){
+		super.setEnabled(enabled);
 		for(JComponent comp : comps){
 			comp.setEnabled(enabled);
 		}

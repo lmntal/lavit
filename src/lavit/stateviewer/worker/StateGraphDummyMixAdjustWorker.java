@@ -65,7 +65,7 @@ public class StateGraphDummyMixAdjustWorker extends SwingWorker<Object,Object> {
 
 	@Override
 	protected Object doInBackground(){
-		panel.statePanel.stateControlPanel.buttonPanel.exchangeDummyOnly.setSelected(true);
+		panel.statePanel.stateControlPanel.stateControlTab.buttonPanel.exchangeDummyOnly.setSelected(true);
 		Env.set("SV_CROSSREDUCTION_DUMMYONLY",true);
 
 		drawNodes.removeDummy();

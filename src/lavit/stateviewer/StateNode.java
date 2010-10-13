@@ -56,7 +56,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -630,6 +633,80 @@ public class StateNode implements Shape {
 		}
 		return fNodes;
 	}
+	 */
+
+
+	/*
+	 * Layer·Ï¥á¥½¥Ã¥É
+	 */
+
+
+	private Double[] sameLayerYs;
+	private Double[] nextLayerYs;
+	private Double[] backLayerYs;
+
+	public void makeLayerNodeList(){
+		TreeSet<Double> sameYs = new TreeSet<Double>();
+		TreeSet<Double> nextYs = new TreeSet<Double>();
+		TreeSet<Double> backYs = new TreeSet<Double>();
+
+		for(StateTransition trans : getToTransitions()){
+			if(trans.to.depth==depth&&trans.to!=this){
+				sameYs.add(trans.to.getY());
+			}else if(trans.to.depth==depth+1){
+				nextYs.add(trans.to.getY());
+			}else if(trans.to.depth==depth-1){
+				backYs.add(trans.to.getY());
+			}
+		}
+		for(StateTransition trans : getFromTransitions()){
+			if(trans.from.depth==depth&&trans.from!=this){
+				sameYs.add(trans.from.getY());
+			}else if(trans.from.depth==depth+1){
+				nextYs.add(trans.from.getY());
+			}else if(trans.from.depth==depth-1){
+				backYs.add(trans.from.getY());
+			}
+		}
+
+		this.sameLayerYs = (Double[])sameYs.toArray(new Double[0]);
+		this.nextLayerYs = (Double[])nextYs.toArray(new Double[0]);
+		this.backLayerYs = (Double[])backYs.toArray(new Double[0]);
+	}
+
+	public Double[] getSameLayerYs(){
+		return sameLayerYs;
+	}
+
+	public Double[] getNextLayerYs(){
+		return nextLayerYs;
+	}
+
+	public Double[] getBackLayerYs(){
+		return backLayerYs;
+	}
+
+	public Double[] getLayerYs(int cmp){
+		if(cmp==-1){
+			return backLayerYs;
+		}else if(cmp==0){
+			return sameLayerYs;
+		}else if(cmp==1){
+			return nextLayerYs;
+		}else{
+			return new Double[0];
+		}
+	}
+
+	public void clearLayerNodeList(){
+		sameLayerYs=null;
+		nextLayerYs=null;
+		backLayerYs=null;
+	}
+
+
+	/*
+	 * Subset·Ï
 	 */
 
 	public boolean hasSubset(){

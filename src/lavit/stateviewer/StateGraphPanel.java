@@ -261,7 +261,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		painter.setActive(active);
 		mover.setActive(active&& Env.is("SV_DYNAMIC_MOVER"));
 
-		statePanel.stateControlPanel.allButtonSetEnabled(active);
+		statePanel.stateControlPanel.setEnabled(active);
 		if(active){
 			update();
 		}else{
@@ -1043,7 +1043,15 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		for(StateNode node : cycleNode){
 			StateTransition t = node.getToCycleTransition();
 			if(t!=null){
-				drawTransition(g2, t, null);
+				if(simpleMode){
+					drawTransition(g2, t, null);
+				}else if(t.from.dummy){
+					drawDummyCurve(g2, t.from, null);
+				}else if(t.to.dummy){
+					drawDummyCurve(g2, t.to, null);
+				}else{
+					drawTransition(g2, t, null);
+				}
 			}
 		}
 		for(StateNode node : cycleNode){

@@ -197,7 +197,7 @@ public class StatePositionSet {
 		StringBuffer sb = new StringBuffer();
 		for(ArrayList<StatePosition> dn : depthNode){
 			for(StatePosition sp : dn){
-				sb.append(sp.no+",");
+				sb.append(sp.id+",");
 			}
 		}
 		return sb.toString();
@@ -275,7 +275,7 @@ public class StatePositionSet {
 		int cross = 0;
 		for(StatePosition n : nodes){
 			for(StatePosition to : n.toNodes){
-				if(n.depth==to.depth&&n.no!=to.no){
+				if(n.depth==to.depth&&n.id!=to.id){
 					double b,t;
 					if(n.y<to.y){
 						b = n.y;
@@ -346,7 +346,6 @@ public class StatePositionSet {
 class StatePosition{
 	StateNode node;
 	long id;
-	int no;
 	int depth;
 	int nth;
 	double x,y;
@@ -369,7 +368,6 @@ class StatePosition{
 	StatePosition(StatePosition node){
 		this.node = node.node;
 		this.id = node.id;
-		this.no = node.no;
 		this.depth = node.depth;
 		this.nth = node.nth;
 		this.x = node.x;

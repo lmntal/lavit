@@ -45,6 +45,8 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -70,7 +72,7 @@ import lavit.stateviewer.StatePanel;
 import lavit.util.CommonFontUser;
 import lavit.util.FixFlowLayout;
 
-public class StateControlPanel extends JPanel implements ChangeListener {
+public class StateControlPanel extends JPanel implements ChangeListener,MouseListener {
 
 	private StatePanel statePanel;
 
@@ -84,14 +86,15 @@ public class StateControlPanel extends JPanel implements ChangeListener {
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 
 		stateControllerTab = new StateControlTab(statePanel);
-		stateControllerTab.setVisible(Env.is("SV_ZOOMSLIDER"));
+		stateControllerTab.setVisible(Env.is("SV_CONTROLLER"));
 		add(stateControllerTab);
 
 		zoomSlider.addChangeListener(this);
-		zoomSlider.setVisible(Env.is("SV_CONTROLLER"));
+		zoomSlider.setVisible(Env.is("SV_ZOOMSLIDER"));
 		add(zoomSlider);
 
 		infoPanel = new StateUnderInfoPanel(statePanel);
+		infoPanel.addMouseListener(this);
 		infoPanel.setVisible(Env.is("SV_INFO"));
 		add(infoPanel);
 
@@ -137,5 +140,20 @@ public class StateControlPanel extends JPanel implements ChangeListener {
 		infoPanel.setVisible(!infoPanel.isVisible());
 		Env.set("SV_INFO",infoPanel.isVisible());
 	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		if(e.getClickCount()>0&&e.getClickCount()%2==0){
+			toggleControllerVisible();
+			javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
+				statePanel.stateGraphPanel.autoCentering();
+			}});
+		}
+	}
+
+	public void mouseReleased(MouseEvent e) {}
+	public void mouseClicked(MouseEvent e) {}
+	public void mouseEntered(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {}
 
 }

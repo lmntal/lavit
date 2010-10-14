@@ -65,7 +65,7 @@ public class StateGraphSimpleMixAdjustWorker extends SwingWorker<Object,Object> 
 
 	@Override
 	protected Object doInBackground(){
-		panel.statePanel.stateControlPanel.stateControlTab.buttonPanel.exchangeDummyOnly.setSelected(false);
+		boolean crossreduction_dummyonly = Env.is("SV_CROSSREDUCTION_DUMMYONLY");
 		Env.set("SV_CROSSREDUCTION_DUMMYONLY",false);
 
 		drawNodes.removeDummy();
@@ -82,6 +82,8 @@ public class StateGraphSimpleMixAdjustWorker extends SwingWorker<Object,Object> 
 		}
 
 		drawNodes.updateNodeLooks();
+
+		Env.set("SV_CROSSREDUCTION_DUMMYONLY", crossreduction_dummyonly);
 
 		end();
 		return null;

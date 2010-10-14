@@ -12,6 +12,7 @@ public class StateControlTab extends JTabbedPane {
 	public StateButtonPanel buttonPanel;
 	public StateSearchPanel searchPanel;
 	public StateDynamicControlPanel dynamicPanel;
+	public StateOtherPanel otherPanel;
 
     StateControlTab(StatePanel statePanel){
     	this.statePanel = statePanel;
@@ -23,7 +24,10 @@ public class StateControlTab extends JTabbedPane {
 		addTab("Search", searchPanel);
 
     	dynamicPanel = new StateDynamicControlPanel(statePanel);
-		addTab("Dynamic Controler",dynamicPanel);
+		addTab("Dynamic",dynamicPanel);
+
+		otherPanel = new StateOtherPanel(statePanel);
+		addTab("Other",otherPanel);
 
     }
 
@@ -32,6 +36,7 @@ public class StateControlTab extends JTabbedPane {
     	dynamicPanel.setEnabled(enabled);
     	searchPanel.setEnabled(enabled);
 		buttonPanel.setEnabled(enabled);
+		otherPanel.setEnabled(enabled);
     }
 
 }

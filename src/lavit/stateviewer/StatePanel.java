@@ -48,6 +48,7 @@ import java.io.OutputStreamWriter;
 
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 
 import lavit.*;
 import lavit.stateviewer.controller.StateControlPanel;
@@ -69,6 +70,7 @@ public class StatePanel extends JPanel{
 
 		stateControlPanel = new StateControlPanel(this);
 		add(stateControlPanel, BorderLayout.SOUTH);
+
 	}
 
 	public void start(String str, boolean ltlMode){

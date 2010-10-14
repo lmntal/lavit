@@ -72,66 +72,15 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 	private JMenuItem add = new JMenuItem("add Editor");
 
 	private JMenu transitionSearchSubmenu = new JMenu("Transition Search");
-	private JMenuItem transInfo = new JMenuItem("Transition Info");
-	private JMenuItem ruleWindow = new JMenuItem("Rule Name");
 	private JMenuItem backNs = new JMenuItem("Back Nodes Search");
 	private JMenuItem nextNs = new JMenuItem("Next Nodes Search");
 	private JMenuItem fromNs = new JMenuItem("From Nodes Search");
 	private JMenuItem toNs = new JMenuItem("To Nodes Search");
-	private JMenuItem searchShortCycle = new JMenuItem("Search Short Cycle");
-	private JMenuItem searchReset = new JMenuItem("Search Reset");
-
-	/*
-	private JMenu resetSubmenu = new JMenu("Graph Reset");
-	private JMenuItem posReset = new JMenuItem("Position Reset");
-	private JMenuItem adjustReset = new JMenuItem("Adjust Reset");
-	private JMenuItem adjust2Reset = new JMenuItem("Adjust(Backedge) Reset");
-
-	private JMenu crossSubmenu = new JMenu("Cross Reduction");
-	private JMenuItem crossInfo = new JMenuItem("Cross Info");
-	private JMenuItem geneticAlgorithm = new JMenuItem("Genetic Algorithm");
-	private JMenuItem exchangeReset = new JMenuItem("Adjacent Exchange");
-	private JCheckBoxMenuItem exchangeDummyOnly = new JCheckBoxMenuItem("Dummy Only");
-
-	private JMenu dummySubmenu = new JMenu("Dummy Control");
-	private JCheckBoxMenuItem dummy = new JCheckBoxMenuItem("Set Dummy");
-	private JCheckBoxMenuItem showdummy = new JCheckBoxMenuItem("Show Dummy");
-	private JMenuItem dummyInfo = new JMenuItem("Dummy Info");
-	private JMenuItem dummyCentering = new JMenuItem("Dummy Centering");
-	private JMenuItem dummySmoothing = new JMenuItem("Dummy Smoothing");
-	*/
-
-	private JMenu graphViewSubmenu = new JMenu("Graph View");
-	private JCheckBoxMenuItem backedge = new JCheckBoxMenuItem("Hide Backedge");
-	private JCheckBoxMenuItem showId = new JCheckBoxMenuItem("Show ID");
-	private JCheckBoxMenuItem showRule = new JCheckBoxMenuItem("Show Rule");
-	private JCheckBoxMenuItem showNoNameRule = new JCheckBoxMenuItem("Show No Name Rule");
-	private JCheckBoxMenuItem showOutTransition = new JCheckBoxMenuItem("Show Out Transition");
-
-	/*
-	private JMenuItem autoCentering = new JMenuItem("Auto Centering");
-	private JMenuItem stretchMove = new JMenuItem("Stretch Move");
-	private JMenuItem shakeMove = new JMenuItem("Shake Move");
-	//private JMenuItem groupMove = new JMenuItem("Group Move");
-
-	private JCheckBoxMenuItem dynamicModeling = new JCheckBoxMenuItem("Dynamic Modeling");
-*/
 
 	private JMenu controlViewSubmenu = new JMenu("Control View");
+	private JCheckBoxMenuItem controller = new  JCheckBoxMenuItem("Show Controller");
 	private JCheckBoxMenuItem zoomSlider = new  JCheckBoxMenuItem("Show Zoom Slider");
 	private JCheckBoxMenuItem info = new JCheckBoxMenuItem("Show Info");
-
-	private JMenu fileSubmenu = new JMenu("File");
-	private JMenuItem dotFile = new JMenuItem("Save Dot File");
-	private JMenuItem saveSlimOutput = new JMenuItem("Save Slim Output File");
-	//private JMenuItem loadSlimOutput = new JMenuItem("Load Slim Output File");
-
-	private JMenuItem updateDefaultYOrder = new JMenuItem("Update Default Y Order");
-	private JMenuItem allReset = new JMenuItem("All Reset");
-	private JMenuItem allDelete = new JMenuItem("All Delete");
-
-	private JMenuItem test = new JMenuItem("Test");
-
 
 	public StateRightMenu(StateGraphPanel graphPanel){
 		this.graphPanel = graphPanel;
@@ -155,14 +104,6 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 
 		//Transition
 
-		transInfo.addActionListener(this);
-		transitionSearchSubmenu.add(transInfo);
-
-		transitionSearchSubmenu.addSeparator();
-
-		ruleWindow.addActionListener(this);
-		transitionSearchSubmenu.add(ruleWindow);
-
 		backNs.addActionListener(this);
 		transitionSearchSubmenu.add(backNs);
 
@@ -175,121 +116,16 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 		toNs.addActionListener(this);
 		transitionSearchSubmenu.add(toNs);
 
-		transitionSearchSubmenu.addSeparator();
-
-		searchShortCycle.addActionListener(this);
-		transitionSearchSubmenu.add(searchShortCycle);
-
-		transitionSearchSubmenu.addSeparator();
-
-		searchReset.addActionListener(this);
-		transitionSearchSubmenu.add(searchReset);
-
 		add(transitionSearchSubmenu);
 
 		addSeparator();
 
 
-/*
-		autoCentering.addActionListener(this);
-		add(autoCentering);
-
-		stretchMove.addActionListener(this);
-		add(stretchMove);
-
-
-		//reset
-
-		posReset.addActionListener(this);
-		resetSubmenu.add(posReset);
-
-		adjustReset.addActionListener(this);
-		resetSubmenu.add(adjustReset);
-
-		adjust2Reset.addActionListener(this);
-		resetSubmenu.add(adjust2Reset);
-
-		add(resetSubmenu);
-
-		//cross
-
-		crossInfo.addActionListener(this);
-		crossSubmenu.add(crossInfo);
-
-		crossSubmenu.addSeparator();
-
-		geneticAlgorithm.addActionListener(this);
-		crossSubmenu.add(geneticAlgorithm);
-
-		exchangeReset.addActionListener(this);
-		crossSubmenu.add(exchangeReset);
-
-		crossSubmenu.addSeparator();
-
-		exchangeDummyOnly.addActionListener(this);
-		exchangeDummyOnly.setSelected(Env.is("SV_CROSSREDUCTION_DUMMYONLY"));
-		crossSubmenu.add(exchangeDummyOnly);
-
-		add(crossSubmenu);
-
-
-		//dummy
-
-		dummy.addActionListener(this);
-		dummy.setSelected(Env.is("SV_STARTUP_SET_BACKDUMMY"));
-		dummySubmenu.add(dummy);
-
-		showdummy.addActionListener(this);
-		showdummy.setSelected(Env.is("SV_SHOW_DUMMY"));
-		dummySubmenu.add(showdummy);
-
-		dummySubmenu.addSeparator();
-
-		dummyInfo.addActionListener(this);
-		dummySubmenu.add(dummyInfo);
-
-		dummySubmenu.addSeparator();
-
-		dummyCentering.addActionListener(this);
-		dummySubmenu.add(dummyCentering);
-
-		dummySmoothing.addActionListener(this);
-		dummySubmenu.add(dummySmoothing);
-
-		add(dummySubmenu);
-
-		addSeparator();
-
-
-		dynamicModeling.addActionListener(this);
-		dynamicModeling.setSelected(Env.is("SV_DYNAMIC_MOVER"));
-		add(dynamicModeling);
-*/
-
-		backedge.addActionListener(this);
-		backedge.setSelected(Env.is("SV_HIDEBACKEDGE"));
-		graphViewSubmenu.add(backedge);
-
-		showId.addActionListener(this);
-		showId.setSelected(Env.is("SV_SHOWID"));
-		graphViewSubmenu.add(showId);
-
-		showRule.addActionListener(this);
-		showRule.setSelected(Env.is("SV_SHOWRULE"));
-		graphViewSubmenu.add(showRule);
-
-		showNoNameRule.addActionListener(this);
-		showNoNameRule.setSelected(Env.is("SV_SHOWNONAMERULE"));
-		graphViewSubmenu.add(showNoNameRule);
-
-		showOutTransition.addActionListener(this);
-		showOutTransition.setSelected(Env.is("SV_SHOWOUTTRANS"));
-		graphViewSubmenu.add(showOutTransition);
-
-		add(graphViewSubmenu);
-
-
 		//view
+
+		controller.addActionListener(this);
+		controller.setSelected(Env.is("SV_CONTROLLER"));
+		controlViewSubmenu.add(controller);
 
 		zoomSlider.addActionListener(this);
 		zoomSlider.setSelected(Env.is("SV_ZOOMSLIDER"));
@@ -301,44 +137,12 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 
 		add(controlViewSubmenu);
 
-
-		//file
-
-		dotFile.addActionListener(this);
-		fileSubmenu.add(dotFile);
-
-		saveSlimOutput.addActionListener(this);
-		fileSubmenu.add(saveSlimOutput);
-
-		//loadSlimOutput.addActionListener(this);
-		//fileSubmenu.add(loadSlimOutput);
-
-		add(fileSubmenu);
-		addSeparator();
-
-
-		updateDefaultYOrder.addActionListener(this);
-		add(updateDefaultYOrder);
-
-		//allReset.addActionListener(this);
-		//add(allReset);
-
-		allDelete.addActionListener(this);
-		add(allDelete);
-
 		updateEnabled();
-
-
-		//test.addActionListener(this);
-		//add(test);
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		JMenuItem src = (JMenuItem)e.getSource();
 		if(src==remove){
-			//for(StateNode node : graphPanel.getSelectNodes()){
-			//	graphPanel.getDrawNodes().remove(node);
-			//}
 			graphPanel.getDrawNodes().remove(graphPanel.getSelectNodes());
 			graphPanel.getSelectNodes().clear();
 			graphPanel.repaint();
@@ -354,15 +158,6 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 			for(StateNode node : graphPanel.getSelectNodes()){
 				FrontEnd.mainFrame.editorPanel.editor.replaceSelection(node.state);
 			}
-		}else if(src==transInfo){
-			JOptionPane.showMessageDialog(
-					FrontEnd.mainFrame,
-					"Transition : "+graphPanel.getDrawNodes().getAllTransition().size(),
-					"Transition Info",
-					JOptionPane.PLAIN_MESSAGE
-			);
-		}else if(src==ruleWindow){
-			new SelectStateTransitionRuleFrame(graphPanel,new StateTransitionEm(graphPanel));
 		}else if(src==backNs){
 			graphPanel.emBackNodes(graphPanel.getSelectNodes());
 		}else if(src==nextNs){
@@ -371,160 +166,13 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 			graphPanel.emFromNodes(graphPanel.getSelectNodes());
 		}else if(src==toNs){
 			graphPanel.emToNodes(graphPanel.getSelectNodes());
-		}else if(src==searchShortCycle){
-			graphPanel.searchShortCycle();
-		}else if(src==searchReset){
-			graphPanel.searchReset();
-/*
-		}else if(src==posReset){
-			graphPanel.positionReset();
-			graphPanel.autoCentering();
-		}else if(src==adjustReset){
-			graphPanel.adjustReset();
-		}else if(src==adjust2Reset){
-			graphPanel.adjust2Reset();
-		}else if(src==exchangeReset){
-			graphPanel.exchangeReset();
-		}else if(src==geneticAlgorithm){
-			graphPanel.geneticAlgorithmLength();
-		}else if(src==exchangeDummyOnly){
-			Env.set("SV_CROSSREDUCTION_DUMMYONLY",!Env.is("SV_CROSSREDUCTION_DUMMYONLY"));
-		}else if(src==autoCentering){
-			graphPanel.autoCentering();
-		}else if(src==stretchMove){
-			graphPanel.stretchMove();
-		}else if(src==dummyCentering){
-			//graphPanel.dummyCentering();
-		}else if(src==dummySmoothing){
-			graphPanel.dummySmoothing();
-		}else if(src==shakeMove){
-			//graphPanel.shakeMove();
-			graphPanel.randomMove();
-		}else if(src==updateDefaultYOrder){
-			graphPanel.getDrawNodes().updateDefaultYOrder();
-		//}else if(src==groupMove){
-		//	graphPanel.groupMove();
-		}else if(src==dummy){
-			Env.set("SV_STARTUP_SET_BACKDUMMY",!Env.is("SV_STARTUP_SET_BACKDUMMY"));
-			if(Env.is("SV_STARTUP_SET_BACKDUMMY")){
-				graphPanel.getDrawNodes().setDummy();
-				graphPanel.getDrawNodes().dummyCentering();
-				if(graphPanel.statePanel.isLtl()){
-					for(StateNode node : graphPanel.getDrawNodes().getAllNode()){
-						if(node.cycle){
-							node.weak = false;
-							graphPanel.getDrawNodes().setLastOrder(node);
-						}else{
-							node.weak = true;
-						}
-					}
-				}
-				graphPanel.getDrawNodes().updateNodeLooks();
-			}else{
-				//graphPanel.statePanel.reset();
-				graphPanel.getDrawNodes().removeDummy();
-			}
-			graphPanel.repaint();
-		}else if(src==dynamicModeling){
-			Env.set("SV_DYNAMIC_MOVER",!Env.is("SV_DYNAMIC_MOVER"));
-			graphPanel.setDynamicMoverActive(Env.is("SV_DYNAMIC_MOVER"));
-		}else if(src==showdummy){
-			Env.set("SV_SHOW_DUMMY",!Env.is("SV_SHOW_DUMMY"));
-			graphPanel.getDrawNodes().updateNodeLooks();
-			graphPanel.repaint();
-*/
-		}else if(src==backedge){
-			Env.set("SV_HIDEBACKEDGE",!Env.is("SV_HIDEBACKEDGE"));
-			graphPanel.setHideBackEdgeMode(Env.is("SV_HIDEBACKEDGE"));
-			graphPanel.repaint();
-		}else if(src==showId){
-			Env.set("SV_SHOWID",!Env.is("SV_SHOWID"));
-			graphPanel.setShowIdMode(Env.is("SV_SHOWID"));
-			graphPanel.repaint();
-		}else if(src==showRule){
-			Env.set("SV_SHOWRULE",!Env.is("SV_SHOWRULE"));
-			graphPanel.setShowRuleMode(Env.is("SV_SHOWRULE"));
-			graphPanel.repaint();
-		}else if(src==showNoNameRule){
-			Env.set("SV_SHOWNONAMERULE",!Env.is("SV_SHOWNONAMERULE"));
-			graphPanel.setShowNoNameRuleMode(Env.is("SV_SHOWNONAMERULE"));
-			graphPanel.repaint();
-		}else if(src==showOutTransition){
-			Env.set("SV_SHOWOUTTRANS",!Env.is("SV_SHOWOUTTRANS"));
-			graphPanel.repaint();
-		}else if(src==info){
-			graphPanel.statePanel.stateControlPanel.toggleInfoVisible();
+		}else if(src==controller){
+			graphPanel.statePanel.stateControlPanel.toggleControllerVisible();
 		}else if(src==zoomSlider){
 			graphPanel.statePanel.stateControlPanel.toggleZoomSliderVisible();
-/*
-			//}else if(src==reduction){
-		//	graphPanel.reduction();
-		}else if(src==crossInfo){
-			JOptionPane.showMessageDialog(
-					FrontEnd.mainFrame,
-					"Cross : "+(new StateGraphExchangeWorker(graphPanel)).getAllCross(),
-					"Cross Info",
-					JOptionPane.PLAIN_MESSAGE
-			);
-		}else if(src==dummyInfo){
-			int size = graphPanel.getDrawNodes().size();
-			int dummy = graphPanel.getDrawNodes().getDummySize();
-			JOptionPane.showMessageDialog(
-					FrontEnd.mainFrame,
-					"All Node : "+size+"\n"+
-					"State : "+(size-dummy)+"\n"+
-					"Dummy : "+dummy,
-					"Dummy Info",
-					JOptionPane.PLAIN_MESSAGE
-			);
-			*/
-		}else if(src==dotFile){
-			dotfileSave();
-			FrontEnd.mainFrame.toolTab.setTab("System");
-		}else if(src==saveSlimOutput){
-			File file = chooseOpenFile();
-			if(file!=null){
-				graphPanel.statePanel.savaFile(file);
-			}
-		}else if(src==allReset){
-			graphPanel.statePanel.reset();
-		}else if(src==allDelete){
-			graphPanel.allDelete();
-		}else if(src==test){
-			/*
-			ArrayList<ArrayList<StateNode>> depthNode = graphPanel.getDrawNodes().getDepthNode();
-			for(int i=1;i<depthNode.size()-1;i++){
-				for(int j=depthNode.get(i).size()-2;j>=1;){
-					StateNode node = depthNode.get(i).get(j);
-					if(node.getToNodes().size()>0){
-						graphPanel.getDrawNodes().remove(node);
-						j-=2;
-					}else{
-						j-=1;
-					}
-				}
-			}
-			graphPanel.getSelectNodes().clear();
-			graphPanel.repaint();
-			*/
-			graphPanel.startMover();
+		}else if(src==info){
+			graphPanel.statePanel.stateControlPanel.toggleInfoVisible();
 		}
-		/*
-		else if(src==output){
-			int w = (int)(panel.getWidth()/panel.getZoom());
-			int h = (int)(panel.getHeight()/panel.getZoom());
-			BufferedImage bi = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
-			Graphics2D g2 = (Graphics2D)bi.getGraphics();
-			g2.setColor(Color.white);
-			g2.fillRect(0, 0, w, h);
-			drawGraph(g2,w,h,false);
-			try {
-			    ImageIO.write(bi, "png", new File("output.png"));
-			} catch (Exception ex) {
-			    FrontEnd.printException(ex);
-			}
-		}
-*/
 	}
 
 	private void updateEnabled(){
@@ -551,48 +199,6 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 			add.setEnabled(false);
 		}
 
-	}
-
-	private boolean dotfileSave(){
-
-		File lmn = FrontEnd.mainFrame.editorPanel.getFile();
-		File file = new File(lmn.getAbsolutePath()+".dot");
-		if (file!=null) {
-			try {
-				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsolutePath())));
-				writer.write("digraph sample {\n");
-				writer.write("graph [rankdir = LR];\n");
-				writer.write("node [style=filled,color=\"#336666\"];\n");
-				writer.write(graphPanel.getDrawNodes().getDotString());
-				writer.write(graphPanel.getDrawNodes().getRankString());
-				writer.write("}\n");
-				writer.close();
-            	FrontEnd.println("(StateViewer) dot file save. [ "+file.getName()+" ]");
-            	FrontEnd.println("(StateViewer) example:\ndot -Tgif \""+file.getAbsolutePath()+"\" -o \""+(new File(lmn.getAbsolutePath()+".gif")).getAbsolutePath()+"\"");
-            	return true;
-			} catch (IOException e) {
-				FrontEnd.printException(e);
-			}
-		}
-
-		return false;
-	}
-
-	private File chooseOpenFile(){
-		String chooser_dir = Env.get("SV_FILE_LAST_CHOOSER_DIR");
-		if(chooser_dir==null){
-			chooser_dir=new File("demo").getAbsolutePath();
-		}else if(!new File(chooser_dir).exists()&&new File("demo").exists()){
-			chooser_dir=new File("demo").getAbsolutePath();
-		}
-		JFileChooser jfc = new JFileChooser(chooser_dir);
-		int r = jfc.showOpenDialog(FrontEnd.mainFrame);
-		if (r != JFileChooser.APPROVE_OPTION) {
-			return null;
-		}
-		File file = jfc.getSelectedFile();
-		Env.set("SV_FILE_LAST_CHOOSER_DIR",file.getParent());
-		return file;
 	}
 
 

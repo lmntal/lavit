@@ -57,7 +57,7 @@ import java.util.Properties;
 public class Env {
 
 	static public final String APP_NAME = "LaViT";
-	static public final String APP_VERSION = "2.5.0";
+	static public final String APP_VERSION = "2.2.0";
 	static public final String APP_DATE = "2010/10/30";
 	static public final String APP_HREF = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
 

@@ -73,24 +73,15 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	private JButton dummyMixAdjust = new JButton("Dummy Mix Adjust");
 
 	private JPanel crossPanel = new JPanel();
-	private JButton crossInfo = new JButton("Cross Info");
 	private JButton geneticAlgorithm = new JButton("Genetic Algorithm");
 	private JButton exchangeReset = new JButton("Adjacent Exchange");
-	public JCheckBox exchangeDummyOnly = new JCheckBox("Dummy Only");
+	private JCheckBox exchangeDummyOnly = new JCheckBox("Dummy Only");
 
 	private JPanel dummyPanel = new JPanel();
-	public JCheckBox startupSetBackDummy = new JCheckBox("StartUp Set Back Dummy");
-	private JCheckBox showdummy = new JCheckBox("Show Dummy");
 	private JButton setBackDummy = new JButton("Set Back Dummy");
 	private JButton removeDummy = new JButton("Remove Dummy");
 	private JButton dummyCentering = new JButton("Dummy Centering");
 	private JButton dummySmoothing = new JButton("Dummy Smoothing");
-	private JButton dummyInfo = new JButton("Dummy Info");
-
-	private JPanel dynamicPanel = new JPanel();
-	private JCheckBox dynamicModeling = new JCheckBox("Dynamic Modeling");
-	private JButton stretchMove = new JButton("Stretch Move");
-
 
 	private JPanel abstractionPanel = new JPanel();
 	private JButton transitionAbstraction = new JButton("Transition Abstraction");
@@ -102,9 +93,9 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 
 	private JComponent comps[] = {
 		posReset,adjustReset,adjust2Reset,adjust3Reset,simpleMixAdjust,dummyMixAdjust,allReset,
-		crossInfo,geneticAlgorithm,exchangeReset,exchangeDummyOnly,
-		startupSetBackDummy,showdummy,setBackDummy,removeDummy,dummyCentering,dummySmoothing,dummyInfo,
-		dynamicModeling,stretchMove,autoCentering,
+		geneticAlgorithm,exchangeReset,exchangeDummyOnly,
+		setBackDummy,removeDummy,dummyCentering,dummySmoothing,
+		autoCentering,
 		transitionAbstraction,selectAbstraction
 	};
 
@@ -130,10 +121,8 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		resetPanel.add(dummyMixAdjust);
 		add(resetPanel);
 
-		crossPanel.setLayout(new GridLayout(1,4));
+		crossPanel.setLayout(new GridLayout(1,3));
 		crossPanel.setBorder(new TitledBorder("Cross Reduction"));
-		crossInfo.addActionListener(this);
-		crossPanel.add(crossInfo);
 		geneticAlgorithm.addActionListener(this);
 		crossPanel.add(geneticAlgorithm);
 		exchangeReset.addActionListener(this);
@@ -143,14 +132,8 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		crossPanel.add(exchangeDummyOnly);
 		add(crossPanel);
 
-		dummyPanel.setLayout(new GridLayout(2,4));
+		dummyPanel.setLayout(new GridLayout(1,4));
 		dummyPanel.setBorder(new TitledBorder("Dummy Control"));
-		startupSetBackDummy.addActionListener(this);
-		startupSetBackDummy.setSelected(Env.is("SV_STARTUP_SET_BACKDUMMY"));
-		dummyPanel.add(startupSetBackDummy);
-		showdummy.addActionListener(this);
-		showdummy.setSelected(Env.is("SV_SHOW_DUMMY"));
-		dummyPanel.add(showdummy);
 		setBackDummy.addActionListener(this);
 		dummyPanel.add(setBackDummy);
 		removeDummy.addActionListener(this);
@@ -159,18 +142,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		dummyPanel.add(dummyCentering);
 		dummySmoothing.addActionListener(this);
 		dummyPanel.add(dummySmoothing);
-		dummyInfo.addActionListener(this);
-		dummyPanel.add(dummyInfo);
 		add(dummyPanel);
-
-		dynamicPanel.setLayout(new GridLayout(1,2));
-		dynamicPanel.setBorder(new TitledBorder("Dynamic Modeling"));
-		dynamicModeling.addActionListener(this);
-		dynamicModeling.setSelected(Env.is("SV_DYNAMIC_MOVER"));
-		dynamicPanel.add(dynamicModeling);
-		stretchMove.addActionListener(this);
-		dynamicPanel.add(stretchMove);
-		add(dynamicPanel);
 
 		abstractionPanel.setLayout(new GridLayout(1,2));
 		abstractionPanel.setBorder(new TitledBorder("Abstraction"));
@@ -216,58 +188,28 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		}else if(src==allReset){
 			statePanel.reset();
 		}
-		else if(src==crossInfo){
-			JOptionPane.showMessageDialog(
-					FrontEnd.mainFrame,
-					"Cross : "+(new StateGraphExchangeWorker(statePanel.stateGraphPanel)).getAllCross(),
-					"Cross Info",
-					JOptionPane.PLAIN_MESSAGE
-			);
-		}else if(src==geneticAlgorithm){
+		else if(src==geneticAlgorithm){
 			statePanel.stateGraphPanel.geneticAlgorithmLength();
 		}else if(src==exchangeReset){
 			statePanel.stateGraphPanel.exchangeReset();
 		}else if(src==exchangeDummyOnly){
 			Env.set("SV_CROSSREDUCTION_DUMMYONLY",!Env.is("SV_CROSSREDUCTION_DUMMYONLY"));
-		}else if(src==startupSetBackDummy){
-			Env.set("SV_STARTUP_SET_BACKDUMMY",!Env.is("SV_STARTUP_SET_BACKDUMMY"));
-		}else if(src==showdummy){
-			Env.set("SV_SHOW_DUMMY",!Env.is("SV_SHOW_DUMMY"));
-			statePanel.stateGraphPanel.setShowDummyMode(Env.is("SV_SHOW_DUMMY"));
-			statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
-			statePanel.stateGraphPanel.repaint();
 		}else if(src==setBackDummy){
 			statePanel.stateGraphPanel.getDrawNodes().setBackDummy();
 			statePanel.stateGraphPanel.getDrawNodes().dummyCentering();
 			statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
-			statePanel.stateGraphPanel.repaint();
+			statePanel.stateGraphPanel.update();
 		}else if(src==removeDummy){
 			statePanel.stateGraphPanel.getDrawNodes().removeDummy();
 			statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
 			statePanel.stateGraphPanel.selectClear();
-			statePanel.stateGraphPanel.repaint();
+			statePanel.stateGraphPanel.update();
 		}else if(src==dummyCentering){
 			statePanel.stateGraphPanel.getDrawNodes().dummyCentering();
-			statePanel.stateGraphPanel.repaint();
+			statePanel.stateGraphPanel.update();
 		}else if(src==dummySmoothing){
 			statePanel.stateGraphPanel.dummySmoothing();
-			statePanel.stateGraphPanel.repaint();
-		}else if(src==dummyInfo){
-			int size = statePanel.stateGraphPanel.getDrawNodes().size();
-			int dummy = statePanel.stateGraphPanel.getDrawNodes().getDummySize();
-			JOptionPane.showMessageDialog(
-					FrontEnd.mainFrame,
-					"All Node : "+size+"\n"+
-					"State : "+(size-dummy)+"\n"+
-					"Dummy : "+dummy,
-					"Dummy Info",
-					JOptionPane.PLAIN_MESSAGE
-			);
-		}else if(src==dynamicModeling){
-			Env.set("SV_DYNAMIC_MOVER",!Env.is("SV_DYNAMIC_MOVER"));
-			statePanel.stateGraphPanel.setDynamicMoverActive(Env.is("SV_DYNAMIC_MOVER"));
-		}else if(src==stretchMove){
-			statePanel.stateGraphPanel.stretchMove();
+			statePanel.stateGraphPanel.update();
 		}else if(src==autoCentering){
 			statePanel.stateGraphPanel.autoCentering();
 		}else if(src==transitionAbstraction){

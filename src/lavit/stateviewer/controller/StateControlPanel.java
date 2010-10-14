@@ -74,51 +74,34 @@ public class StateControlPanel extends JPanel implements ChangeListener {
 
 	private StatePanel statePanel;
 
-	/*
-	private JPanel control = new JPanel();
-	private JButton delete = new JButton("Delete");
-    private JButton reset = new JButton("All Reset");
-    */
-
-
-
-    public StateControlTab stateControlTab;
-
+    public StateControlTab stateControllerTab;
     private JSlider zoomSlider = new JSlider(1,399);
-
-    private JPanel infoPanel = new JPanel();
-    private JLabel zoomNum = new JLabel();
-	private JLabel stateNum = new JLabel();
+    private StateUnderInfoPanel infoPanel;
 
 	public StateControlPanel(StatePanel statePanel){
 
 		this.statePanel = statePanel;
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 
-		stateControlTab = new StateControlTab(statePanel);
-		add(stateControlTab);
+		stateControllerTab = new StateControlTab(statePanel);
+		stateControllerTab.setVisible(Env.is("SV_ZOOMSLIDER"));
+		add(stateControllerTab);
 
 		zoomSlider.addChangeListener(this);
-		zoomSlider.setVisible(Env.is("SV_ZOOMSLIDER"));
+		zoomSlider.setVisible(Env.is("SV_CONTROLLER"));
 		add(zoomSlider);
 
-		infoPanel.setLayout(new GridLayout(1,2));
-		zoomNum.setHorizontalAlignment(JLabel.LEFT);
-		infoPanel.add(zoomNum);
-		stateNum.setHorizontalAlignment(JLabel.RIGHT);
-		infoPanel.add(stateNum);
-
+		infoPanel = new StateUnderInfoPanel(statePanel);
 		infoPanel.setVisible(Env.is("SV_INFO"));
 		add(infoPanel);
 
 		setEnabled(false);
-		setDrawInfo(0,0);
-		setStateInfo(0,0,0);
+
 	}
 
 	public void setEnabled(boolean enabled){
 		super.setEnabled(enabled);
-		stateControlTab.setEnabled(enabled);
+		stateControllerTab.setEnabled(enabled);
 		zoomSlider.setEnabled(enabled);
 	}
 
@@ -137,9 +120,12 @@ public class StateControlPanel extends JPanel implements ChangeListener {
 	}
 
 	public void updateInfo(){
-		StateGraphPanel p = statePanel.stateGraphPanel;
-		setDrawInfo(p.getZoom(),p.getDrawTime());
-		setStateInfo(p.getDepth()-1,p.getAllNum(),p.getEndNum());
+		infoPanel.updateInfo();
+	}
+
+	public void toggleControllerVisible(){
+		stateControllerTab.setVisible(!stateControllerTab.isVisible());
+		Env.set("SV_CONTROLLER", stateControllerTab.isVisible());
 	}
 
 	public void toggleZoomSliderVisible(){
@@ -150,18 +136,6 @@ public class StateControlPanel extends JPanel implements ChangeListener {
 	public void toggleInfoVisible(){
 		infoPanel.setVisible(!infoPanel.isVisible());
 		Env.set("SV_INFO",infoPanel.isVisible());
-	}
-
-	private void setDrawInfo(double zoom,double drawTime){
-		String z = ""+(int)(zoom*100);
-		if(zoom<0.01){
-			z = ""+(((int)(zoom*10000))/100.0);
-		}
-		zoomNum.setText(" Zoom : "+z+"%, DrawTime : "+(drawTime/1000)+"s");
-	}
-
-	private void setStateInfo(int depth,int num,int end){
-		stateNum.setText(" Depth : "+depth+", State : "+num+", (End : "+end+") ");
 	}
 
 }

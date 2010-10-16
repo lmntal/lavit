@@ -85,7 +85,7 @@ public class StatePanel extends JPanel{
 		if(res){
 			FrontEnd.println("(StateViewer) start! (state = "+drawNodes.size()+")");
 			stateGraphPanel.init(drawNodes);
-			stateGraphPanel.setCycleMode(ltlMode);
+			stateGraphPanel.getStateDraw().setCycleMode(ltlMode);
 			FrontEnd.mainFrame.toolTab.setTab("StateViewer");
 		}else{
 			FrontEnd.println("(StateViewer) error.");

@@ -46,6 +46,8 @@ public class StateDynamicMover extends Thread {
 	private StateGraphPanel panel;
 	private boolean active;
 
+	private boolean physicsMode;
+
 	private double k;
 	private double nc;
 	private double dc;
@@ -77,7 +79,12 @@ public class StateDynamicMover extends Thread {
 		this.maxSpeed = maxSpeed*10;
 	}
 
+	public void setPhysicsMode(boolean physicsMode){
+		this.physicsMode = physicsMode;
+	}
+
 	public void run(){
+		long sleepTime = 0;
 		while(true){
 			try{
 				StateNodeSet drawNodes = panel.getDrawNodes();
@@ -156,11 +163,12 @@ public class StateDynamicMover extends Thread {
 						}
 					}
 					panel.repaint();
+					while(System.currentTimeMillis()<sleepTime+interval){
+						sleep(1);
+					}
+					sleepTime=System.currentTimeMillis();
 				}else{
-					sleep(100);
-				}
-				if(interval>0){
-					sleep(interval);
+					sleep(300);
 				}
 			} catch (Exception e) {
 			}

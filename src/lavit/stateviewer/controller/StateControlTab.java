@@ -18,6 +18,7 @@ public class StateControlTab extends JTabbedPane {
 	public StateSearchPanel searchPanel;
 	public StateDynamicControlPanel dynamicPanel;
 	public StateOtherPanel otherPanel;
+	public StateBetaPanel betaPanel;
 
     StateControlTab(StatePanel statePanel){
     	this.statePanel = statePanel;
@@ -34,6 +35,9 @@ public class StateControlTab extends JTabbedPane {
 		otherPanel = new StateOtherPanel(statePanel);
 		addTab("Other", otherPanel);
 
+		betaPanel = new StateBetaPanel(statePanel);
+		addTab("Beta", betaPanel);
+
     }
 
     public void setEnabled(boolean enabled) {
@@ -42,14 +46,7 @@ public class StateControlTab extends JTabbedPane {
     	searchPanel.setEnabled(enabled);
 		buttonPanel.setEnabled(enabled);
 		otherPanel.setEnabled(enabled);
-    }
-
-    public void setAllVisible(boolean aFlag){
-    	buttonPanel.setVisible(aFlag);
-    	searchPanel.setVisible(aFlag);
-    	dynamicPanel.setVisible(aFlag);
-    	otherPanel.setVisible(aFlag);
-    	validate();
+		betaPanel.setEnabled(enabled);
     }
 
 }

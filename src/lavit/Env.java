@@ -196,6 +196,7 @@ public class Env {
     			map.put("PATH",bin);
     		}
 		}
+
     }
 
     static public String getDirNameOfSlim(){

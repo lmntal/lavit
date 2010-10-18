@@ -69,18 +69,21 @@ public class StateTransitionEm implements StateTransitionCatcher {
 		*/
 
 		StateNodeSet drawNodes = graphPanel.getDrawNodes();
-		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
+		ArrayList<StateNode> weakNodes = new ArrayList<StateNode>(drawNodes.getAllNode());
+		ArrayList<StateTransition> weakTransitions = new ArrayList<StateTransition>(drawNodes.getAllTransition());
 
 		for(StateTransition t : trans){
-			t.from.cycle = true;
-			weaks.remove(t.from);
-			t.to.cycle = true;
-			weaks.remove(t.to);
-			t.cycle = true;
 			drawNodes.setLastOrder(t);
+			weakNodes.remove(t.from);
+			weakNodes.remove(t.to);
+			weakTransitions.remove(t);
 		}
 
-		for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
+		for(StateNode node : weakNodes){ node.weak = true; }
+		for(StateTransition t : weakTransitions){ t.weak = true; }
+
+		graphPanel.getDrawNodes().updateNodeLooks();
+		graphPanel.getStateDraw().setSearchMode(true);
 		graphPanel.update();
 	}
 }

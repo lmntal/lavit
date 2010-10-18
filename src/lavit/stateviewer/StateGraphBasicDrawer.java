@@ -5,6 +5,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Shape;
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
@@ -29,21 +30,14 @@ public class StateGraphBasicDrawer extends StateDraw {
 		this.panel = panel;
 	}
 
-	public void drawGraph(Graphics g){
-		this.g2 = (Graphics2D)g;
+	public void drawGraph(Graphics2D g2){
+		this.g2 = g2;
 		this.drawNodes = panel.getDrawNodes();
 		this.zoom = panel.getZoom();
 
-		g2.setFont(font);
-
-		//フレームの初期化
+		//背景色
 		g2.setColor(Color.white);
 		g2.fillRect(0, 0, panel.getWidth(), panel.getHeight());
-
-		if(!panel.isActive()){ return; }
-
-		double startTime = System.currentTimeMillis();
-		//this.simpleMode = zoom<=0.7;
 
 		//描写対象の決定
 		double minX=-10/zoom,maxX=(panel.getWidth()+10)/zoom;
@@ -55,12 +49,9 @@ public class StateGraphBasicDrawer extends StateDraw {
 			}
 		}
 
-		if(Env.is("SV_VERTICAL_VIEW")){ g2.rotate(90 * Math.PI/180,panel.getWidth()/2, panel.getHeight()/2); }
-		g2.scale(zoom,zoom);
-
 		//初期状態の矢印の描写
 		if(!Env.is("SV_SHOWOUTTRANS")||drawNodes.getAllOutTransition().size()==0){
-			drawStartArrow(g2);
+			drawStartArrow();
 		}
 
 		//OUTTRANSの描画
@@ -89,7 +80,7 @@ public class StateGraphBasicDrawer extends StateDraw {
 			for(StateNode from : outFrom.keySet()){
 				double y = (panel.getHeight()/zoom)*((double)i/(double)(outFrom.size()+2));
 				for(StateNode to : outFrom.get(from)){
-					drawNodeArrow(g2,0,y,0,to.getX(),to.getY(),to.getRadius(),5);
+					drawNodeArrow(0,y,0,to.getX(),to.getY(),to.getRadius(),5);
 				}
 				i++;
 			}
@@ -97,7 +88,7 @@ public class StateGraphBasicDrawer extends StateDraw {
 			for(StateNode to : outTo.keySet()){
 				double y = (panel.getHeight()/zoom)*((double)i/(double)(outTo.size()+2));
 				for(StateNode from : outTo.get(to)){
-					drawNodeArrow(g2,from.getX(),from.getY(),from.getRadius(),panel.getWidth()/zoom,y,0,5);
+					drawNodeArrow(from.getX(),from.getY(),from.getRadius(),panel.getWidth()/zoom,y,0,5);
 				}
 				i++;
 			}
@@ -108,54 +99,69 @@ public class StateGraphBasicDrawer extends StateDraw {
 		if(simpleMode){
 			//すべて直線で描画
 			for(StateTransition t : drawNodes.getAllTransition()){
-				drawTransition(g2, t, null);
+				drawTransition(t, null);
 			}
 		}else{
+			/*
 			//ダミー以外を描画
 			for(StateTransition t : drawNodes.getAllTransition()){
 				if(t.from.dummy||t.to.dummy){ continue; }
-				drawTransition(g2, t, null);
+				drawTransition(t, null);
+				System.out.println(t);
 			}
+			System.out.println();
 			//ダミーカーブ
 			ArrayList<ArrayList<StateNode>> dummyGroups = getDummyGroups(drawNodes.getDepthNode());
-			drawDummyCurve(g2, dummyGroups, null);
+			drawDummyCurve(dummyGroups, null);
+			*/
+			drawNodes.allNodeUnMark();
+			for(StateTransition t : drawNodes.getAllTransition()){
+				if(t.from.dummy){
+					drawDummyCurve(t.from, null);
+				}else if(t.to.dummy){
+					drawDummyCurve(t.to, null);
+				}else{
+					drawTransition(t, null);
+				}
+			}
 		}
 
 		//ノードの描写
 		for(StateNode node : drawNodes.getAllNode()){
-			drawNode(g2, node, null, null);
+			drawNode(node, null, null);
 		}
 
 		//サイクルの優先描画
+		drawNodes.allNodeUnMark();
 		ArrayList<StateNode> cycleNode = drawNodes.getCycleNode();
 		for(StateNode node : cycleNode){
 			StateTransition t = node.getToCycleTransition();
 			if(t!=null){
 				if(simpleMode){
-					drawTransition(g2, t, null);
+					drawTransition(t, null);
 				}else if(t.from.dummy){
-					drawDummyCurve(g2, t.from, null);
+					drawDummyCurve(t.from, null);
 				}else if(t.to.dummy){
-					drawDummyCurve(g2, t.to, null);
+					drawDummyCurve(t.to, null);
 				}else{
-					drawTransition(g2, t, null);
+					drawTransition(t, null);
 				}
 			}
 		}
 		for(StateNode node : cycleNode){
-			drawNode(g2, node, null, null);
+			drawNode(node, null, null);
 		}
 
 		//選択しているノードの描写
 		for(StateNode node : panel.getSelectNodes()){
-			drawSelectNode(g2,node);
+			drawSelectNode(node);
 		}
 		panel.updateNodeLabel();
 		panel.validate();
 
 		//選択トランジションの描画
 		if(panel.getSelectTransition()!=null){
-			drawSelectTransition(g2, panel.getSelectTransition());
+			drawSelectTransition(panel.getSelectTransition());
 		}
 
 		//debug:トランジション選択範囲の描画
@@ -169,23 +175,9 @@ public class StateGraphBasicDrawer extends StateDraw {
 			selectTransition.draw(g2);
 		}
 		*/
-
-		//選択時の四角の表示
-		if(panel.isSelectSquare()&&panel.getLastPoint()!=null&&panel.getStartPoint()!=null){
-			Point p1 = new Point((int)((double)panel.getLastPoint().getX()/zoom), (int)((double)panel.getLastPoint().getY()/zoom));
-			Point p2 = new Point((int)((double)panel.getStartPoint().getX()/zoom), (int)((double)panel.getStartPoint().getY()/zoom));
-
-			g2.setColor(Color.RED);
-			g2.drawRect(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.max(p1.x, p2.x)-Math.min(p1.x, p2.x), Math.max(p1.y, p2.y)-Math.min(p1.y, p2.y));
-		}
-
-		g2.scale(1.0/zoom, 1.0/zoom);
-		if(Env.is("SV_VERTICAL_VIEW")){ g2.rotate(-90 * Math.PI/180, panel.getWidth()/2, panel.getHeight()/2); }
-
-		panel.setDrawTime(System.currentTimeMillis()-startTime);
 	}
 
-	private void drawStartArrow(Graphics2D g2){
+	private void drawStartArrow(){
 		if(drawNodes.getStartNode().size()!=1){ return; }
 
 		StateNode node = drawNodes.getStartNodeOne();
@@ -197,7 +189,7 @@ public class StateGraphBasicDrawer extends StateDraw {
 			g2.setColor(Color.black);
 		}
 
-		drawNodeArrow(g2,node.getX()-30,node.getY(),node.getRadius(),node.getX()-7,node.getY(),node.getRadius(),5);
+		drawNodeArrow(node.getX()-30,node.getY(),node.getRadius(),node.getX()-7,node.getY(),node.getRadius(),5);
 	}
 
 	/*
@@ -248,7 +240,7 @@ public class StateGraphBasicDrawer extends StateDraw {
 	}
 	*/
 
-	private void drawTransition(Graphics2D g2, StateTransition t, Color color){
+	private void drawTransition(StateTransition t, Color color){
 
 		StateNode from = t.from;
 		StateNode to = t.to;
@@ -270,15 +262,15 @@ public class StateGraphBasicDrawer extends StateDraw {
 			if(to!=from){
 				if(to.dummy){
 					if(to.dummy&&from.dummy){
-						drawLine(g2,from.getX(),from.getY(),to.getX(),to.getY());
+						drawLine(from.getX(),from.getY(),to.getX(),to.getY());
 					}else{
-						drawNodeLine(g2,from.getX(),from.getY(),from.getRadius(),to.getX(),to.getY(),0);
+						drawNodeLine(from.getX(),from.getY(),from.getRadius(),to.getX(),to.getY(),0);
 					}
 				}else{
-					drawNodeArrow(g2,from.getX(),from.getY(),from.getRadius(),to.getX(),to.getY(),to.getRadius(),5);
+					drawNodeArrow(from.getX(),from.getY(),from.getRadius(),to.getX(),to.getY(),to.getRadius(),5);
 				}
 			}else{
-				drawSelfArrow(g2,from);
+				drawSelfArrow(from);
 			}
 			//ルール名の表示
 			if((showRuleMode||showNoNameRuleMode)&&!from.dummy){
@@ -296,7 +288,7 @@ public class StateGraphBasicDrawer extends StateDraw {
 			}
 		}else{
 			if(to!=from){
-				drawLine(g2,from.getX(),from.getY(),to.getX(),to.getY());
+				drawLine(from.getX(),from.getY(),to.getX(),to.getY());
 			}
 		}
 	}
@@ -329,7 +321,7 @@ public class StateGraphBasicDrawer extends StateDraw {
 		return dummyGroups;
 	}
 
-	private void drawDummyCurve(Graphics2D g2, ArrayList<ArrayList<StateNode>> dummyGroups,  Color color){
+	private void drawDummyCurve(ArrayList<ArrayList<StateNode>> dummyGroups,  Color color){
 		for(ArrayList<StateNode> dummyGroup : dummyGroups){
 			/*
 			StateNode sN = dummyGroup.get(0).getToNodes().get(0);
@@ -385,12 +377,15 @@ public class StateGraphBasicDrawer extends StateDraw {
 			p.lineTo(nN.getX(), nN.getY());
 			g2.draw(p);
 			*/
-			drawDummyCurve(g2, dummyGroup.get(0), null);
+			drawDummyCurve(dummyGroup.get(0), null);
 		}
 	}
 
 	//ダミーカーブの描画
-	private void drawDummyCurve(Graphics2D g2, StateNode dummy, Color color){
+	private void drawDummyCurve(StateNode dummy, Color color){
+		//markされてる場合は描画しない
+		if(dummy.isMarked()){ return; }
+
 		if(color==null){
 			if(searchMode&&dummy.weak||!searchMode&&cycleMode&&!dummy.cycle){
 				color = Color.lightGray;
@@ -407,6 +402,7 @@ public class StateGraphBasicDrawer extends StateDraw {
 			n = n.getFromNode();
 		}
 		while(n.dummy){
+			n.mark();
 			dummyGroup.add(n);
 			n = n.getToNode();
 		}
@@ -429,7 +425,7 @@ public class StateGraphBasicDrawer extends StateDraw {
 		//パスの作成、直線、曲線描画
 		GeneralPath p = new GeneralPath();
 		Point2D fP = points.get(0);
-		drawNodeLine(g2,n0.getX(), n0.getY(), n0.getRadius(), fP.getX(), fP.getY(), 0);
+		drawNodeLine(n0.getX(), n0.getY(), n0.getRadius(), fP.getX(), fP.getY(), 0);
 
 		p.moveTo(fP.getX(), fP.getY());
 		for(int i=1;(i+1)<points.size();i+=2){
@@ -439,7 +435,7 @@ public class StateGraphBasicDrawer extends StateDraw {
 
 		//矢印の描画
 		Point2D lP = points.get(points.size()-1);
-		drawNodeArrow(g2, lP.getX(), lP.getY(), 0, nN.getX(), nN.getY(), nN.getRadius(), 5);
+		drawNodeArrow(lP.getX(), lP.getY(), 0, nN.getX(), nN.getY(), nN.getRadius(), 5);
 
 
 		//ルール名の表示
@@ -458,7 +454,7 @@ public class StateGraphBasicDrawer extends StateDraw {
 		}
 	}
 
-	private void drawNode(Graphics2D g2, StateNode node, Color fillColor, Color drawColor){
+	private void drawNode(StateNode node, Color fillColor, Color drawColor){
 		if(!node.isInFrame()){ return; }
 
 		if(hideBackEdgeMode&&node.backDummy||!showDummyMode&&node.dummy){ return; }
@@ -489,52 +485,54 @@ public class StateGraphBasicDrawer extends StateDraw {
 		}
 	}
 
-	private void drawSelectNode(Graphics2D g2, StateNode node){
+	private void drawSelectNode(StateNode node){
 
 		// 遷移元の描画
+		drawNodes.allNodeUnMark();
 		for(StateTransition f : node.getFromTransitions()){
 			if(!f.from.dummy){
-				drawTransition(g2, f, Color.BLUE);
+				drawTransition(f, Color.BLUE);
 			}else{
 				if(!simpleMode){
-					drawDummyCurve(g2, f.from, Color.BLUE);
+					drawDummyCurve(f.from, Color.BLUE);
 				}else{
 					while(f.from.dummy){
 						f = f.from.getFromTransition();
-						drawTransition(g2, f, Color.BLUE);
+						drawTransition(f, Color.BLUE);
 					}
 				}
 			}
 			if(node.dummy){
-				drawTransition(g2, f, Color.GRAY);
+				drawTransition(f, Color.GRAY);
 			}
 		}
 
 		// 遷移先の描画
+		drawNodes.allNodeUnMark();
 		for(StateTransition t : node.getToTransitions()){
 			StateTransition f = t.to.getToTransition(node);
 			if(!t.to.dummy){
-				drawTransition(g2,t,Color.RED);
+				drawTransition(t,Color.RED);
 			}else{
 				if(!simpleMode){
-					drawDummyCurve(g2, t.to, Color.RED);
+					drawDummyCurve(t.to, Color.RED);
 				}else{
 					while(t.to.dummy){
 						t = t.to.getToTransition();
-						drawTransition(g2,t,Color.RED);
+						drawTransition(t,Color.RED);
 					}
 				}
 			}
 			if(node.dummy){
-				drawTransition(g2, t, Color.GRAY);
+				drawTransition(t, Color.GRAY);
 			}
 			if(f!=null){
-				drawTransition(g2,f,Color.RED);
+				drawTransition(f,Color.RED);
 			}
 		}
 
 		// 状態の描画
-		drawNode(g2, node, node.getColor(), Color.RED);
+		drawNode(node, node.getColor(), Color.RED);
 
 		/*
 		// 遷移元の表示
@@ -610,23 +608,23 @@ public class StateGraphBasicDrawer extends StateDraw {
 		*/
 	}
 
-	private void drawSelectTransition(Graphics2D g2, StateTransition trans){
+	private void drawSelectTransition(StateTransition trans){
 
-		drawTransition(g2, trans, Color.RED);
+		drawTransition(trans, Color.RED);
 
 		// 状態の描画
-		drawNode(g2, trans.from, trans.from.getColor(), Color.BLUE);
-		drawNode(g2, trans.to, trans.to.getColor(), Color.RED);
+		drawNode(trans.from, trans.from.getColor(), Color.BLUE);
+		drawNode(trans.to, trans.to.getColor(), Color.RED);
 	}
 
-	private void drawSelfArrow(Graphics2D g2,StateNode node){
+	private void drawSelfArrow(StateNode node){
 		double radius = node.getRadius();
-		drawArc(g2,node.getX()-radius*2+1,node.getY()-radius*2+1,radius*2-1,radius*2-1,0,270);
-		drawLine(g2,node.getX()-radius-1,node.getY(),node.getX()-radius-1,node.getY()-3);
-		drawLine(g2,node.getX()-radius-1,node.getY(),node.getX()-radius-3,node.getY()+1);
+		drawArc(node.getX()-radius*2+1,node.getY()-radius*2+1,radius*2-1,radius*2-1,0,270);
+		drawLine(node.getX()-radius-1,node.getY(),node.getX()-radius-1,node.getY()-3);
+		drawLine(node.getX()-radius-1,node.getY(),node.getX()-radius-3,node.getY()+1);
 	}
 
-	private void drawNodeArrow(Graphics2D g2,double x1,double y1,double r1,double x2,double y2,double r2,double a){
+	private void drawNodeArrow(double x1,double y1,double r1,double x2,double y2,double r2,double a){
 		double theta = Math.atan2((double)(y2-y1),(double)(x2-x1));
 
 		double cos = Math.cos(theta);
@@ -639,12 +637,12 @@ public class StateGraphBasicDrawer extends StateDraw {
 
 		double dts = (2.0 * Math.PI / 360.0) * 30;
 
-		drawLine(g2,startX,startY,endX,endY);
-		drawLine(g2,endX,endY,endX-a*Math.cos(theta-dts),endY-a*Math.sin(theta-dts));
-		drawLine(g2,endX,endY,endX-a*Math.cos(theta+dts),endY-a*Math.sin(theta+dts));
+		drawLine(startX,startY,endX,endY);
+		drawLine(endX,endY,endX-a*Math.cos(theta-dts),endY-a*Math.sin(theta-dts));
+		drawLine(endX,endY,endX-a*Math.cos(theta+dts),endY-a*Math.sin(theta+dts));
 	}
 
-	private void drawNodeLine(Graphics2D g2,double x1,double y1,double r1,double x2,double y2,double r2){
+	private void drawNodeLine(double x1,double y1,double r1,double x2,double y2,double r2){
 		double theta = Math.atan2((double)(y2-y1),(double)(x2-x1));
 
 		double cos = Math.cos(theta);
@@ -655,10 +653,10 @@ public class StateGraphBasicDrawer extends StateDraw {
 		double endX = x2-r2*cos;
 		double endY = y2-r2*sin;
 
-		drawLine(g2,startX,startY,endX,endY);
+		drawLine(startX,startY,endX,endY);
 	}
 
-	private void drawLine(Graphics2D g2,double x1,double y1,double x2,double y2){
+	private void drawLine(double x1,double y1,double x2,double y2){
 		if(zoom>2.0){
 			//doubleライン
 			g2.draw(new Line2D.Double(x1,y1,x2,y2));
@@ -668,7 +666,7 @@ public class StateGraphBasicDrawer extends StateDraw {
 		}
 	}
 
-	private void drawArc(Graphics2D g2,double x,double y,double w,double h,double start,double extent){
+	private void drawArc(double x,double y,double w,double h,double start,double extent){
 		if(zoom>2.0){
 			//doubleアーク
 			g2.draw(new Arc2D.Double(x,y,w,h,start,extent,Arc2D.OPEN));
@@ -676,6 +674,167 @@ public class StateGraphBasicDrawer extends StateDraw {
 			//intアーク
 			g2.drawArc((int)x,(int)y,(int)w,(int)h,(int)start,(int)extent);
 		}
+	}
+
+	public void setNodeLook(StateNode node){
+		Shape shape;
+		double radius;
+		Color color;
+
+		//色の決定
+		double to = node.getToTransitions().size();
+		double from = node.getFromTransitions().size();
+		double r = 0;
+		double g = 0;
+		double b = 0;
+
+		if(from<to){
+			if(from*2<to){
+				r = 0;
+				g = 255*Math.sqrt(from*2/to);
+				b = 255;
+			}else if(from*2==to){
+				r = 0;
+				g = 255;
+				b = 255;
+			}else if(from*2>to){
+				r = 0;
+				g = 255;
+				b = 255*Math.sqrt(to/from-1);
+			}
+		}else if(from==to){
+			r = 0;
+			g = 255;
+			b = 0;
+		}else if(from>to){
+			if(from<to*2){
+				r = 255*Math.sqrt(from/to-1);
+				g = 255;
+				b = 0;
+			}else if(from==to*2){
+				r = 255;
+				g = 255;
+				b = 0;
+			}else if(from>to*2){
+				r = 255;
+				g = 255*Math.sqrt(to*2/from);
+				b = 0;
+			}
+		}
+
+		//色の設定
+		if(node.dummy){
+			color = Color.gray;
+		}else{
+			color = new Color((int)r,(int)g,(int)b);
+		}
+
+		//大きさの設定
+		if(node.dummy){
+			if(Env.is("SV_SHOW_DUMMY")){
+				radius = 2.0;
+			}else{
+				radius = 0.0;
+			}
+		}else if(node.weak){
+			radius = 3.0;
+		}else{
+			radius = 5.0;
+		}
+
+		//形の設定
+		if(node.getChildSet()==null){
+			shape = new RoundRectangle2D.Double(node.getX()-radius,node.getY()-radius,radius*2,radius*2,radius*2,radius*2);
+		}else{
+			shape = new RoundRectangle2D.Double(node.getX()-radius,node.getY()-radius,radius*2,radius*2,radius/2,radius/2);
+		}
+
+		node.setColor(color);
+		node.setRadius(radius);
+		node.setShape(shape);
+
+		/*
+		if(to<from){
+			if(to*2<from){
+				r = 255;
+				g = 255*Math.sqrt(to*2/from);
+			}else{
+				g = 255;
+				r = 255*Math.sqrt(to/from);
+			}
+		}else if(to>from){
+			if(to>from*2){
+				b = 255;
+				g = 255*Math.sqrt(from*2/to);
+			}else{
+				g = 255;
+				b = 255*Math.sqrt(from/to);
+			}
+		}else{
+			g = 255;
+		}
+		 */
+
+		/*
+		if(from<to){
+			r = 0;
+			g = 255*Math.sqrt(from/to);
+			b = 255*Math.sqrt(1-from/to);
+		}else if(from==to){
+			r = 0;
+			g = 255;
+			b = 0;
+		}else if(from>to){
+			r = 255*Math.sqrt(1-to/from);
+			g = 255*Math.sqrt(to/from);
+			b = 0;
+		}
+		 */
+
+		/*
+		switch(colorMode){
+			case normal:
+				radius = 5.0;
+				fillColor = new Color((int)r,(int)g,(int)b);
+				drawColor = Color.gray;
+				break;
+			case em:
+				radius = 6.0;
+				fillColor = new Color((int)r,(int)g,(int)b);
+				drawColor = Color.black;
+				break;
+			case weak:
+				radius = 4.0;
+				fillColor = Color.white;
+				drawColor = new Color((int)r,(int)g,(int)b);
+				break;
+			case dummy:
+				radius = 0.0;
+				fillColor = Color.black;
+				drawColor = Color.black;
+				break;
+			case showdummy:
+				radius = 3.0;
+				fillColor = Color.white;
+				drawColor = Color.gray;
+				break;
+		}
+		 */
+		/*
+		if(toIds.size()==0){
+			color = Color.red;
+		}else if(toIds.size()==1){
+			color = Color.blue;
+		}else if(toIds.size()==2){
+			color = Color.orange;
+		}else if(toIds.size()==3){
+			color = Color.green;
+		}else if(toIds.size()==4){
+			color = Color.yellow;
+		}else{
+			color = Color.cyan;
+		}
+		 */
 	}
 
 }

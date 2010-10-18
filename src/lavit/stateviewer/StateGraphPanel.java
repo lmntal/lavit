@@ -280,7 +280,6 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 	public void loadFont(){
 		font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")-4);
-		draw.setFont(font);
 		update();
 		revalidate();
 	}
@@ -932,7 +931,34 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	public void paintComponent(Graphics g){
-		draw.drawGraph(g);
+		Graphics2D g2 = (Graphics2D)g;
+
+		g2.setFont(font);
+
+		//フレームの初期化
+		g2.setColor(Color.white);
+		g2.fillRect(0, 0, getWidth(), getHeight());
+
+		if(!isActive()){ return; }
+
+		double startTime = System.currentTimeMillis();
+
+		g2.scale(zoom,zoom);
+
+		draw.drawGraph(g2);
+
+		//選択時の四角の表示
+		if(selectSquare&&lastPoint!=null&&startPoint!=null){
+			Point p1 = new Point((int)((double)lastPoint.getX()/zoom), (int)((double)lastPoint.getY()/zoom));
+			Point p2 = new Point((int)((double)startPoint.getX()/zoom), (int)((double)startPoint.getY()/zoom));
+
+			g2.setColor(Color.RED);
+			g2.drawRect(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.max(p1.x, p2.x)-Math.min(p1.x, p2.x), Math.max(p1.y, p2.y)-Math.min(p1.y, p2.y));
+		}
+
+		g2.scale(1.0/zoom, 1.0/zoom);
+
+		setDrawTime(System.currentTimeMillis()-startTime);
 	}
 
 	/*
@@ -1054,6 +1080,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		if(selectNode==null&&selectNodes.size()==0){
 			if(zoom>0.3){
 				selectTransition = drawNodes.pickATransition(p);
+				if(selectTransition!=null&&e.getClickCount()==2){
+					selectTransition.doubleClick(this);
+				}
 			}else{
 				selectTransition = null;
 			}

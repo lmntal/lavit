@@ -57,6 +57,7 @@ import lavit.stateviewer.worker.StatePositionSet;
 import lavit.util.NodeYComparator;
 
 public class StateNodeSet {
+	public StateGraphPanel panel;
 
 	public StateNode parentNode;
 	public int generation;
@@ -82,12 +83,14 @@ public class StateNodeSet {
 	final String initStartMarkString = "init:";
 	final String labelMarkString = "Labels";
 
-	public StateNodeSet(){
+	public StateNodeSet(StateGraphPanel panel){
+		this.panel = panel;
 		this.parentNode = null;
 		this.generation = 0;
 	}
 
-	public StateNodeSet(StateNode parent){
+	public StateNodeSet(StateGraphPanel panel, StateNode parent){
+		this.panel = panel;
 		this.parentNode = parent;
 		this.generation = parent.parentSet.generation+1;
 	}

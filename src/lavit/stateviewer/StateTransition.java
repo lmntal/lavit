@@ -49,6 +49,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 
 import lavit.Env;
+import lavit.util.UtilTextFrame;
 
 public class StateTransition {
 	public StateNode from;
@@ -108,6 +109,10 @@ public class StateTransition {
 		for(String r : rs){
 			rules.add(r);
 		}
+	}
+
+	void doubleClick(StateGraphPanel graphPanel){
+		new UtilTextFrame(from.id+" -> "+to.id, from.state+"\n\n->\n\n"+to.state);
 	}
 
 	public String toString(){

@@ -136,7 +136,7 @@ public class StateAbstractionMaker {
 			}
 		}
 
-		StateNodeSet child = new StateNodeSet(newNode);
+		StateNodeSet child = new StateNodeSet(graphPanel, newNode);
 		child.setSubNode(groupNodes, allTrans, outTrans);
 		newNode.setChildSet(child);
 		newNode.setPosition(bestX, y);

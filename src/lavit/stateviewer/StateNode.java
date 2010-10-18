@@ -74,6 +74,8 @@ import lavit.editor.NoWrapEditorKit;
 import lavit.frame.ChildWindowListener;
 import lavit.runner.LmntalRunner;
 import lavit.runner.UnyoRunner;
+import lavit.util.StateDraw;
+import lavit.util.UtilTextFrame;
 
 public class StateNode implements Shape {
 	public long id;
@@ -131,8 +133,10 @@ public class StateNode implements Shape {
 		this.inFrame = false;
 
 		this.shape = new RoundRectangle2D.Double(0,0,0,0,0,0);
+		this.radius = 5.0;
+		this.color = Color.black;
 
-		updateLooks();
+		//updateLooks();
 	}
 
 	/*
@@ -164,158 +168,15 @@ public class StateNode implements Shape {
 	 */
 
 	void updateLooks(){
-
-		//色の決定
-		double to = toes.size();
-		double from = froms.size();
-		double r = 0;
-		double g = 0;
-		double b = 0;
-
-		if(from<to){
-			if(from*2<to){
-				r = 0;
-				g = 255*Math.sqrt(from*2/to);
-				b = 255;
-			}else if(from*2==to){
-				r = 0;
-				g = 255;
-				b = 255;
-			}else if(from*2>to){
-				r = 0;
-				g = 255;
-				b = 255*Math.sqrt(to/from-1);
-			}
-		}else if(from==to){
-			r = 0;
-			g = 255;
-			b = 0;
-		}else if(from>to){
-			if(from<to*2){
-				r = 255*Math.sqrt(from/to-1);
-				g = 255;
-				b = 0;
-			}else if(from==to*2){
-				r = 255;
-				g = 255;
-				b = 0;
-			}else if(from>to*2){
-				r = 255;
-				g = 255*Math.sqrt(to*2/from);
-				b = 0;
-			}
+		StateGraphPanel panel = parentSet.panel;
+		StateDraw draw = panel.getStateDraw();
+		if(draw!=null){
+			draw.setNodeLook(this);
 		}
+	}
 
-		//色の設定
-		if(dummy){
-			color = Color.gray;
-		}else{
-			color = new Color((int)r,(int)g,(int)b);
-		}
-
-		//大きさの設定
-		if(dummy){
-			if(Env.is("SV_SHOW_DUMMY")){
-				radius = 2.0;
-			}else{
-				radius = 0.0;
-			}
-		}else if(weak){
-			radius = 3.0;
-		}else{
-			radius = 5.0;
-		}
-
-		//形の設定
-		if(childSet==null){
-			shape = new RoundRectangle2D.Double(getX()-radius,getY()-radius,radius*2,radius*2,radius*2,radius*2);
-		}else{
-			shape = new RoundRectangle2D.Double(getX()-radius,getY()-radius,radius*2,radius*2,radius/2,radius/2);
-		}
-
-		/*
-		if(to<from){
-			if(to*2<from){
-				r = 255;
-				g = 255*Math.sqrt(to*2/from);
-			}else{
-				g = 255;
-				r = 255*Math.sqrt(to/from);
-			}
-		}else if(to>from){
-			if(to>from*2){
-				b = 255;
-				g = 255*Math.sqrt(from*2/to);
-			}else{
-				g = 255;
-				b = 255*Math.sqrt(from/to);
-			}
-		}else{
-			g = 255;
-		}
-		 */
-
-		/*
-		if(from<to){
-			r = 0;
-			g = 255*Math.sqrt(from/to);
-			b = 255*Math.sqrt(1-from/to);
-		}else if(from==to){
-			r = 0;
-			g = 255;
-			b = 0;
-		}else if(from>to){
-			r = 255*Math.sqrt(1-to/from);
-			g = 255*Math.sqrt(to/from);
-			b = 0;
-		}
-		 */
-
-		/*
-		switch(colorMode){
-			case normal:
-				radius = 5.0;
-				fillColor = new Color((int)r,(int)g,(int)b);
-				drawColor = Color.gray;
-				break;
-			case em:
-				radius = 6.0;
-				fillColor = new Color((int)r,(int)g,(int)b);
-				drawColor = Color.black;
-				break;
-			case weak:
-				radius = 4.0;
-				fillColor = Color.white;
-				drawColor = new Color((int)r,(int)g,(int)b);
-				break;
-			case dummy:
-				radius = 0.0;
-				fillColor = Color.black;
-				drawColor = Color.black;
-				break;
-			case showdummy:
-				radius = 3.0;
-				fillColor = Color.white;
-				drawColor = Color.gray;
-				break;
-		}
-		 */
-		/*
-		if(toIds.size()==0){
-			color = Color.red;
-		}else if(toIds.size()==1){
-			color = Color.blue;
-		}else if(toIds.size()==2){
-			color = Color.orange;
-		}else if(toIds.size()==3){
-			color = Color.green;
-		}else if(toIds.size()==4){
-			color = Color.yellow;
-		}else{
-			color = Color.cyan;
-		}
-		 */
-
+	public void setShape(Shape shape){
+		this.shape = shape;
 	}
 
 	public synchronized double getX(){
@@ -488,7 +349,6 @@ public class StateNode implements Shape {
 	}
 
 	String getToRuleName(StateNode toNode){
-		StringBuffer buf = new StringBuffer();
 		for(StateTransition t : toes){
 			if(t.to==toNode){
 				return t.getRuleNameString();
@@ -777,11 +637,19 @@ public class StateNode implements Shape {
 		return backs;
 	}
 
+	public void setRadius(double radius){
+		this.radius = radius;
+	}
+
 	public double getRadius(){
 		return radius;
 	}
 
-	Color getColor(){
+	public void setColor(Color color){
+		this.color = color;
+	}
+
+	public Color getColor(){
 		return color;
 	}
 
@@ -867,7 +735,7 @@ public class StateNode implements Shape {
 
 	void doubleClick(StateGraphPanel graphPanel){
 		if(childSet==null){
-			new TextFrame(""+id,state);
+			new UtilTextFrame(""+id,state);
 		}else{
 			graphPanel.init(childSet);
 		}
@@ -898,7 +766,7 @@ public class StateNode implements Shape {
 		for(StateNode n : getFromNodes()){ buf.append(n.id+", "); }
 		buf.append("\n");
 
-		new TextFrame(""+id, buf.toString());
+		new UtilTextFrame(""+id, buf.toString());
 	}
 
 	public String toString(){
@@ -991,44 +859,6 @@ public class StateNode implements Shape {
 		return false;
 	}
 	*/
-
-	private class TextFrame extends JFrame{
-
-		TextFrame(String title,String str){
-
-			int width = FrontEnd.mainFrame.getWidth()/2;
-			int height = FrontEnd.mainFrame.getHeight()/2;
-			int x = FrontEnd.mainFrame.getX();
-			int y = FrontEnd.mainFrame.getY();
-
-			setSize(width,height);
-			setLocation(x,y);
-			setTitle(title);
-			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-			/*
-			JTextArea text = new JTextArea(state);
-			text.setLineWrap(true);
-			text.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")));
-			 */
-			AutoStyledDocument doc = new AutoStyledDocument();
-			JTextPane editor = new JTextPane();
-			//editor.setEditorKit(new NoWrapEditorKit());
-			editor.setDocument(doc);
-			editor.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")));
-			editor.setText(str);
-			doc.colorChange();
-			doc.end();
-
-			add(new JScrollPane(editor));
-
-			addWindowListener(new ChildWindowListener(this));
-
-			setVisible(true);
-
-		}
-
-	}
 
 	/*
 	private class TextDialog extends JDialog{

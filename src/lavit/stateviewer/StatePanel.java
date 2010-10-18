@@ -77,7 +77,7 @@ public class StatePanel extends JPanel{
 
 		this.originalString = str;
 		this.ltlMode = ltlMode;
-		this.drawNodes = new StateNodeSet();
+		this.drawNodes = new StateNodeSet(stateGraphPanel);
 
 		FrontEnd.println("(StateViewer) parsing.");
 		boolean res = drawNodes.setSlimResult(str, ltlMode);

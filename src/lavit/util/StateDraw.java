@@ -37,12 +37,12 @@ package lavit.util;
 
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 import lavit.Env;
+import lavit.stateviewer.StateNode;
 
 public abstract class StateDraw {
-	protected Font font;
-
 	protected boolean simpleMode;
 	protected boolean hideBackEdgeMode;
 	protected boolean showIdMode;
@@ -66,10 +66,6 @@ public abstract class StateDraw {
 
 		//this.cycleMode = false;
 		this.searchMode = false;
-	}
-
-	public void setFont(Font font){
-		this.font = font;
 	}
 
 	public void setCycleMode(boolean cycleMode){
@@ -124,5 +120,6 @@ public abstract class StateDraw {
 		return this.showDummyMode;
 	}
 
-	public abstract void drawGraph(Graphics g);
+	public abstract void drawGraph(Graphics2D g2);
+	public abstract void setNodeLook(StateNode node);
 }

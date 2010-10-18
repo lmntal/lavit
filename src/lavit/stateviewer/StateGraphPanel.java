@@ -153,7 +153,8 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		selectNodes  = new ArrayList<StateNode>();
 
-		draw = new StateGraphBasicDrawer(this);
+		draw = new StateGraphBasicDraw(this);
+		//draw = new StateGraphBlackDraw(this);
 
 		painter = new StatePainter(this);
 		painter.start();
@@ -284,7 +285,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		revalidate();
 	}
 
-	public StateDraw getStateDraw(){
+	public StateDraw getDraw(){
 		return draw;
 	}
 
@@ -945,6 +946,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		g2.scale(zoom,zoom);
 
+		//グラフ描画
 		draw.drawGraph(g2);
 
 		//選択時の四角の表示
@@ -1139,30 +1141,6 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 			if(e.isControlDown()){
 				Rectangle2D.Double d = getNodesWindowDimension();
-
-/*
-				double posX,posY;
-				if(e.getX()<d.getCenterX()){
-					if(e.getY()<d.getCenterY()){
-						posX = d.getMaxX();
-						posY = d.getMaxY();
-					}else{
-						posX = d.getMaxX();
-						posY = d.getMinY();
-					}
-				}else{
-					if(e.getY()<d.getCenterY()){
-						posX = d.getMinX();
-						posY = d.getMaxY();
-					}else{
-						posX = d.getMinX();
-						posY = d.getMinY();
-					}
-				}
-				double scaleX = Math.abs(((double)e.getX()-posX)/((double)lastPoint.x-posX));
-				double scaleY = Math.abs(((double)e.getY()-posY)/((double)lastPoint.y-posY));
-*/
-
 				double posX,posY;
 				if(startPoint.x<d.getCenterX()){
 					if(startPoint.y<d.getCenterY()){
@@ -1185,6 +1163,29 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				double scaleY = Math.abs(((double)e.getY()-posY)/((double)lastPoint.y-posY));
 
 				drawNodes.allScaleCenterMove(scaleX,scaleY);
+
+				/*
+				double posX,posY;
+				if(e.getX()<d.getCenterX()){
+					if(e.getY()<d.getCenterY()){
+						posX = d.getMaxX();
+						posY = d.getMaxY();
+					}else{
+						posX = d.getMaxX();
+						posY = d.getMinY();
+					}
+				}else{
+					if(e.getY()<d.getCenterY()){
+						posX = d.getMinX();
+						posY = d.getMaxY();
+					}else{
+						posX = d.getMinX();
+						posY = d.getMinY();
+					}
+				}
+				double scaleX = Math.abs(((double)e.getX()-posX)/((double)lastPoint.x-posX));
+				double scaleY = Math.abs(((double)e.getY()-posY)/((double)lastPoint.y-posY));
+				*/
 
 				/*
 				double posX,posY,scaleX,scaleY;

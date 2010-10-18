@@ -171,24 +171,24 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 			);
 		}else if(src==showdummy){
 			Env.set("SV_SHOW_DUMMY",!Env.is("SV_SHOW_DUMMY"));
-			graphPanel.getStateDraw().setShowDummyMode(Env.is("SV_SHOW_DUMMY"));
+			graphPanel.getDraw().setShowDummyMode(Env.is("SV_SHOW_DUMMY"));
 			graphPanel.getDrawNodes().updateNodeLooks();
 			graphPanel.update();
 		}else if(src==backedge){
 			Env.set("SV_HIDEBACKEDGE",!Env.is("SV_HIDEBACKEDGE"));
-			graphPanel.getStateDraw().setHideBackEdgeMode(Env.is("SV_HIDEBACKEDGE"));
+			graphPanel.getDraw().setHideBackEdgeMode(Env.is("SV_HIDEBACKEDGE"));
 			graphPanel.update();
 		}else if(src==showId){
 			Env.set("SV_SHOWID",!Env.is("SV_SHOWID"));
-			graphPanel.getStateDraw().setShowIdMode(Env.is("SV_SHOWID"));
+			graphPanel.getDraw().setShowIdMode(Env.is("SV_SHOWID"));
 			graphPanel.update();
 		}else if(src==showRule){
 			Env.set("SV_SHOWRULE",!Env.is("SV_SHOWRULE"));
-			graphPanel.getStateDraw().setShowRuleMode(Env.is("SV_SHOWRULE"));
+			graphPanel.getDraw().setShowRuleMode(Env.is("SV_SHOWRULE"));
 			graphPanel.update();
 		}else if(src==showNoNameRule){
 			Env.set("SV_SHOWNONAMERULE",!Env.is("SV_SHOWNONAMERULE"));
-			graphPanel.getStateDraw().setShowNoNameRuleMode(Env.is("SV_SHOWNONAMERULE"));
+			graphPanel.getDraw().setShowNoNameRuleMode(Env.is("SV_SHOWNONAMERULE"));
 			graphPanel.update();
 		}else if(src==showOutTransition){
 			Env.set("SV_SHOWOUTTRANS",!Env.is("SV_SHOWOUTTRANS"));

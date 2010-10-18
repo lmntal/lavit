@@ -83,7 +83,7 @@ public class StateTransitionEm implements StateTransitionCatcher {
 		for(StateTransition t : weakTransitions){ t.weak = true; }
 
 		graphPanel.getDrawNodes().updateNodeLooks();
-		graphPanel.getStateDraw().setSearchMode(true);
+		graphPanel.getDraw().setSearchMode(true);
 		graphPanel.update();
 	}
 }

@@ -169,7 +169,7 @@ public class StateNode implements Shape {
 
 	void updateLooks(){
 		StateGraphPanel panel = parentSet.panel;
-		StateDraw draw = panel.getStateDraw();
+		StateDraw draw = panel.getDraw();
 		if(draw!=null){
 			draw.setNodeLook(this);
 		}

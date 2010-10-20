@@ -1317,8 +1317,6 @@ public class StateNodeSet {
 	}
 
 	void allScaleMove(double scaleX, double scaleY, double pX, double pY){
-		if(scaleX<0.5){ scaleX=0.5; }else if(scaleX>2){ scaleX=2; }
-		if(scaleY<0.5){ scaleY=0.5; }else if(scaleY>2){ scaleY=2; }
 		for(StateNode node : getAllNode()){
 			double x = (node.getX()-pX)*scaleX+pX;
 			double y = (node.getY()-pY)*scaleY+pY;
@@ -1327,6 +1325,8 @@ public class StateNodeSet {
 	}
 
 	public void allScaleCenterMove(double scaleX,double scaleY){
+		if(scaleX<0.5){ scaleX=0.5; }else if(scaleX>2){ scaleX=2; }
+		if(scaleY<0.5){ scaleY=0.5; }else if(scaleY>2){ scaleY=2; }
 		Rectangle2D.Double d = getNodesDimension();
 		allScaleMove(scaleX,scaleY,d.getCenterX(),d.getCenterY());
 	}

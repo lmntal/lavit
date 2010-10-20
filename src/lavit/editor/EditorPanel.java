@@ -40,6 +40,8 @@ import lavit.util.CommonFontUser;
 
 import java.io.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -50,7 +52,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.filechooser.FileFilter;
 
-public class EditorPanel extends JPanel implements DocumentListener,CommonFontUser {
+public class EditorPanel extends JPanel implements DocumentListener,KeyListener,CommonFontUser {
 
 	public AutoStyledDocument doc;
 	public JTextPane editor;
@@ -76,6 +78,7 @@ public class EditorPanel extends JPanel implements DocumentListener,CommonFontUs
 		editor.setEditorKit(new NoWrapEditorKit());
 		editor.setDocument(doc);
 		editor.addCaretListener(new RowColumnListener());
+		editor.addKeyListener(this);
 
 		eLine = new EditerLineComponent(editor.getSize().height);
 
@@ -475,6 +478,56 @@ public class EditorPanel extends JPanel implements DocumentListener,CommonFontUs
 		public String getDescription(){
 			return "LMNtal "+Lang.d[5]+" (*.lmn)";
 		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if(e.isControlDown()){
+			switch(e.getKeyCode()){
+			case KeyEvent.VK_SEMICOLON:
+			case KeyEvent.VK_ADD:
+			case KeyEvent.VK_PLUS:
+				for(int i=0;i<Env.FONT_SIZE_LIST.length;++i){
+					if(Env.FONT_SIZE_LIST[i].equals(Env.get("EDITER_FONT_SIZE"))){
+						i++;
+						if(i>=Env.FONT_SIZE_LIST.length){ i = Env.FONT_SIZE_LIST.length-1; }
+						Env.set("EDITER_FONT_SIZE",Env.FONT_SIZE_LIST[i]);
+						FrontEnd.loadAllFont();
+						break;
+					}
+				}
+				break;
+			case KeyEvent.VK_MINUS:
+			case KeyEvent.VK_SUBTRACT:
+				System.out.println("-");
+				for(int i=0;i<Env.FONT_SIZE_LIST.length;++i){
+					if(Env.FONT_SIZE_LIST[i].equals(Env.get("EDITER_FONT_SIZE"))){
+						i--;
+						if(i<0){ i=0; }
+						Env.set("EDITER_FONT_SIZE",Env.FONT_SIZE_LIST[i]);
+						FrontEnd.loadAllFont();
+						break;
+					}
+				}
+				break;
+			case KeyEvent.VK_0:
+				Env.set("EDITER_FONT_SIZE","14");
+				FrontEnd.loadAllFont();
+				break;
+			}
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

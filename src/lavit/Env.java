@@ -57,8 +57,8 @@ import java.util.Properties;
 public class Env {
 
 	static public final String APP_NAME = "LaViT";
-	static public final String APP_VERSION = "2.2.1";
-	static public final String APP_DATE = "2010/10/19";
+	static public final String APP_VERSION = "2.3.0";
+	static public final String APP_DATE = "2010/10/25";
 	static public final String APP_HREF = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
 
 	static public final String LMNTAL_VERSION = "LMNtal : 1.02 (2009/11/16)";
@@ -78,6 +78,8 @@ public class Env {
     static private Properties prop = new Properties();
 
     static public final String IMAGEFILE_ICON = "img/icon.png";
+
+    static public final String FONT_SIZE_LIST[] = {"8","9","10","11","12","14","16","18","20","24","28","32","36","40","44","48","54","60","66","72","80","88","96","106"};
 
     public Env(){
     	env = this;

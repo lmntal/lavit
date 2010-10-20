@@ -13,57 +13,128 @@ import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StatePanel;
 import lavit.stateviewer.StateTransitionAbstraction;
 
-public class StateBetaPanel extends JPanel implements ActionListener {
+public class StateBetaPanel extends JPanel {
 	private StatePanel statePanel;
 
-	private JComboBox simpleModeBox;
-	private String[] simpleModeBoxItems = {"auto","true","false"};
-
-	private JComboBox startupResetBox;
-	private String[] startupResetBoxItems = {"none","PositionReset","AdjustReset","AdjustBackReset","AdjustFindReset","SimpleMixAdjust","DummyMixAdjust"};
+	private SimpleModeChanger simpleModeChanger;
+	private StartupResetChanger startupResetChanger;
+	private GraphDrawChanger graphDrawChanger;
 
 	StateBetaPanel(StatePanel statePanel){
 		this.statePanel = statePanel;
 
-		add(new JLabel("Simple Mode:"));
-		simpleModeBox = new JComboBox(simpleModeBoxItems);
-		simpleModeBox.addActionListener(this);
-		add(simpleModeBox);
-		for(String str : simpleModeBoxItems){
-			if(str.equals(Env.get("SV_SIMPLE_MODE"))){
-				simpleModeBox.setSelectedItem(str);
-				break;
-			}
-		}
+		simpleModeChanger = new SimpleModeChanger();
+		add(simpleModeChanger);
 
-		add(new JLabel("Startup Reset:"));
-		startupResetBox = new JComboBox(startupResetBoxItems);
-		startupResetBox.addActionListener(this);
-		add(startupResetBox);
-		for(String str : startupResetBoxItems){
-			if(str.equals(Env.get("SV_STARTUP_RESET_TYPE"))){
-				startupResetBox.setSelectedItem(str);
-				break;
-			}
-		}
+		startupResetChanger = new StartupResetChanger();
+		add(startupResetChanger);
+
+		graphDrawChanger = new GraphDrawChanger();
+		add(graphDrawChanger);
 
 	}
 
 	public void setEnabled(boolean enabled){
 		super.setEnabled(enabled);
-		simpleModeBox.setEnabled(enabled);
-		startupResetBox.setEnabled(enabled);
+		simpleModeChanger.setEnabled(enabled);
+		startupResetChanger.setEnabled(enabled);
 	}
 
-	public void actionPerformed(ActionEvent e) {
-		Object src = e.getSource();
+	class SimpleModeChanger extends JPanel implements ActionListener{
+		private JComboBox box;
+		private String[] boxItems = {"auto","true","false"};
 
-		if(src==simpleModeBox){
-			Env.set("SV_SIMPLE_MODE",(String)simpleModeBox.getSelectedItem());
-			statePanel.stateGraphPanel.updateSimpleMode();
-			statePanel.stateGraphPanel.update();
-		}else if(src==startupResetBox){
-			Env.set("SV_STARTUP_RESET_TYPE",(String)startupResetBox.getSelectedItem());
+		SimpleModeChanger(){
+			add(new JLabel("Simple Mode:"));
+			box = new JComboBox(boxItems);
+			box.addActionListener(this);
+			add(box);
+			for(String str : boxItems){
+				if(str.equals(Env.get("SV_SIMPLE_MODE"))){
+					box.setSelectedItem(str);
+					break;
+				}
+			}
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Object src = e.getSource();
+
+			if(src==box){
+				Env.set("SV_SIMPLE_MODE",(String)box.getSelectedItem());
+				statePanel.stateGraphPanel.updateSimpleMode();
+				statePanel.stateGraphPanel.update();
+			}
+		}
+
+		public void setEnabled(boolean enabled){
+			super.setEnabled(enabled);
+			box.setEnabled(enabled);
+		}
+	}
+
+	class StartupResetChanger extends JPanel implements ActionListener{
+		private JComboBox box;
+		private String[] boxItems = {"none","PositionReset","AdjustReset","AdjustBackReset","AdjustFindReset","SimpleMixAdjust","DummyMixAdjust"};
+
+		StartupResetChanger(){
+			add(new JLabel("Startup Reset:"));
+			box = new JComboBox(boxItems);
+			box.addActionListener(this);
+			add(box);
+			for(String str : boxItems){
+				if(str.equals(Env.get("SV_STARTUP_RESET_TYPE"))){
+					box.setSelectedItem(str);
+					break;
+				}
+			}
+		}
+
+		public void setEnabled(boolean enabled){
+			super.setEnabled(enabled);
+			box.setEnabled(enabled);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			Object src = e.getSource();
+
+			if(src==box){
+				Env.set("SV_STARTUP_RESET_TYPE",(String)box.getSelectedItem());
+			}
+		}
+	}
+
+	class GraphDrawChanger extends JPanel implements ActionListener{
+		private JComboBox box;
+		private String[] boxItems = {"BASIC","BLACK"};
+
+		GraphDrawChanger(){
+			add(new JLabel("Graph Draw Mode:"));
+			box = new JComboBox(boxItems);
+			box.addActionListener(this);
+			add(box);
+			for(String str : boxItems){
+				if(str.equals(Env.get("SV_GRAPH_DRAW"))){
+					box.setSelectedItem(str);
+					break;
+				}
+			}
+		}
+
+		public void setEnabled(boolean enabled){
+			super.setEnabled(enabled);
+			box.setEnabled(enabled);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			Object src = e.getSource();
+
+			if(src==box){
+				Env.set("SV_GRAPH_DRAW",(String)box.getSelectedItem());
+				statePanel.stateGraphPanel.updateDraw();
+				statePanel.stateGraphPanel.update();
+			}
 		}
 	}
 

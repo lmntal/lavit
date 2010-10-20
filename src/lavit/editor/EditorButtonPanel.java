@@ -199,7 +199,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 				while(lmntalRunner.isRunning()){
 					FrontEnd.sleep(200);
 				}
-				FrontEnd.println("(LMNtal) Done!");
+				FrontEnd.println("(LMNtal) Done! ["+(lmntalRunner.getTime()/1000.0)+"s]");
 				lmntalRunner = null;
 				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
 					setButtonEnable(true);
@@ -271,7 +271,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 				while(slimRunner.isRunning()){
 					FrontEnd.sleep(200);
 				}
-				FrontEnd.println("(SLIM) Done!");
+				FrontEnd.println("(SLIM) Done! ["+(slimRunner.getTime()/1000.0)+"s]");
 				slimRunner = null;
 				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
 					setButtonEnable(true);
@@ -300,6 +300,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 				while(slimRunner.isRunning()){
 					FrontEnd.sleep(200);
 				}
+				FrontEnd.println("(SLIM) Done! ["+(slimRunner.getTime()/1000.0)+"s]");
 				if(slimRunner.isSuccess()){
 					FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(),false);
 				}

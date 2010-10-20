@@ -81,7 +81,7 @@ public class StateTransition {
 	}
 	 */
 
-	String getRuleNameString(){
+	public String getRuleNameString(){
 		StringBuffer buf = new StringBuffer();
 		for(String s : rules){
 			if(buf.length()>0){ buf.append(" "); }

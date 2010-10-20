@@ -87,6 +87,7 @@ public class StateControlPanel extends JPanel implements ChangeListener,MouseLis
 
 		stateControllerTab = new StateControlTab(statePanel);
 		stateControllerTab.setVisible(Env.is("SV_CONTROLLER"));
+		//stateControllerTab.addMouseListener(this);
 		add(stateControllerTab);
 
 		zoomSlider.addChangeListener(this);
@@ -146,7 +147,7 @@ public class StateControlPanel extends JPanel implements ChangeListener,MouseLis
 		if(e.getClickCount()>0&&e.getClickCount()%2==0){
 			toggleControllerVisible();
 			javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-				statePanel.stateGraphPanel.autoCentering();
+				statePanel.stateGraphPanel.fitCentering();
 			}});
 		}
 	}

@@ -49,6 +49,7 @@ import java.io.OutputStreamWriter;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JSplitPane;
 
 import lavit.*;
 import lavit.stateviewer.controller.StateControlPanel;
@@ -63,6 +64,7 @@ public class StatePanel extends JPanel{
 	private StateNodeSet drawNodes;
 
 	public StatePanel(){
+
 		setLayout(new BorderLayout());
 
 		stateGraphPanel = new StateGraphPanel(this);
@@ -71,6 +73,20 @@ public class StatePanel extends JPanel{
 		stateControlPanel = new StateControlPanel(this);
 		add(stateControlPanel, BorderLayout.SOUTH);
 
+
+		/*
+		setLayout(new BorderLayout());
+
+		stateGraphPanel = new StateGraphPanel(this);
+		stateControlPanel = new StateControlPanel(this);
+
+		JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, stateGraphPanel, stateControlPanel);
+		jsp.setOneTouchExpandable(true);
+		jsp.setResizeWeight(0.5);
+		jsp.setDividerLocation(0.9);
+
+		add(jsp, BorderLayout.CENTER);
+		 */
 	}
 
 	public void start(String str, boolean ltlMode){

@@ -1,6 +1,8 @@
 package lavit.stateviewer.controller;
 
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -10,11 +12,12 @@ import javax.swing.event.ChangeListener;
 import lavit.Env;
 import lavit.stateviewer.StatePanel;
 
-public class StateControlTab extends JTabbedPane {
+public class StateControlTab extends JTabbedPane{
 
 	public StatePanel statePanel;
 
 	public StateButtonPanel buttonPanel;
+	public StateSimulationPanel simulationPanel;
 	public StateSearchPanel searchPanel;
 	public StateDynamicControlPanel dynamicPanel;
 	public StateOtherPanel otherPanel;
@@ -25,6 +28,9 @@ public class StateControlTab extends JTabbedPane {
 
     	buttonPanel = new StateButtonPanel(statePanel);
 		addTab("Control Button", buttonPanel);
+
+		simulationPanel = new StateSimulationPanel(statePanel);
+		addTab("Simulation", simulationPanel);
 
 		searchPanel = new StateSearchPanel(statePanel);
 		addTab("Search", searchPanel);
@@ -37,6 +43,8 @@ public class StateControlTab extends JTabbedPane {
 
 		betaPanel = new StateBetaPanel(statePanel);
 		addTab("Beta", betaPanel);
+
+		//this.addMouseListener(this);
 
     }
 

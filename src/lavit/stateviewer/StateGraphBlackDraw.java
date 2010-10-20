@@ -136,9 +136,9 @@ public class StateGraphBlackDraw extends StateDraw {
 		if(!node.isInFrame()){ return; }
 
 		if(node.weak){
-			g2.setColor(Color.lightGray);
+			g2.setColor(new Color(155,155,155,100));
 		}else{
-			g2.setColor(Color.white);
+			g2.setColor(new Color(0,0,255,100));
 		}
 
 		drawNodeArrow(node.getX()-30,node.getY(),node.getRadius(),node.getX()-7,node.getY(),node.getRadius(),3);
@@ -152,11 +152,16 @@ public class StateGraphBlackDraw extends StateDraw {
 		if(hideBackEdgeMode&&to.depth<from.depth){ return; }
 		if(!from.isInFrame()&&!to.isInFrame()){ return; }
 
+		//色の決定
 		if(color==null){
 			if(searchMode&&t.weak||!searchMode&&cycleMode&&!t.cycle){
-				color = Color.lightGray;
+				color = new Color(155,155,155,100);
 			}else{
-				color = Color.white;
+				if(t.from.depth<t.to.depth){
+					color = new Color(0,0,255,100);
+				}else if(t.from.depth>t.to.depth){
+					color = new Color(255,0,0,100);
+				}
 			}
 		}
 		g2.setColor(color);
@@ -202,15 +207,6 @@ public class StateGraphBlackDraw extends StateDraw {
 		//markされてる場合は描画しない
 		if(dummy.isMarked()){ return; }
 
-		if(color==null){
-			if(searchMode&&dummy.weak||!searchMode&&cycleMode&&!dummy.cycle){
-				color = Color.lightGray;
-			}else{
-				color = Color.white;
-			}
-		}
-		g2.setColor(color);
-
 		//ダミーのリストの作成
 		ArrayList<StateNode> dummyGroup = new ArrayList<StateNode>();
 		StateNode n = dummy;
@@ -240,6 +236,20 @@ public class StateGraphBlackDraw extends StateDraw {
 
 		if(hideBackEdgeMode&&nN.depth<n0.depth){ return; }
 		if(!inFrame){ return; }
+
+		//色の決定
+		if(color==null){
+			if(searchMode&&dummy.weak||!searchMode&&cycleMode&&!dummy.cycle){
+				color = new Color(155,155,155,100);
+			}else{
+				if(n0.depth<nN.depth){
+					color = new Color(0,0,255,100);
+				}else if(n0.depth>=nN.depth){
+					color = new Color(255,0,0,100);
+				}
+			}
+		}
+		g2.setColor(color);
 
 		//パスの作成、直線、曲線描画
 		GeneralPath p = new GeneralPath();
@@ -319,11 +329,11 @@ public class StateGraphBlackDraw extends StateDraw {
 
 		if(fillColor==null||drawColor==null){
 			if(searchMode&&node.weak||!searchMode&&cycleMode&&!node.cycle){
-				fillColor = Color.white;
+				fillColor = new Color(255,255,255,100);
 				drawColor = node.getColor();
 			}else{
 				fillColor = node.getColor();
-				drawColor = Color.lightGray;
+				drawColor = new Color(155,155,155,100);
 			}
 		}
 
@@ -548,44 +558,30 @@ public class StateGraphBlackDraw extends StateDraw {
 		double b = 200;
 
 		if(from<to){
-			if(from*2<to){
-				r = 200;
-				g = 255*Math.sqrt(from*2/to);
-				b = 255;
-			}else if(from*2==to){
-				r = 200;
-				g = 255;
-				b = 255;
-			}else if(from*2>to){
-				r = 200;
-				g = 255;
-				b = 255*Math.sqrt(to/from-1);
-			}
-		}else if(from==to){
-			r = 200;
-			g = 255;
+			r = 50;
+			g = 50;
 			b = 200;
-		}else if(from>to){
-			if(from<to*2){
-				r = 255*Math.sqrt(from/to-1);
-				g = 255;
-				b = 200;
-			}else if(from==to*2){
-				r = 255;
-				g = 255;
-				b = 200;
-			}else if(from>to*2){
-				r = 255;
-				g = 255*Math.sqrt(to*2/from);
-				b = 200;
-			}
+		}else if(from>=to){
+			r = 200;
+			g = 50;
+			b = 50;
+		}
+		if(from==0){
+			r = 0;
+			g = 0;
+			b = 255;
+		}
+		if(to==0){
+			r = 255;
+			g = 0;
+			b = 0;
 		}
 
 		//色の設定
 		if(node.dummy){
 			color = Color.gray;
 		}else{
-			color = new Color((int)r,(int)g,(int)b,100);
+			color = new Color((int)r,(int)g,(int)b, 200);
 		}
 
 		//大きさの設定
@@ -598,7 +594,8 @@ public class StateGraphBlackDraw extends StateDraw {
 		}else if(node.weak){
 			radius = 3.0;
 		}else{
-			radius = 5.0;
+			//radius = 5.0;
+			radius = to*to+from*from;
 		}
 
 		//形の設定

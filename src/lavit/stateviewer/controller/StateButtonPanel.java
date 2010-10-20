@@ -89,6 +89,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 
 	private JPanel basicPanel = new JPanel();
 	private JButton autoCentering = new JButton("Auto Centering");
+	private JButton fitCentering = new JButton("Fit Centering");
 	private JButton allReset = new JButton("All Reset");
 
 	private JComponent comps[] = {
@@ -152,9 +153,11 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		abstractionPanel.add(selectAbstraction);
 		add(abstractionPanel);
 
-		basicPanel.setLayout(new GridLayout(1,2));
+		basicPanel.setLayout(new GridLayout(1,3));
 		autoCentering.addActionListener(this);
 		basicPanel.add(autoCentering);
+		fitCentering.addActionListener(this);
+		basicPanel.add(fitCentering);
 		allReset.addActionListener(this);
 		basicPanel.add(allReset);
 		add(basicPanel);
@@ -212,6 +215,8 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 			statePanel.stateGraphPanel.update();
 		}else if(src==autoCentering){
 			statePanel.stateGraphPanel.autoCentering();
+		}else if(src==fitCentering){
+			statePanel.stateGraphPanel.fitCentering();
 		}else if(src==transitionAbstraction){
 			StateGraphPanel p = statePanel.stateGraphPanel;
 			new SelectStateTransitionRuleFrame(p,new StateTransitionAbstraction(p));

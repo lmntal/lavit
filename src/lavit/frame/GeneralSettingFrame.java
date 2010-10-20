@@ -152,7 +152,6 @@ public class GeneralSettingFrame extends JFrame {
 	public class FontSettingPanel extends JPanel implements ActionListener{
 
 		String fontFamilyList[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-		String fontSizeList[] = {"8","9","10","11","12","14","16","18","20","24","28","32","36","40","44","48","54","60","66","72","80","88","96","106"};
 		String tabSizeList[] = {"1","2","3","4","5","6","7","8","9","10"};
 
 
@@ -170,7 +169,7 @@ public class GeneralSettingFrame extends JFrame {
 			add(fontFamilyComboBox);
 
 			add(new JLabel("FontSize"));
-			fontSizeComboBox = new JComboBox(fontSizeList);
+			fontSizeComboBox = new JComboBox(Env.FONT_SIZE_LIST);
 			add(fontSizeComboBox);
 
 			add(new JLabel("TabSize"));
@@ -192,7 +191,7 @@ public class GeneralSettingFrame extends JFrame {
 					break;
 				}
 			}
-			for(String str : fontSizeList){
+			for(String str : Env.FONT_SIZE_LIST){
 				if(str.equals(Env.get("EDITER_FONT_SIZE"))){
 					fontSizeComboBox.setSelectedItem(str);
 					break;

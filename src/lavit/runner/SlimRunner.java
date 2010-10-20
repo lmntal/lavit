@@ -68,6 +68,8 @@ public class SlimRunner {
 
 	private boolean quiet;
 
+	private long time;
+
 	public SlimRunner(String option){
 		this(option,FrontEnd.mainFrame.editorPanel.getFile());
 	}
@@ -83,6 +85,7 @@ public class SlimRunner {
 		this.ncFile = null;
 		this.success = false;
 		this.quiet = false;
+		this.time = 0;
 	}
 
 	public void run() {
@@ -122,6 +125,10 @@ public class SlimRunner {
 		return true;
 	}
 
+	public long getTime(){
+		return time;
+	}
+
 	public void kill() {
 		if (runner!=null) {
 			runner.kill();
@@ -138,6 +145,7 @@ public class SlimRunner {
 		return success;
 	}
 
+
 	private class ThreadRunner extends Thread {
 		private Process p1;
 		private Process p2;
@@ -151,7 +159,8 @@ public class SlimRunner {
 		public void run() {
 			try {
 
-				//System.out.println("SLIM_START="+System.currentTimeMillis());
+				//計測開始
+				long startTimeMillis = System.currentTimeMillis();
 
 				// LMNtal起動
 				String cmd1 = Env.getLmntalCmd()+" "+Env.get("SLIM_LMNTAL_COMPILE_OPTION")+" "+Env.getSpaceEscape(targetFile.getAbsolutePath());
@@ -236,6 +245,7 @@ public class SlimRunner {
 				in2.close();
 				p2.waitFor();
 
+				time = System.currentTimeMillis() - startTimeMillis;
 				success = true;
 
 				//System.out.println("SLIM_END  ="+System.currentTimeMillis());

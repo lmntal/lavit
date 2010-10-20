@@ -59,6 +59,8 @@ public class LmntalRunner {
 	private File targetFile;
 	private boolean success;
 
+	private long time;
+
 	public LmntalRunner(String option){
 		this(option,FrontEnd.mainFrame.editorPanel.getFile());
 	}
@@ -97,6 +99,10 @@ public class LmntalRunner {
 		return true;
 	}
 
+	public long getTime(){
+		return time;
+	}
+
 	public void kill() {
 		if (runner!=null) {
 			runner.kill();
@@ -119,6 +125,11 @@ public class LmntalRunner {
 
 		public void run() {
 			try {
+
+				//計測開始
+				long startTimeMillis = System.currentTimeMillis();
+
+				//オプション
 				String cmd = Env.getLmntalCmd()+option+" "+Env.getSpaceEscape(targetFile.getAbsolutePath());
 
 				FrontEnd.println("(LMNtal) "+cmd);
@@ -152,6 +163,7 @@ public class LmntalRunner {
 				in.close();
 				p.waitFor();
 
+				time = System.currentTimeMillis() - startTimeMillis;
 				success = true;
 
 			}catch(Exception e){

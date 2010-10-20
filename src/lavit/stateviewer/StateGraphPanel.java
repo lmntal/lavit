@@ -154,7 +154,6 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		selectNodes  = new ArrayList<StateNode>();
 
 		draw = new StateGraphBasicDraw(this);
-		//draw = new StateGraphBlackDraw(this);
 
 		painter = new StatePainter(this);
 		painter.start();
@@ -190,6 +189,10 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			generalControlPanel.setVisible(true);
 			generalControlPanel.updateLabel(nodes);
 		}
+
+		updateDraw();
+
+		statePanel.stateControlPanel.stateControllerTab.simulationPanel.init();
 
 		if(!Env.get("SV_STARTUP_RESET_TYPE").equals("none")){
 			if(drawNodes.size()<=Env.getInt("SV_STARTUP_RESET_LIMIT")){
@@ -313,6 +316,15 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		}
 	}
 
+	public void updateDraw(){
+		if(Env.get("SV_GRAPH_DRAW").equals("BLACK")){
+			draw = new StateGraphBlackDraw(this);
+		}else{
+			draw = new StateGraphBasicDraw(this);
+		}
+		if(drawNodes!=null) drawNodes.updateNodeLooks();
+	}
+
 	public void changeZoom(double dz){
 		double z = Math.sqrt(zoom*10000);
 		z -= dz;
@@ -356,6 +368,17 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 	public ArrayList<StateNode> getSelectNodes(){
 		return selectNodes;
+	}
+
+	public void setSelectNode(StateNode selectNode){
+		selectClear();
+		selectNodes.add(selectNode);
+	}
+
+	public void selectClear(){
+		selectNodes.clear();
+		nodeSelected = false;
+		selectTransition = null;
 	}
 
 	public StateTransition getSelectTransition(){
@@ -524,6 +547,23 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		drawNodes.allMove(((getWidth()-d.width)/2.0)/zoom,((getHeight()-d.height)/2.0)/zoom);
 	}
 
+	public void fitCentering(){
+		Rectangle2D.Double d = drawNodes.getNodesDimension();
+		drawNodes.allMove(-1.0*d.getX(), -1.0*d.getY());
+		d = getNodesWindowDimension();
+		drawNodes.allScaleMove(getWidth()/d.getWidth(), getHeight()/d.getHeight(), 0, 0);
+		update();
+	}
+
+	public Rectangle2D.Double getNodesWindowDimension(){
+		Rectangle2D.Double d = drawNodes.getNodesDimension();
+		d.x *= zoom;
+		d.y *= zoom;
+		d.width *= zoom;
+		d.height *= zoom;
+		return d;
+	}
+
 
 	/*
 	public void dummyCentering(){
@@ -572,15 +612,6 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		update();
 	}
 	*/
-
-	public Rectangle2D.Double getNodesWindowDimension(){
-		Rectangle2D.Double d = drawNodes.getNodesDimension();
-		d.x *= zoom;
-		d.y *= zoom;
-		d.width *= zoom;
-		d.height *= zoom;
-		return d;
-	}
 
 	public int stateFind(String str){
 		selectClear();
@@ -1003,12 +1034,6 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		maker.end();
 	}
 
-	public void selectClear(){
-		selectNodes.clear();
-		nodeSelected = false;
-		selectTransition = null;
-	}
-
 	public boolean isDragg(){
 		if(lastPoint==null){
 			return false;
@@ -1286,10 +1311,25 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		//double oldZoom = zoom;
 		double dz = (double)e.getWheelRotation()*5;
-		if(e.isControlDown()){
+		double s = 1.1;
+		if(e.isAltDown()){
 			dz /= 5;
+			s -= 1.0;
+			s /= 5;
+			s += 1.0;
 		}
-		changeZoom(dz);
+		if(e.isControlDown()){
+			if(dz>0){
+				drawNodes.allScaleCenterMove(s, 1);
+				drawNodes.allScaleCenterMove(1, s);
+			}else if(dz<0){
+				drawNodes.allScaleCenterMove(1.0/s, 1);
+				drawNodes.allScaleCenterMove(1, 1.0/s);
+			}
+		}else{
+			changeZoom(dz);
+		}
+		update();
 
 		//double dx = (double)(e.getX() - getWidth()/2) / zoom;
 		//double dy = (double)(e.getY() - getHeight()/2) / zoom;
@@ -1301,7 +1341,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		boolean isUpdate = false;
 		double d = 5;
 		double s = 1.1;
-		if(e.isControlDown()){
+		if(e.isAltDown()){
 			d /= 5;
 			s -= 1.0;
 			s /= 5;
@@ -1312,13 +1352,13 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		case KeyEvent.VK_LEFT:
 			if(selectNodes.size()==0){
 				if(e.isControlDown()){
-					drawNodes.allScaleCenterMove(1.0/s,1);
+					drawNodes.allScaleCenterMove(1.0/s, 1);
 				}else{
-					drawNodes.allMove(-d/zoom,0);
+					drawNodes.allMove(-d/zoom, 0);
 				}
 			}else{
 				for(StateNode node : selectNodes){
-					node.move(-d/zoom,0);
+					node.move(-d/zoom, 0);
 				}
 			}
 			isUpdate = true;
@@ -1326,13 +1366,13 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		case KeyEvent.VK_RIGHT:
 			if(selectNodes.size()==0){
 				if(e.isControlDown()){
-					drawNodes.allScaleCenterMove(s,1);
+					drawNodes.allScaleCenterMove(s, 1);
 				}else{
-					drawNodes.allMove(d/zoom,0);
+					drawNodes.allMove(d/zoom, 0);
 				}
 			}else{
 				for(StateNode node : selectNodes){
-					node.move(d/zoom,0);
+					node.move(d/zoom, 0);
 				}
 			}
 			isUpdate = true;
@@ -1340,13 +1380,13 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		case KeyEvent.VK_DOWN:
 			if(selectNodes.size()==0){
 				if(e.isControlDown()){
-					drawNodes.allScaleCenterMove(1,s);
+					drawNodes.allScaleCenterMove(1, s);
 				}else{
-					drawNodes.allMove(0,d/zoom);
+					drawNodes.allMove(0, d/zoom);
 				}
 			}else{
 				for(StateNode node : selectNodes){
-					node.move(0,d/zoom);
+					node.move(0, d/zoom);
 				}
 			}
 			isUpdate = true;
@@ -1354,21 +1394,18 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		case KeyEvent.VK_UP:
 			if(selectNodes.size()==0){
 				if(e.isControlDown()){
-					drawNodes.allScaleCenterMove(1,1/s);
+					drawNodes.allScaleCenterMove(1, 1/s);
 				}else{
-					drawNodes.allMove(0,-d/zoom);
+					drawNodes.allMove(0, -d/zoom);
 				}
 			}else{
 				for(StateNode node : selectNodes){
-					node.move(0,-d/zoom);
+					node.move(0, -d/zoom);
 				}
 			}
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_DELETE:
-			//for(StateNode node : selectNodes){
-			//	drawNodes.remove(node);
-			//}
 			drawNodes.remove(selectNodes);
 			selectClear();
 			update();
@@ -1378,7 +1415,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		case KeyEvent.VK_ADD:
 		case KeyEvent.VK_PLUS:
 			if(e.isControlDown()){
-			changeZoom(-1);
+				changeZoom(-1);
 			}
 			break;
 		case KeyEvent.VK_MINUS:

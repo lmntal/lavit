@@ -68,6 +68,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
 	private boolean endFlag;
+	private boolean changeActive;
 
 	private ProgressFrame frame;
 
@@ -78,9 +79,11 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
 		this.endFlag = false;
+		this.changeActive = true;
 	}
 
 	public void waitExecute(){
+		this.changeActive = false;
 		selectExecute();
 		while(!endFlag){
 			try {
@@ -109,7 +112,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 	}
 
 	public void ready(boolean open){
-		panel.setActive(false);
+		if(changeActive) panel.setActive(false);
 		if(open){
 			frame = new ProgressFrame();
 			addPropertyChangeListener(frame);
@@ -123,15 +126,13 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 			node.setPosition((node.depth+1)*xInterval,node.getY());
 		}
 		panel.autoCentering();
-		panel.setActive(true);
+		if(changeActive) panel.setActive(true);
 		if(frame!=null) frame.dispose();
 		this.endFlag = true;
 	}
 
 	@Override
 	protected Object doInBackground(){
-
-		//System.out.println((new Date()));
 
 		int endNode = 0;
 		double w = (double)panel.getWidth();

@@ -72,6 +72,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -94,6 +95,7 @@ import lavit.runner.LmntalRunner;
 import lavit.stateviewer.controller.StateGenerationControlPanel;
 import lavit.stateviewer.controller.StateNodeLabel;
 import lavit.stateviewer.controller.StateRightMenu;
+import lavit.stateviewer.draw.*;
 import lavit.stateviewer.worker.StateDynamicMover;
 import lavit.stateviewer.worker.StateGraphAdjust2Worker;
 import lavit.stateviewer.worker.StateGraphAdjust3Worker;
@@ -317,8 +319,12 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	public void updateDraw(){
-		if(Env.get("SV_GRAPH_DRAW").equals("BLACK")){
-			draw = new StateGraphBlackDraw(this);
+		if(Env.get("SV_GRAPH_DRAW").equals("FLOWNODE")){
+			draw = new StateGraphFlownodeDraw(this);
+		}else if(Env.get("SV_GRAPH_DRAW").equals("ATOMCOLOR")){
+			draw = new StateGraphAtomcolorDraw(this);
+		}else if(Env.get("SV_GRAPH_DRAW").equals("BONE")){
+			draw = new StateGraphBoneDraw(this);
 		}else{
 			draw = new StateGraphBasicDraw(this);
 		}
@@ -450,11 +456,11 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	*/
 
 	public void dummyMixAdjust(){
-		(new StateGraphDummyMixAdjustWorker(this)).selectExecute();
+		(new StateGraphDummyMixAdjustWorker(this)).start();
 	}
 
 	public void simpleMixAdjust(){
-		(new StateGraphSimpleMixAdjustWorker(this)).selectExecute();
+		(new StateGraphSimpleMixAdjustWorker(this)).start();
 	}
 
 	public void positionReset(){
@@ -972,12 +978,13 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		g2.fillRect(0, 0, getWidth(), getHeight());
 
 		if(!isActive()){ return; }
+		//グラフ描画
 
 		double startTime = System.currentTimeMillis();
 
+
 		g2.scale(zoom,zoom);
 
-		//グラフ描画
 		draw.drawGraph(g2);
 
 		//選択時の四角の表示
@@ -992,6 +999,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		g2.scale(1.0/zoom, 1.0/zoom);
 
 		setDrawTime(System.currentTimeMillis()-startTime);
+
 	}
 
 	/*

@@ -57,7 +57,7 @@ public class StateTransition {
 	public boolean cycle;
 	public boolean weak;
 
-	private ArrayList<String> rules = new ArrayList<String>();
+	private ArrayList<StateRule> rules = new ArrayList<StateRule>();
 
 	Color color;
 
@@ -83,14 +83,14 @@ public class StateTransition {
 
 	public String getRuleNameString(){
 		StringBuffer buf = new StringBuffer();
-		for(String s : rules){
+		for(StateRule r : rules){
 			if(buf.length()>0){ buf.append(" "); }
-			buf.append(s);
+			buf.append(r.getName());
 		}
 		return buf.toString();
 	}
 
-	public ArrayList<String> getRules(){
+	public ArrayList<StateRule> getRules(){
 		return rules;
 	}
 
@@ -98,25 +98,25 @@ public class StateTransition {
 		return to.dummy;
 	}
 
-	void addRules(String str){
-		for(String s : str.split(" ")){
-			rules.add(s);
-		}
+	void addRules(StateRule rule){
+		if(rule==null){ return; }
+		if(rules.contains(rule)){ return; }
+		rules.add(rule);
 	}
 
-	void addRules(ArrayList<String> rs){
+	void addRules(ArrayList<StateRule> rs){
 		if(rs==null){ return; }
-		for(String r : rs){
-			rules.add(r);
+		for(StateRule r : rs){
+			addRules(r);
 		}
 	}
 
 	void doubleClick(StateGraphPanel graphPanel){
-		new UtilTextFrame(from.id+" -> "+to.id, from.state+"\n\n->\n\n"+to.state);
+		new UtilTextFrame(from.id+" -> "+to.id, from.state+"\n\n-> ("+getRuleNameString()+")\n\n"+to.state);
 	}
 
 	public String toString(){
-		return from.id+" -> "+to.id;
+		return from.id+" -> "+to.id+" ("+getRuleNameString()+")";
 	}
 
 	private Shape getShape(){

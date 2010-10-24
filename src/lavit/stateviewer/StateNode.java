@@ -215,25 +215,25 @@ public class StateNode implements Shape {
 	}
 	 */
 
-	public Collection<StateNode> getRuleNameGroupNodes(String ruleName){
+	public Collection<StateNode> getRuleNameGroupNodes(StateRule rule){
 		HashSet<StateNode> nodes = new HashSet<StateNode>();
 		for(StateTransition t : toes){
-			if(t.getRules().contains(ruleName)){
+			if(t.getRules().contains(rule)){
 				nodes.add(t.to);
 			}
 		}
 		for(StateTransition f : froms){
-			if(f.getRules().contains(ruleName)){
+			if(f.getRules().contains(rule)){
 				nodes.add(f.from);
 			}
 		}
 		return nodes;
 	}
 
-	public Collection<StateNode> getRuleNameGroupNodes(Collection<String> ruleNames){
+	public Collection<StateNode> getRuleNameGroupNodes(Collection<StateRule> rules){
 		HashSet<StateNode> nodes = new HashSet<StateNode>();
-		for(String ruleName : ruleNames){
-			nodes.addAll(getRuleNameGroupNodes(ruleName));
+		for(StateRule rule : rules){
+			nodes.addAll(getRuleNameGroupNodes(rule));
 		}
 		return nodes;
 	}
@@ -319,6 +319,7 @@ public class StateNode implements Shape {
 		return toNodes;
 	}
 
+	/*
 	ArrayList<String> getToRuleNames(StateNode toNode){
 		for(StateTransition t : toes){
 			if(t.to==toNode){
@@ -327,8 +328,9 @@ public class StateNode implements Shape {
 		}
 		return null;
 	}
+	*/
 
-	StateTransition getToTransition(StateNode toNode){
+	public StateTransition getToTransition(StateNode toNode){
 		for(StateTransition t : toes){
 			if(t.to==toNode){
 				return t;
@@ -337,18 +339,18 @@ public class StateNode implements Shape {
 		return null;
 	}
 
-	StateTransition getToTransition(){
+	public StateTransition getToTransition(){
 		for(StateTransition t : toes){
 			return t;
 		}
 		return null;
 	}
 
-	void setToTransition(LinkedHashSet<StateTransition> toes){
+	public void setToTransition(LinkedHashSet<StateTransition> toes){
 		this.toes = toes;
 	}
 
-	String getToRuleName(StateNode toNode){
+	public String getToRuleName(StateNode toNode){
 		for(StateTransition t : toes){
 			if(t.to==toNode){
 				return t.getRuleNameString();
@@ -385,7 +387,7 @@ public class StateNode implements Shape {
 		return null;
 	}
 
-	StateTransition getFromTransition(){
+	public StateTransition getFromTransition(){
 		for(StateTransition f : froms){
 			return f;
 		}
@@ -653,19 +655,19 @@ public class StateNode implements Shape {
 		return color;
 	}
 
-	boolean isAccept(){
+	public boolean isAccept(){
 		return accept;
 	}
 
-	void setAccept(boolean accept){
+	public void setAccept(boolean accept){
 		this.accept = accept;
 	}
 
-	boolean isInFrame(){
+	public boolean isInFrame(){
 		return inFrame;
 	}
 
-	void setInFrame(boolean inFrame){
+	public void setInFrame(boolean inFrame){
 		this.inFrame = inFrame;
 	}
 
@@ -726,9 +728,18 @@ public class StateNode implements Shape {
 
 	boolean isMatch(String str){
 		if(dummy) return false;
-		if(toString().lastIndexOf(str)>=0){
-			return true;
+		if(childSet==null){
+			if(toString().lastIndexOf(str)>=0){
+				return true;
+			}else{
+				return false;
+			}
 		}else{
+			for(StateNode node : childSet.getAllNode()){
+				if(node.isMatch(str)){
+					return true;
+				}
+			}
 			return false;
 		}
 	}

@@ -68,6 +68,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
 	private boolean endFlag;
+	private boolean changeActive;
 
 	private ProgressFrame frame;
 
@@ -75,9 +76,11 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
 		this.endFlag = false;
+		this.changeActive = true;
 	}
 
 	public void waitExecute(){
+		this.changeActive = false;
 		selectExecute();
 		while(!endFlag){
 			try {
@@ -106,7 +109,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 	}
 
 	public void ready(boolean open){
-		panel.setActive(false);
+		if(changeActive) panel.setActive(false);
 		if(open){
 			frame = new ProgressFrame();
 			addPropertyChangeListener(frame);
@@ -115,13 +118,14 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 
 	public void end() {
 		panel.autoCentering();
-		panel.setActive(true);
+		if(changeActive) panel.setActive(true);
 		if(frame!=null) frame.dispose();
 		this.endFlag = true;
 	}
 
 	@Override
 	protected Object doInBackground(){
+
 		Env.startWatch("Exchange[1]");
 
 		if(Env.is("SV_CROSSREDUCTION_DUMMYONLY")&&drawNodes.getDummySize()==0){ end(); return null; }

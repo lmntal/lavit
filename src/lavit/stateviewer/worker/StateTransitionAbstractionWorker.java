@@ -66,20 +66,23 @@ import lavit.stateviewer.*;
 public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>{
 	private StateGraphPanel panel;
 	private boolean endFlag;
+	private boolean changeActive;
 
 	private ProgressFrame frame;
 
 	private StateAbstractionMaker maker;
-	private Collection<String> ruleNames;
+	private Collection<StateRule> rules;
 	private Collection<StateTransition> trans;
 
 	public StateTransitionAbstractionWorker(StateGraphPanel panel){
 		this.panel = panel;
 		this.endFlag = false;
+		this.changeActive = true;
 	}
 
-	public void waitExecute(Collection<String> ruleNames){
-		selectExecute(ruleNames);
+	public void waitExecute(Collection<StateRule> rules){
+		this.changeActive = false;
+		selectExecute(rules);
 		while(!endFlag){
 			try {
 				Thread.sleep(100);
@@ -87,27 +90,27 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 		}
 	}
 
-	public void selectExecute(Collection<String> ruleNames){
+	public void selectExecute(Collection<StateRule> rules){
 		if(panel.getSelectNodes().size()<1000){
-			atomic(ruleNames);
+			atomic(rules);
 		}else{
-			ready(ruleNames);
+			ready(rules);
 			execute();
 		}
 	}
 
-	public void atomic(Collection<String> ruleNames){
-		ready(ruleNames, false);
+	public void atomic(Collection<StateRule> rules){
+		ready(rules, false);
 		doInBackground();
 		done();
 	}
 
-	public void ready(Collection<String> ruleNames){
-		ready(ruleNames, true);
+	public void ready(Collection<StateRule> rules){
+		ready(rules, true);
 	}
 
-	public void ready(Collection<String> ruleNames, boolean open){
-		panel.setActive(false);
+	public void ready(Collection<StateRule> rules, boolean open){
+		if(changeActive) panel.setActive(false);
 
 		if(open){
 			frame = new ProgressFrame();
@@ -115,13 +118,13 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 		}
 
 		this.maker = new StateAbstractionMaker(panel);
-		this.ruleNames = ruleNames;
+		this.rules = rules;
 		this.trans = new LinkedHashSet<StateTransition>();
 
 		//ダミーが含まれるため再構築
 		for(StateTransition t : panel.getDrawNodes().getAllTransition()){
-			rule: for(String r : t.getRules()){
-				if(ruleNames.contains(r)){
+			rule: for(StateRule r : t.getRules()){
+				if(rules.contains(r)){
 					trans.add(t);
 					break rule;
 				}
@@ -131,7 +134,7 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 
 	public void end() {
 		maker.end();
-		panel.setActive(true);
+		if(changeActive) panel.setActive(true);
 		if(frame!=null) frame.dispose();
 		this.endFlag = true;
 	}
@@ -183,7 +186,7 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 					StateNode node = queue.remove();
 
 					Env.startWatch("Worker[1-1]");
-					Collection<StateNode> ns = node.getRuleNameGroupNodes(ruleNames);
+					Collection<StateNode> ns = node.getRuleNameGroupNodes(rules);
 					Env.stopWatch("Worker[1-1]");
 
 					for(StateNode n : ns){

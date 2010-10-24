@@ -1,3 +1,38 @@
+/*
+ *   Copyright (c) 2008, Ueda Laboratory LMNtal Group <lmntal@ueda.info.waseda.ac.jp>
+ *   All rights reserved.
+ *
+ *   Redistribution and use in source and binary forms, with or without
+ *   modification, are permitted provided that the following conditions are
+ *   met:
+ *
+ *    1. Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *    2. Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in
+ *       the documentation and/or other materials provided with the
+ *       distribution.
+ *
+ *    3. Neither the name of the Ueda Laboratory LMNtal Group nor the
+ *       names of its contributors may be used to endorse or promote
+ *       products derived from this software without specific prior
+ *       written permission.
+ *
+ *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ *   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ *   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package lavit.stateviewer.worker;
 
 import java.awt.event.ActionEvent;
@@ -18,53 +53,18 @@ import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
 
-public class StateGraphDummyMixAdjustWorker extends SwingWorker<Object,Object> {
+public class StateGraphDummyMixAdjustWorker extends Thread {
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
-	private boolean endFlag;
 
 	public StateGraphDummyMixAdjustWorker(StateGraphPanel panel){
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
-		this.endFlag = false;
 	}
 
-	public void waitExecute(){
-		selectExecute();
-		while(!endFlag){
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {}
-		}
-	}
-
-	public void selectExecute(){
-		if(drawNodes.size()<1000){
-			atomic();
-		}else{
-			ready();
-			execute();
-		}
-	}
-
-	public void atomic(){
-		ready();
-		doInBackground();
-		done();
-	}
-
-	public void ready(){
+	public void run() {
 		panel.setActive(false);
-	}
 
-	public void end() {
-		panel.autoCentering();
-		panel.setActive(true);
-		this.endFlag = true;
-	}
-
-	@Override
-	protected Object doInBackground(){
 		boolean crossreduction_dummyonly = Env.is("SV_CROSSREDUCTION_DUMMYONLY");
 		Env.set("SV_CROSSREDUCTION_DUMMYONLY",true);
 
@@ -83,21 +83,8 @@ public class StateGraphDummyMixAdjustWorker extends SwingWorker<Object,Object> {
 
 		Env.set("SV_CROSSREDUCTION_DUMMYONLY", crossreduction_dummyonly);
 
-		end();
-		return null;
-	}
-
-	boolean rideOtherNode(ArrayList<StateNode> nodes,StateNode node){
-		for(StateNode n : nodes){
-			if(n==node) continue;
-			double dy = node.getY()-n.getY();
-			if(dy<0){ dy *= -1; }
-			double r = node.getRadius()+n.getRadius()+7;
-			if(dy<r){
-				return true;
-			}
-		}
-		return false;
+		panel.autoCentering();
+		panel.setActive(true);
 	}
 
 }

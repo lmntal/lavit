@@ -53,7 +53,7 @@ public class StateTransitionAbstraction implements StateTransitionCatcher {
 	}
 
 	@Override
-	public void transitionCatch(Collection<String> rules, Collection<StateTransition> trans) {
+	public void transitionCatch(Collection<StateRule> rules, Collection<StateTransition> trans) {
 
 		StateTransitionAbstractionWorker worker = new StateTransitionAbstractionWorker(graphPanel);
 		if(trans.size()<500){

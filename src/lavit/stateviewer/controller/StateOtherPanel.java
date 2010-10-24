@@ -1,3 +1,38 @@
+/*
+ *   Copyright (c) 2008, Ueda Laboratory LMNtal Group <lmntal@ueda.info.waseda.ac.jp>
+ *   All rights reserved.
+ *
+ *   Redistribution and use in source and binary forms, with or without
+ *   modification, are permitted provided that the following conditions are
+ *   met:
+ *
+ *    1. Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *    2. Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in
+ *       the documentation and/or other materials provided with the
+ *       distribution.
+ *
+ *    3. Neither the name of the Ueda Laboratory LMNtal Group nor the
+ *       names of its contributors may be used to endorse or promote
+ *       products derived from this software without specific prior
+ *       written permission.
+ *
+ *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ *   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ *   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package lavit.stateviewer.controller;
 
 import java.awt.Dimension;
@@ -44,6 +79,7 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 	private JCheckBox showRule = new JCheckBox("Show Rule");
 	private JCheckBox showNoNameRule = new JCheckBox("Show Rule (No Name)");
 	private JCheckBox showOutTransition = new JCheckBox("Show Out Transition");
+	private JCheckBox noCurve = new JCheckBox("No Curve Transition");
 
 	private JPanel startupPanel = new JPanel();
 	private JCheckBox startupSetBackDummy = new JCheckBox("Set Back Dummy");
@@ -59,7 +95,7 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 
 	private JComponent comps[] = {
 			transInfo,dummyInfo,crossInfo,
-			showdummy,backedge,showId,showRule,showNoNameRule,showOutTransition,
+			showdummy,backedge,showId,showRule,showNoNameRule,showOutTransition,noCurve,
 			startupSetBackDummy,
 			dotFile,saveSlimOutput,
 			searchShortCycle,updateDefaultYOrder,allDelete
@@ -81,7 +117,7 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 		infoPanel.add(crossInfo);
 		add(infoPanel);
 
-		graphViewPanel.setLayout(new GridLayout(2,3));
+		graphViewPanel.setLayout(new GridLayout(2,4));
 		graphViewPanel.setBorder(new TitledBorder("Graph View"));
 		graphViewPanel.setMaximumSize(new Dimension(1000,70));
 		showdummy.addActionListener(this);
@@ -102,6 +138,9 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 		showOutTransition.addActionListener(this);
 		showOutTransition.setSelected(Env.is("SV_SHOWOUTTRANS"));
 		graphViewPanel.add(showOutTransition);
+		noCurve.addActionListener(this);
+		noCurve.setSelected(Env.is("SV_NOCURVE"));
+		graphViewPanel.add(noCurve);
 		add(graphViewPanel);
 
 		startupPanel.setLayout(new GridLayout(1,3));
@@ -192,6 +231,9 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 			graphPanel.update();
 		}else if(src==showOutTransition){
 			Env.set("SV_SHOWOUTTRANS",!Env.is("SV_SHOWOUTTRANS"));
+			graphPanel.update();
+		}else if(src==noCurve){
+			Env.set("SV_NOCURVE",!Env.is("SV_NOCURVE"));
 			graphPanel.update();
 		}else if(src==startupSetBackDummy){
 			Env.set("SV_STARTUP_SET_BACKDUMMY",!Env.is("SV_STARTUP_SET_BACKDUMMY"));

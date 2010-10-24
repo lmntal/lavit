@@ -68,6 +68,7 @@ public class StateNodeSet {
 	private LinkedHashMap<Long,StateNode> allNode = new LinkedHashMap<Long,StateNode>();
 	private LinkedHashSet<StateTransition> allTransition = new LinkedHashSet<StateTransition>();
 	private LinkedHashSet<StateTransition> outTransition = new LinkedHashSet<StateTransition>();
+	private LinkedHashSet<StateRule> allRule = new LinkedHashSet<StateRule>();
 
 	private ArrayList<StateNode> cycleNode =  new ArrayList<StateNode>();
 
@@ -119,6 +120,23 @@ public class StateNodeSet {
 
 	long getMaxNodeId(){
 		return getRootStateNodeSet().maxNodeId;
+	}
+
+	public LinkedHashSet<StateRule> getRules(){
+		return allRule;
+	}
+
+	public StateRule getRule(String name){
+		LinkedHashSet<StateRule> allRule = getRootStateNodeSet().getRules();
+		if(name.length()==0){ return null; }
+		for(StateRule r : allRule){
+			if(r.equals(name)){
+				return r;
+			}
+		}
+		StateRule r = new StateRule(name);
+		allRule.add(r);
+		return r;
 	}
 
 	public boolean setSlimResult(String str, boolean ltlMode){
@@ -211,7 +229,9 @@ public class StateNodeSet {
 						StateTransition t = new StateTransition();
 						t.from = from;
 						t.to = to;
-						t.addRules(rules);
+						for(String rule : rules.split(" ")){
+							t.addRules(getRule(rule));
+						}
 
 						t.from.addToTransition(t);
 						t.to.addFromTransition(t);
@@ -982,9 +1002,9 @@ public class StateNodeSet {
 
 				StateTransition newTrans = new StateTransition(f.from, t.to, f.cycle && t.cycle, f.weak && t.weak);
 
-				ArrayList<String> rules = new ArrayList<String>();
-				for(String fr : f.getRules()){
-					for(String tr : t.getRules()){
+				ArrayList<StateRule> rules = new ArrayList<StateRule>();
+				for(StateRule fr : f.getRules()){
+					for(StateRule tr : t.getRules()){
 						if(fr.equals(tr)){
 							rules.add(tr);
 						}
@@ -1272,6 +1292,39 @@ public class StateNodeSet {
 		}
 		updateNodeLooks();
 		 */
+	}
+
+	public void setVerticalDummy(){
+		for(StateTransition trans : new ArrayList<StateTransition>(getAllTransition())){
+			if(!(trans.from.depth==trans.to.depth)){ continue; }
+
+			double y1,y2;//y1<y2
+			if(trans.from.getY()<trans.to.getY()){
+				y1 = trans.from.getY();
+				y2 = trans.to.getY();
+			}else{
+				y1 = trans.to.getY();
+				y2 = trans.from.getY();
+			}
+
+			ArrayList<StateNode> nodes = depthNode.get(trans.from.depth);
+			ArrayList<StateNode> inNodes = new ArrayList<StateNode>();
+
+			for(StateNode n : nodes){
+				if(y1<n.getY()&&n.getY()<y2){
+					inNodes.add(n);
+				}
+			}
+
+			if(inNodes.size()>0){
+				StateNode dummy = makeDummyFromTransition(trans);
+				dummy.setX((trans.from.getX()+trans.to.getX())/2+20);
+				dummy.setY((trans.from.getY()+trans.to.getY())/2);
+			}
+		}
+
+		setTreeDepth();
+		updateNodeLooks();
 	}
 
 	void addTransition(StateTransition trans){

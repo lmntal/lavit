@@ -1,4 +1,39 @@
-package lavit.stateviewer;
+/*
+ *   Copyright (c) 2008, Ueda Laboratory LMNtal Group <lmntal@ueda.info.waseda.ac.jp>
+ *   All rights reserved.
+ *
+ *   Redistribution and use in source and binary forms, with or without
+ *   modification, are permitted provided that the following conditions are
+ *   met:
+ *
+ *    1. Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *    2. Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in
+ *       the documentation and/or other materials provided with the
+ *       distribution.
+ *
+ *    3. Neither the name of the Ueda Laboratory LMNtal Group nor the
+ *       names of its contributors may be used to endorse or promote
+ *       products derived from this software without specific prior
+ *       written permission.
+ *
+ *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ *   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ *   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
+package lavit.stateviewer.draw;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -12,20 +47,25 @@ import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import lavit.Env;
+import lavit.stateviewer.StateGraphPanel;
+import lavit.stateviewer.StateNode;
+import lavit.stateviewer.StateNodeSet;
+import lavit.stateviewer.StateTransition;
 import lavit.util.StateDraw;
 
-public class StateGraphBlackDraw extends StateDraw {
+public class StateGraphFlownodeDraw extends StateDraw {
 	StateGraphPanel panel;
 
 	Graphics2D g2;
 	StateNodeSet drawNodes;
 	private double zoom;
 
-	StateGraphBlackDraw(StateGraphPanel panel){
+	public StateGraphFlownodeDraw(StateGraphPanel panel){
 		this.panel = panel;
 	}
 
@@ -60,6 +100,7 @@ public class StateGraphBlackDraw extends StateDraw {
 		}
 
 		//線の描写
+		boolean nocurve = Env.is("SV_NOCURVE");
 		if(simpleMode){
 			//すべて直線で描画
 			for(StateTransition t : drawNodes.getAllTransition()){
@@ -68,7 +109,9 @@ public class StateGraphBlackDraw extends StateDraw {
 		}else{
 			drawNodes.allNodeUnMark();
 			for(StateTransition t : drawNodes.getAllTransition()){
-				if(t.from.dummy){
+				if(nocurve){
+					drawTransition(t, null);
+				}else if(t.from.dummy){
 					drawDummyCurve(t.from, null);
 				}else if(t.to.dummy){
 					drawDummyCurve(t.to, null);
@@ -158,9 +201,9 @@ public class StateGraphBlackDraw extends StateDraw {
 				color = new Color(155,155,155,100);
 			}else{
 				if(t.from.depth<t.to.depth){
-					color = new Color(0,0,255,100);
-				}else if(t.from.depth>t.to.depth){
 					color = new Color(255,0,0,100);
+				}else if(t.from.depth>t.to.depth){
+					color = new Color(0,0,255,100);
 				}
 			}
 		}
@@ -243,9 +286,9 @@ public class StateGraphBlackDraw extends StateDraw {
 				color = new Color(155,155,155,100);
 			}else{
 				if(n0.depth<nN.depth){
-					color = new Color(0,0,255,100);
-				}else if(n0.depth>=nN.depth){
 					color = new Color(255,0,0,100);
+				}else if(n0.depth>=nN.depth){
+					color = new Color(0,0,255,100);
 				}
 			}
 		}
@@ -330,7 +373,7 @@ public class StateGraphBlackDraw extends StateDraw {
 		if(fillColor==null||drawColor==null){
 			if(searchMode&&node.weak||!searchMode&&cycleMode&&!node.cycle){
 				fillColor = new Color(255,255,255,100);
-				drawColor = node.getColor();
+				drawColor = new Color(255,255,255,100);
 			}else{
 				fillColor = node.getColor();
 				drawColor = new Color(155,155,155,100);
@@ -561,7 +604,11 @@ public class StateGraphBlackDraw extends StateDraw {
 			r = 50;
 			g = 50;
 			b = 200;
-		}else if(from>=to){
+		}else if(from==to){
+			r = 100;
+			g = 100;
+			b = 100;
+		}else if(from>to){
 			r = 200;
 			g = 50;
 			b = 50;
@@ -592,10 +639,12 @@ public class StateGraphBlackDraw extends StateDraw {
 				radius = 0.0;
 			}
 		}else if(node.weak){
-			radius = 3.0;
+			radius = 1.0;
 		}else{
 			//radius = 5.0;
-			radius = to*to+from*from;
+			//radius = to*to+from*from;
+			//radius = to+from;
+			radius = Math.sqrt(to*to+from*from);
 		}
 
 		//形の設定

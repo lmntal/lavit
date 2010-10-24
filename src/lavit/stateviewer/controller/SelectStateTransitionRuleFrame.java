@@ -69,6 +69,7 @@ import lavit.stateviewer.*;
 import lavit.util.StateTransitionCatcher;
 
 public class SelectStateTransitionRuleFrame extends JFrame implements ActionListener {
+	private StateGraphPanel graphPanel;
 	private StateTransitionCatcher catcher;
 
 	private JPanel panel;
@@ -79,14 +80,14 @@ public class SelectStateTransitionRuleFrame extends JFrame implements ActionList
 	private JButton rev;
 
 	private boolean end;
-	private HashMap<String,ArrayList<StateTransition>> rules = new HashMap<String,ArrayList<StateTransition>>();
+	private HashMap<StateRule,ArrayList<StateTransition>> rules = new HashMap<StateRule,ArrayList<StateTransition>>();
 
 	public SelectStateTransitionRuleFrame(StateGraphPanel graphPanel,StateTransitionCatcher catcher){
-
+		this.graphPanel = graphPanel;
 		this.catcher = catcher;
 
 		for(StateTransition t : graphPanel.getDrawNodes().getAllTransition()){
-			for(String r : t.getRules()){
+			for(StateRule r : t.getRules()){
 				if(!rules.containsKey(r)){
 					rules.put(r,new ArrayList<StateTransition>());
 				}
@@ -135,10 +136,10 @@ public class SelectStateTransitionRuleFrame extends JFrame implements ActionList
 		Object src = e.getSource();
 		if(src==ok){
 			ArrayList<StateTransition> trans = new ArrayList<StateTransition>();
-			for(String ruleName : rulePanel.getSelectedRuleNames()){
-				trans.addAll(rules.get(ruleName));
+			for(StateRule rule : rulePanel.getSelectedRules()){
+				trans.addAll(rules.get(rule));
 			}
-			catcher.transitionCatch(rulePanel.getSelectedRuleNames(), trans);
+			catcher.transitionCatch(rulePanel.getSelectedRules(), trans);
 			dispose();
 		}else if(src==rev){
 			rulePanel.selectReverse();
@@ -159,18 +160,21 @@ public class SelectStateTransitionRuleFrame extends JFrame implements ActionList
 		SelectPanel(){
 
 			//ルール名の集合
-			ArrayList<String> rs = new ArrayList<String>(rules.keySet());
-			Collections.sort(rs);
+			ArrayList<String> rns = new ArrayList<String>();
+			for(StateRule r : rules.keySet()){
+				rns.add(r.getName());
+			}
+			Collections.sort(rns);
 
-			setLayout(new GridLayout(rs.size(),2));
+			setLayout(new GridLayout(rns.size(),2));
 
-			ruleCheckBoxes = new JCheckBox[rs.size()];
-			for(int i=0;i<rs.size();++i){
-				ruleCheckBoxes[i] = new JCheckBox(rs.get(i));
+			ruleCheckBoxes = new JCheckBox[rns.size()];
+			for(int i=0;i<rns.size();++i){
+				ruleCheckBoxes[i] = new JCheckBox(rns.get(i));
 				add(ruleCheckBoxes[i]);
 
 				int c = 0;
-				for(StateTransition t : rules.get(rs.get(i))){
+				for(StateTransition t : rules.get(graphPanel.getDrawNodes().getRule(rns.get(i)))){
 					if(!t.isToDummy()){ c++; }
 				}
 
@@ -184,14 +188,14 @@ public class SelectStateTransitionRuleFrame extends JFrame implements ActionList
 
 		}
 
-		ArrayList<String> getSelectedRuleNames(){
-			ArrayList<String> ruleNames = new ArrayList<String>();
+		ArrayList<StateRule> getSelectedRules(){
+			ArrayList<StateRule> rules = new ArrayList<StateRule>();
 			for(JCheckBox cb : ruleCheckBoxes){
 				if(cb.isSelected()){
-					ruleNames.add(cb.getText());
+					rules.add(graphPanel.getDrawNodes().getRule(cb.getText()));
 				}
 			}
-			return ruleNames;
+			return rules;
 		}
 
 		void selectReverse(){

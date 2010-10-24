@@ -72,6 +72,7 @@ import lavit.stateviewer.StateNodeSet;
 public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>{
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
+	private boolean changeActive;
 
 	private ProgressFrame frame;
 
@@ -80,16 +81,17 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 	public StateGraphGeneticAlgorithmWorker(StateGraphPanel panel){
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
+		this.changeActive = true;
 	}
 
 	public void ready(){
-		panel.setActive(false);
+		if(changeActive) panel.setActive(false);
 		frame = new ProgressFrame();
 	}
 
 	public void end() {
 		panel.autoCentering();
-		panel.setActive(true);
+		if(changeActive) panel.setActive(true);
 		frame.dispose();
 	}
 

@@ -79,6 +79,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 
 	private JPanel dummyPanel = new JPanel();
 	private JButton setBackDummy = new JButton("Set Back Dummy");
+	private JButton setVerticalDummy = new JButton("Set Vertical Dummy");
 	private JButton removeDummy = new JButton("Remove Dummy");
 	private JButton dummyCentering = new JButton("Dummy Centering");
 	private JButton dummySmoothing = new JButton("Dummy Smoothing");
@@ -93,11 +94,11 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	private JButton allReset = new JButton("All Reset");
 
 	private JComponent comps[] = {
-		posReset,adjustReset,adjust2Reset,adjust3Reset,simpleMixAdjust,dummyMixAdjust,allReset,
+		posReset,adjustReset,adjust2Reset,adjust3Reset,simpleMixAdjust,dummyMixAdjust,
 		geneticAlgorithm,exchangeReset,exchangeDummyOnly,
-		setBackDummy,removeDummy,dummyCentering,dummySmoothing,
-		autoCentering,
-		transitionAbstraction,selectAbstraction
+		setBackDummy,setVerticalDummy,removeDummy,dummyCentering,dummySmoothing,
+		transitionAbstraction,selectAbstraction,
+		autoCentering,fitCentering,allReset
 	};
 
 	StateButtonPanel(StatePanel statePanel){
@@ -133,10 +134,12 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		crossPanel.add(exchangeDummyOnly);
 		add(crossPanel);
 
-		dummyPanel.setLayout(new GridLayout(1,4));
+		dummyPanel.setLayout(new GridLayout(1,5));
 		dummyPanel.setBorder(new TitledBorder("Dummy Control"));
 		setBackDummy.addActionListener(this);
 		dummyPanel.add(setBackDummy);
+		setVerticalDummy.addActionListener(this);
+		dummyPanel.add(setVerticalDummy);
 		removeDummy.addActionListener(this);
 		dummyPanel.add(removeDummy);
 		dummyCentering.addActionListener(this);
@@ -200,6 +203,10 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		}else if(src==setBackDummy){
 			statePanel.stateGraphPanel.getDrawNodes().setBackDummy();
 			statePanel.stateGraphPanel.getDrawNodes().dummyCentering();
+			statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
+			statePanel.stateGraphPanel.update();
+		}else if(src==setVerticalDummy){
+			statePanel.stateGraphPanel.getDrawNodes().setVerticalDummy();
 			statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
 			statePanel.stateGraphPanel.update();
 		}else if(src==removeDummy){

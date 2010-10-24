@@ -38,6 +38,7 @@ package lavit.util;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ConcurrentModificationException;
 
 import lavit.Env;
 import lavit.stateviewer.StateNode;

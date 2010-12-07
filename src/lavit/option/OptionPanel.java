@@ -60,8 +60,8 @@ public class OptionPanel extends JPanel {
 		optionSlimPanel = new OptionSlimPanel();
 		add(optionSlimPanel);
 
-		optionSVDepthPanel = new OptionSVDepthPanel();
-		add(optionSVDepthPanel);
+		//optionSVDepthPanel = new OptionSVDepthPanel();
+		//add(optionSVDepthPanel);
 
 		optionSVPanel = new OptionSVPanel();
 		add(optionSVPanel);

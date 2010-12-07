@@ -83,6 +83,7 @@ public class StateNodeSet {
 	final String graphMarkString = "Transitions";
 	final String initStartMarkString = "init:";
 	final String labelMarkString = "Labels";
+	final String pathsMarkString = "CounterExamplePaths";
 
 	public StateNodeSet(StateGraphPanel panel){
 		this.panel = panel;
@@ -142,26 +143,29 @@ public class StateNodeSet {
 	public boolean setSlimResult(String str, boolean ltlMode){
 
 		int line=0;
+		Long init = -1L;
 		String[] strs = str.split("\n");
 
 		// cycle parse
-		if(ltlMode){
-			// cycle探し
-			for(;line<strs.length;++line){
-				if(strs[line].equals(cycleMarkString)) break;
-				if(strs[line].equals(cycleEndMarkString)) break;
-			}
-			if(line>=strs.length) return false; //エラー
+		if(!Env.is("SLIM2")){
+			if(ltlMode){
+				// cycle探し
+				for(;line<strs.length;++line){
+					if(strs[line].equals(cycleMarkString)) break;
+					if(strs[line].equals(cycleEndMarkString)) break;
+				}
+				if(line>=strs.length) return false; //エラー
 
-			// cycle解析
-			for(line++;line<strs.length;++line){
-				String ss[] = strs[line].split(":",3);
-				if(ss.length<3){ break; }
+				// cycle解析
+				for(line++;line<strs.length;++line){
+					String ss[] = strs[line].split(":",3);
+					if(ss.length<3){ break; }
 
-				long id = getIdFromMemString(ss[2]);
-				StateNode node = getNodeInMaking(id);
-				node.cycle = true;
-				cycleNode.add(node);
+					long id = getIdFromMemString(ss[2]);
+					StateNode node = getNodeInMaking(id);
+					node.cycle = true;
+					cycleNode.add(node);
+				}
 			}
 		}
 
@@ -191,8 +195,8 @@ public class StateNodeSet {
 		// init解析
 		line++;
 		if(strs[line].startsWith(initStartMarkString)){
-			long id = getIdFromMemString(strs[line].substring(initStartMarkString.length()));
-			StateNode node = getNodeInMaking(id);
+			init = getIdFromMemString(strs[line].substring(initStartMarkString.length()));
+			StateNode node = getNodeInMaking(init);
 			startNode.add(node);
 		}else{
 			return false; //エラー
@@ -207,38 +211,36 @@ public class StateNodeSet {
 			StateNode from = getNodeInMaking(id);
 			String toIdsStr = ss[1];
 
-			try{
-				if(toIdsStr.length()>0){
-					String[] toStrs = toIdsStr.split(",");
-					for(String toIdStr : toStrs){
-						StateNode to = null;
-						Long toId;
-						String rules = "";
 
-						int leftBracketIndex = toIdStr.indexOf("(");
-						int rightBracketIndex = -1;
-						if(leftBracketIndex>0){ rightBracketIndex = toIdStr.indexOf(")",leftBracketIndex); }
-						if(rightBracketIndex>0){
-							toId = getIdFromMemString(toIdStr.substring(0,leftBracketIndex));
-							rules = toIdStr.substring(leftBracketIndex+1,rightBracketIndex);
-						}else{
-							toId = getIdFromMemString(toIdStr);
-						}
-						to = getNodeInMaking(toId);
+			if(toIdsStr.length()>0){
+				String[] toStrs = toIdsStr.split(",");
+				for(String toIdStr : toStrs){
+					StateNode to = null;
+					Long toId;
+					String rules = "";
 
-						StateTransition t = new StateTransition();
-						t.from = from;
-						t.to = to;
-						for(String rule : rules.split(" ")){
-							t.addRules(getRule(rule));
-						}
-
-						t.from.addToTransition(t);
-						t.to.addFromTransition(t);
-						allTransition.add(t);
+					int leftBracketIndex = toIdStr.indexOf("(");
+					int rightBracketIndex = -1;
+					if(leftBracketIndex>0){ rightBracketIndex = toIdStr.indexOf(")",leftBracketIndex); }
+					if(rightBracketIndex>0){
+						toId = getIdFromMemString(toIdStr.substring(0,leftBracketIndex));
+						rules = toIdStr.substring(leftBracketIndex+1,rightBracketIndex);
+					}else{
+						toId = getIdFromMemString(toIdStr);
 					}
+					to = getNodeInMaking(toId);
+
+					StateTransition t = new StateTransition();
+					t.from = from;
+					t.to = to;
+					for(String rule : rules.split(" ")){
+						t.addRules(getRule(rule));
+					}
+
+					t.from.addToTransition(t);
+					t.to.addFromTransition(t);
+					allTransition.add(t);
 				}
-			}catch(NumberFormatException e){
 			}
 		}
 
@@ -260,6 +262,43 @@ public class StateNodeSet {
 				node.label = ss[1];
 				if(node.label.toLowerCase().indexOf("accept")!=-1){
 					node.accept = true;
+				}
+			}
+		}
+
+		if(Env.is("SLIM2")){
+			if(ltlMode){
+				// cycle探し
+				for(;line<strs.length;++line){
+					if(strs[line].equals(pathsMarkString)) break;
+				}
+				if(line<strs.length){
+					HashMap<Long,ArrayList<Long>> paths = new HashMap<Long,ArrayList<Long>>();
+
+					// CounterExamplePaths解析
+					for(line++;line<strs.length;++line){
+						String ss[] = strs[line].split("::",2);
+						if(ss.length<2){ break; }
+						long id = getIdFromMemString(ss[0]);
+						ArrayList<Long> ids = new ArrayList<Long>();
+						if(ss[1].trim().length()>0){
+							for(String toStr : ss[1].split(",")){
+								ids.add(getIdFromMemString(toStr.trim()));
+							}
+						}
+						paths.put(id, ids);
+					}
+
+					//cycle化
+					StateNode node = getNodeInMaking(init);
+					while(!cycleNode.contains(node)){
+						node.cycle = true;
+						cycleNode.add(node);
+						ArrayList<Long> ids = paths.get(node.id);
+						if(ids.size()==0){ break; }
+						node = allNode.get(ids.get(0));
+					}
+
 				}
 			}
 		}

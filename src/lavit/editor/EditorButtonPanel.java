@@ -289,9 +289,14 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 			FrontEnd.mainFrame.toolTab.setTab("System");
 
 			FrontEnd.println("(StateViewer) Doing...");
-			String opt = "--nd "+Env.get("SV_OPTION");
-			if(!Env.get("SV_DEPTH_LIMIT").equals("unset")){
-				opt += " --bfs_depth "+Env.get("SV_DEPTH_LIMIT");
+			String opt = "";
+			if(Env.is("SLIM2")){
+				opt = "--nd -t --dump-lavit "+Env.get("SV_OPTION");
+			}else{
+				opt = "--nd "+Env.get("SV_OPTION");
+				if(!Env.get("SV_DEPTH_LIMIT").equals("unset")){
+					opt += " --bfs_depth "+Env.get("SV_DEPTH_LIMIT");
+				}
 			}
 			slimRunner = new SlimRunner(opt);
 			slimRunner.setBuffering(true);
@@ -385,7 +390,11 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 			FrontEnd.mainFrame.toolTab.setTab("StateProfiler");
 
 			FrontEnd.println("(StateProfiler) Doing...");
-			slimRunner = new SlimRunner("--nd_dump --hideruleset");
+			if(Env.is("SLIM2")){
+				slimRunner = new SlimRunner("--nd --dump-inc --dump-lavit");
+			}else{
+				slimRunner = new SlimRunner("--nd_dump --hideruleset");
+			}
 			slimRunner.setOutputGetter(FrontEnd.mainFrame.toolTab.stateProfilePanel);
 
 			slimRunner.run();

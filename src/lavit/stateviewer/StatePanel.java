@@ -96,7 +96,12 @@ public class StatePanel extends JPanel{
 		this.drawNodes = new StateNodeSet(stateGraphPanel);
 
 		FrontEnd.println("(StateViewer) parsing.");
-		boolean res = drawNodes.setSlimResult(str, ltlMode);
+		boolean res = false;
+		try{
+			res = drawNodes.setSlimResult(str, ltlMode);
+		}catch(NumberFormatException e){
+			FrontEnd.printException(e);
+		}
 
 		if(res){
 			FrontEnd.println("(StateViewer) start! (state = "+drawNodes.size()+")");

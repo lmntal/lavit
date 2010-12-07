@@ -83,6 +83,7 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 
 	private JPanel startupPanel = new JPanel();
 	private JCheckBox startupSetBackDummy = new JCheckBox("Set Back Dummy");
+	private JCheckBox startupAbstraction = new JCheckBox("Abstraction");
 
 	private JPanel filePanel = new JPanel();
 	private JButton dotFile = new JButton("Save Dot File");
@@ -149,6 +150,9 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 		startupSetBackDummy.addActionListener(this);
 		startupSetBackDummy.setSelected(Env.is("SV_STARTUP_SET_BACKDUMMY"));
 		startupPanel.add(startupSetBackDummy);
+		startupAbstraction.addActionListener(this);
+		startupAbstraction.setSelected(Env.is("SV_STARTUP_ABSTRACTION"));
+		startupPanel.add(startupAbstraction);
 		add(startupPanel);
 
 		filePanel.setLayout(new GridLayout(1,2));
@@ -237,6 +241,8 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 			graphPanel.update();
 		}else if(src==startupSetBackDummy){
 			Env.set("SV_STARTUP_SET_BACKDUMMY",!Env.is("SV_STARTUP_SET_BACKDUMMY"));
+		}else if(src==startupAbstraction){
+			Env.set("SV_STARTUP_ABSTRACTION",!Env.is("SV_STARTUP_ABSTRACTION"));
 		}else if(src==dotFile){
 			dotfileSave();
 			FrontEnd.mainFrame.toolTab.setTab("System");

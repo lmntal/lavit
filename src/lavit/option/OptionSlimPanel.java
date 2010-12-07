@@ -50,7 +50,7 @@ import lavit.*;
 
 public class OptionSlimPanel extends JPanel implements ActionListener,DocumentListener {
 
-	String majorOption[] = {"-t","--nd","--nd_result","--nd_dump","--mem-enc","--showproxy","--hideruleset"};
+	String majorOption[] = {"-t","--nd","--nd_result","--nd_dump","--mem-enc","--showproxy","--hideruleset","--hide-ruleset","--show-transition"};
 	JCheckBox optionCheckBox[] = new JCheckBox[majorOption.length];
 	JTextField optionField = new JTextField(15);
 

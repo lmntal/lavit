@@ -92,6 +92,7 @@ import javax.swing.event.MouseInputListener;
 
 import lavit.*;
 import lavit.runner.LmntalRunner;
+import lavit.stateviewer.controller.SelectStateTransitionRuleFrame;
 import lavit.stateviewer.controller.StateGenerationControlPanel;
 import lavit.stateviewer.controller.StateNodeLabel;
 import lavit.stateviewer.controller.StateRightMenu;
@@ -169,6 +170,8 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 	public void init(StateNodeSet nodes){
 
+		setActive(false);
+
 		this.drawNodes = nodes;
 		if(nodes.generation==0){
 			this.rootDrawNodes = nodes;
@@ -196,6 +199,24 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		statePanel.stateControlPanel.stateControllerTab.simulationPanel.init();
 
+		if(Env.is("SV_STARTUP_ABSTRACTION")){
+			new SelectStateTransitionRuleFrame(this, new StateTransitionAbstraction(this));
+		}else{
+			startupReset();
+			autoCentering();
+			setActive(true);
+		}
+
+	}
+
+	public void init(StateNodeSet nodes, StateNode selectNode){
+		init(nodes);
+		if(nodes.getAllNode().contains(selectNode)){
+			selectNodes.add(selectNode);
+		}
+	}
+
+	public void startupReset(){
 		if(!Env.get("SV_STARTUP_RESET_TYPE").equals("none")){
 			if(drawNodes.size()<=Env.getInt("SV_STARTUP_RESET_LIMIT")){
 				FrontEnd.println("(StateViewer) Startup Reset : "+Env.get("SV_STARTUP_RESET_TYPE"));
@@ -213,20 +234,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 					dummyMixAdjust();
 				}
 			}else{
-				FrontEnd.println("(StateViewer) "+drawNodes.size()+" state > Startup Reset Limit ("+Env.getInt("SV_AUTO_ADJUST_STARTUP_LIMIT")+" state)");
+				FrontEnd.println("(StateViewer) "+drawNodes.size()+" state > Startup Reset Limit ("+Env.getInt("SV_STARTUP_RESET_LIMIT")+" state)");
 				FrontEnd.sleep(300);
 			}
-		}
-
-		autoCentering();
-		setActive(true);
-
-	}
-
-	public void init(StateNodeSet nodes, StateNode selectNode){
-		init(nodes);
-		if(nodes.getAllNode().contains(selectNode)){
-			selectNodes.add(selectNode);
 		}
 	}
 

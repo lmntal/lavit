@@ -105,13 +105,15 @@ public class LtlButtonPanel extends JPanel implements ActionListener {
 		ltlButton.addActionListener(this);
 		buttonPanel.add(ltlButton);
 
-		ltlallButton = new JButton("slim --ltl_all");
+		ltlallButton = new JButton("slim --ltl-all");
 		ltlallButton.addActionListener(this);
 		buttonPanel.add(ltlallButton);
 
+		/*
 		ltlndButton = new JButton("slim --ltl_nd");
 		ltlndButton.addActionListener(this);
 		buttonPanel.add(ltlndButton);
+		 */
 
 		ltlsvButton = new JButton("LTL StateViewer");
 		ltlsvButton.addActionListener(this);
@@ -126,7 +128,7 @@ public class LtlButtonPanel extends JPanel implements ActionListener {
 	public void setAllEnable(boolean enable){
 		ltlButton.setEnabled(enable);
 		ltlallButton.setEnabled(enable);
-		ltlndButton.setEnabled(enable);
+		//ltlndButton.setEnabled(enable);
 		ltlsvButton.setEnabled(enable);
 	}
 
@@ -166,12 +168,20 @@ public class LtlButtonPanel extends JPanel implements ActionListener {
 			FrontEnd.println("(SLIM) Doing...");
 
 			String option = "";
-			if(src==ltlButton){
-				option = "--ltl "+Env.get("LTL_OPTION");
-			}else if(src==ltlallButton){
-				option = "--ltl_all "+Env.get("LTL_OPTION");
-			}else if(src==ltlndButton){
-				option = "--ltl_nd "+Env.get("LTL_OPTION");
+			if(Env.is("SLIM2")){
+				if(src==ltlButton){
+					option = "--ltl "+Env.get("LTL_OPTION");
+				}else if(src==ltlallButton){
+					option = "--ltl-all "+Env.get("LTL_OPTION");
+				}
+			}else{
+				if(src==ltlButton){
+					option = "--ltl "+Env.get("LTL_OPTION");
+				}else if(src==ltlallButton){
+					option = "--ltl_all "+Env.get("LTL_OPTION");
+				}else if(src==ltlndButton){
+					option = "--ltl_nd "+Env.get("LTL_OPTION");
+				}
 			}
 
 			slimRunner = new SlimRunner(option);
@@ -205,7 +215,11 @@ public class LtlButtonPanel extends JPanel implements ActionListener {
 
 			FrontEnd.println("(StateViewer) Doing...");
 
-			slimRunner = new SlimRunner("--ltl_nd "+Env.get("LTL_OPTION"));
+			if(Env.is("SLIM2")){
+				slimRunner = new SlimRunner("--ltl-all -t --dump-lavit "+Env.get("LTL_OPTION"));
+			}else{
+				slimRunner = new SlimRunner("--ltl_nd "+Env.get("LTL_OPTION"));
+			}
 			slimRunner.setSymbolFile(ltlPanel.getSymbolFile(getSelectedNo()));
 			slimRunner.setNcFile(ltlPanel.getNcFile(getSelectedNo()));
 			slimRunner.setBuffering(true);

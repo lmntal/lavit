@@ -91,7 +91,7 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 	}
 
 	public void selectExecute(Collection<StateRule> rules){
-		if(panel.getSelectNodes().size()<1000){
+		if(panel.getDrawNodes().size()<1000){
 			atomic(rules);
 		}else{
 			ready(rules);

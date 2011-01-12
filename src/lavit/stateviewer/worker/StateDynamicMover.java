@@ -172,6 +172,7 @@ public class StateDynamicMover extends Thread {
 					sleep(300);
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 

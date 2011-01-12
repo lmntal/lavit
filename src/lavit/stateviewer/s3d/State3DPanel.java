@@ -1,3 +1,38 @@
+/*
+ *   Copyright (c) 2008, Ueda Laboratory LMNtal Group <lmntal@ueda.info.waseda.ac.jp>
+ *   All rights reserved.
+ *
+ *   Redistribution and use in source and binary forms, with or without
+ *   modification, are permitted provided that the following conditions are
+ *   met:
+ *
+ *    1. Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *    2. Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in
+ *       the documentation and/or other materials provided with the
+ *       distribution.
+ *
+ *    3. Neither the name of the Ueda Laboratory LMNtal Group nor the
+ *       names of its contributors may be used to endorse or promote
+ *       products derived from this software without specific prior
+ *       written permission.
+ *
+ *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ *   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ *   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package lavit.stateviewer.s3d;
 
 import java.awt.BorderLayout;
@@ -37,12 +72,14 @@ import com.sun.j3d.utils.universe.ViewingPlatform;
 public class State3DPanel extends JPanel {
 	private LinkedHashMap<StateNode,State3DNode> all3DNode = new LinkedHashMap<StateNode,State3DNode>();
 	private LinkedHashSet<State3DTransition> all3DTransition = new LinkedHashSet<State3DTransition>();
+	private State3DNode startNode;
 	private ArrayList<ArrayList<State3DNode>> depthNode = new ArrayList<ArrayList<State3DNode>>();
 	public StatePanel statePanel;
 
 	public Canvas3D canvas;
 	public SimpleUniverse universe;
 	public BranchGroup rootBranchGroup;
+	public BranchGroup axisBranchGroup;
 
 	public State3DDynamicMover mover;
 
@@ -61,7 +98,6 @@ public class State3DPanel extends JPanel {
 
 		setCamera();
 		setOrbitBehavior();
-		setLine();
 
 		mover = new State3DDynamicMover(this);
 		mover.start();
@@ -96,18 +132,30 @@ public class State3DPanel extends JPanel {
 			deleteGraph();
 		}
 
+		//ダミーを抜く
+		statePanel.stateGraphPanel.getDrawNodes().removeDummy();
+		statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
+		statePanel.stateGraphPanel.selectClear();
+		statePanel.stateGraphPanel.update();
+
 		//3Dノードとトランジションの生成
 		for(StateTransition trans : statePanel.stateGraphPanel.getDrawNodes().getAllTransition()){
 			State3DNode from = all3DNode.get(trans.from);
-			if(from==null){ from = new State3DNode(trans.from, statePanel.stateGraphPanel); all3DNode.put(trans.from, from); }
+			if(from==null){ from = new State3DNode(trans.from, statePanel); all3DNode.put(trans.from, from); }
 			State3DNode to = all3DNode.get(trans.to);
-			if(to==null){ to = new State3DNode(trans.to, statePanel.stateGraphPanel); all3DNode.put(trans.to, to); }
-			State3DTransition s3dtrans = new State3DTransition(trans);
+			if(to==null){ to = new State3DNode(trans.to, statePanel); all3DNode.put(trans.to, to); }
+			State3DTransition s3dtrans = new State3DTransition(trans, statePanel);
 			from.toes.add(s3dtrans);
 			to.froms.add(s3dtrans);
 			s3dtrans.from = from;
 			s3dtrans.to = to;
 			all3DTransition.add(s3dtrans);
+		}
+
+		//スタートノード
+		startNode = all3DNode.get(statePanel.stateGraphPanel.getDrawNodes().getStartNodeOne());
+		for(State3DNode node : getAllNode()){
+			node.setStartNode(startNode);
 		}
 
 		//深さの決定
@@ -119,11 +167,20 @@ public class State3DPanel extends JPanel {
 			depthNode.add(ns);
 		}
 
+		if(Env.is("SV3D_AUTO_RESET")){
+			reset3dPosition();
+		}
 		updateGraph();
 	}
 
 	public void updateGraph(){
 		hideGraph();
+
+		if(Env.is("SV3D_DRAW_AXIS")){
+			setLine();
+		}else{
+			removeLine();
+		}
 
 		rootBranchGroup = new BranchGroup();
 		rootBranchGroup.setCapability(BranchGroup.ALLOW_DETACH);
@@ -157,7 +214,50 @@ public class State3DPanel extends JPanel {
 		all3DTransition.clear();
 	}
 
+	public void reset3dPosition(){
+		int d = 0;
+		for(ArrayList<State3DNode> nodes : depthNode){
+			for(State3DNode node : nodes){
+				//fromが2つ以上ある場合は平均座標に配置
+				int fromSize=node.getFromBackNodes().size();
+				if(fromSize>=2){
+					double y=0,z=0;
+					for(State3DNode from : node.getFromBackNodes()){
+						y += from.getY();
+						z += from.getZ();
+					}
+					node.setY(y/fromSize);
+					node.setZ(z/fromSize);
+				}
+
+				//toがある場合は円形に配置
+				int toSize=node.getToNextNodes().size();
+				if(toSize>=1){
+					double r = 10*Math.sqrt(toSize-1);
+					int i=0;
+					for(State3DNode to : node.getToNextNodes()){
+						to.setY(r*Math.cos(d+i*2*Math.PI/toSize)+node.getY());
+						to.setZ(r*Math.sin(d+i*2*Math.PI/toSize)+node.getZ());
+						i++;
+					}
+				}
+				d+=Math.PI/2;
+			}
+		}
+	}
+
+	public void removeLine(){
+		if(axisBranchGroup!=null){
+			universe.getLocale().removeBranchGraph(axisBranchGroup);
+		}
+	}
+
 	public void setLine(){
+		removeLine();
+
+		axisBranchGroup = new BranchGroup();
+		axisBranchGroup.setCapability(BranchGroup.ALLOW_DETACH);
+
 		TransformGroup tg = new TransformGroup();
 
 		//ラインを追加
@@ -191,10 +291,9 @@ public class State3DPanel extends JPanel {
 		geometry.setColor(1, new Color3f(Color.BLUE));
 		tg.addChild(new Shape3D(geometry));
 
-		BranchGroup bg = new BranchGroup();
-		bg.addChild(tg);
+		axisBranchGroup.addChild(tg);
 
-		universe.addBranchGraph(bg);
+		universe.addBranchGraph(axisBranchGroup);
 	}
 
 	public void setCamera(){

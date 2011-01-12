@@ -63,28 +63,31 @@ public class State3DControlPanel extends JPanel implements ChangeListener,Action
 
 	private JPanel dynamicPanel = new JPanel();
 	private JCheckBox activeCheckBox = new JCheckBox("3D Modeling");
+	private JCheckBox dynamicModeling = new JCheckBox("Dynamic 3D Modeling");
 	private JButton updateButton = new JButton("Update");
 	private JButton resetButton = new JButton("Reset");
 
-	private JCheckBox dynamicModeling = new JCheckBox("Dynamic 3D Modeling");
-
 	private JPanel parameterPanel = new JPanel();
 	private JLabel xLabel = new JLabel();
-	private JSlider xSlider = new JSlider(1,300);
+	private JSlider xSlider = new JSlider(1,50);
 	private JLabel yLabel = new JLabel();
-	private JSlider ySlider = new JSlider(1,300);
+	private JSlider ySlider = new JSlider(1,50);
 	private JLabel zLabel = new JLabel();
-	private JSlider zSlider = new JSlider(1,300);
+	private JSlider zSlider = new JSlider(1,50);
 
 	private JLabel labels[] = {xLabel,yLabel,zLabel};
 	private JSlider sliders[] = {xSlider,ySlider,zSlider};
+
+	private JPanel optionPanel = new JPanel();
+	private JCheckBox drawAxis = new JCheckBox("Draw Axis");
+	private JCheckBox startupReset = new JCheckBox("Startup 3D Reset");
 
 	State3DControlPanel(StatePanel statePanel){
 		this.statePanel = statePanel;
 
 		setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
 
-		dynamicPanel.setLayout(new GridLayout(1,2));
+		dynamicPanel.setLayout(new GridLayout(1,4));
 		dynamicPanel.setMaximumSize(new Dimension(1000,30));
 		dynamicPanel.setBorder(new EmptyBorder(2,5,2,5));
 
@@ -92,15 +95,16 @@ public class State3DControlPanel extends JPanel implements ChangeListener,Action
 		activeCheckBox.setSelected(Env.is("SV3D"));
 		dynamicPanel.add(activeCheckBox);
 
+		dynamicModeling.addActionListener(this);
+		dynamicModeling.setEnabled(activeCheckBox.isSelected());
+		dynamicModeling.setSelected(false);
+		dynamicPanel.add(dynamicModeling);
+
 		updateButton.addActionListener(this);
 		dynamicPanel.add(updateButton);
 
 		resetButton.addActionListener(this);
 		dynamicPanel.add(resetButton);
-
-		dynamicModeling.addActionListener(this);
-		dynamicModeling.setSelected(false);
-		dynamicPanel.add(dynamicModeling);
 
 		xSlider.setValue(Env.getInt("SV3D_X_SCALE"));
 		ySlider.setValue(Env.getInt("SV3D_Y_SCALE"));
@@ -119,6 +123,20 @@ public class State3DControlPanel extends JPanel implements ChangeListener,Action
 		}
 		add(parameterPanel);
 		stateUpdate();
+
+		optionPanel.setLayout(new GridLayout(1,2));
+		optionPanel.setMaximumSize(new Dimension(1000,30));
+		optionPanel.setBorder(new EmptyBorder(2,5,2,5));
+
+		startupReset.addActionListener(this);
+		startupReset.setSelected(Env.is("SV3D_AUTO_RESET"));
+		optionPanel.add(startupReset);
+
+		drawAxis.addActionListener(this);
+		drawAxis.setSelected(Env.is("SV3D_DRAW_AXIS"));
+		optionPanel.add(drawAxis);
+
+		add(optionPanel);
 
 	}
 
@@ -141,12 +159,17 @@ public class State3DControlPanel extends JPanel implements ChangeListener,Action
 			statePanel.toggle3D();
 			Env.set("SV3D",!Env.is("SV3D"));
 			setSubEnabled(Env.is("SV3D"));
+			dynamicModeling.setEnabled(true);
 		}else if(src==updateButton){
 			state3DPanel.updateGraph();
 		}else if(src==resetButton){
 			state3DPanel.createGraph();
 		}else if(src==dynamicModeling){
 			statePanel.state3DPanel.setDynamicMoverActive(dynamicModeling.isSelected());
+		}else if(src==startupReset){
+			Env.set("SV3D_AUTO_RESET",!Env.is("SV3D_AUTO_RESET"));
+		}else if(src==drawAxis){
+			Env.set("SV3D_DRAW_AXIS",!Env.is("SV3D_DRAW_AXIS"));
 		}
 	}
 

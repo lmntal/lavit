@@ -131,6 +131,7 @@ public class State3DDynamicMover extends Thread {
 							for(State3DNode n : nodes){
 								if(node.getID()==n.getID()) continue;
 								double l = node.distance(n);
+								if(l==0){ continue; }
 								double ry = (node.getY()-n.getY())/l;
 								if(ry!=0){
 									if(0<ry&&ry<d){ ry=d; }
@@ -178,6 +179,7 @@ public class State3DDynamicMover extends Thread {
 					sleep(300);
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 

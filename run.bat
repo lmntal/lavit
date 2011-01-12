@@ -1,1 +1,1 @@
-javaw -Xms16M -Xmx1000M -jar LaViT.jar
+javaw -Xms16M -Xmx512M -jar LaViT.jar

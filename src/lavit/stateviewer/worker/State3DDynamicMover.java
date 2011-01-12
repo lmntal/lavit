@@ -41,9 +41,11 @@ import lavit.*;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
+import lavit.stateviewer.s3d.State3DNode;
+import lavit.stateviewer.s3d.State3DPanel;
 
-public class StateDynamicMover extends Thread {
-	private StateGraphPanel panel;
+public class State3DDynamicMover extends Thread {
+	private State3DPanel panel;
 	private boolean active;
 
 	private boolean physicsMode;
@@ -54,7 +56,7 @@ public class StateDynamicMover extends Thread {
 	private long interval;
 	private int maxSpeed;
 
-	public StateDynamicMover(StateGraphPanel panel){
+	public State3DDynamicMover(State3DPanel panel){
 		this.panel = panel;
 		this.active = false;
 	}
@@ -87,83 +89,87 @@ public class StateDynamicMover extends Thread {
 		long sleepTime = 0;
 		while(true){
 			try{
-				StateNodeSet drawNodes = panel.getDrawNodes();
+
 				if(active){
+					for(State3DNode node : panel.getAllNode()){
+						node.setDDY(0);
+						node.setDDZ(0);
+					}
+
 					double springLength = 30;
-					if(drawNodes.getDepth()>=2){
-						springLength = drawNodes.getDepthNode().get(1).get(0).getX() - drawNodes.getDepthNode().get(0).get(0).getX();
+
+					if(panel.getDepth()>=2){
+						springLength = panel.getDepthNode().get(1).get(0).getX() - panel.getDepthNode().get(0).get(0).getX();
 					}
 
 					//ばね
-					for(StateNode node : drawNodes.getAllNode()){
-						for(StateNode to : node.getToNodes()){
-							double l = Math.sqrt((node.getX()-to.getX())*(node.getX()-to.getX())+(node.getY()-to.getY())*(node.getY()-to.getY()));
+					for(State3DNode node : panel.getAllNode()){
+						for(State3DNode to : node.getToNodes()){
+							double l = node.distance(to);
 							if(l==0){ continue; }
 							double f = -1.0 * (l-springLength)*k;
 							double rateY = (node.getY()-to.getY())/l;
-							node.ddy += f*rateY;
+							node.addDDY(f*rateY);
+							double rateZ = (node.getZ()-to.getZ())/l;
+							node.addDDZ(f*rateZ);
 						}
-						for(StateNode from : node.getFromNodes()){
-							double l = Math.sqrt((node.getX()-from.getX())*(node.getX()-from.getX())+(node.getY()-from.getY())*(node.getY()-from.getY()));
+						for(State3DNode from : node.getFromNodes()){
+							double l = node.distance(from);
 							if(l==0){ continue; }
 							double f = -1.0 * (l-springLength)*k;
 							double rateY = (node.getY()-from.getY())/l;
-							node.ddy += f*rateY;
+							node.addDDY(f*rateY);
+							double rateZ = (node.getZ()-from.getZ())/l;
+							node.addDDZ(f*rateZ);
 						}
 					}
 
 					//斥力
 					int d = 10;
-					for(ArrayList<StateNode> nodes : drawNodes.getDepthNode()){
-						for(StateNode node : nodes){
-							for(StateNode n : nodes){
-								if(node.id==n.id) continue;
-								double r = node.getY()-n.getY();
-								if(r==0) continue;
-								if(0<r&&r<d){ r=d; }
-								if(-d<r&&r<0){ r=-d; }
-								double f;
-								if(r>0){
-									f = ((node.dummy?dc:nc)+(n.dummy?dc:nc))/(r*r);
-								}else{
-									f = -((node.dummy?dc:nc)+(n.dummy?dc:nc))/(r*r);
+					for(ArrayList<State3DNode> nodes : panel.getDepthNode()){
+						for(State3DNode node : nodes){
+							for(State3DNode n : nodes){
+								if(node.getID()==n.getID()) continue;
+								double l = node.distance(n);
+								double ry = (node.getY()-n.getY())/l;
+								if(ry!=0){
+									if(0<ry&&ry<d){ ry=d; }
+									if(-d<ry&&ry<0){ ry=-d; }
+									double f;
+									if(ry>0){
+										f = ((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(ry*ry);
+									}else{
+										f = -((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(ry*ry);
+									}
+									node.addDDY(f);
 								}
-								/*
-							r/=20;
-							if(-1<r&&r<0){
-								f = -1*(5*r*r*r/4-19*r*r/8+9/8);
-							}else if(0<r&&r<1){
-								f = 1*(5*r*r*r/4-19*r*r/8+9/8);
-							}else{
-								f = 0;
-							}
-								 */
-								node.ddy += f;
+								double rz = (node.getZ()-n.getZ())/l;
+								if(rz!=0){
+									if(0<rz&&rz<d){ rz=d; }
+									if(-d<rz&&rz<0){ rz=-d; }
+									double f;
+									if(rz>0){
+										f = ((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(rz*rz);
+									}else{
+										f = -((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(rz*rz);
+									}
+									node.addDDZ(f);
+								}
 							}
 						}
 					}
 
 					//摩擦力
-					for(StateNode node : drawNodes.getAllNode()){
-						node.ddy += -0.5 * (node.dy+node.ddy);
+					for(State3DNode node : panel.getAllNode()){
+						node.addDDY(-0.7 * (node.getDY()+node.getDDY()));
+						node.addDDZ(-0.7 * (node.getDZ()+node.getDDZ()));
 					}
 
 					//移動
-					for(StateNode node : drawNodes.getAllNode()){
-						if(panel.getSelectNodes().contains(node)&&panel.isDragg()) continue;
-						node.dy += node.ddy;
-						if(node.dy>maxSpeed){
-							node.move(0,maxSpeed);
-						}else if(node.dy<-maxSpeed){
-							node.move(0,-maxSpeed);
-						}else{
-							//dyがおかしくなった場合は0にする
-							if(!(-1000000000<node.dy&&node.dy<1000000000)){ node.dy=0; node.ddy=0; }
-							node.move(0,node.dy);
-						}
-						//System.out.println("id:"+node.id+",y:"+node.getY()+".dy:"+node.dy+",ddy:"+node.ddy);
+					for(State3DNode node : panel.getAllNode()){
+						node.move(maxSpeed);
 					}
-					panel.repaint();
+					panel.statePanel.stateGraphPanel.repaint();
 					while(System.currentTimeMillis()<sleepTime+interval){
 						sleep(1);
 					}

@@ -69,6 +69,7 @@ import lavit.*;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StatePanel;
 import lavit.stateviewer.StateTransitionAbstraction;
+import lavit.stateviewer.worker.State3DDynamicMover;
 import lavit.stateviewer.worker.StateDynamicMover;
 import lavit.stateviewer.worker.StateGraphExchangeWorker;
 import lavit.util.CommonFontUser;
@@ -152,6 +153,13 @@ public class StateDynamicControlPanel extends JPanel implements ChangeListener,A
 		mover.setInnerMaxSpeed(maxSpeedSlider.getValue());
 		Env.set("SV_DYNAMIC_MAXSPEED", maxSpeedSlider.getValue());
 		stateUpdate();
+		if(statePanel.state3DPanel==null){ return; }
+		State3DDynamicMover mover3d = statePanel.state3DPanel.mover;
+		mover3d.setInnerSpring(springSlider.getValue());
+		mover3d.setInnerNodeRepulsion(nodeRepulsionSlider.getValue());
+		mover3d.setInnerDummyRepulsion(dummyRepulsionSlider.getValue());
+		mover3d.setInnerInterval(intervalSlider.getValue());
+		mover3d.setInnerMaxSpeed(maxSpeedSlider.getValue());
 	}
 
 	public void stateUpdate(){

@@ -1,0 +1,9 @@
+/* a brute-force heart symbol */
+ 
+red(L406,red(L226,red(L158,L110)),L491,red(L226,L453,
+  red(L162,L158,red(L99,L100),red(L99,L110)),L206,L488)),
+red(L415,red(L221,red(L180,L87)),L501,
+  red(L221,L452,red(L180,L141,red(L86,L87),L183),
+    red(L162,L100,red(L86,L141),L183,L205,L206),
+    red(red(L452,L453,L205),L491,L501,
+      red(L405,L406,L407),red(L405,L415,red(L407)),L488))).

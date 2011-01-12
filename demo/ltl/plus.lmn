@@ -1,0 +1,6 @@
+/* can N become 5 from any state? */
+
+n(1).
+n(N) :- N<10, N_=N+1 | n(N_).
+n(N) :- N<10, N_=N+2 | n(N_).
+n(N) :- N>=10 | n(1).

@@ -1,0 +1,29 @@
+/*
+NAME
+  hold hands (LTL version)
+
+SYNOPSIS
+  run under SLIM LTL mode
+  property: nobody is left alone finally
+  
+AUTHOR
+  Ryo Okabe
+
+HISTORY
+  2007/12/14(Fri)
+
+*/
+
+/*
+kid(hand,hand), kid(hand,hand),
+kid(hand,hand), kid(hand,hand),
+kid(hand,hand), kid(hand,hand),
+kid(hand,hand), kid(hand,hand),
+kid(hand,hand), kid(hand,hand),
+*/
+kid(hand,hand), kid(hand,hand),
+kid(hand,hand), kid(hand,hand),
+kid(hand,hand), kid(hand,hand).
+
+hand@@
+kid(A,B),hand(B),hand(C),kid(C,D) :- kid(A,X),kid(X,D).

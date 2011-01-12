@@ -1,0 +1,14 @@
+/* starfish ('hitode' in Japanese) */
+
+hitode(
+  yellow(A,B,yellow(L1,10),yellow(L2)),
+  yellow(B,C,yellow(L2,10),yellow(L3)),
+  yellow(C,D,yellow(L3,10),yellow(L4)),
+  yellow(D,E,yellow(L4,10),yellow(L5)),
+  yellow(E,A,yellow(L5,10),yellow(L1))
+).
+
+L1=yellow(H1,0), L2=yellow(H1) :- yellow(L1,L2).
+L1=yellow(H1,N), L2=yellow(H1) :- N>0, M=N-1 |
+  L1=yellow(H2,X,yellow(L,M)), L2=yellow(H2,X,yellow(L)).
+

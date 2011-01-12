@@ -1,0 +1,65 @@
+pn(2).// number of passenger
+fn(2).// number of floor
+
+
+//preparation
+
+initial_ruleset{
+make@@ fn(F) :- int(F) | fn1(F),fn2(F).
+make@@ fn1(F) :- F>0,F0=F-1 | fn1(F0),
+{ f(F),btn(false),elv(null).
+ in@@ p,elv({open(true),$p}) :- elv({p,open(true),$p}).
+ out@@ elv({p,open(true),$p}) :- p,elv({open(true),$p}).
+}.
+
+make@@ pn(P),{ f(F),$p,@p }
+ :- P0=P-1,P>0,int(F),P=:=F | pn(P0),{ p,f(F),$p,@p }.
+make@@ pn(P),fn2(F),{ f(1),$p,@p }
+ :- P0=P-1,P>0,int(F),P>F | pn(P0),fn2(F),{ p,f(1),$p,@p }.
+
+make@@ pn(0),{ f(F),elv(null),$p,@p } :- int(F) | { elv({open(true),act(null),{}}),f(F),$p,@p }.
+make@@ fn2(F),{ elv({{$b},$e}),$p,@p } :- F>0,F_=F-1 | fn2(F_),{ elv({{btn(F,false),$b},$e}),$p,@p }.
+
+make@@ fn1(0),fn2(0) :- |.
+}.
+
+
+
+// action of passenger
+
+outterbtn@@ { p,btn(false),elv(null),$p,@p } :- { p,btn(true),elv(null),$p,@p }.
+
+innerbtn@@ { elv({p,{btn(B,false),$b},$q}),$p1,@p1 },{ f(F),$p2,@p2 }
+ :- B=:=F | { elv({p,{btn(B,true),$b},$q}),$p1,@p1 },{ f(F),$p2,@p2 }.
+
+
+
+// action of elevator
+
+elv_close@@ { elv({open(Op),act(close),$q}),$p,@p } :- unary(Op) | { elv({open(false),act(null),$q}),$p,@p }.
+
+elv_open@@ { elv({open(Op),act(open),$q}),$p,@p } :- unary(Op) | { elv({open(true),act(null),$q}),$p,@p }.
+
+elv_move@@ { elv({act(move(M)),$q }),$p1,@p1 },{ f(F),elv(null),$p2,@p2 }
+ :- M=:=F | { elv(null),$p1,@p1 },{ elv({act(null),$q}),f(F),$p2,@p2 }.
+
+elv_nomove@@ { f(F),elv{act(move(M)),$q},$p,@p }
+ :- F=:=M | { f(F),elv{act(null),$q},$p,@p }.
+
+
+
+// controller
+
+cnt(null).
+
+cnt@@ cnt(null),{ elv({act(null),{btn(T,true),$b},$q}),$p,@p }
+ :- T>0 | cnt(move(T)),{ elv({act(close),{btn(T,true),$b},$q}),$p,@p }.
+
+cnt@@ cnt(null),{ f(F),btn(true),$p1,@p1 },{ elv({act(null),$q}),$p2,@p2 }
+ :- int(F) | cnt(move(F)),{ f(F),btn(true),$p1,@p1 },{ elv({act(close),$q}),$p2,@p2 }.
+
+cnt@@ cnt(move(F)),{ elv({act(null),$q}),$p,@p }
+ :- int(F) | cnt(end),{ elv({act(move(F)),$q}),$p,@p }.
+
+cnt@@ cnt(end),{ btn(B),f(F),elv({act(null),{btn(T,TB),$b},$q}),$p,@p }
+ :- unary(B),unary(TB),F=:=T | cnt(null),{ btn(false),f(F),elv({act(open),{btn(T,false),$b},$q}),$p,@p }.

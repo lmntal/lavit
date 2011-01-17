@@ -35,6 +35,7 @@
 
 package lavit.stateviewer.controller;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -61,6 +62,8 @@ import lavit.stateviewer.worker.State3DDynamicMover;
 public class State3DControlPanel extends JPanel implements ChangeListener,ActionListener {
 	private StatePanel statePanel;
 
+	public State3DNodeLabel node3DLabel;
+
 	private JPanel dynamicPanel = new JPanel();
 	private JCheckBox activeCheckBox = new JCheckBox("3D Modeling");
 	private JCheckBox dynamicModeling = new JCheckBox("Dynamic 3D Modeling");
@@ -81,11 +84,17 @@ public class State3DControlPanel extends JPanel implements ChangeListener,Action
 	private JPanel optionPanel = new JPanel();
 	private JCheckBox drawAxis = new JCheckBox("Draw Axis");
 	private JCheckBox startupReset = new JCheckBox("Startup 3D Reset");
+	private JButton rotateBtn = new JButton("Rotate YZ");
 
 	State3DControlPanel(StatePanel statePanel){
 		this.statePanel = statePanel;
 
 		setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
+
+		node3DLabel = new State3DNodeLabel();
+		node3DLabel.setMaximumSize(new Dimension(1000,30));
+		node3DLabel.setVisible(false);
+		add(node3DLabel);
 
 		dynamicPanel.setLayout(new GridLayout(1,4));
 		dynamicPanel.setMaximumSize(new Dimension(1000,30));
@@ -124,7 +133,7 @@ public class State3DControlPanel extends JPanel implements ChangeListener,Action
 		add(parameterPanel);
 		stateUpdate();
 
-		optionPanel.setLayout(new GridLayout(1,2));
+		optionPanel.setLayout(new GridLayout(1,3));
 		optionPanel.setMaximumSize(new Dimension(1000,30));
 		optionPanel.setBorder(new EmptyBorder(2,5,2,5));
 
@@ -135,6 +144,9 @@ public class State3DControlPanel extends JPanel implements ChangeListener,Action
 		drawAxis.addActionListener(this);
 		drawAxis.setSelected(Env.is("SV3D_DRAW_AXIS"));
 		optionPanel.add(drawAxis);
+
+		rotateBtn.addActionListener(this);
+		optionPanel.add(rotateBtn);
 
 		add(optionPanel);
 
@@ -170,6 +182,9 @@ public class State3DControlPanel extends JPanel implements ChangeListener,Action
 			Env.set("SV3D_AUTO_RESET",!Env.is("SV3D_AUTO_RESET"));
 		}else if(src==drawAxis){
 			Env.set("SV3D_DRAW_AXIS",!Env.is("SV3D_DRAW_AXIS"));
+		}else if(src==rotateBtn){
+			statePanel.state3DPanel.rotationYZ(Math.PI/4);
+			statePanel.stateGraphPanel.update();
 		}
 	}
 

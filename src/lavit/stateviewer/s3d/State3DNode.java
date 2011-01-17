@@ -66,7 +66,10 @@ public class State3DNode {
 	public StateNode node;
 	public LinkedHashSet<State3DTransition> toes = new LinkedHashSet<State3DTransition>();
 	public LinkedHashSet<State3DTransition> froms = new LinkedHashSet<State3DTransition>();
+
 	public TransformGroup tg = null;
+	public Sphere sphere = null;
+
 	public double z,dz,ddz;
 	public State3DNode startNode;
 
@@ -97,13 +100,17 @@ public class State3DNode {
 		ap.setMaterial(ma);
 
 		// 物体を追加
-		Sphere sphere = new Sphere(0.2f, Sphere.GENERATE_NORMALS, 50, ap);
+		sphere = new Sphere(0.2f, Sphere.GENERATE_NORMALS, 50, ap);
 		tg.addChild(sphere);
 
 		// 平行移動を定義
 		Transform3D transform = new Transform3D();
 		transform.set(new Vector3d(getGraphPoint()));
 		tg.setTransform(transform);
+	}
+
+	public Sphere getSphere(){
+		return sphere;
 	}
 
 	public void setStartNode(State3DNode startNode){

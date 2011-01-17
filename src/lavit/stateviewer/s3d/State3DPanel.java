@@ -53,6 +53,7 @@ import lavit.Env;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StatePanel;
 import lavit.stateviewer.StateTransition;
+import lavit.stateviewer.controller.StateNodeLabel;
 import lavit.stateviewer.worker.State3DDynamicMover;
 import lavit.stateviewer.worker.StateDynamicMover;
 
@@ -61,6 +62,7 @@ import com.sun.j3d.utils.behaviors.picking.PickObject;
 import com.sun.j3d.utils.behaviors.vp.OrbitBehavior;
 import com.sun.j3d.utils.geometry.ColorCube;
 import com.sun.j3d.utils.geometry.Cone;
+import com.sun.j3d.utils.geometry.Primitive;
 import com.sun.j3d.utils.geometry.Sphere;
 import com.sun.j3d.utils.picking.PickCanvas;
 import com.sun.j3d.utils.picking.PickResult;
@@ -73,6 +75,7 @@ public class State3DPanel extends JPanel {
 	private LinkedHashMap<StateNode,State3DNode> all3DNode = new LinkedHashMap<StateNode,State3DNode>();
 	private LinkedHashSet<State3DTransition> all3DTransition = new LinkedHashSet<State3DTransition>();
 	private State3DNode startNode;
+	private State3DNode selectNode;
 	private ArrayList<ArrayList<State3DNode>> depthNode = new ArrayList<ArrayList<State3DNode>>();
 	public StatePanel statePanel;
 
@@ -411,7 +414,7 @@ public class State3DPanel extends JPanel {
 
 		return objRoot;
 	}
-*/
+	 */
 
 	public BranchGroup createObjects() {
 
@@ -447,22 +450,46 @@ public class State3DPanel extends JPanel {
 		return light;
 	}
 
+	public void rotationYZ(double alpha){
+		for(State3DNode node : all3DNode.values()){
+			double y1 = node.getY(), z1 = node.getZ();
+			double y2 = y1 * Math.cos(alpha) - z1 * Math.sin(alpha);
+			double z2 = y1 * Math.sin(alpha) + z1 * Math.cos(alpha);
+			node.setY(y2);
+			node.setZ(z2);
+		}
+	}
+
 
 	class MListener extends MouseAdapter{
 
-	    public void mousePressed(MouseEvent e){
-	        if(rootBranchGroup==null){ return; }
-	    	PickCanvas pickCanvas = new PickCanvas(canvas, rootBranchGroup);
-	        pickCanvas.setMode(PickTool.GEOMETRY_INTERSECT_INFO);
-	        pickCanvas.setTolerance(4.0f);
-	        pickCanvas.setShapeLocation(e);
-	        PickResult[] results = pickCanvas.pickAll();
-	        if(results!=null){
-	        	System.out.println("results.length="+results.length);
-	        }
-
-	        //rootBranchGroup.pickAll(pickshape)
-	    }
+		public void mousePressed(MouseEvent e){
+			if(rootBranchGroup==null){ return; }
+			PickCanvas pickCanvas = new PickCanvas(canvas, rootBranchGroup);
+			pickCanvas.setMode(PickTool.BOUNDS);
+			pickCanvas.setTolerance(4.0f);
+			pickCanvas.setShapeLocation(e);
+			PickResult[] results = pickCanvas.pickAll();
+			selectNode = null;
+			if(results!=null){
+				for(PickResult res : results){
+					Primitive p = (Primitive)res.getNode(PickResult.PRIMITIVE);
+					if(p==null){ continue; }
+					if(p instanceof Sphere){
+						Sphere s = (Sphere)p;
+						for(State3DNode node : all3DNode.values()){
+							if(node.getSphere()==s){
+								selectNode = node;
+							}
+						}
+					}
+				}
+			}
+			statePanel.stateControlPanel.stateControllerTab.s3dPanel.node3DLabel.setNode(selectNode);
+			if(selectNode!=null){
+				statePanel.stateGraphPanel.setSelectNode(selectNode.node);
+			}
+		}
 
 	}
 

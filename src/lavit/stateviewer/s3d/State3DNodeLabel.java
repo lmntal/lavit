@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.stateviewer.controller;
+package lavit.stateviewer.s3d;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -52,14 +52,14 @@ import lavit.stateviewer.s3d.State3DNode;
 import lavit.util.CommonFontUser;
 import lavit.util.FixFlowLayout;
 
-public class StateNodeLabel extends JPanel implements CommonFontUser {
+public class State3DNodeLabel extends JPanel implements CommonFontUser {
 	private JPanel stateStatus;
 	private JLabel stateNodenum;
 	private JLabel stateLabel;
 
 	private JTextField stateTextField;
 
-	public StateNodeLabel(){
+	public State3DNodeLabel(){
 
 		setLayout(new BorderLayout());
 		setOpaque(false);
@@ -91,9 +91,9 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 		revalidate();
 	}
 
-	public void setNode(ArrayList<StateNode> nodes){
-		if(nodes.size()==1){
-			StateNode node = nodes.get(0);
+	public void setNode(State3DNode node3d){
+		if(node3d!=null){
+			StateNode node = node3d.node;
 			if(node.hasSubset()){
 				stateNodenum.setText("Node: "+node.getChildSet().size());
 			}else{
@@ -107,15 +107,10 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			stateTextField.setText(node.toString());
 			stateTextField.setVisible(true);
 			setVisible(true);
-		}else if(nodes.size()>1){
-			stateNodenum.setText("Node: "+nodes.size());
-			stateLabel.setText("");
-			stateTextField.setText("");
-			stateTextField.setVisible(false);
-			setVisible(true);
 		}else{
 			setVisible(false);
 		}
+
 	}
 
 }

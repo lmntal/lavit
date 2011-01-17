@@ -80,6 +80,7 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 	private JCheckBox showNoNameRule = new JCheckBox("Show Rule (No Name)");
 	private JCheckBox showOutTransition = new JCheckBox("Show Out Transition");
 	private JCheckBox noCurve = new JCheckBox("No Curve Transition");
+	private JCheckBox antialias = new JCheckBox("Antialias");
 
 	private JPanel startupPanel = new JPanel();
 	private JCheckBox startupSetBackDummy = new JCheckBox("Set Back Dummy");
@@ -96,7 +97,7 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 
 	private JComponent comps[] = {
 			transInfo,dummyInfo,crossInfo,
-			showdummy,backedge,showId,showRule,showNoNameRule,showOutTransition,noCurve,
+			showdummy,backedge,showId,showRule,showNoNameRule,showOutTransition,noCurve,antialias,
 			startupSetBackDummy,
 			dotFile,saveSlimOutput,
 			searchShortCycle,updateDefaultYOrder,allDelete
@@ -142,6 +143,9 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 		noCurve.addActionListener(this);
 		noCurve.setSelected(Env.is("SV_NOCURVE"));
 		graphViewPanel.add(noCurve);
+		antialias.addActionListener(this);
+		antialias.setSelected(Env.is("SV_ANTIALIAS"));
+		graphViewPanel.add(antialias);
 		add(graphViewPanel);
 
 		startupPanel.setLayout(new GridLayout(1,3));
@@ -238,6 +242,9 @@ public class StateOtherPanel extends JPanel implements ActionListener {
 			graphPanel.update();
 		}else if(src==noCurve){
 			Env.set("SV_NOCURVE",!Env.is("SV_NOCURVE"));
+			graphPanel.update();
+		}else if(src==antialias){
+			Env.set("SV_ANTIALIAS",!Env.is("SV_ANTIALIAS"));
 			graphPanel.update();
 		}else if(src==startupSetBackDummy){
 			Env.set("SV_STARTUP_SET_BACKDUMMY",!Env.is("SV_STARTUP_SET_BACKDUMMY"));

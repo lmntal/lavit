@@ -50,7 +50,17 @@ import lavit.util.FixFlowLayout;
 
 public class OptionUnyoPanel extends JPanel implements ActionListener,DocumentListener{
 
-	String majorOption[] = {"-t","-O1","-O2","-O3","-s1","-s2","-s3","--hideruleset"," --hiderule"};
+	String majorOption[] = {
+			"-t",
+			"-O1",
+			"-O2",
+			"-O3",
+			"-s1",
+			"-s2",
+			"-s3",
+			"--hideruleset",
+			" --hiderule"
+	};
 	JCheckBox optionCheckBox[] = new JCheckBox[majorOption.length];
 	JTextField optionField = new JTextField(15);
 

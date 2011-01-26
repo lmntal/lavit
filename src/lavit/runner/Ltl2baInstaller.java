@@ -82,8 +82,9 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.util.OuterRunner;
 
-public class Ltl2baInstaller {
+public class Ltl2baInstaller implements OuterRunner  {
 
 	private ThreadRunner runner;
 	private boolean success;

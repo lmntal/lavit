@@ -43,8 +43,9 @@ import java.util.StringTokenizer;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.util.OuterRunner;
 
-public class UnyoRunner {
+public class UnyoRunner implements OuterRunner {
 
 	private ThreadRunner runner;
 

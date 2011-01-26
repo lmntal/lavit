@@ -125,6 +125,7 @@ public class State3DDynamicMover extends Thread {
 					}
 
 					//юмно
+					/*
 					int d = 10;
 					for(ArrayList<State3DNode> nodes : panel.getDepthNode()){
 						for(State3DNode node : nodes){
@@ -156,6 +157,40 @@ public class State3DDynamicMover extends Thread {
 									}
 									node.addDDZ(f);
 								}
+							}
+						}
+					}
+					*/
+
+					int d = 10;
+					for(State3DNode node : panel.getAllNode()){
+						for(State3DNode n : panel.getAllNode()){
+							if(node.getID()==n.getID()) continue;
+							double l = node.distance(n);
+							if(l==0){ continue; }
+							double ry = (node.getY()-n.getY())/l;
+							if(ry!=0){
+								if(0<ry&&ry<d){ ry=d; }
+								if(-d<ry&&ry<0){ ry=-d; }
+								double f;
+								if(ry>0){
+									f = ((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(ry*ry);
+								}else{
+									f = -((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(ry*ry);
+								}
+								node.addDDY(f);
+							}
+							double rz = (node.getZ()-n.getZ())/l;
+							if(rz!=0){
+								if(0<rz&&rz<d){ rz=d; }
+								if(-d<rz&&rz<0){ rz=-d; }
+								double f;
+								if(rz>0){
+									f = ((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(rz*rz);
+								}else{
+									f = -((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(rz*rz);
+								}
+								node.addDDZ(f);
 							}
 						}
 					}

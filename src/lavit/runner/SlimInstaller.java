@@ -72,8 +72,9 @@ import javax.swing.border.LineBorder;
 import lavit.Env;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.util.OuterRunner;
 
-public class SlimInstaller {
+public class SlimInstaller implements OuterRunner {
 
 	private ThreadRunner runner;
 	private boolean success;

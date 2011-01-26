@@ -50,7 +50,23 @@ import lavit.util.FixFlowLayout;
 
 public class OptionLMNtalPanel extends JPanel implements ActionListener,DocumentListener{
 
-	String majorOption[] = {"-t","-p1","-p2","-p3","-O1","-O2","-O3","-s1","-s2","-s3","--hideruleset"," --hiderule","--slimcode","--compileonly","--type-verbose"};
+	String majorOption[] = {
+			"-t",
+			"-p1",
+			"-p2",
+			"-p3",
+			"-O1",
+			"-O2",
+			"-O3",
+			"-s1",
+			"-s2",
+			"-s3",
+			"--hideruleset",
+			"--hiderule",
+			"--slimcode",
+			"--compileonly",
+			"--type-verbose"
+	};
 	JCheckBox optionCheckBox[] = new JCheckBox[majorOption.length];
 	JTextField optionField = new JTextField(15);
 

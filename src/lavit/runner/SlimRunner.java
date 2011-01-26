@@ -53,8 +53,9 @@ import java.util.TimerTask;
 
 import lavit.*;
 import lavit.system.OutputPanel;
+import lavit.util.OuterRunner;
 
-public class SlimRunner {
+public class SlimRunner implements OuterRunner {
 
 	private ThreadRunner runner;
 	private RunnerOutputGetter output;

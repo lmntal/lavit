@@ -50,7 +50,13 @@ import lavit.util.FixFlowLayout;
 
 public class OptionLtlPanel extends JPanel implements ActionListener,DocumentListener{
 
-	String majorOption[] = {"--hideruleset","--hide-ruleset","-t","--dump-lavit","--mem-enc","--show-transition"};
+	String majorOption[] = {
+			"--hide-ruleset",
+			"-t",
+			"--dump-lavit",
+			"--mem-enc",
+			"--show-transition"
+	};
 	JCheckBox optionCheckBox[] = new JCheckBox[majorOption.length];
 	JTextField optionField = new JTextField(15);
 

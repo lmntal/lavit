@@ -48,8 +48,9 @@ import java.util.TimerTask;
 
 import lavit.*;
 import lavit.system.OutputPanel;
+import lavit.util.OuterRunner;
 
-public class LmntalRunner {
+public class LmntalRunner implements OuterRunner {
 
 	private ThreadRunner runner;
 	private RunnerOutputGetter output;

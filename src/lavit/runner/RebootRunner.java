@@ -48,8 +48,9 @@ import java.util.TimerTask;
 
 import lavit.*;
 import lavit.system.OutputPanel;
+import lavit.util.OuterRunner;
 
-public class RebootRunner {
+public class RebootRunner implements OuterRunner {
 
 	private ThreadRunner runner;
 	private String option;
@@ -78,6 +79,12 @@ public class RebootRunner {
 
 	public void exit(){
 		runner=null;
+	}
+
+
+	@Override
+	public boolean isSuccess() {
+		return true;
 	}
 
 	private class ThreadRunner extends Thread {

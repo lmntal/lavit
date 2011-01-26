@@ -45,8 +45,9 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import lavit.*;
+import lavit.util.OuterRunner;
 
-public class Ltl2baRunner {
+public class Ltl2baRunner implements OuterRunner {
 
 	private ThreadRunner runner;
 	private StringBuffer buffer;
@@ -80,6 +81,13 @@ public class Ltl2baRunner {
 
 	public boolean isSuccess(){
 		return success;
+	}
+
+	public void kill() {
+		if (runner!=null) {
+			runner.interrupt();
+			runner=null;
+		}
 	}
 
 	private class ThreadRunner extends Thread {

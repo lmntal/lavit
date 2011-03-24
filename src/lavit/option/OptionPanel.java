@@ -42,6 +42,7 @@ public class OptionPanel extends JPanel {
 
 	private OptionLMNtalPanel optionLMNtalPanel;
 	private OptionUnyoPanel optionUnyoPanel;
+	private OptionCompilePanel optionCompilePanel;
 	private OptionSlimPanel optionSlimPanel;
 	private OptionSVPanel optionSVPanel;
 	private OptionSVDepthPanel optionSVDepthPanel;
@@ -56,6 +57,9 @@ public class OptionPanel extends JPanel {
 
 		optionUnyoPanel = new OptionUnyoPanel();
 		add(optionUnyoPanel);
+
+		optionCompilePanel = new OptionCompilePanel();
+		add(optionCompilePanel);
 
 		optionSlimPanel = new OptionSlimPanel();
 		add(optionSlimPanel);

@@ -35,7 +35,6 @@
 
 package lavit.option;
 
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -46,29 +45,23 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import lavit.*;
+import lavit.Env;
+import lavit.util.FixFlowLayout;
 
-public class OptionSlimPanel extends JPanel implements ActionListener,DocumentListener {
+public class OptionCompilePanel extends JPanel implements ActionListener,DocumentListener{
 
 	String majorOption[] = {
-			"-t",
-			"--nd",
-			"--dump-lmn",
-			"--dump-inc",
-			"--mem-enc",
-			"--show-proxy",
-			"--hide-ruleset",
-			"--show-transition",
-			"--show-ends",
-			"--hl"
+			"--interpret",
+			"--slimcode",
+			"--hl-opt"
 	};
 	JCheckBox optionCheckBox[] = new JCheckBox[majorOption.length];
 	JTextField optionField = new JTextField(15);
 
-	OptionSlimPanel(){
+	OptionCompilePanel(){
 
-		setLayout(new FlowLayout());
-		setBorder(new TitledBorder("Slim Option"));
+		setLayout(new FixFlowLayout());
+		setBorder(new TitledBorder("Slimcode Compile Option"));
 
 		for(int i=0;i<majorOption.length;++i){
 			optionCheckBox[i] = new JCheckBox(majorOption[i]);
@@ -91,7 +84,7 @@ public class OptionSlimPanel extends JPanel implements ActionListener,DocumentLi
 		}
 		optionField.setText("");
 
-		String[] options = Env.get("SLIM_OPTION").split(" ");
+		String[] options = Env.get("SLIM_LMNTAL_COMPILE_OPTION").split(" ");
 		for(String o : options){
 			boolean exist = false;
 			for(int i=0;i<majorOption.length;++i){
@@ -126,7 +119,7 @@ public class OptionSlimPanel extends JPanel implements ActionListener,DocumentLi
 		if(field.length()>0){
 			newOptions += " " + optionField.getText();
 		}
-		Env.set("SLIM_OPTION",newOptions);
+		Env.set("SLIM_LMNTAL_COMPILE_OPTION",newOptions);
 	}
 
 	public void changedUpdate(DocumentEvent e) {
@@ -140,6 +133,5 @@ public class OptionSlimPanel extends JPanel implements ActionListener,DocumentLi
 	public void removeUpdate(DocumentEvent e) {
 		actionPerformed(null);
 	}
-
 
 }

@@ -321,7 +321,9 @@ public class SlimInstaller implements OuterRunner {
 					bar.setIndeterminate(false);
 					final int progress = (i+1)*5;
 					javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){
-						bar.setValue(progress);
+						if(bar.getValue()<progress){
+							bar.setValue(progress);
+						}
 					}});
 				}
 			}

@@ -252,17 +252,24 @@ public class Env {
     	path = getLinuxStylePath(path);
     	return path;
     }
-
-    static public String getLinuxStylePath(String path){
-    	if(File.separatorChar=='\\'){
-    		path = path.replace('\\','/');
-    		if(path.startsWith("c:/")||path.startsWith("C:/")){
-    			path = "/cygdrive/c/"+path.substring(3);
+    
+    static public String getLinuxStylePath(String path)
+    {
+    	if (File.separatorChar == '\\')
+    	{
+    		path = path.replace('\\', '/');
+    		if (path.contains(":"))
+    		{
+    			String[] part = path.split(":");
+    			if (1 < part.length && !part[0].equals(""))
+    			{
+    				path = "/cygdrive/" + part[0] + part[1];
+    			}
     		}
-        }
+    	}
     	return path;
     }
-
+    
     static public String getLmntalCmd(){
     	String cmd = "java";
 		cmd += " -classpath ";

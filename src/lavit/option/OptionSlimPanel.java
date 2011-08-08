@@ -56,6 +56,7 @@ public class OptionSlimPanel extends JPanel implements ActionListener,DocumentLi
 			"--dump-lmn",
 			"--dump-inc",
 			"--mem-enc",
+			"--delta-mem",
 			"--show-proxy",
 			"--hide-ruleset",
 			"--show-transition",

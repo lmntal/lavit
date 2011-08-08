@@ -53,7 +53,8 @@ public class OptionCompilePanel extends JPanel implements ActionListener,Documen
 	String majorOption[] = {
 			"--interpret",
 			"--slimcode",
-			"--hl-opt"
+			"--hl-opt",
+			"--optimize-slimoptimizer"
 	};
 	JCheckBox optionCheckBox[] = new JCheckBox[majorOption.length];
 	JTextField optionField = new JTextField(15);

@@ -92,7 +92,8 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 		doc.addUndoableEditListener(new RedoUndoListener());
 
 		scrollPane = new JScrollPane(editor);
-		scrollPane.setRowHeaderView(eLine);
+		scrollPane.setRowHeaderView(new LineNumberView(editor));
+		//scrollPane.setRowHeaderView(eLine);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(15);
 		add(scrollPane, BorderLayout.CENTER);
 

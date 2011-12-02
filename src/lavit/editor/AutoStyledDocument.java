@@ -141,4 +141,32 @@ public class AutoStyledDocument extends DefaultStyledDocument{
 
 	}
 
+	// -- タブに関する実装 --
+	
+	private static final class CustomTabSet extends TabSet
+	{
+		private static final long serialVersionUID = 1L;
+
+		private int _width;
+
+		public CustomTabSet(int width)
+		{
+			super(new TabStop[] { new TabStop(width) });
+			_width = width;
+		}
+
+		@Override
+		public TabStop getTabAfter(float x)
+		{
+			return new TabStop((int)Math.ceil(x / _width) * _width);
+		}
+	}
+
+	public void setTabWidth(int width)
+	{
+		TabSet tabSet = new CustomTabSet(width);
+		SimpleAttributeSet attr = new SimpleAttributeSet();
+		StyleConstants.setTabSet(attr, tabSet);
+		setParagraphAttributes(0, getLength(), attr, false);
+	}
 }

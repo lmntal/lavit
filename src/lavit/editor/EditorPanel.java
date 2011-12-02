@@ -310,20 +310,12 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 		buttonPanel.updateFileStatus();
 	}
 
-	private void setTabWidth(JTextPane textPane, int charactersPerTab){
+	private void setTabWidth(JTextPane textPane, int charactersPerTab)
+	{
 		FontMetrics fm = textPane.getFontMetrics( textPane.getFont() );
 		int charWidth = fm.charWidth(' ');
 		int tabWidth = charWidth * charactersPerTab;
-		TabStop[] tabs = new TabStop[20];
-		for (int j=0;j<tabs.length;j++){
-			int tab = j + 1;
-			tabs[j] = new TabStop( tab * tabWidth );
-		}
-		TabSet tabSet = new TabSet(tabs);
-		SimpleAttributeSet attributes = new SimpleAttributeSet();
-		StyleConstants.setTabSet(attributes, tabSet);
-		int length = textPane.getDocument().getLength();
-		textPane.getStyledDocument().setParagraphAttributes(0, length, attributes, false);
+		doc.setTabWidth(tabWidth);
 	}
 
 	private int getLineOfOffset(int offset) throws BadLocationException {

@@ -52,18 +52,16 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.filechooser.FileFilter;
 
+@SuppressWarnings("serial")
 public class EditorPanel extends JPanel implements DocumentListener,KeyListener,CommonFontUser {
 
 	public AutoStyledDocument doc;
-	public JTextPane editor;
+	private JTextPane editor;
 	public UndoManager undoredoManager;
 
 	private JScrollPane scrollPane;
 
 	public EditorButtonPanel buttonPanel;
-
-	private EditerLineComponent eLine;
-	//private Font font;
 
 	private File editorFile;
 	private boolean changed;
@@ -80,8 +78,6 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 		editor.addCaretListener(new RowColumnListener());
 		editor.addKeyListener(this);
 
-		eLine = new EditerLineComponent(editor.getSize().height);
-
 		loadFont();
 		FrontEnd.addFontUser(this);
 
@@ -93,7 +89,6 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 
 		scrollPane = new JScrollPane(editor);
 		scrollPane.setRowHeaderView(new LineNumberView(editor));
-		//scrollPane.setRowHeaderView(eLine);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(15);
 		add(scrollPane, BorderLayout.CENTER);
 
@@ -102,6 +97,11 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 
 		setMinimumSize(new Dimension(0,0));
 
+	}
+
+	public JTextPane getSelectedEditor()
+	{
+		return editor;
 	}
 
 	public File getFile(){
@@ -131,7 +131,6 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 		doc.removeDocumentListener(this);
 		editor.setText("");
 		doc.addDocumentListener(this);
-		eLine.setHeightByLines(getLineCount());
 		doc.colorChange();
 		undoredoManager.discardAllEdits();
 
@@ -153,7 +152,7 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 		}
 	}
 
-	public void openInnerEditorFile(){
+	private void openInnerEditorFile(){
 		try {
 			String encoding = Env.get("EDITER_FILE_READ_ENCODING");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(editorFile), encoding));
@@ -171,7 +170,6 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 			doc.removeDocumentListener(this);
 			editor.setText(buf.toString());
 			doc.addDocumentListener(this);
-			eLine.setHeightByLines(getLineCount());
 			doc.colorChange();
 			undoredoManager.discardAllEdits();
 
@@ -284,12 +282,6 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 	public void loadFont(){
 		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
 		editor.setFont(font);
-		if(eLine!=null){
-			eLine.setFont(font);
-			eLine.setEditorMargin(editor.getMargin());
-			eLine.setHeightByLines(getLineCount());
-			eLine.repaint();
-		}
 		setTabWidth(editor,Env.getInt("EDITER_TAB_SIZE"));
 	}
 
@@ -350,7 +342,6 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 	private void commonUpdate(DocumentEvent e) {
 		if (e.getDocument() == doc) {
 			editorChange(true);
-			eLine.setHeightByLines(getLineCount());
 			if(!e.getClass().getName().equals("javax.swing.text.AbstractDocument$UndoRedoDocumentEvent")){
 				doc.colorUpdate();
 			}
@@ -438,7 +429,6 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 				int pos = editor.getCaretPosition();
 				int line = getLineOfOffset(pos);
 				buttonPanel.setRowColumn(line+1, pos-getLineStartOffset(line)+1);
-				eLine.updateCaretPos(line+1);
 			} catch (BadLocationException ex) {
 				FrontEnd.printException(ex);
 			}

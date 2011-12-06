@@ -278,11 +278,11 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         }else if(src == iExit) {
         	FrontEnd.frontEnd.exit();
         }else if(src == iCopy) {
-        	FrontEnd.mainFrame.editorPanel.editor.copy();
+        	FrontEnd.mainFrame.editorPanel.getSelectedEditor().copy();
         }else if(src == iCut) {
-        	FrontEnd.mainFrame.editorPanel.editor.cut();
+        	FrontEnd.mainFrame.editorPanel.getSelectedEditor().cut();
         }else if(src == iPaste) {
-        	FrontEnd.mainFrame.editorPanel.editor.paste();
+        	FrontEnd.mainFrame.editorPanel.getSelectedEditor().paste();
         }else if(src == iUndo) {
         	FrontEnd.mainFrame.editorPanel.editorUndo();
         }else if(src == iRedo) {

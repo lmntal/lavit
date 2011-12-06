@@ -6,8 +6,13 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
@@ -37,6 +42,26 @@ public class LmnTextPane extends JTextPane
 		});
 		
 		setFont(new Font("Consolas", Font.PLAIN, 12));
+		
+		InputMap im = getInputMap();
+		im.put(KeyStroke.getKeyStroke("control Z"), "undo");
+		im.put(KeyStroke.getKeyStroke("control Y"), "redo");
+		
+		ActionMap am = getActionMap();
+		am.put("undo", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				_doc.undo();
+			}
+		});
+		am.put("redo", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				_doc.redo();
+			}
+		});
 	}
 	
 	public void setTabWidth(int spaces)
@@ -44,6 +69,11 @@ public class LmnTextPane extends JTextPane
 		FontMetrics fm = getFontMetrics(getFont());
 		int width = fm.charWidth('m') * spaces;
 		_doc.setTabWidth(width);
+	}
+	
+	public void clearUndo()
+	{
+		_doc.clearUndo();
 	}
 	
 	// 右端で折り返さないようにする

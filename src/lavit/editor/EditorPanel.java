@@ -35,210 +35,285 @@
 
 package lavit.editor;
 
-import lavit.*;
-import lavit.util.CommonFontUser;
-
-import java.io.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.UndoableEdit;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextPane;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 
+import lavit.Env;
+import lavit.FrontEnd;
+import lavit.Lang;
+import lavit.multiedit.EditorPage;
+import lavit.multiedit.coloring.lexer.TokenLabel;
+import lavit.util.CommonFontUser;
+
 @SuppressWarnings("serial")
-public class EditorPanel extends JPanel implements DocumentListener,KeyListener,CommonFontUser {
-
-	public AutoStyledDocument doc;
-	private JTextPane editor;
-	public UndoManager undoredoManager;
-
-	private JScrollPane scrollPane;
-
+public class EditorPanel extends JPanel implements DocumentListener, KeyListener, CommonFontUser
+{
 	public EditorButtonPanel buttonPanel;
 
-	private File editorFile;
-	private boolean changed;
+	private EditorPage editor;
 
-	public EditorPanel(){
-
+	public EditorPanel()
+	{
 		setLayout(new BorderLayout());
 
-		doc = new AutoStyledDocument();
-
-		editor = new JTextPane();
-		editor.setEditorKit(new NoWrapEditorKit());
-		editor.setDocument(doc);
-		editor.addCaretListener(new RowColumnListener());
+		editor = new EditorPage();
 		editor.addKeyListener(this);
 
 		loadFont();
 		FrontEnd.addFontUser(this);
 
-		undoredoManager = new UndoManager();
-		undoredoManager.setLimit(1000);
-
-		doc.addDocumentListener(this);
-		doc.addUndoableEditListener(new RedoUndoListener());
-
-		scrollPane = new JScrollPane(editor);
-		scrollPane.setRowHeaderView(new LineNumberView(editor));
-		scrollPane.getVerticalScrollBar().setUnitIncrement(15);
-		add(scrollPane, BorderLayout.CENTER);
+		add(editor, BorderLayout.CENTER);
 
 		buttonPanel = new EditorButtonPanel(this);
 		add(buttonPanel, BorderLayout.SOUTH);
 
-		setMinimumSize(new Dimension(0,0));
-
+		setMinimumSize(new Dimension(0, 0));
+		
+		updateHighlight();
+	}
+	
+	public void updateHighlight()
+	{
+		editor.removeAllHighlights();
+		
+		String colortarget = Env.get("COLOR_TARGET");
+		for (String target : colortarget.split("\\s+"))
+		{
+			if (target.equals("comment"))
+			{
+				editor.addHighlight(TokenLabel.COMMENT | TokenLabel.STRING);
+			}
+			else if (target.equals("symbol"))
+			{
+				editor.addHighlight(TokenLabel.OPERATOR);
+			}
+			else if (target.equals("reserved"))
+			{
+				editor.addHighlight(TokenLabel.KEYWORD);
+			}
+		}
+		editor.updateHighlight();
 	}
 
 	public JTextPane getSelectedEditor()
 	{
-		return editor;
+		return editor.getJTextPane();
 	}
 
-	public File getFile(){
-		return editorFile;
+	public File getFile()
+	{
+		return editor.getFile();
 	}
 
-	public void firstFileOpen(){
+	/**
+	 * first.lmn を開く
+	 */
+	public void firstFileOpen()
+	{
 		File first = new File("first.lmn");
-		if(first.exists()){
-			editorFile = first;
-			openInnerEditorFile();
+		if (first.exists())
+		{
+			openInnerEditorFile(first);
 			FrontEnd.mainFrame.toolTab.ltlPanel.loadFile("0");
-		}else{
-			editorFile = new File("first.lmn");
-			try{
-				editorFile.createNewFile();
-			}catch(Exception e){
+		}
+		else
+		{
+			try
+			{
+				first.createNewFile();
+			}
+			catch(Exception e)
+			{
 				FrontEnd.printException(e);
 			}
-			editorChange(false);
 			FrontEnd.println("(EDITOR) new file.");
 		}
 	}
 
-	public void newFileOpen(){
-		if(!closeFile()){return;}
-		doc.removeDocumentListener(this);
+	/**
+	 * 新規作成
+	 */
+	public void newFileOpen()
+	{
+		if (!closeFile())
+		{
+			return;
+		}
+		
 		editor.setText("");
-		doc.addDocumentListener(this);
-		doc.colorChange();
-		undoredoManager.discardAllEdits();
+		editor.clearUndo();
+		editor.setFile(null);
+		editor.setModified(false);
 
-		File newfile;
-	    for(int i=0;(newfile = new File("untitled"+i+".lmn")).exists();i++);
-
-		editorFile = newfile;
-		editorChange(false);
 		FrontEnd.println("(EDITOR) new file.");
 	}
 
-	public void fileOpen(){
-		if(!closeFile()){return;}
+	/**
+	 * ファイルを開く
+	 */
+	public void fileOpen()
+	{
+		if (!closeFile())
+		{
+			return;
+		}
+		
 		File file = chooseOpenFile();
-		if (file!=null) {
-			editorFile = file;
-			openInnerEditorFile();
+		if (file != null)
+		{
+			openInnerEditorFile(file);
 			FrontEnd.mainFrame.toolTab.ltlPanel.loadFile("0");
 		}
 	}
 
-	private void openInnerEditorFile(){
-		try {
+	private void openInnerEditorFile(File file)
+	{
+		try
+		{
 			String encoding = Env.get("EDITER_FILE_READ_ENCODING");
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(editorFile), encoding));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
 
-			StringBuffer buf = new StringBuffer("");
-			String strLine;
-			if((strLine = reader.readLine()) != null){
-				buf.append(strLine);
+			StringBuffer buf = new StringBuffer();
+			String line;
+			if((line = reader.readLine()) != null)
+			{
+				buf.append(line);
 			}
-			while ((strLine = reader.readLine()) != null) {
-				buf.append("\r\n" + strLine);
+			while ((line = reader.readLine()) != null)
+			{
+				buf.append("\r\n");
+				buf.append(line);
 			}
 			reader.close();
 
-			doc.removeDocumentListener(this);
 			editor.setText(buf.toString());
-			doc.addDocumentListener(this);
-			doc.colorChange();
-			undoredoManager.discardAllEdits();
+			editor.clearUndo();
+			editor.setCaretPosition(0);
+			editor.setModified(false);
+			editor.setFile(file);
 
-			editorChange(false);
-
-			FrontEnd.println("(EDITOR) file open. [ "+editorFile.getName()+" ]");
-		}catch (Exception e) {
+			FrontEnd.println("(EDITOR) file open. [ " + file.getName() + " ]");
+		}
+		catch (Exception e)
+		{
 			FrontEnd.printException(e);
 		}
 	}
 
-	public boolean fileSave(){
-		try {
-			editorFileSave();
-			return true;
-		} catch (IOException e) {
+	/**
+	 * 上書き保存
+	 */
+	public boolean fileSave()
+	{
+		try
+		{
+			if (editor.hasFile())
+			{
+				editorFileSave(editor.getFile());
+				return true;
+			}
+			else
+			{
+				return fileSaveAs();
+			}
+		}
+		catch (IOException e)
+		{
 			FrontEnd.printException(e);
 		}
 		return false;
 	}
 
-	public boolean fileSaveAs(){
+	/**
+	 * 名前を付けて保存
+	 */
+	public boolean fileSaveAs()
+	{
 		File file = chooseWriteFile();
-		if (file!=null) {
-			editorFile = file;
-			try {
-				editorFileSave();
+		if (file != null)
+		{
+			try
+			{
+				editorFileSave(file);
 				return true;
-			} catch (IOException e) {
+			}
+			catch (IOException e)
+			{
 				FrontEnd.printException(e);
 			}
 		}
 		return false;
 	}
 
-	private void editorFileSave() throws IOException{
+	private void editorFileSave(File file) throws IOException
+	{
 		String encoding = Env.get("EDITER_FILE_WRITE_ENCODING");
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(editorFile.getAbsolutePath()), encoding));
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile()), encoding));
 		editor.write(writer);
 		writer.close();
-		editorChange(false);
-		FrontEnd.println("(EDITOR) file save. [ "+editorFile.getName()+" ]");
+		editor.setFile(file);
+		editor.setModified(false);
+		FrontEnd.println("(EDITOR) file save. [ " + file.getName() + " ]");
 	}
 
-	public boolean closeFile(){
-		if (isChanged()) {
+	public boolean closeFile()
+	{
+		if (editor.isModified())
+		{
 			String option[] = { Lang.d[0], Lang.d[1], Lang.d[2] };
-			int r = JOptionPane.showOptionDialog(FrontEnd.mainFrame,editorFile.getName()+Lang.f[2],editorFile.getName(),JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE,null,option,option[0]);
-			if (r == JOptionPane.YES_OPTION) {
+			String title = editor.hasFile() ? editor.getFile().getName() : "untitled";
+			String message = title + Lang.f[2];
+			int r = JOptionPane.showOptionDialog(FrontEnd.mainFrame, message, title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, option, option[0]);
+			if (r == JOptionPane.YES_OPTION)
+			{
 				return fileSave();
-			} else if (r == JOptionPane.CANCEL_OPTION || r == JOptionPane.CLOSED_OPTION) {
+			}
+			else if (r == JOptionPane.CANCEL_OPTION || r == JOptionPane.CLOSED_OPTION)
+			{
 				return false;
 			}
 		}
 		return true;
 	}
 
-	private File chooseOpenFile(){
+	private File chooseOpenFile()
+	{
 		String chooser_dir = Env.get("EDITER_FILE_LAST_CHOOSER_DIR");
-		if(chooser_dir==null){
+		if (chooser_dir == null)
+		{
 			chooser_dir=new File("demo").getAbsolutePath();
-		}else if(!new File(chooser_dir).exists()&&new File("demo").exists()){
+		}
+		else if (!new File(chooser_dir).exists() && new File("demo").exists())
+		{
 			chooser_dir=new File("demo").getAbsolutePath();
 		}
 
 		JFileChooser jfc = new JFileChooser(chooser_dir);
 		jfc.addChoosableFileFilter(new LmnFilter());
 		int r = jfc.showOpenDialog(FrontEnd.mainFrame);
-		if (r != JFileChooser.APPROVE_OPTION) {
+		if (r != JFileChooser.APPROVE_OPTION)
+		{
 			return null;
 		}
 		File file = jfc.getSelectedFile();
@@ -246,70 +321,81 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 		return file;
 	}
 
-	private File chooseWriteFile(){
+	private File chooseWriteFile()
+	{
 		JFileChooser jfc = new JFileChooser(Env.get("EDITER_FILE_LAST_CHOOSER_DIR"));
 		jfc.addChoosableFileFilter(new LmnFilter());
 		File file = null;
-		while(true) {
+		while (true)
+		{
 			int r = jfc.showSaveDialog(FrontEnd.mainFrame);
-			if (r != JFileChooser.APPROVE_OPTION) {
+			if (r != JFileChooser.APPROVE_OPTION)
+			{
 				return null;
 			}
 			file = jfc.getSelectedFile();
 
-			if(!file.exists()&&!file.getAbsolutePath().endsWith(".lmn")){
-				file = new File(file.getAbsolutePath()+".lmn");
+			if (!file.exists() && !file.getAbsolutePath().endsWith(".lmn"))
+			{
+				file = new File(file.getAbsolutePath() + ".lmn");
 			}
 
-			if(file.exists()){
+			if (file.exists())
+			{
 				String option[] = { Lang.d[0], Lang.d[1], Lang.d[2] };
 				r = JOptionPane.showOptionDialog(FrontEnd.mainFrame,file.getName()+Lang.f[0],Lang.f[1],JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE,null,option,option[0]);
-				if (r == JOptionPane.YES_OPTION) {
-					Env.set("EDITER_FILE_LAST_CHOOSER_DIR",file.getParent());
+				if (r == JOptionPane.YES_OPTION)
+				{
+					Env.set("EDITER_FILE_LAST_CHOOSER_DIR", file.getParent());
 					return file;
-				} else if (r == JOptionPane.CANCEL_OPTION || r == JOptionPane.CLOSED_OPTION) {
+				}
+				else if (r == JOptionPane.CANCEL_OPTION || r == JOptionPane.CLOSED_OPTION)
+				{
 					return null;
-				} else {
+				}
+				else
+				{
 					/* もう一度選択 */
 				}
-			}else{
-				Env.set("EDITER_FILE_LAST_CHOOSER_DIR",file.getParent());
+			}
+			else
+			{
+				Env.set("EDITER_FILE_LAST_CHOOSER_DIR", file.getParent());
 				return file;
 			}
 		}
 	}
 
-	public void loadFont(){
+	public void loadFont()
+	{
 		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
 		editor.setFont(font);
-		setTabWidth(editor,Env.getInt("EDITER_TAB_SIZE"));
+		setTabWidth(Env.getInt("EDITER_TAB_SIZE"));
 	}
 
-	public boolean isChanged(){
-		return changed;
+	public boolean isChanged()
+	{
+		return editor.isModified();
 	}
 
-	String getFileName(){
-		if(editorFile==null){
+	String getFileName()
+	{
+		if (!editor.hasFile())
+		{
 			return "";
-		}else{
-			return editorFile.getName();
+		}
+		else
+		{
+			return editor.getFile().getName();
 		}
 	}
 
-	private void editorChange(boolean change){
-		this.changed = change;
-		buttonPanel.updateFileStatus();
-	}
-
-	private void setTabWidth(JTextPane textPane, int charactersPerTab)
+	private void setTabWidth(int charactersPerTab)
 	{
-		FontMetrics fm = textPane.getFontMetrics( textPane.getFont() );
-		int charWidth = fm.charWidth(' ');
-		int tabWidth = charWidth * charactersPerTab;
-		doc.setTabWidth(tabWidth);
+		editor.setTabWidth(charactersPerTab);
 	}
 
+	/*
 	private int getLineOfOffset(int offset) throws BadLocationException {
 		if (offset < 0) {
 			throw new BadLocationException("Can't translate offset to line", -1);
@@ -338,7 +424,9 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 		Element map = doc.getDefaultRootElement();
 		return map.getElementCount();
 	}
+	*/
 
+	/*
 	private void commonUpdate(DocumentEvent e) {
 		if (e.getDocument() == doc) {
 			editorChange(true);
@@ -347,7 +435,9 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 			}
 		}
 	}
+	*/
 
+	/*
 	private void checkIndent(DocumentEvent e){
 		try {
 			if(doc.getText(e.getOffset(),e.getLength()).endsWith("\n")){
@@ -385,39 +475,32 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 			FrontEnd.printException(ex);
 		}
 	}
+	*/
 
 	public void changedUpdate(DocumentEvent e) {
 	}
 
 	public void insertUpdate(DocumentEvent e) {
-		commonUpdate(e);
-		checkIndent(e);
+		//commonUpdate(e);
+		//checkIndent(e);
 	}
 
 	public void removeUpdate(DocumentEvent e) {
-		commonUpdate(e);
+		//commonUpdate(e);
 	}
 
-	public void editorUndo(){
-		try{
-			undoredoManager.undo();
-		} catch (CannotUndoException e) {
-			FrontEnd.printException(e);
-		}
-		redoundoUpdate();
+	public void editorUndo()
+	{
+		//editor.undo();
 	}
 
-	public void editorRedo(){
-		try{
-			undoredoManager.redo();
-		} catch (CannotUndoException e) {
-			FrontEnd.printException(e);
-		}
-		redoundoUpdate();
+	public void editorRedo()
+	{
+		//editor.redo();
 	}
 
 	public void redoundoUpdate(){
-		FrontEnd.mainFrame.mainMenuBar.updateUndoRedo(undoredoManager.canUndo(), undoredoManager.canRedo());
+		//FrontEnd.mainFrame.mainMenuBar.updateUndoRedo(undoredoManager.canUndo(), undoredoManager.canRedo());
 	}
 
 	/**
@@ -425,6 +508,7 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 	 */
 	private class RowColumnListener implements CaretListener{
 		public void caretUpdate(CaretEvent e) {
+			/*
 			try {
 				int pos = editor.getCaretPosition();
 				int line = getLineOfOffset(pos);
@@ -432,16 +516,7 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 			} catch (BadLocationException ex) {
 				FrontEnd.printException(ex);
 			}
-		}
-	}
-
-	/**
-	 * 元に戻す・やり直しのためのリスナー
-	 */
-	private class RedoUndoListener implements UndoableEditListener {
-		public void undoableEditHappened(UndoableEditEvent e) {
-			undoredoManager.addEdit(e.getEdit());
-			redoundoUpdate();
+			*/
 		}
 	}
 
@@ -464,7 +539,8 @@ public class EditorPanel extends JPanel implements DocumentListener,KeyListener,
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(KeyEvent e)
+	{
 		if(e.isControlDown()){
 			switch(e.getKeyCode()){
 			case KeyEvent.VK_SEMICOLON:

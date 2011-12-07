@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.editor;
+package lavit.multiedit;
 
 import java.awt.Color;
 import java.awt.Dimension;

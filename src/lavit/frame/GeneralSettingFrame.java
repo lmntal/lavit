@@ -145,7 +145,7 @@ public class GeneralSettingFrame extends JFrame {
 				}
 			}
 			Env.set("COLOR_TARGET",newOptions);
-			FrontEnd.mainFrame.editorPanel.doc.colorUpdate();
+			FrontEnd.mainFrame.editorPanel.updateHighlight();
 		}
 	}
 

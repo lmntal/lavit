@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.multiedit.coloring;
+package lavit.multiedit.coloring.lexer;
 
 public final class ColorLabel implements Comparable<ColorLabel>
 {

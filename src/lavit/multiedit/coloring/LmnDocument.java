@@ -36,7 +36,9 @@
 package lavit.multiedit.coloring;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.SwingUtilities;
@@ -51,6 +53,7 @@ import javax.swing.text.TabSet;
 import javax.swing.text.TabStop;
 import javax.swing.undo.UndoManager;
 
+import lavit.multiedit.coloring.lexer.ColorLabel;
 import lavit.multiedit.coloring.lexer.Lexer;
 import lavit.multiedit.coloring.lexer.TokenLabel;
 
@@ -60,6 +63,9 @@ public class LmnDocument extends DefaultStyledDocument
 	private TreeSet<ColorLabel> _labels = new TreeSet<ColorLabel>();
 	private List<Integer> _tabs = new ArrayList<Integer>();
 	private int[] _parenPair = null;
+	
+	private boolean _modified;
+	private int _hlFlags;
 	
 	private UndoManager _undo = new UndoManager();
 	
@@ -72,10 +78,12 @@ public class LmnDocument extends DefaultStyledDocument
 		{
 			public void removeUpdate(DocumentEvent e)
 			{
+				setModified(true);
 				reparse();
 			}
 			public void insertUpdate(DocumentEvent e)
 			{
+				setModified(true);
 				try
 				{
 					String ins = getText(e.getOffset(), e.getLength());
@@ -151,6 +159,16 @@ public class LmnDocument extends DefaultStyledDocument
 		_undo.discardAllEdits();
 	}
 	
+	public boolean isModified()
+	{
+		return _modified;
+	}
+	
+	public void setModified(boolean b)
+	{
+		_modified = b;
+	}
+	
 	public TreeSet<ColorLabel> getLabels()
 	{
 		return _labels;
@@ -177,12 +195,22 @@ public class LmnDocument extends DefaultStyledDocument
 		return set;
 	}
 	
-	private void reparse()
+	public void addHighlight(int labelKind)
+	{
+		_hlFlags |= labelKind;
+	}
+	
+	public void removeHighlight(int labelKind)
+	{
+		_hlFlags &= ~labelKind;
+	}
+	
+	public void reparse()
 	{
 		try
 		{
 			String text = getText(0, getLength()).replace("\r\n", "\n");
-			Lexer lexer = new Lexer(text);
+			Lexer lexer = new Lexer(text, _hlFlags);
 			
 			_labels = lexer.lex();
 			

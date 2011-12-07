@@ -1,10 +1,44 @@
+/*
+ *   Copyright (c) 2008, Ueda Laboratory LMNtal Group <lmntal@ueda.info.waseda.ac.jp>
+ *   All rights reserved.
+ *
+ *   Redistribution and use in source and binary forms, with or without
+ *   modification, are permitted provided that the following conditions are
+ *   met:
+ *
+ *    1. Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *    2. Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in
+ *       the documentation and/or other materials provided with the
+ *       distribution.
+ *
+ *    3. Neither the name of the Ueda Laboratory LMNtal Group nor the
+ *       names of its contributors may be used to endorse or promote
+ *       products derived from this software without specific prior
+ *       written permission.
+ *
+ *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ *   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ *   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package lavit.multiedit.coloring.lexer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
-import lavit.multiedit.coloring.ColorLabel;
 import lavit.util.TrieTreeMatcher;
 
 public class Lexer
@@ -86,12 +120,14 @@ public class Lexer
 	private char[] _cs;
 	private int _column;
 	private int _state;
+	private int _flags;
 
-	public Lexer(String text)
+	public Lexer(String text, int flags)
 	{
 		_cs = text.toCharArray();
 		_column = 0;
 		_state = STATE_LMNTAL;
+		_flags = flags;
 	}
 
 	public List<Integer> getTabs()
@@ -262,7 +298,10 @@ public class Lexer
 
 	private void addItem(int start, int length, int label)
 	{
-		_labels.add(new ColorLabel(start, length, label));
+		if ((_flags & label) != 0)
+		{
+			_labels.add(new ColorLabel(start, length, label));
+		}
 	}
 
 	private boolean end()

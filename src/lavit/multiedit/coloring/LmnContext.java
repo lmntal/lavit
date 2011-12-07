@@ -62,6 +62,7 @@ import javax.swing.text.Utilities;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 
+import lavit.multiedit.coloring.lexer.ColorLabel;
 import lavit.multiedit.coloring.lexer.TokenLabel;
 
 @SuppressWarnings("serial")

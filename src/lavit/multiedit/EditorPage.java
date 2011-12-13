@@ -108,6 +108,26 @@ public class EditorPage extends JScrollPane
 		_text.setModified(b);
 	}
 
+	public boolean canUndo()
+	{
+		return _text.canUndo();
+	}
+	
+	public boolean canRedo()
+	{
+		return _text.canRedo();
+	}
+	
+	public void undo()
+	{
+		_text.undo();
+	}
+	
+	public void redo()
+	{
+		_text.redo();
+	}
+	
 	public void clearUndo()
 	{
 		_text.clearUndo();
@@ -145,19 +165,52 @@ public class EditorPage extends JScrollPane
 	public void removeAllHighlights()
 	{
 		_text.removeHighlight(
-				TokenLabel.KEYWORD |
-				TokenLabel.COMMENT |
-				TokenLabel.STRING |
-				TokenLabel.OPERATOR);
+				  TokenLabel.KEYWORD
+				| TokenLabel.COMMENT
+				| TokenLabel.STRING
+				| TokenLabel.OPERATOR);
 	}
 
 	public void addHighlight(int kind)
 	{
 		_text.addHighlight(kind);
 	}
+	
+	/**
+	 * <p>タブ文字の可視性を設定します。</p>
+	 * @param b 可視にする場合は {@code true}
+	 */
+	public void setShowTabs(boolean b)
+	{
+		_text.setShowTabs(b);
+	}
+	
+	/**
+	 * <p>改行文字の可視性を設定します。</p>
+	 * @param b 可視にする場合は {@code true}
+	 */
+	public void setShowEols(boolean b)
+	{
+		_text.setShowEols(b);
+	}
 
 	public void updateHighlight()
 	{
 		_text.updateHighlight();
+	}
+	
+	public void copy()
+	{
+		_text.copy();
+	}
+	
+	public void cut()
+	{
+		_text.cut();
+	}
+	
+	public void paste()
+	{
+		_text.paste();
 	}
 }

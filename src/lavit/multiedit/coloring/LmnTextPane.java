@@ -59,11 +59,10 @@ public class LmnTextPane extends JTextPane
 	public LmnTextPane()
 	{
 		setEditorKit(new LmnEditorKit());
+		setUI(new LmnTextPaneUI(this));
 		
 		_doc = new LmnDocument();
 		setDocument(_doc);
-		
-		setOpaque(false);
 		
 		addCaretListener(new CaretListener()
 		{
@@ -74,6 +73,10 @@ public class LmnTextPane extends JTextPane
 				repaint();
 			}
 		});
+		
+		CustomCaret caret = new CustomCaret();
+		caret.setBlinkRate(getCaret().getBlinkRate());
+		setCaret(caret);
 		
 		InputMap im = getInputMap();
 		im.put(KeyStroke.getKeyStroke("control Z"), "undo");
@@ -101,6 +104,16 @@ public class LmnTextPane extends JTextPane
 		FontMetrics fm = getFontMetrics(getFont());
 		int width = fm.charWidth('m') * spaces;
 		_doc.setTabWidth(width);
+	}
+	
+	public boolean canUndo()
+	{
+		return _doc.canUndo();
+	}
+	
+	public boolean canRedo()
+	{
+		return _doc.canRedo();
 	}
 	
 	public void undo()
@@ -142,6 +155,16 @@ public class LmnTextPane extends JTextPane
 	public void removeHighlight(int labelKind)
 	{
 		_doc.removeHighlight(labelKind);
+	}
+	
+	public void setShowTabs(boolean b)
+	{
+		_doc.setShowTabs(b);
+	}
+	
+	public void setShowEols(boolean b)
+	{
+		_doc.setShowEols(b);
 	}
 	
 	// 右端で折り返さないようにする

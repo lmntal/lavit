@@ -36,9 +36,7 @@
 package lavit.multiedit.coloring;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.SwingUtilities;
@@ -66,6 +64,8 @@ public class LmnDocument extends DefaultStyledDocument
 	
 	private boolean _modified;
 	private int _hlFlags;
+	private boolean _showTabs;
+	private boolean _showEols;
 	
 	private UndoManager _undo = new UndoManager();
 	
@@ -203,6 +203,26 @@ public class LmnDocument extends DefaultStyledDocument
 	public void removeHighlight(int labelKind)
 	{
 		_hlFlags &= ~labelKind;
+	}
+	
+	public boolean getShowTabs()
+	{
+		return _showTabs;
+	}
+	
+	public void setShowTabs(boolean b)
+	{
+		_showTabs = b;
+	}
+	
+	public boolean getShowEols()
+	{
+		return _showEols;
+	}
+	
+	public void setShowEols(boolean b)
+	{
+		_showEols = b;
 	}
 	
 	public void reparse()

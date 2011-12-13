@@ -79,6 +79,8 @@ public class EditorPanel extends JPanel implements DocumentListener, KeyListener
 
 		editor = new EditorPage();
 		editor.addKeyListener(this);
+		editor.setShowTabs(true);
+		editor.setShowEols(true);
 
 		loadFont();
 		FrontEnd.addFontUser(this);

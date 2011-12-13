@@ -76,12 +76,14 @@ public class LmnContext extends StyleContext implements ViewFactory
 
 class LmnView extends PlainView
 {
+	private LmnDocument _doc;
 	private Map<Integer, Color> _colors = new TreeMap<Integer, Color>();
 	private int _marginLeft;
 	
 	public LmnView(Element e)
 	{
 		super(e);
+		_doc = (LmnDocument)getDocument();
 	}
 	
 	public void paint(Graphics g, Shape alloc)
@@ -94,7 +96,12 @@ class LmnView extends PlainView
 		_marginLeft = alloc.getBounds().x;
 		
 		drawParenPair(g, alloc);
-		drawTabs(g, alloc);
+		
+		if (_doc.getShowTabs())
+		{
+			drawTabs(g, alloc);
+		}
+		
 		super.paint(g, alloc);
 	}
 	
@@ -169,7 +176,7 @@ class LmnView extends PlainView
 			x = Utilities.drawTabbedText(lb, x, y, g, this, 0);
 		}
 		
-		if (p0 < p1)
+		if (_doc.getShowEols() && p0 < p1)
 		{
 			String eol = doc.getText(p1 - 1, 1);
 			if (eol.charAt(0) == '\n')
@@ -208,16 +215,14 @@ class LmnView extends PlainView
 		int h = fm.getHeight();
 		try
 		{
+			g.setColor(new Color(255, 200, 100));
+			
 			for (ColorLabel c : parens)
 			{
 				Shape s = modelToView(c.getStart(), alloc, Bias.Backward);
 				Rectangle rc = s.getBounds();
 				
-				g.setColor(new Color(255, 200, 100));
 				g.fillRect(rc.x, rc.y, w, h);
-				
-				g.setColor(new Color(205, 150, 50));
-				g.drawRect(rc.x, rc.y, w - 1, h - 1);
 			}
 		}
 		catch (BadLocationException e)

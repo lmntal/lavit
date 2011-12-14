@@ -45,10 +45,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Element;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.TabSet;
-import javax.swing.text.TabStop;
 import javax.swing.undo.UndoManager;
 
 import lavit.multiedit.coloring.lexer.ColorLabel;
@@ -61,11 +57,13 @@ public class LmnDocument extends DefaultStyledDocument
 	private TreeSet<ColorLabel> _labels = new TreeSet<ColorLabel>();
 	private List<Integer> _tabs = new ArrayList<Integer>();
 	private int[] _parenPair = null;
+	private int _tabWidth = 8;
 	
 	private boolean _modified;
 	private int _hlFlags;
 	private boolean _showTabs;
 	private boolean _showEols;
+	private boolean _enableIndent = true;
 	
 	private UndoManager _undo = new UndoManager();
 	
@@ -84,48 +82,19 @@ public class LmnDocument extends DefaultStyledDocument
 			public void insertUpdate(DocumentEvent e)
 			{
 				setModified(true);
-				try
+				if (_enableIndent)
 				{
-					String ins = getText(e.getOffset(), e.getLength());
-					if (ins.endsWith("\n"))
-					{
-						Element elem = getParagraphElement(e.getOffset() - 1);
-						String prevLine = getText(elem.getStartOffset(), elem.getEndOffset() - elem.getStartOffset());
-						String indent = "";
-						for (int i = 0; i < prevLine.length(); i++)
-						{
-							char c = prevLine.charAt(i);
-							if (c != ' ' && c != '\t') break;
-							indent += c;
-						}
-						
-						final String fs = indent;
-						final int pos = e.getOffset() + e.getLength();
-						
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								try
-								{
-									insertString(pos, fs, null);
-								}
-								catch (BadLocationException e)
-								{
-									e.printStackTrace();
-								}
-							}
-						});
-					}
-				}
-				catch (BadLocationException e1)
-				{
-					e1.printStackTrace();
+					autoIndent(e.getOffset(), e.getLength());
 				}
 				reparse();
 			}
 			public void changedUpdate(DocumentEvent e) { }
 		});
+	}
+	
+	public void setAutoIndent(boolean enabled)
+	{
+		_enableIndent = enabled;
 	}
 	
 	public boolean canUndo()
@@ -242,31 +211,56 @@ public class LmnDocument extends DefaultStyledDocument
 			e.printStackTrace();
 		}
 	}
-	
-	// Implementation of tab setting.
-	
-	private static final class CustomTabSet extends TabSet
+
+	public void setTabWidth(int spaces)
 	{
-		private int _width;
-
-		public CustomTabSet(int width)
-		{
-			super(new TabStop[] { new TabStop(width) });
-			_width = width;
-		}
-
-		@Override
-		public TabStop getTabAfter(float x)
-		{
-			return new TabStop((int)Math.ceil(x / _width) * _width);
-		}
+		_tabWidth = spaces;
 	}
 
-	public void setTabWidth(int width)
+	public int getTabWidth()
 	{
-		TabSet tabSet = new CustomTabSet(width);
-		SimpleAttributeSet attr = new SimpleAttributeSet();
-		StyleConstants.setTabSet(attr, tabSet);
-		setParagraphAttributes(0, getLength(), attr, false);
+		return _tabWidth;
+	}
+	
+	private void autoIndent(int offset, int length)
+	{
+		try
+		{
+			String ins = getText(offset, length);
+			if (ins.endsWith("\n"))
+			{
+				Element elem = getParagraphElement(offset - 1);
+				String prevLine = getText(elem.getStartOffset(), elem.getEndOffset() - elem.getStartOffset());
+				String indent = "";
+				for (int i = 0; i < prevLine.length(); i++)
+				{
+					char c = prevLine.charAt(i);
+					if (c != ' ' && c != '\t') break;
+					indent += c;
+				}
+				
+				final String fs = indent;
+				final int pos = offset + length;
+				
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						try
+						{
+							insertString(pos, fs, null);
+						}
+						catch (BadLocationException e)
+						{
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		}
+		catch (BadLocationException e1)
+		{
+			e1.printStackTrace();
+		}
 	}
 }

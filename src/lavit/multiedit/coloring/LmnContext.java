@@ -53,11 +53,7 @@ import javax.swing.text.Element;
 import javax.swing.text.PlainView;
 import javax.swing.text.Position.Bias;
 import javax.swing.text.Segment;
-import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
-import javax.swing.text.TabSet;
-import javax.swing.text.TabStop;
 import javax.swing.text.Utilities;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
@@ -107,13 +103,9 @@ class LmnView extends PlainView
 	
 	public float nextTabStop(float x, int tabOffset)
 	{
-		TabSet tabSet = StyleConstants.getTabSet(((StyledDocument)getDocument()).getParagraphElement(0).getAttributes());
-		
-		if (tabSet == null)
-			return x + 10;
-		
-		TabStop tabStop = tabSet.getTabAfter(x + 0.01F);
-		return _marginLeft + tabStop.getPosition();
+		FontMetrics fm = getGraphics().getFontMetrics();
+		int width = fm.charWidth('m') * _doc.getTabWidth();
+		return _marginLeft + (int)Math.ceil(x / width) * width;
 	}
 	
 	protected void updateDamage(DocumentEvent changes, Shape a, ViewFactory f)

@@ -336,18 +336,18 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		{
 			_tabview.setSelectedPage(0);
 			boolean ret = closeSelectedPage();
-			if (ret)
-			{
-				_tabview.closeSelectedPage();
-			}
 			exit_success = exit_success && ret;
 		}
 		return exit_success;
 	}
 	
+	/**
+	 * 選択しているページを閉じる
+	 */
 	public boolean closeSelectedPage()
 	{
 		EditorPage page = _tabview.getSelectedPage();
+		boolean ret = true;
 		if (page.isModified())
 		{
 			String option[] = { Lang.d[0], Lang.d[1], Lang.d[2] };
@@ -356,14 +356,18 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 			int r = JOptionPane.showOptionDialog(FrontEnd.mainFrame, message, title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, option, option[0]);
 			if (r == JOptionPane.YES_OPTION)
 			{
-				return fileSave();
+				ret = fileSave();
 			}
 			else if (r == JOptionPane.CANCEL_OPTION || r == JOptionPane.CLOSED_OPTION)
 			{
-				return false;
+				ret = false;
 			}
 		}
-		return true;
+		if (ret)
+		{
+			_tabview.closeSelectedPage();
+		}
+		return ret;
 	}
 
 	private File chooseOpenFile()

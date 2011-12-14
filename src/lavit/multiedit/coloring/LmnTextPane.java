@@ -37,7 +37,6 @@ package lavit.multiedit.coloring;
 
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -103,9 +102,7 @@ public class LmnTextPane extends JTextPane
 	
 	public void setTabWidth(int spaces)
 	{
-		FontMetrics fm = getFontMetrics(getFont());
-		int width = fm.charWidth('m') * spaces;
-		_doc.setTabWidth(width);
+		_doc.setTabWidth(spaces);
 	}
 	
 	public boolean canUndo()
@@ -184,6 +181,8 @@ public class LmnTextPane extends JTextPane
 		Rectangle bounds = g.getClipBounds();
 		g.setColor(Color.WHITE);
 		g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+		
+		// paint line highlight
 		try
 		{
 			Rectangle rc0 = modelToView(0);
@@ -205,7 +204,15 @@ public class LmnTextPane extends JTextPane
 		}
 		super.paintComponent(g);
 	}
-	
+
+	public void setText(String text)
+	{
+		// ユーザによる編集ではないため、一時的にオートインデントを無効化
+		_doc.setAutoIndent(false);
+		super.setText(text);
+		_doc.setAutoIndent(true);
+	}
+
 	private int[] findParenPair(int caretPos)
 	{
 		String text = getText().replace("\r\n", "\n");

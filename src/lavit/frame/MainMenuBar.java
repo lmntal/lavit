@@ -38,6 +38,7 @@ package lavit.frame;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URI;
@@ -60,6 +61,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
     private JMenuItem iOpen;
     private JMenuItem iSave;
     private JMenuItem iSaveAs;
+    private JMenuItem iClose;
+    private JMenuItem iCloseAll;
     private JMenuItem iSVOpen;
     private JMenuItem iExit;
 
@@ -118,6 +121,16 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         file.add(iSaveAs);
         iSaveAs.addActionListener(this);
         iSaveAs.setMnemonic(KeyEvent.VK_A);
+        
+        iClose = new JMenuItem("閉じる(C)");
+        file.add(iClose);
+        iClose.addActionListener(this);
+        iClose.setMnemonic(KeyEvent.VK_C);
+
+        iCloseAll = new JMenuItem("すべて閉じる(W)");
+        file.add(iCloseAll);
+        iCloseAll.addActionListener(this);
+        iCloseAll.setMnemonic(KeyEvent.VK_W);
 
         file.addSeparator();
 
@@ -295,6 +308,10 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         	FrontEnd.mainFrame.editorPanel.fileSave();
         }else if(src == iSaveAs) {
         	FrontEnd.mainFrame.editorPanel.fileSaveAs();
+        }else if(src == iClose) {
+        	FrontEnd.mainFrame.editorPanel.closeSelectedPage();
+        }else if(src == iCloseAll) {
+        	FrontEnd.mainFrame.editorPanel.closeFile();
         }else if(src == iSVOpen){
         	FrontEnd.mainFrame.toolTab.statePanel.loadFile();
         }else if(src == iExit) {

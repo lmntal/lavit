@@ -48,6 +48,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import lavit.*;
 
@@ -168,6 +170,26 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         iPaste.addActionListener(this);
         iPaste.setMnemonic(KeyEvent.VK_P);
         iPaste.setAccelerator(KeyStroke.getKeyStroke("control V"));
+        
+        edit.addMenuListener(new MenuListener()
+		{
+			@Override
+			public void menuSelected(MenuEvent e)
+			{
+				iUndo.setEnabled(FrontEnd.mainFrame.editorPanel.canUndo());
+				iRedo.setEnabled(FrontEnd.mainFrame.editorPanel.canRedo());
+			}
+			
+			@Override
+			public void menuDeselected(MenuEvent e)
+			{
+			}
+			
+			@Override
+			public void menuCanceled(MenuEvent e)
+			{
+			}
+		});
 
 
         run = new JMenu(Lang.m[10]);

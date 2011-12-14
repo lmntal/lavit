@@ -38,8 +38,9 @@ package lavit.editor;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -49,10 +50,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -63,69 +70,87 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.multiedit.EditorPage;
+import lavit.multiedit.TabView;
 import lavit.multiedit.coloring.lexer.TokenLabel;
 import lavit.util.CommonFontUser;
 
 @SuppressWarnings("serial")
-public class EditorPanel extends JPanel implements DocumentListener, KeyListener, CommonFontUser
+public class EditorPanel extends JPanel implements DocumentListener, CommonFontUser
 {
 	public EditorButtonPanel buttonPanel;
 
-	private EditorPage editor;
+	private TabView _tabview;
+	private int _hlFlags;
 
 	public EditorPanel()
 	{
 		setLayout(new BorderLayout());
 
-		editor = new EditorPage();
-		editor.addKeyListener(this);
-		editor.setShowTabs(true);
-		editor.setShowEols(true);
-
+		_tabview = new TabView();
+		
 		loadFont();
 		FrontEnd.addFontUser(this);
 
-		add(editor, BorderLayout.CENTER);
+		add(_tabview, BorderLayout.CENTER);
 
 		buttonPanel = new EditorButtonPanel(this);
 		add(buttonPanel, BorderLayout.SOUTH);
 
 		setMinimumSize(new Dimension(0, 0));
-		
+
 		updateHighlight();
+
+		InputMap im = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_DOWN_MASK), "mag_font");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, InputEvent.CTRL_DOWN_MASK), "mag_font");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SEMICOLON, InputEvent.CTRL_DOWN_MASK), "mag_font");
+
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK), "min_font");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK), "min_font");
+
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK), "def_font");
+
+		ActionMap am = getActionMap();
+		am.put("mag_font", getScaleUpAction());
+		am.put("min_font", getScaleDownAction());
+		am.put("def_font", getScaleDefaultAction());
 	}
-	
+
 	public void updateHighlight()
 	{
-		editor.removeAllHighlights();
-		
 		String colortarget = Env.get("COLOR_TARGET");
+		_hlFlags = 0;
 		for (String target : colortarget.split("\\s+"))
 		{
 			if (target.equals("comment"))
 			{
-				editor.addHighlight(TokenLabel.COMMENT | TokenLabel.STRING);
+				_hlFlags |= TokenLabel.COMMENT;
+				_hlFlags |= TokenLabel.STRING;
 			}
 			else if (target.equals("symbol"))
 			{
-				editor.addHighlight(TokenLabel.OPERATOR);
+				_hlFlags |= TokenLabel.OPERATOR;
 			}
 			else if (target.equals("reserved"))
 			{
-				editor.addHighlight(TokenLabel.KEYWORD);
+				_hlFlags |= TokenLabel.KEYWORD;
 			}
 		}
-		editor.updateHighlight();
+		for (EditorPage page : _tabview.getPages())
+		{
+			page.removeAllHighlights();
+			page.addHighlight(_hlFlags);
+		}
 	}
 
 	public JTextPane getSelectedEditor()
 	{
-		return editor.getJTextPane();
+		return _tabview.getSelectedPage().getJTextPane();
 	}
 
 	public File getFile()
 	{
-		return editor.getFile();
+		return _tabview.getSelectedPage().getFile();
 	}
 
 	/**
@@ -158,15 +183,15 @@ public class EditorPanel extends JPanel implements DocumentListener, KeyListener
 	 */
 	public void newFileOpen()
 	{
-		if (!closeFile())
-		{
-			return;
-		}
-		
-		editor.setText("");
-		editor.clearUndo();
-		editor.setFile(null);
-		editor.setModified(false);
+		EditorPage page = new EditorPage();
+		_tabview.addPage(page, "untitled", "untitled");
+		page.addHighlight(_hlFlags);
+		page.setShowTabs(true);
+		page.setShowEols(true);
+		page.setText("");
+		page.clearUndo();
+		page.setFile(null);
+		page.setModified(false);
 
 		FrontEnd.println("(EDITOR) new file.");
 	}
@@ -176,11 +201,6 @@ public class EditorPanel extends JPanel implements DocumentListener, KeyListener
 	 */
 	public void fileOpen()
 	{
-		if (!closeFile())
-		{
-			return;
-		}
-		
 		File file = chooseOpenFile();
 		if (file != null)
 		{
@@ -209,11 +229,16 @@ public class EditorPanel extends JPanel implements DocumentListener, KeyListener
 			}
 			reader.close();
 
-			editor.setText(buf.toString());
-			editor.clearUndo();
-			editor.setCaretPosition(0);
-			editor.setModified(false);
-			editor.setFile(file);
+			EditorPage page = new EditorPage();
+			_tabview.addPage(page, file.getName(), file.getAbsolutePath());
+			page.addHighlight(_hlFlags);
+			page.setShowTabs(true);
+			page.setShowEols(true);
+			page.setText(buf.toString());
+			page.setCaretPosition(0);
+			page.setModified(false);
+			page.setFile(file);
+			page.clearUndo();
 
 			FrontEnd.println("(EDITOR) file open. [ " + file.getName() + " ]");
 		}
@@ -228,11 +253,12 @@ public class EditorPanel extends JPanel implements DocumentListener, KeyListener
 	 */
 	public boolean fileSave()
 	{
+		EditorPage page = _tabview.getSelectedPage();
 		try
 		{
-			if (editor.hasFile())
+			if (page.hasFile())
 			{
-				editorFileSave(editor.getFile());
+				editorFileSave(page.getFile());
 				return true;
 			}
 			else
@@ -270,21 +296,62 @@ public class EditorPanel extends JPanel implements DocumentListener, KeyListener
 
 	private void editorFileSave(File file) throws IOException
 	{
+		EditorPage page = _tabview.getSelectedPage();
 		String encoding = Env.get("EDITER_FILE_WRITE_ENCODING");
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile()), encoding));
-		editor.write(writer);
+		page.write(writer);
 		writer.close();
-		editor.setFile(file);
-		editor.setModified(false);
+		page.setFile(file);
+		page.setModified(false);
+		_tabview.setTitle(_tabview.getSelectedIndex(), file.getName(), file.getAbsolutePath());
 		FrontEnd.println("(EDITOR) file save. [ " + file.getName() + " ]");
 	}
 
+	/**
+	 * すべて閉じる
+	 */
 	public boolean closeFile()
 	{
+		/*
 		if (editor.isModified())
 		{
 			String option[] = { Lang.d[0], Lang.d[1], Lang.d[2] };
 			String title = editor.hasFile() ? editor.getFile().getName() : "untitled";
+			String message = title + Lang.f[2];
+			int r = JOptionPane.showOptionDialog(FrontEnd.mainFrame, message, title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, option, option[0]);
+			if (r == JOptionPane.YES_OPTION)
+			{
+				return fileSave();
+			}
+			else if (r == JOptionPane.CANCEL_OPTION || r == JOptionPane.CLOSED_OPTION)
+			{
+				return false;
+			}
+		}
+		return true;
+		*/
+		
+		boolean exit_success = true;
+		while (0 < _tabview.getTabCount())
+		{
+			_tabview.setSelectedPage(0);
+			boolean ret = closeSelectedPage();
+			if (ret)
+			{
+				_tabview.closeSelectedPage();
+			}
+			exit_success = exit_success && ret;
+		}
+		return exit_success;
+	}
+	
+	public boolean closeSelectedPage()
+	{
+		EditorPage page = _tabview.getSelectedPage();
+		if (page.isModified())
+		{
+			String option[] = { Lang.d[0], Lang.d[1], Lang.d[2] };
+			String title = page.hasFile() ? page.getFile().getName() : "untitled";
 			String message = title + Lang.f[2];
 			int r = JOptionPane.showOptionDialog(FrontEnd.mainFrame, message, title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, option, option[0]);
 			if (r == JOptionPane.YES_OPTION)
@@ -371,30 +438,43 @@ public class EditorPanel extends JPanel implements DocumentListener, KeyListener
 	public void loadFont()
 	{
 		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
-		editor.setFont(font);
+		_tabview.setFont(font);
 		setTabWidth(Env.getInt("EDITER_TAB_SIZE"));
 	}
 
 	public boolean isChanged()
 	{
-		return editor.isModified();
+		if (_tabview.getTabCount() == 0)
+		{
+			return false;
+		}
+
+		return _tabview.getSelectedPage().isModified();
 	}
 
 	String getFileName()
 	{
-		if (!editor.hasFile())
+		if (_tabview.getTabCount() == 0)
+		{
+			return "";
+		}
+
+		if (!_tabview.getSelectedPage().hasFile())
 		{
 			return "";
 		}
 		else
 		{
-			return editor.getFile().getName();
+			return _tabview.getSelectedPage().getFile().getName();
 		}
 	}
 
 	private void setTabWidth(int charactersPerTab)
 	{
-		editor.setTabWidth(charactersPerTab);
+		for (EditorPage page : _tabview.getPages())
+		{
+			page.setTabWidth(charactersPerTab);
+		}
 	}
 
 	/*
@@ -491,14 +571,32 @@ public class EditorPanel extends JPanel implements DocumentListener, KeyListener
 		//commonUpdate(e);
 	}
 
+	public boolean canUndo()
+	{
+		if (_tabview.getTabCount() > 0)
+		{
+			return _tabview.getSelectedPage().canUndo();
+		}
+		return false;
+	}
+
+	public boolean canRedo()
+	{
+		if (_tabview.getTabCount() > 0)
+		{
+			return _tabview.getSelectedPage().canRedo();
+		}
+		return false;
+	}
+
 	public void editorUndo()
 	{
-		//editor.undo();
+		_tabview.getSelectedPage().undo();
 	}
 
 	public void editorRedo()
 	{
-		//editor.redo();
+		_tabview.getSelectedPage().redo();
 	}
 
 	public void redoundoUpdate(){
@@ -522,73 +620,91 @@ public class EditorPanel extends JPanel implements DocumentListener, KeyListener
 		}
 	}
 
-	private class LmnFilter extends FileFilter{
-
-		public boolean accept(File f){
-			if (f.isDirectory()){
-				return true;
-			}
-			if (f.getName().toLowerCase().endsWith(".lmn")){
-				return true;
-			}else{
-				return false;
-			}
+	private static final class LmnFilter extends FileFilter
+	{
+		public boolean accept(File f)
+		{
+			return f.isDirectory() || f.getName().toLowerCase().endsWith(".lmn");
 		}
 
-		public String getDescription(){
-			return "LMNtal "+Lang.d[5]+" (*.lmn)";
+		public String getDescription()
+		{
+			return "LMNtal " + Lang.d[5] + " (*.lmn)";
 		}
 	}
 
-	@Override
-	public void keyPressed(KeyEvent e)
+	private void scaleUp()
 	{
-		if(e.isControlDown()){
-			switch(e.getKeyCode()){
-			case KeyEvent.VK_SEMICOLON:
-			case KeyEvent.VK_ADD:
-			case KeyEvent.VK_PLUS:
-				for(int i=0;i<Env.FONT_SIZE_LIST.length;++i){
-					if(Env.FONT_SIZE_LIST[i].equals(Env.get("EDITER_FONT_SIZE"))){
-						i++;
-						if(i>=Env.FONT_SIZE_LIST.length){ i = Env.FONT_SIZE_LIST.length-1; }
-						Env.set("EDITER_FONT_SIZE",Env.FONT_SIZE_LIST[i]);
-						FrontEnd.loadAllFont();
-						break;
-					}
+		for (int i = 0; i < Env.FONT_SIZE_LIST.length; i++)
+		{
+			if (Env.FONT_SIZE_LIST[i].equals(Env.get("EDITER_FONT_SIZE")))
+			{
+				i++;
+				if (i >= Env.FONT_SIZE_LIST.length)
+				{
+					i = Env.FONT_SIZE_LIST.length - 1;
 				}
-				break;
-			case KeyEvent.VK_MINUS:
-			case KeyEvent.VK_SUBTRACT:
-				System.out.println("-");
-				for(int i=0;i<Env.FONT_SIZE_LIST.length;++i){
-					if(Env.FONT_SIZE_LIST[i].equals(Env.get("EDITER_FONT_SIZE"))){
-						i--;
-						if(i<0){ i=0; }
-						Env.set("EDITER_FONT_SIZE",Env.FONT_SIZE_LIST[i]);
-						FrontEnd.loadAllFont();
-						break;
-					}
-				}
-				break;
-			case KeyEvent.VK_0:
-				Env.set("EDITER_FONT_SIZE","14");
+				Env.set("EDITER_FONT_SIZE",Env.FONT_SIZE_LIST[i]);
 				FrontEnd.loadAllFont();
 				break;
 			}
 		}
 	}
 
-	@Override
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-
+	private void scaleDown()
+	{
+		for (int i = 0; i < Env.FONT_SIZE_LIST.length; i++)
+		{
+			if (Env.FONT_SIZE_LIST[i].equals(Env.get("EDITER_FONT_SIZE")))
+			{
+				i--;
+				if (i < 0)
+				{
+					i = 0;
+				}
+				Env.set("EDITER_FONT_SIZE",Env.FONT_SIZE_LIST[i]);
+				FrontEnd.loadAllFont();
+				break;
+			}
+		}
 	}
 
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-
+	private void scaleDefault()
+	{
+		Env.set("EDITER_FONT_SIZE","14");
+		FrontEnd.loadAllFont();
 	}
 
+	private Action getScaleUpAction()
+	{
+		return new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				scaleUp();
+			}
+		};
+	}
+
+	private Action getScaleDownAction()
+	{
+		return new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				scaleDown();
+			}
+		};
+	}
+
+	private Action getScaleDefaultAction()
+	{
+		return new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				scaleDefault();
+			}
+		};
+	}
 }

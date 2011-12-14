@@ -50,6 +50,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
+import javax.swing.text.BadLocationException;
 
 @SuppressWarnings("serial")
 public class LmnTextPane extends JTextPane
@@ -59,10 +60,11 @@ public class LmnTextPane extends JTextPane
 	public LmnTextPane()
 	{
 		setEditorKit(new LmnEditorKit());
-		setUI(new LmnTextPaneUI(this));
 		
 		_doc = new LmnDocument();
 		setDocument(_doc);
+		
+		setOpaque(false);
 		
 		addCaretListener(new CaretListener()
 		{
@@ -182,6 +184,25 @@ public class LmnTextPane extends JTextPane
 		Rectangle bounds = g.getClipBounds();
 		g.setColor(Color.WHITE);
 		g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+		try
+		{
+			Rectangle rc0 = modelToView(0);
+			Rectangle rc = modelToView(getCaretPosition());
+			
+			if (rc0 == null || rc == null) return;
+			
+			int x = rc0.x;
+			int y = rc.y;
+			int w = getWidth();
+			int h = rc.height;
+			
+			g.setColor(new Color(240, 240, 255));
+			g.fillRect(x, y, w, h);
+		}
+		catch (BadLocationException e)
+		{
+			e.printStackTrace();
+		}
 		super.paintComponent(g);
 	}
 	

@@ -68,7 +68,7 @@ public class GeneralSettingFrame extends JFrame {
 
 	GeneralSettingFrame(){
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setTitle("LaViT Reboot");
+		setTitle("Preferences");
 		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
         setAlwaysOnTop(true);
         setPreferredSize(new Dimension(500, 400));

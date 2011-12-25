@@ -33,33 +33,43 @@
  *
  */
 
-package lavit.system;
+package lavit.ui;
 
-import java.awt.BorderLayout;
+import javax.swing.BorderFactory;
+import javax.swing.border.Border;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
+/**
+ * <p>Flattened SplitPaneUI.</p>
+ * @author Yuuki SHINOBU
+ * @since December 26, 2011
+ */
+public class FlatSplitPaneUI extends BasicSplitPaneUI
+{
+	public BasicSplitPaneDivider createDefaultDivider()
+	{
+		return new FlatDivider(this);
+	}
 
-import lavit.ui.FlatSplitPaneUI;
-import lavit.util.CommonFontUser;
+	protected void installDefaults()
+	{
+		super.installDefaults();
+		splitPane.setBorder(null);
+	}
 
-public class SystemPanel extends JPanel {
+	private static final class FlatDivider extends BasicSplitPaneDivider
+	{
+		private static final long serialVersionUID = 1L;
 
-	public JSplitPane jsp;
-	public OutputPanel outputPanel;
-	public LogPanel logPanel;
+		public FlatDivider(BasicSplitPaneUI ui)
+		{
+			super(ui);
+			super.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+		}
 
-	public SystemPanel(){
-		setLayout(new BorderLayout());
-
-		outputPanel = new OutputPanel();
-		logPanel = new LogPanel();
-
-		jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT,outputPanel,logPanel);
-		jsp.setUI(new FlatSplitPaneUI());
-		jsp.setOneTouchExpandable(true);
-        jsp.setResizeWeight(0.7);
-
-        add(jsp, BorderLayout.CENTER);
+		public void setBorder(Border b)
+		{
+		}
 	}
 }

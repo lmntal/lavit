@@ -48,6 +48,7 @@ import javax.swing.WindowConstants;
 
 import lavit.Env;
 import lavit.editor.EditorPanel;
+import lavit.ui.FlatSplitPaneUI;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame{
@@ -113,6 +114,7 @@ public class MainFrame extends JFrame{
 
 		double editerPer = Env.getPercentage("WINDOW_EDITER_PERCENTAGE",50);
 		jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, editorPanel, toolTab);
+		jsp.setUI(new FlatSplitPaneUI());
 		jsp.setOneTouchExpandable(true);
         jsp.setResizeWeight(0.5);
         //jsp.setDividerLocation((int)(Env.getInt("WINDOW_WIDTH")*editerPer));

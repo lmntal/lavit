@@ -337,7 +337,13 @@ public class GeneralSettingFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			if(e.getSource()==langComboBox){
 				Env.set("LANG",(String)langComboBox.getSelectedItem());
-				JOptionPane.showMessageDialog(FrontEnd.mainFrame,Lang.f[4],"Change Language",JOptionPane.PLAIN_MESSAGE);
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						JOptionPane.showMessageDialog(GeneralSettingFrame.this,Lang.f[4],"Change Language",JOptionPane.PLAIN_MESSAGE);
+					}
+				});
 			}else{
 				Env.set("LookAndFeel",(String)lookAndFeelComboBox.getSelectedItem());
 				FrontEnd.updateLookAndFeel();

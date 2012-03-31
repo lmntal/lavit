@@ -37,9 +37,6 @@ package lavit.frame;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,43 +44,35 @@ import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 
 import lavit.Env;
-import lavit.FrontEnd;
-import lavit.Lang;
-import lavit.util.FixFlowLayout;
 
-public class VersionFrame extends JFrame implements ActionListener {
-	JButton button;
-
-	String strTable[] = {
-			"LaViT",
-			"Version : "+Env.APP_VERSION,
-			"Date : "+Env.APP_DATE,
-			"",
-			Env.LMNTAL_VERSION,
-			Env.SLIM_VERSION,
-			Env.UNYO_VERSION
+@SuppressWarnings("serial")
+public class VersionFrame extends JDialog
+{
+	private JButton button;
+	private String strTable[] =
+	{
+		"LaViT",
+		"Version : " + Env.APP_VERSION,
+		"Date : " + Env.APP_DATE,
+		"",
+		Env.LMNTAL_VERSION,
+		Env.SLIM_VERSION,
+		Env.UNYO_VERSION
 	};
 
-	VersionFrame(){
+	public VersionFrame()
+	{
 		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
 
+		setTitle("Version information");
 		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setResizable(false);
 		setAlwaysOnTop(true);
 
 	    JPanel panel = new JPanel();
@@ -105,7 +94,14 @@ public class VersionFrame extends JFrame implements ActionListener {
 		panel.add(lPanel);
 
 		button = new JButton("OK");
-		button.addActionListener(this);
+		button.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				dispose();
+			}
+		});
 		button.setAlignmentX(Component.CENTER_ALIGNMENT);
 		panel.add(button);
 
@@ -113,17 +109,6 @@ public class VersionFrame extends JFrame implements ActionListener {
 
 		pack();
 		setLocationRelativeTo(null);
-	    setVisible(true);
-
+	 	setVisible(true);
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object src = e.getSource();
-		if(src==button){
-			dispose();
-		}
-
-	}
-
 }

@@ -45,6 +45,7 @@ import java.util.HashSet;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.WindowConstants;
+import javax.swing.border.Border;
 
 import lavit.Env;
 import lavit.editor.EditorPanel;
@@ -113,7 +114,15 @@ public class MainFrame extends JFrame{
 		toolTab = new ToolTab();
 
 		double editerPer = Env.getPercentage("WINDOW_EDITER_PERCENTAGE",50);
-		jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, editorPanel, toolTab);
+		jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, editorPanel, toolTab)
+		{
+			public void setBorder(Border b)
+			{
+			}
+			public void updateUI()
+			{
+			}
+		};
 		jsp.setUI(new FlatSplitPaneUI());
 		jsp.setOneTouchExpandable(true);
         jsp.setResizeWeight(0.5);

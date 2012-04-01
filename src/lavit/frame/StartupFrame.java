@@ -37,35 +37,27 @@ package lavit.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Insets;
 import java.io.File;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
+import javax.swing.JWindow;
+import javax.swing.SwingUtilities;
 
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
-import lavit.runner.Ltl2baInstaller;
-import lavit.runner.SlimInstaller;
 
-public class StartupFrame extends JFrame {
-
-	public StartupFrame(){
-
+@SuppressWarnings("serial")
+public class StartupFrame extends JWindow
+{
+	public StartupFrame()
+	{
 		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
 
 		//setSize(image.getIconWidth()+30, image.getIconHeight()+30);
-	    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-	    setUndecorated(true);
 	    setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 
 	    JPanel panel = new JPanel();
@@ -87,48 +79,66 @@ public class StartupFrame extends JFrame {
 	    pack();
 	    setLocationRelativeTo(null);
 	    setVisible(true);
-
 	}
 
-	LangSettingFrame langFrame;
-	SlimPathSettingFrame slimFrame;
-	CygwinPathSettingFrame cygwinFrame;
+	// TODO: [refactor] initial settings
+	private LangSettingFrame langFrame;
+	private SlimPathSettingFrame slimFrame;
+	private CygwinPathSettingFrame cygwinFrame;
 
-	public void startEnvSet(){
-
-		if((Env.get("LANG")==null||Env.get("LANG").equals(""))){
-			javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){
-				langFrame = new LangSettingFrame();
-			}});
-			while(langFrame==null||langFrame.isDisplayable()){
+	public void startEnvSet()
+	{
+		if (Env.get("LANG") == null || Env.get("LANG").equals(""))
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					langFrame = new LangSettingFrame();
+				}
+			});
+			while (langFrame == null || langFrame.isDisplayable())
+			{
 				FrontEnd.sleep(200);
 			}
 		}
 
 		Lang.set(Env.get("LANG"));
 
-		if(Env.isWindows()&&!Env.isSet("WINDOWS_CYGWIN_DIR")){
-			javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){
-				cygwinFrame = new CygwinPathSettingFrame();
-			}});
-			while(cygwinFrame==null||cygwinFrame.isDisplayable()){
+		if (Env.isWindows() && !Env.isSet("WINDOWS_CYGWIN_DIR"))
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					cygwinFrame = new CygwinPathSettingFrame();
+				}
+			});
+			while (cygwinFrame == null || cygwinFrame.isDisplayable())
+			{
 				FrontEnd.sleep(200);
 			}
 		}
 
 		File lmntal = new File(Env.LMNTAL_LIBRARY_DIR+File.separator+"bin"+File.separator+"lmntal");
-		if(lmntal.exists()&&!lmntal.canExecute()){
+		if (lmntal.exists() && !lmntal.canExecute())
+		{
 			lmntal.setExecutable(true);
 		}
 
-		if(Env.get("SLIM_EXE_PATH")==null||Env.get("SLIM_EXE_PATH").equals("")){
-			javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){
-				slimFrame = new SlimPathSettingFrame();
-			}});
-			while(slimFrame==null||!slimFrame.isEnd()){
+		if (Env.get("SLIM_EXE_PATH") == null || Env.get("SLIM_EXE_PATH").equals(""))
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					slimFrame = new SlimPathSettingFrame();
+				}
+			});
+			while (slimFrame == null || !slimFrame.isEnd())
+			{
 				FrontEnd.sleep(200);
 			}
 		}
 	}
-
 }

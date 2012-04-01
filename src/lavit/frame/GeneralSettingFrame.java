@@ -41,16 +41,14 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
 import lavit.Env;
@@ -58,7 +56,9 @@ import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.util.FixFlowLayout;
 
-public class GeneralSettingFrame extends JFrame {
+@SuppressWarnings("serial")
+public class GeneralSettingFrame extends JDialog
+{
 	JPanel panel;
 	//SlimLibSettingPanel slimLibSettingPanel;
 	EditorColorPanel editorColorPanel;
@@ -66,8 +66,9 @@ public class GeneralSettingFrame extends JFrame {
 	EncodingSettingPanel encodingSettingPanel;
 	ViewSettingPanel viewSettingPanel;
 
-	GeneralSettingFrame(){
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	GeneralSettingFrame()
+	{
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setTitle("Preferences");
 		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
         setAlwaysOnTop(true);
@@ -291,67 +292,59 @@ public class GeneralSettingFrame extends JFrame {
 		}
 	}
 
-	public class ViewSettingPanel extends JPanel implements ActionListener{
+	private class ViewSettingPanel extends JPanel
+	{
+		private String langList[] = {"jp", "en"};
 
-		String langList[] = {"jp","en"};
-		String lookAndFeelList[] = {"Metal","Motif","Windows","WindowsClassic","SystemDefault"};
+		private JComboBox langComboBox;
+		private JComboBox lookAndFeelComboBox;
 
-		JComboBox lookAndFeelComboBox;
-		JComboBox langComboBox;
-
-		ViewSettingPanel(){
-
+		public ViewSettingPanel()
+		{
 			setLayout(new FixFlowLayout());
 			setBorder(new TitledBorder("View"));
 
 			add(new JLabel("Lang"));
 			langComboBox = new JComboBox(langList);
+			langComboBox.setSelectedItem(Env.get("LANG"));
+			langComboBox.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					Env.set("LANG", (String)langComboBox.getSelectedItem());
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							JOptionPane.showMessageDialog(GeneralSettingFrame.this,Lang.f[4],"Change Language",JOptionPane.PLAIN_MESSAGE);
+						}
+					});
+				}
+			});
 			add(langComboBox);
 
 			add(new JLabel("LookAndFeel"));
-			lookAndFeelComboBox = new JComboBox(lookAndFeelList);
-			add(lookAndFeelComboBox);
-
-			settingInit();
-
-			lookAndFeelComboBox.addActionListener(this);
-			langComboBox.addActionListener(this);
-
-		}
-
-		void settingInit(){
-			for(String str : lookAndFeelList){
-				if(str.equals(Env.get("LookAndFeel"))){
-					lookAndFeelComboBox.setSelectedItem(str);
-					break;
-				}
-			}
-			for(String str : langList){
-				if(str.equals(Env.get("LANG"))){
-					langComboBox.setSelectedItem(str);
-					break;
-				}
-			}
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			if(e.getSource()==langComboBox){
-				Env.set("LANG",(String)langComboBox.getSelectedItem());
-				SwingUtilities.invokeLater(new Runnable()
+			String lafName = Env.get("LookAndFeel");
+			lookAndFeelComboBox = new JComboBox();
+			for (LookAndFeelEntry ent : LookAndFeelEntry.getSupportedLookAndFeelEntries())
+			{
+				lookAndFeelComboBox.addItem(ent);
+				if (lafName.equals(ent.getName()))
 				{
-					public void run()
-					{
-						JOptionPane.showMessageDialog(GeneralSettingFrame.this,Lang.f[4],"Change Language",JOptionPane.PLAIN_MESSAGE);
-					}
-				});
-			}else{
-				Env.set("LookAndFeel",(String)lookAndFeelComboBox.getSelectedItem());
-				FrontEnd.updateLookAndFeel();
-				SwingUtilities.updateComponentTreeUI(FrontEnd.mainFrame);
+					lookAndFeelComboBox.setSelectedItem(ent);
+				}
 			}
+			lookAndFeelComboBox.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					LookAndFeelEntry lafEntry = (LookAndFeelEntry)lookAndFeelComboBox.getSelectedItem();
+					FrontEnd.setLookAndFeel(lafEntry);
+				}
+			});
+			add(lookAndFeelComboBox);
 		}
-
 	}
-
-
 }

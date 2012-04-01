@@ -57,7 +57,7 @@ public class EditorPage extends JScrollPane
 	public EditorPage()
 	{
 		_text = new LmnTextPane();
-		_text.setTransferHandler(null);
+		//_text.setTransferHandler(null);
 
 		setRowHeaderView(new LineNumberView(_text));
 		setViewportView(_text);

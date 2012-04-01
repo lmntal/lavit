@@ -35,15 +35,17 @@
 
 package lavit;
 
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.io.File;
 import java.util.HashSet;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
-import lavit.frame.*;
+import lavit.frame.LookAndFeelEntry;
+import lavit.frame.MainFrame;
+import lavit.frame.StartupFrame;
 import lavit.runner.RebootRunner;
 import lavit.util.CommonFontUser;
 
@@ -51,7 +53,6 @@ public class FrontEnd {
 
 	static public FrontEnd frontEnd;
 	static public MainFrame mainFrame;
-	static public StartupFrame sf;
 
 	static public HashSet<CommonFontUser> fontUsers = new HashSet<CommonFontUser>();
 
@@ -158,6 +159,33 @@ public class FrontEnd {
 
 	}
 
+	public static void setLookAndFeel(LookAndFeelEntry lafEntry)
+	{
+		Env.set("LookAndFeel", lafEntry.getName());
+
+		final String className = lafEntry.getClassName();
+
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				try
+				{
+					UIManager.setLookAndFeel(className);
+					for (Window window : Window.getWindows())
+					{
+						SwingUtilities.updateComponentTreeUI(window);
+					}
+				}
+				catch (Exception e)
+				{
+					FrontEnd.printException(e);
+				}
+			}
+		});
+	}
+
 	static public void addFontUser(CommonFontUser user){
 		fontUsers.add(user);
 	}
@@ -179,28 +207,44 @@ public class FrontEnd {
 
 		new Env();
 
+		StartupFrame sf;
+		
 		//システムのLookAndFeelのエラーに対応
-		FrontEnd.updateLookAndFeel();
-		try{
-			FrontEnd.sf = new StartupFrame();
-		}catch(Exception e){
+		//FrontEnd.updateLookAndFeel();
+		
+		setLookAndFeel(LookAndFeelEntry.getLookAndFeelEntry(Env.get("LookAndFeel")));
+		
+		try
+		{
+			sf = new StartupFrame();
+		}
+		catch (Exception e)
+		{
 			FrontEnd.printException(e);
-			Env.set("LookAndFeel","Metal");
+			Env.set("LookAndFeel", "Metal");
 			FrontEnd.updateLookAndFeel();
-			FrontEnd.sf = new StartupFrame();
+			sf = new StartupFrame();
 		}
 
-		FrontEnd.sf.startEnvSet();
+		sf.startEnvSet();
+		final StartupFrame sf2 = sf;
 
-		javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){
-			try{
-				new FrontEnd(args);
-				FrontEnd.sf.setVisible(false);
-			}catch(Exception e){
-				FrontEnd.printException(e);
-				e.printStackTrace();
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					new FrontEnd(args);
+					sf2.setVisible(false);
+				}
+				catch (Exception e)
+				{
+					FrontEnd.printException(e);
+					e.printStackTrace();
+				}
 			}
-		}});
+		});
 	}
 
 }

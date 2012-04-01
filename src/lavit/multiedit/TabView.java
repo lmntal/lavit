@@ -35,11 +35,22 @@
 
 package lavit.multiedit;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.plaf.LabelUI;
+import javax.swing.plaf.basic.BasicLabelUI;
+
+import lavit.Env;
 
 @SuppressWarnings("serial")
 public class TabView extends JTabbedPane
@@ -68,15 +79,38 @@ public class TabView extends JTabbedPane
 		setSelectedPage(getTabCount() - 1);
 	}
 	
-	public void setTitle(int index, String title, String toolTip)
+	public void setTitle(final int index, String title, String toolTip)
 	{
+		JPanel hp = new JPanel(new BorderLayout());
+		hp.setOpaque(false);
+		
 		// fix header width
 		JLabel header = new JLabel(title);
 		Dimension dim = header.getPreferredSize();
 		dim.width = Math.max(dim.width, 100);
 		header.setPreferredSize(dim);
+		hp.add(header, BorderLayout.CENTER);
 		
-		setTabComponentAt(index, header);
+		Icon icon = new ImageIcon(Env.getImageOfFile("img/tab_icon.png"));
+		JLabel iconLabel = new JLabel(icon);
+		iconLabel.setPreferredSize(new Dimension(16, 16));
+		hp.add(iconLabel, BorderLayout.WEST);
+		
+		/*
+		JButton closeButton = new JButton("x");
+		closeButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent event)
+			{
+				closePage(index);
+			}
+		});
+		closeButton.setBorder(null);
+		closeButton.setPreferredSize(new Dimension(18, 18));
+		hp.add(closeButton, BorderLayout.EAST);
+		//*/
+		
+		setTabComponentAt(index, hp);
 	}
 	
 	public EditorPage getSelectedPage()

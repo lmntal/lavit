@@ -62,8 +62,8 @@ public class ToolTab extends JTabbedPane {
 		systemPanel = new SystemPanel();
 		addTab("System", systemPanel);
 
-		visualPanel = new VisualPanel();
-		addTab("Visual", visualPanel);
+		//visualPanel = new VisualPanel();
+		//addTab("Visual", visualPanel);
 
 		ltlPanel = new LtlPanel();
 		addTab("LTL Model Check", ltlPanel);

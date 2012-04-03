@@ -47,10 +47,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.plaf.LabelUI;
-import javax.swing.plaf.basic.BasicLabelUI;
 
 import lavit.Env;
+import lavit.ui.FlatButton;
 
 @SuppressWarnings("serial")
 public class TabView extends JTabbedPane
@@ -58,7 +57,7 @@ public class TabView extends JTabbedPane
 	public TabView()
 	{
 	}
-	
+
 	public void setFont(Font font)
 	{
 		super.setFont(font);
@@ -67,37 +66,50 @@ public class TabView extends JTabbedPane
 			getComponentAt(i).setFont(font);
 		}
 	}
-	
+
 	public void addPage(EditorPage page, String title, String toolTip)
 	{
 		page.setFont(getFont());
 		page.setTabWidth(4);
-		
+
 		addTab(title, null, page, toolTip);
 		setTitle(getTabCount() - 1, title, toolTip);
-		
+
 		setSelectedPage(getTabCount() - 1);
 	}
-	
+
 	public void setTitle(final int index, String title, String toolTip)
 	{
 		JPanel hp = new JPanel(new BorderLayout());
 		hp.setOpaque(false);
-		
+
 		// fix header width
 		JLabel header = new JLabel(title);
 		Dimension dim = header.getPreferredSize();
 		dim.width = Math.max(dim.width, 100);
 		header.setPreferredSize(dim);
 		hp.add(header, BorderLayout.CENTER);
-		
-		Icon icon = new ImageIcon(Env.getImageOfFile("img/tab_icon.png"));
+
+		Icon icon;
+		if (title.endsWith(".lmn"))
+		{
+			icon = new ImageIcon(Env.getImageOfFile("img/tab_icon_lmn.png"));
+		}
+		else if (title.endsWith(".il") || title.endsWith(".tal"))
+		{
+			icon = new ImageIcon(Env.getImageOfFile("img/tab_icon_il.png"));
+		}
+		else
+		{
+			icon = new ImageIcon(Env.getImageOfFile("img/tab_icon.png"));
+		}
 		JLabel iconLabel = new JLabel(icon);
 		iconLabel.setPreferredSize(new Dimension(16, 16));
 		hp.add(iconLabel, BorderLayout.WEST);
-		
-		/*
-		JButton closeButton = new JButton("x");
+
+		JButton closeButton = new FlatButton();
+		closeButton.setIcon(new ImageIcon(Env.getImageOfFile("img/tab_close_cold.png")));
+		closeButton.setRolloverIcon(new ImageIcon(Env.getImageOfFile("img/tab_close_hot.png")));
 		closeButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent event)
@@ -105,36 +117,34 @@ public class TabView extends JTabbedPane
 				closePage(index);
 			}
 		});
-		closeButton.setBorder(null);
-		closeButton.setPreferredSize(new Dimension(18, 18));
+		closeButton.setPreferredSize(new Dimension(16, 16));
 		hp.add(closeButton, BorderLayout.EAST);
-		//*/
-		
+
 		setTabComponentAt(index, hp);
 	}
-	
+
 	public EditorPage getSelectedPage()
 	{
 		int index = getSelectedIndex();
 		return (EditorPage)getComponentAt(index);
 	}
-	
+
 	public void setSelectedPage(int index)
 	{
 		setSelectedIndex(index);
 		getSelectedPage().requestFocus();
 	}
-	
+
 	public void closePage(int index)
 	{
 		removeTabAt(index);
 	}
-	
+
 	public void closeSelectedPage()
 	{
 		closePage(getSelectedIndex());
 	}
-	
+
 	public EditorPage[] getPages()
 	{
 		EditorPage[] pages = new EditorPage[getTabCount()];

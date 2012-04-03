@@ -35,6 +35,9 @@
 <entry key="m29">General Setting</entry>
 <entry key="m30">Open StateViewer File</entry>
 
+<entry key="m31">Close</entry>
+<entry key="m32">Close All</entry>
+
 <entry key="d0">Yes</entry>
 <entry key="d1">No</entry>
 <entry key="d2">Cancel</entry>
@@ -44,6 +47,7 @@
 <entry key="d6">OK</entry>
 <entry key="d7">END</entry>
 <entry key="d8">Reverse</entry>
+<entry key="d9">LMNtal Intermediate Code</entry>
 
 <entry key="f0"> is already exists. Do you want to overwrite this file ?</entry>
 <entry key="f1">overwrite</entry>

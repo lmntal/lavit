@@ -35,6 +35,9 @@
 <entry key="m29">一般</entry>
 <entry key="m30">StateViewerファイルを開く</entry>
 
+<entry key="m31">閉じる(C)</entry>
+<entry key="m32">すべて閉じる(L)</entry>
+
 <entry key="d0">はい</entry>
 <entry key="d1">いいえ</entry>
 <entry key="d2">キャンセル</entry>
@@ -44,6 +47,7 @@
 <entry key="d6">ＯＫ</entry>
 <entry key="d7">終了</entry>
 <entry key="d8">反転</entry>
+<entry key="d9">LMNtal 中間命令列</entry>
 
 <entry key="f0"> は既に存在します。上書きしますか？</entry>
 <entry key="f1">上書き保存</entry>

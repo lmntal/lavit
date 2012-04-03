@@ -72,12 +72,15 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
     private JMenuItem iPaste;
     public  JMenuItem iUndo;
     public  JMenuItem iRedo;
+    private JMenuItem iTemplate;
 
     private JMenu run;
     private JMenuItem iLMNtal;
     private JMenuItem iLMNtalg;
     private JMenuItem iUNYO;
     private JMenuItem iSLIM;
+    private JMenuItem iILJavaRun;
+    private JMenuItem iILSlimRun;
     private JMenuItem iSViewer;
     private JMenuItem iStateProfiler;
     private JMenuItem iKill;
@@ -122,15 +125,17 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         iSaveAs.addActionListener(this);
         iSaveAs.setMnemonic(KeyEvent.VK_A);
         
-        iClose = new JMenuItem("閉じる(C)");
+        file.addSeparator();
+        
+        iClose = new JMenuItem(Lang.m[31]);
         file.add(iClose);
         iClose.addActionListener(this);
         iClose.setMnemonic(KeyEvent.VK_C);
 
-        iCloseAll = new JMenuItem("すべて閉じる(W)");
+        iCloseAll = new JMenuItem(Lang.m[32]);
         file.add(iCloseAll);
         iCloseAll.addActionListener(this);
-        iCloseAll.setMnemonic(KeyEvent.VK_W);
+        iCloseAll.setMnemonic(KeyEvent.VK_L);
 
         file.addSeparator();
 
@@ -203,7 +208,22 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 			{
 			}
 		});
-
+        
+        /*
+        edit.addSeparator();
+        
+        iTemplate = new JMenuItem("Insert template...");
+        iTemplate.setMnemonic(KeyEvent.VK_T);
+        iTemplate.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				FrontEnd.mainFrame.loadTemplate();
+			}
+		});
+        edit.add(iTemplate);
+		*/
 
         run = new JMenu(Lang.m[10]);
         add(run);
@@ -232,6 +252,36 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         iSLIM.addActionListener(this);
         iSLIM.setMnemonic(KeyEvent.VK_S);
         iSLIM.setAccelerator(KeyStroke.getKeyStroke("F4"));
+        
+        run.addSeparator();
+
+        iILJavaRun = new JMenuItem(Lang.m[33]);
+        run.add(iILJavaRun);
+        iILJavaRun.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				FrontEnd.mainFrame.runAsILCode();
+			}
+		});
+        iILJavaRun.setMnemonic(KeyEvent.VK_I);
+        
+        /*
+        iILSlimRun = new JMenuItem("中間命令列をSLIMで実行(M)");
+        run.add(iILSlimRun);
+        iILSlimRun.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				FrontEnd.mainFrame.runAsILCode();
+			}
+		});
+        iILSlimRun.setMnemonic(KeyEvent.VK_I);
+        */
+        
+        run.addSeparator();
 
         iSViewer = new JMenuItem(Lang.m[15]);
         run.add(iSViewer);

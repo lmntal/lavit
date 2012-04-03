@@ -37,6 +37,7 @@
 
 <entry key="m31">閉じる(C)</entry>
 <entry key="m32">すべて閉じる(L)</entry>
+<entry key="m33">中間命令列を実行(I)</entry>
 
 <entry key="d0">はい</entry>
 <entry key="d1">いいえ</entry>

@@ -415,6 +415,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 			if(lmntalRunner!=null) lmntalRunner.kill();
 			if(slimRunner!=null) slimRunner.kill();
 			if(unyoRunner!=null) unyoRunner.kill();
+			FrontEnd.mainFrame.killILRunner();
 			FrontEnd.mainFrame.toolTab.ltlPanel.ltlButtonPanel.runnerKill();
 			FrontEnd.errPrintln("Kill");
 

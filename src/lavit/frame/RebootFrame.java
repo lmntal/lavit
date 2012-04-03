@@ -35,39 +35,36 @@
 
 package lavit.frame;
 
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
-import lavit.runner.SlimInstaller;
 
-public class RebootFrame extends JFrame  {
+@SuppressWarnings("serial")
+public class RebootFrame extends JDialog
+{
 	private SelectPanel panel;
 
-	public RebootFrame(){
-
+	public RebootFrame()
+	{
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("LaViT Reboot");
 		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
-        setAlwaysOnTop(true);
-        setResizable(false);
+		setAlwaysOnTop(true);
+		setResizable(false);
 
 		panel = new SelectPanel(this);
 		add(panel);
@@ -76,19 +73,27 @@ public class RebootFrame extends JFrame  {
 
 		pack();
 		setLocationRelativeTo(FrontEnd.mainFrame);
-		setVisible(true);
-
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				setVisible(true);
+			}
+		});
 	}
 
-	private class SelectPanel extends JPanel implements ActionListener {
-		private JFrame frame;
+	private class SelectPanel extends JPanel implements ActionListener
+	{
+		private Window frame;
 
 		private JTextField pathInput = new JTextField();
 
 		private JButton reboot = new JButton(Lang.m[27]);
 		private JButton cancel = new JButton(Lang.d[2]);
 
-		SelectPanel(JFrame frame){
+		public SelectPanel(Window frame)
+		{
 			this.frame = frame;
 
 			setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));

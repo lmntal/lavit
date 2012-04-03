@@ -49,6 +49,7 @@ import javax.swing.SwingUtilities;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
+import lavit.util.StringUtils;
 
 @SuppressWarnings("serial")
 public class StartupFrame extends JWindow
@@ -88,7 +89,7 @@ public class StartupFrame extends JWindow
 
 	public void startEnvSet()
 	{
-		if (Env.get("LANG") == null || Env.get("LANG").equals(""))
+		if (StringUtils.nullOrEmpty(Env.get("LANG")))
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
@@ -126,7 +127,7 @@ public class StartupFrame extends JWindow
 			lmntal.setExecutable(true);
 		}
 
-		if (Env.get("SLIM_EXE_PATH") == null || Env.get("SLIM_EXE_PATH").equals(""))
+		if (StringUtils.nullOrEmpty(Env.get("SLIM_EXE_PATH")))
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{

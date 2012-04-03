@@ -44,11 +44,16 @@ import java.util.HashSet;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
+import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
+import javax.swing.text.BadLocationException;
 
 import lavit.Env;
+import lavit.FrontEnd;
 import lavit.editor.EditorPanel;
+import lavit.runner.ILRunner;
+import lavit.runner.PrintLineListener;
 import lavit.ui.FlatSplitPaneUI;
 
 @SuppressWarnings("serial")
@@ -63,6 +68,8 @@ public class MainFrame extends JFrame{
 	
 	private Dimension sizeSave;
 	private Point locationSave;
+
+	private ILRunner ilRunner;
 
 	public MainFrame()
 	{
@@ -156,7 +163,64 @@ public class MainFrame extends JFrame{
 		}
 		super.dispose();
 	}
-	
+
+	public void loadTemplate()
+	{
+		TemplateSelectDialog dialog = TemplateSelectDialog.create(this);
+		dialog.setVisible(true);
+		if (dialog.isAccepted())
+		{
+			String contents = dialog.getTemplateContents();
+			JTextPane textPane = editorPanel.getSelectedEditor();
+			try
+			{
+				textPane.getDocument().insertString(textPane.getCaretPosition(), contents, null);
+			}
+			catch (BadLocationException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void runAsILCode()
+	{
+		if (ilRunner != null) return;
+		
+		if (editorPanel.isChanged())
+		{
+			editorPanel.fileSave();
+		}
+		FrontEnd.mainFrame.toolTab.systemPanel.outputPanel.outputStart("lmntal --stdin-tal", Env.get("LMNTAL_OPTION"), editorPanel.getFile());
+		String s = editorPanel.getSelectedEditor().getText();
+		ILRunner runner = new ILRunner(Env.get("LMNTAL_OPTION"));
+		runner.setStdoutListener(new PrintLineListener()
+		{
+			@Override
+			public void println(String line)
+			{
+				FrontEnd.mainFrame.toolTab.systemPanel.outputPanel.println(line);
+			}
+		});
+		runner.setStderrListener(new PrintLineListener()
+		{
+			@Override
+			public void println(String line)
+			{
+				FrontEnd.mainFrame.toolTab.systemPanel.outputPanel.errPrintln(line);
+			}
+		});
+		runner.exec(s);
+	}
+
+	public void killILRunner()
+	{
+		if (ilRunner != null)
+		{
+			ilRunner.kill();
+		}
+	}
+
 	public void exit()
 	{
 		Env.set("WINDOW_X", locationSave.x);

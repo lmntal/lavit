@@ -159,23 +159,20 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 	public void firstFileOpen()
 	{
 		File first = new File("first.lmn");
-		if (first.exists())
-		{
-			openInnerEditorFile(first);
-			FrontEnd.mainFrame.toolTab.ltlPanel.loadFile("0");
-		}
-		else
+		if (!first.exists())
 		{
 			try
 			{
 				first.createNewFile();
+				FrontEnd.println("(EDITOR) new file.");
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				FrontEnd.printException(e);
 			}
-			FrontEnd.println("(EDITOR) new file.");
 		}
+		openInnerEditorFile(first);
+		FrontEnd.mainFrame.toolTab.ltlPanel.loadFile("0");
 	}
 
 	/**
@@ -216,17 +213,9 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 			String encoding = Env.get("EDITER_FILE_READ_ENCODING");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
 
-			StringBuffer buf = new StringBuffer();
-			String line;
-			if((line = reader.readLine()) != null)
-			{
-				buf.append(line);
-			}
-			while ((line = reader.readLine()) != null)
-			{
-				buf.append("\r\n");
-				buf.append(line);
-			}
+			StringBuilder buf = new StringBuilder();
+			int c;
+			while ((c = reader.read()) != -1) buf.append(Character.toChars(c));
 			reader.close();
 
 			EditorPage page = new EditorPage();
@@ -383,7 +372,9 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		}
 
 		JFileChooser jfc = new JFileChooser(chooser_dir);
-		jfc.addChoosableFileFilter(new LmnFilter());
+		jfc.addChoosableFileFilter(LmnFilter.getInstance());
+		jfc.addChoosableFileFilter(FilterILCode.getInstance());
+		jfc.setFileFilter(LmnFilter.getInstance());
 		int r = jfc.showOpenDialog(FrontEnd.mainFrame);
 		if (r != JFileChooser.APPROVE_OPTION)
 		{
@@ -397,7 +388,9 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 	private File chooseWriteFile()
 	{
 		JFileChooser jfc = new JFileChooser(Env.get("EDITER_FILE_LAST_CHOOSER_DIR"));
-		jfc.addChoosableFileFilter(new LmnFilter());
+		jfc.addChoosableFileFilter(LmnFilter.getInstance());
+		jfc.addChoosableFileFilter(FilterILCode.getInstance());
+		jfc.setFileFilter(LmnFilter.getInstance());
 		File file = null;
 		while (true)
 		{
@@ -408,9 +401,16 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 			}
 			file = jfc.getSelectedFile();
 
-			if (!file.exists() && !file.getAbsolutePath().endsWith(".lmn"))
+			if (!file.exists())
 			{
-				file = new File(file.getAbsolutePath() + ".lmn");
+				if (!file.getName().endsWith(".lmn") && jfc.getFileFilter() == LmnFilter.getInstance())
+				{
+					file = new File(file.getAbsolutePath() + ".lmn");
+				}
+				else if (!file.getName().endsWith(".il") && !file.getName().endsWith(".tal") && jfc.getFileFilter() == FilterILCode.getInstance())
+				{
+					file = new File(file.getAbsolutePath() + ".il");
+				}
 			}
 
 			if (file.exists())
@@ -452,8 +452,7 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		{
 			return false;
 		}
-
-		return _tabview.getSelectedPage().isModified();
+		return !_tabview.getSelectedPage().hasFile() || _tabview.getSelectedPage().isModified();
 	}
 
 	String getFileName()
@@ -624,19 +623,6 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		}
 	}
 
-	private static final class LmnFilter extends FileFilter
-	{
-		public boolean accept(File f)
-		{
-			return f.isDirectory() || f.getName().toLowerCase().endsWith(".lmn");
-		}
-
-		public String getDescription()
-		{
-			return "LMNtal " + Lang.d[5] + " (*.lmn)";
-		}
-	}
-
 	private void scaleUp()
 	{
 		for (int i = 0; i < Env.FONT_SIZE_LIST.length; i++)
@@ -710,5 +696,63 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 				scaleDefault();
 			}
 		};
+	}
+}
+
+/**
+ * <p>File name filter for LMNtal source file.</p>
+ * <p>This class is designed as singleton.</p>
+ */
+final class LmnFilter extends FileFilter
+{
+	private static LmnFilter instance;
+
+	private LmnFilter() { }
+
+	public boolean accept(File f)
+	{
+		return f.isDirectory() || f.getName().toLowerCase().endsWith(".lmn");
+	}
+
+	public String getDescription()
+	{
+		return "LMNtal " + Lang.d[5] + " (*.lmn)";
+	}
+
+	public static LmnFilter getInstance()
+	{
+		if (instance == null) instance = new LmnFilter();
+		return instance;
+	}
+}
+
+/**
+ * <p>File name filter for LMNtal intermediate code file.</p>
+ * <p>This class is designed as singleton.</p>
+ */
+final class FilterILCode extends FileFilter
+{
+	private static FilterILCode instance;
+
+	private FilterILCode() { }
+
+	public boolean accept(File f)
+	{
+		String name = f.getName().toLowerCase();
+		return f.isDirectory() || name.endsWith(".il") || name.endsWith(".tal");
+	}
+
+	public String getDescription()
+	{
+		return Lang.d[9] + " (*.il, *.tal)";
+	}
+
+	public static FilterILCode getInstance()
+	{
+		if (instance == null)
+		{
+			instance = new FilterILCode();
+		}
+		return instance;
 	}
 }

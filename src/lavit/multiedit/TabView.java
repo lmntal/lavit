@@ -73,12 +73,12 @@ public class TabView extends JTabbedPane
 		page.setTabWidth(4);
 
 		addTab(title, null, page, toolTip);
-		setTitle(getTabCount() - 1, title, toolTip);
+		setTitle(page, title, toolTip);
 
 		setSelectedPage(getTabCount() - 1);
 	}
 
-	public void setTitle(final int index, String title, String toolTip)
+	public void setTitle(final EditorPage page, String title, String toolTip)
 	{
 		JPanel hp = new JPanel(new BorderLayout());
 		hp.setOpaque(false);
@@ -114,13 +114,13 @@ public class TabView extends JTabbedPane
 		{
 			public void actionPerformed(ActionEvent event)
 			{
-				closePage(index);
+				closePage(indexOfComponent(page));
 			}
 		});
 		closeButton.setPreferredSize(new Dimension(16, 16));
 		hp.add(closeButton, BorderLayout.EAST);
 
-		setTabComponentAt(index, hp);
+		setTabComponentAt(indexOfComponent(page), hp);
 	}
 
 	public EditorPage getSelectedPage()

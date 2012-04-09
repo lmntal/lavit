@@ -292,7 +292,7 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		writer.close();
 		page.setFile(file);
 		page.setModified(false);
-		_tabview.setTitle(_tabview.getSelectedIndex(), file.getName(), file.getAbsolutePath());
+		_tabview.setTitle(page, file.getName(), file.getAbsolutePath());
 		FrontEnd.println("(EDITOR) file save. [ " + file.getName() + " ]");
 	}
 

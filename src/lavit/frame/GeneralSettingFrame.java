@@ -100,12 +100,15 @@ public class GeneralSettingFrame extends JDialog
 
 	}
 
-	private class EditorColorPanel extends JPanel implements ActionListener{
-		String majorOption[] = {"comment","symbol","reserved"};
-		JCheckBox optionCheckBox[] = new JCheckBox[majorOption.length];
+	private static class EditorColorPanel extends JPanel implements ActionListener
+	{
+		private final String majorOption[] = { "comment", "symbol", "reserved" };
+		private JCheckBox optionCheckBox[] = new JCheckBox[majorOption.length];
+		private JCheckBox optShowEols;
+		private JCheckBox optShowTabs;
 
-		EditorColorPanel(){
-
+		public EditorColorPanel()
+		{
 			setLayout(new FixFlowLayout());
 			setBorder(new TitledBorder("Color"));
 
@@ -118,9 +121,36 @@ public class GeneralSettingFrame extends JDialog
 			for(int i=0;i<majorOption.length;++i){
 				optionCheckBox[i].addActionListener(this);
 			}
+			
+			optShowEols = new JCheckBox("Show Line Delimiters");
+			optShowEols.setSelected(Env.is("SHOW_LINE_DELIMITERS"));
+			add(optShowEols);
+			optShowEols.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					Env.set("SHOW_LINE_DELIMITERS", optShowEols.isSelected());
+					FrontEnd.mainFrame.editorPanel.updateHighlight();
+				}
+			});
+			
+			optShowTabs = new JCheckBox("Show Tabs");
+			optShowTabs.setSelected(Env.is("SHOW_TABS"));
+			add(optShowTabs);
+			optShowTabs.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					Env.set("SHOW_TABS", optShowTabs.isSelected());
+					FrontEnd.mainFrame.editorPanel.updateHighlight();
+				}
+			});
 		}
 
-		void settingInit(){
+		private void settingInit()
+		{
 			for(int i=0;i<majorOption.length;++i){
 				optionCheckBox[i].setSelected(false);
 			}
@@ -134,7 +164,8 @@ public class GeneralSettingFrame extends JDialog
 			}
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e)
+		{
 			String newOptions = "";
 			for(int i=0;i<majorOption.length;++i){
 				if(optionCheckBox[i].isSelected()){

@@ -49,6 +49,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import lavit.Env;
+import lavit.FrontEnd;
 import lavit.ui.FlatButton;
 
 @SuppressWarnings("serial")
@@ -114,7 +115,8 @@ public class TabView extends JTabbedPane
 		{
 			public void actionPerformed(ActionEvent event)
 			{
-				closePage(indexOfComponent(page));
+				setSelectedComponent(page);
+				FrontEnd.mainFrame.editorPanel.closeSelectedPage();
 			}
 		});
 		closeButton.setPreferredSize(new Dimension(16, 16));

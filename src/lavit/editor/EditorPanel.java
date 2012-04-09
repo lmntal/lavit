@@ -140,7 +140,10 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		{
 			page.removeAllHighlights();
 			page.addHighlight(_hlFlags);
+			page.setShowTabs(Env.is("SHOW_TABS"));
+			page.setShowEols(Env.is("SHOW_LINE_DELIMITERS"));
 		}
+		repaint();
 	}
 
 	public JTextPane getSelectedEditor()
@@ -183,8 +186,8 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		EditorPage page = new EditorPage();
 		_tabview.addPage(page, "untitled", "untitled");
 		page.addHighlight(_hlFlags);
-		page.setShowTabs(true);
-		page.setShowEols(true);
+		page.setShowTabs(Env.is("SHOW_TABS"));
+		page.setShowEols(Env.is("SHOW_LINE_DELIMITERS"));
 		page.setText("");
 		page.clearUndo();
 		page.setFile(null);
@@ -221,8 +224,8 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 			EditorPage page = new EditorPage();
 			_tabview.addPage(page, file.getName(), file.getAbsolutePath());
 			page.addHighlight(_hlFlags);
-			page.setShowTabs(true);
-			page.setShowEols(true);
+			page.setShowTabs(Env.is("SHOW_TABS"));
+			page.setShowEols(Env.is("SHOW_LINE_DELIMITERS"));
 			page.setText(buf.toString());
 			page.setCaretPosition(0);
 			page.setModified(false);

@@ -103,9 +103,14 @@ class LmnView extends PlainView
 	
 	public float nextTabStop(float x, int tabOffset)
 	{
-		FontMetrics fm = getGraphics().getFontMetrics();
-		int width = fm.charWidth('m') * _doc.getTabWidth();
-		return _marginLeft + (int)Math.ceil(x / width) * width;
+		Graphics g = getGraphics();
+		if (g != null)
+		{
+			FontMetrics fm = getGraphics().getFontMetrics();
+			int width = fm.charWidth('m') * _doc.getTabWidth();
+			return _marginLeft + (int)Math.ceil(x / width) * width;
+		}
+		return 0;
 	}
 	
 	protected void updateDamage(DocumentEvent changes, Shape a, ViewFactory f)

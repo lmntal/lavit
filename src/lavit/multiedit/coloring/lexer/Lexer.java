@@ -53,6 +53,7 @@ public class Lexer
 	{
 		lmnKwds.add("int");
 		lmnKwds.add("unary");
+		lmnKwds.add("uniq");
 		lmnKwds.add("float");
 		lmnKwds.add("ground");
 		lmnKwds.add("string");

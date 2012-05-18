@@ -273,8 +273,7 @@ public class SlimInstaller implements OuterRunner {
 
 			setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			setAlwaysOnTop(true);
-			//setUndecorated(true);
+			setResizable(false);
 
 		    JPanel panel = new JPanel();
 		    panel.setBackground(new Color(255,255,255));

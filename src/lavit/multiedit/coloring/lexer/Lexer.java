@@ -233,16 +233,23 @@ public class Lexer
 			{
 			case 0:
 				if (peek() == '*')
+				{
 					s = 1;
+				}
+				succ();
 				break;
 			case 1:
 				if (peek() == '/')
+				{
 					s = 2;
+					succ();
+				}
 				else
+				{
 					s = 0;
+				}
 				break;
 			}
-			succ();
 		}
 		addItem(start, _column - start, TokenLabel.COMMENT);
 	}

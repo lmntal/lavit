@@ -35,30 +35,27 @@
 
 package lavit.runner;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -66,60 +63,75 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+import javax.swing.text.Element;
 
 import lavit.Env;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
 import lavit.util.OuterRunner;
 
-public class SlimInstaller implements OuterRunner {
-
+public class SlimInstaller implements OuterRunner
+{
 	private ThreadRunner runner;
 	private boolean success;
 
-	public SlimInstaller(){
+	public SlimInstaller()
+	{
 		this.runner = new ThreadRunner();
 		this.success = false;
 	}
 
-	public void run() {
+	@Override
+	public void run()
+	{
 		runner.start();
 	}
 
-	public boolean isRunning() {
+	@Override
+	public boolean isRunning()
+	{
 		if(runner==null) return false;
 		return true;
 	}
 
-	public void kill() {
-		if (runner!=null) {
+	@Override
+	public void kill()
+	{
+		if (runner!=null)
+		{
 			runner.kill();
 			runner.interrupt();
-			runner=null;
+			runner = null;
 		}
 	}
 
-	public void exit(){
-		runner=null;
+	public void exit()
+	{
+		runner = null;
 	}
 
-	public boolean isSuccess(){
+	public boolean isSuccess()
+	{
 		return success;
 	}
 
-	private class ThreadRunner extends Thread {
+	private class ThreadRunner extends Thread
+	{
 		private Process p;
 		private BufferedReader in;
 		private InstallWindow window;
 
-		ThreadRunner(){
+		public ThreadRunner()
+		{
 			window = new InstallWindow();
 			//new JDialog(window);
 		}
 
-		public void run() {
+		@Override
+		public void run()
+		{
 			try {
 
 				ProcessBuilder pb;
@@ -219,32 +231,39 @@ public class SlimInstaller implements OuterRunner {
 			}
 		}
 
-		ArrayList<String> strList(String str){
-			ArrayList<String> cmdList = new ArrayList<String>();
+		private List<String> strList(String str)
+		{
+			List<String> cmdList = new ArrayList<String>();
 			StringTokenizer st = new StringTokenizer(str);
-			while(st.hasMoreTokens()){
+			while (st.hasMoreTokens())
+			{
 				String s = st.nextToken();
-				if(s.length()>=2&&s.charAt(0)=='"'&&s.charAt(s.length()-1)=='"'){
-					s = s.substring(1,s.length()-1);
+				if (s.length() >= 2 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"')
+				{
+					s = s.substring(1, s.length() - 1);
 				}
 				cmdList.add(s);
 			}
 			return cmdList;
 		}
 
-		private void kill() {
-			if(p!=null) p.destroy();
+		private void kill()
+		{
+			if (p != null) p.destroy();
 		}
-
 	}
 
-	private class InstallWindow extends JFrame implements ActionListener{
+	@SuppressWarnings("serial")
+	private static class InstallWindow extends JFrame implements ActionListener
+	{
+		private static final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
 		private JProgressBar bar;
 		private JTextArea text;
 		private JButton button;
 
-		private String[] progressMatchString = {
+		private String[] progressMatchString =
+		{
 				"checking for a BSD-compatible install",
 				"checking for style of include used by make",
 				"checking for suffix of object files",
@@ -267,24 +286,22 @@ public class SlimInstaller implements OuterRunner {
 				"make install end"
 		};
 
-		InstallWindow(){
-
+		public InstallWindow()
+		{
 			ImageIcon image = new ImageIcon(Env.getImageOfFile("img/slim_c_s.png"));
 
 			setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			setResizable(false);
+			setTitle("Installing SLIM...");
 
 		    JPanel panel = new JPanel();
 		    panel.setBackground(new Color(255,255,255));
 			panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
 			add(panel);
 
-
 			JLabel icon = new JLabel(image);
 			icon.setAlignmentX(Component.CENTER_ALIGNMENT);
 			panel.add(icon);
-
 
 			bar = new JProgressBar(0,100);
 			//bar.setStringPainted(true);
@@ -293,8 +310,8 @@ public class SlimInstaller implements OuterRunner {
 
 			text = new JTextArea();
 			text.setEditable(false);
-			text.setLineWrap(true);
-			text.setFont(new Font(null,Font.PLAIN,11));
+			text.setLineWrap(false);
+			text.setFont(new Font(Font.DIALOG, Font.PLAIN, 11));
 			JScrollPane textScrollPane = new JScrollPane(text);
 			textScrollPane.setPreferredSize(new Dimension(image.getIconWidth(),image.getIconHeight()/2));
 			panel.add(textScrollPane);
@@ -310,10 +327,10 @@ public class SlimInstaller implements OuterRunner {
 			pack();
 			setLocationRelativeTo(null);
 		    setVisible(true);
-
 		}
 
-		private void println(String str){
+		private void println(String str)
+		{
 			//progress bar¤Î½èÍý
 			for(int i=0;i<progressMatchString.length;++i){
 				if(str.startsWith(progressMatchString[i])){
@@ -327,28 +344,32 @@ public class SlimInstaller implements OuterRunner {
 				}
 			}
 
-			SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-			String date = dateFormat.format(new Date());
-			if(str.length()>0){ str = "["+date+"] "+str; }
-
-			text.append(str+"\n");
-			text.setCaretPosition(text.getText().length()-1);
-
+			if (str.length() > 0)
+			{
+				text.append(String.format("[%s] %s\n", DATE_FORMAT.format(new Date()), str));
+				Element elem = text.getDocument().getDefaultRootElement();
+				int offs = elem.getElement(elem.getElementCount() - 1).getStartOffset();
+				text.setCaretPosition(offs);
+			}
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e)
+		{
 			dispose();
 		}
 
-		public void exit(){
-			javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){
-				//bar.setIndeterminate(false);
-				bar.setValue(100);
-				button.setEnabled(true);
-			}});
+		public void exit()
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					//bar.setIndeterminate(false);
+					bar.setValue(100);
+					button.setEnabled(true);
+					setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				}
+			});
 		}
-
 	}
-
-
 }

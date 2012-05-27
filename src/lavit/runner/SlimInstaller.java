@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -119,12 +120,25 @@ public class SlimInstaller implements OuterRunner
 
 	private class ThreadRunner extends Thread
 	{
+		private Icon ICON_SUCCESS;
+		private Icon ICON_FAILED;
+
 		private Process p;
 		private BufferedReader in;
 		private InstallWindow window;
 
 		public ThreadRunner()
 		{
+			if (ICON_SUCCESS == null)
+			{
+				ICON_SUCCESS = new ImageIcon(Env.getImageOfFile("img/icon_success.png"));
+			}
+
+			if (ICON_FAILED == null)
+			{
+				ICON_FAILED = new ImageIcon(Env.getImageOfFile("img/icon_failed.png"));
+			}
+
 			window = new InstallWindow();
 			//new JDialog(window);
 		}
@@ -201,22 +215,24 @@ public class SlimInstaller implements OuterRunner
 				// slim.exe が無かったら例外
 				if(!(new File(Env.getSlimInstallPath()+File.separator+"bin"+File.separator+Env.getSlimBinaryName())).exists()) throw new Exception();
 
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
+				SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
 						window,
 						Lang.w[10],
 						"SLIM INSTALL",
-						JOptionPane.PLAIN_MESSAGE
+						JOptionPane.PLAIN_MESSAGE,
+						ICON_SUCCESS
 				);}});
 
 				success = true;
 
 			}catch(Exception e){
 
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
+				SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
 						window,
 						Lang.w[11],
 						"SLIM INSTALL",
-						JOptionPane.PLAIN_MESSAGE
+						JOptionPane.PLAIN_MESSAGE,
+						ICON_FAILED
 				);}});
 
 				StringWriter sw = new StringWriter();
@@ -336,7 +352,7 @@ public class SlimInstaller implements OuterRunner
 				if(str.startsWith(progressMatchString[i])){
 					bar.setIndeterminate(false);
 					final int progress = (i+1)*5;
-					javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){
+					SwingUtilities.invokeLater(new Runnable(){public void run(){
 						if(bar.getValue()<progress){
 							bar.setValue(progress);
 						}

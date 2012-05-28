@@ -75,11 +75,25 @@ import lavit.util.OuterRunner;
 
 public class SlimInstaller implements OuterRunner
 {
+	private static Icon ICON_SUCCESS;
+	private static Icon ICON_FAILED;
+
 	private ThreadRunner runner;
 	private boolean success;
+	private File slimSourceDir;
 
 	public SlimInstaller()
 	{
+		if (ICON_SUCCESS == null)
+		{
+			ICON_SUCCESS = new ImageIcon(Env.getImageOfFile("img/icon_success.png"));
+		}
+
+		if (ICON_FAILED == null)
+		{
+			ICON_FAILED = new ImageIcon(Env.getImageOfFile("img/icon_failed.png"));
+		}
+
 		this.runner = new ThreadRunner();
 		this.success = false;
 	}
@@ -118,133 +132,119 @@ public class SlimInstaller implements OuterRunner
 		return success;
 	}
 
+	private File getSlimSourceDir()
+	{
+		if (slimSourceDir == null)
+		{
+			slimSourceDir = new File(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfSlim());
+		}
+		return slimSourceDir;
+	}
+
 	private class ThreadRunner extends Thread
 	{
-		private Icon ICON_SUCCESS;
-		private Icon ICON_FAILED;
-
 		private Process p;
-		private BufferedReader in;
 		private InstallWindow window;
 
 		public ThreadRunner()
 		{
-			if (ICON_SUCCESS == null)
-			{
-				ICON_SUCCESS = new ImageIcon(Env.getImageOfFile("img/icon_success.png"));
-			}
-
-			if (ICON_FAILED == null)
-			{
-				ICON_FAILED = new ImageIcon(Env.getImageOfFile("img/icon_failed.png"));
-			}
-
 			window = new InstallWindow();
-			//new JDialog(window);
+		}
+
+		private int execCommand(String cmd)
+		{
+			try
+			{
+				ProcessBuilder pb = new ProcessBuilder(strList(cmd));
+				Env.setProcessEnvironment(pb.environment());
+				pb.directory(getSlimSourceDir());
+				pb.redirectErrorStream(true);
+				p = pb.start();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+				String line;
+				while ((line = reader.readLine()) != null)
+				{
+					window.println(line);
+				}
+				reader.close();
+				p.waitFor();
+				return p.exitValue();
+			}
+			catch (Exception e)
+			{
+				PrintWriter writer = new PrintWriter(new StringWriter());
+				e.printStackTrace(writer);
+				window.println(writer.toString());
+			}
+			return -1;
 		}
 
 		@Override
 		public void run()
 		{
-			try {
+			String shCmd = Env.getBinaryAbsolutePath("sh") + " configure --prefix=" + Env.getSpaceEscape(Env.getSlimInstallLinuxPath() + "/") + " " + Env.get("SLIM_CONFIGURE_OPTION");
+			String makeCmd = Env.getBinaryAbsolutePath("make");
+			String makeInstallCmd = Env.getBinaryAbsolutePath("make") + " install";
+			boolean succeeded = true;
+			int ret;
 
-				ProcessBuilder pb;
-				String str;
-				String shCmd = Env.getBinaryAbsolutePath("sh")+" configure --prefix="+Env.getSpaceEscape(Env.getSlimInstallLinuxPath()+"/")+" "+Env.get("SLIM_CONFIGURE_OPTION");
-				String makeCmd = Env.getBinaryAbsolutePath("make");
-				String makeInstallCmd = Env.getBinaryAbsolutePath("make")+" install";
+			// sh configure起動
+			window.println(shCmd);
+			ret = execCommand(shCmd);
+			window.println("configure end. exit=" + ret + ".\n");
+			succeeded = (ret == 0);
 
-				// sh configure起動
-				window.println(shCmd);
-
-				pb = new ProcessBuilder(strList(shCmd));
-				Env.setProcessEnvironment(pb.environment());
-				pb.directory(new File(Env.LMNTAL_LIBRARY_DIR+File.separator+Env.getDirNameOfSlim()));
-				pb.redirectErrorStream(true);
-				p = pb.start();
-				in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-				while ((str=in.readLine())!=null) {
-					window.println(str);
-				}
-				in.close();
-				p.waitFor();
-				//if(p.exitValue()!=0) throw new Exception("configure error.");
-
-				window.println("configure end. exit="+p.exitValue()+".\n");
-
-
-				// make起動
+			// make起動
+			if (succeeded)
+			{
 				window.println(makeCmd);
-
-				pb = new ProcessBuilder(strList(makeCmd));
-				Env.setProcessEnvironment(pb.environment());
-				pb.directory(new File(Env.LMNTAL_LIBRARY_DIR+File.separator+Env.getDirNameOfSlim()));
-				pb.redirectErrorStream(true);
-				p = pb.start();
-				in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-				while ((str=in.readLine())!=null) {
-					window.println(str);
-				}
-				in.close();
-				p.waitFor();
-
-				window.println("make end. exit="+p.exitValue()+".\n");
-
-
-				// make install起動
-				window.println(makeInstallCmd);
-
-				pb = new ProcessBuilder(strList(makeInstallCmd));
-				Env.setProcessEnvironment(pb.environment());
-				pb.directory(new File(Env.LMNTAL_LIBRARY_DIR+File.separator+Env.getDirNameOfSlim()));
-				pb.redirectErrorStream(true);
-				p = pb.start();
-				in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-				while ((str=in.readLine())!=null) {
-					window.println(str);
-				}
-				in.close();
-				p.waitFor();
-
-				window.println("make install end. exit="+p.exitValue()+".\n");
-
-
-				// slim.exe が無かったら例外
-				if(!(new File(Env.getSlimInstallPath()+File.separator+"bin"+File.separator+Env.getSlimBinaryName())).exists()) throw new Exception();
-
-				SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
-						window,
-						Lang.w[10],
-						"SLIM INSTALL",
-						JOptionPane.PLAIN_MESSAGE,
-						ICON_SUCCESS
-				);}});
-
-				success = true;
-
-			}catch(Exception e){
-
-				SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
-						window,
-						Lang.w[11],
-						"SLIM INSTALL",
-						JOptionPane.PLAIN_MESSAGE,
-						ICON_FAILED
-				);}});
-
-				StringWriter sw = new StringWriter();
-			    e.printStackTrace(new PrintWriter(sw));
-			    window.println(sw.toString());
-
-			}finally{
-
-				window.exit();
-				exit();
-
+				ret = execCommand(makeCmd);
+				window.println("make end. exit=" + ret + ".\n");
+				succeeded = (ret == 0);
 			}
+
+			// make install起動
+			if (succeeded)
+			{
+				window.println(makeInstallCmd);
+				ret = execCommand(makeInstallCmd);
+				window.println("make install end. exit=" + ret + ".\n");
+				succeeded = (ret == 0);
+			}
+
+			// slim.exe が無かったら失敗
+			File slimBin = new File(Env.getSlimInstallPath() + File.separator + "bin" + File.separator + Env.getSlimBinaryName());
+			succeeded = slimBin.exists();
+
+			if (succeeded)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						JOptionPane.showMessageDialog(
+							window, Lang.w[10], "SLIM INSTALL",
+							JOptionPane.PLAIN_MESSAGE, ICON_SUCCESS);
+					}
+				});
+			}
+			else
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						JOptionPane.showMessageDialog(
+							window, Lang.w[11], "SLIM INSTALL",
+							JOptionPane.PLAIN_MESSAGE, ICON_FAILED);
+					}
+				});
+			}
+
+			success = succeeded;
+			window.exit();
+			exit();
 		}
 
 		private List<String> strList(String str)

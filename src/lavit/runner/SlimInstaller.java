@@ -177,7 +177,7 @@ public class SlimInstaller implements OuterRunner
 				e.printStackTrace(writer);
 				window.println(writer.toString());
 			}
-			return -1;
+			return 1;
 		}
 
 		@Override
@@ -214,8 +214,11 @@ public class SlimInstaller implements OuterRunner
 			}
 
 			// slim.exe が無かったら失敗
-			File slimBin = new File(Env.getSlimInstallPath() + File.separator + "bin" + File.separator + Env.getSlimBinaryName());
-			succeeded = slimBin.exists();
+			if (succeeded)
+			{
+				File slimBin = new File(Env.getSlimInstallPath() + File.separator + "bin" + File.separator + Env.getSlimBinaryName());
+				succeeded = slimBin.exists();
+			}
 
 			if (succeeded)
 			{

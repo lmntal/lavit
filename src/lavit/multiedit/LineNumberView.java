@@ -74,7 +74,16 @@ public class LineNumberView extends JComponent
 	private JTextComponent _text;
 	private int            _top;
 	private int            _lineHeight;
+	
+	/**
+	 * <p>設定されたフォントにおける数字の最大幅を保持します。</p>
+	 */
 	private int            _digitWidth;
+	
+	/**
+	 * <p>テキストの最大行数の桁数を保持します。</p>
+	 */
+	private int            _digitCount;
 	
 	public LineNumberView(JTextComponent text)
 	{
@@ -143,22 +152,25 @@ public class LineNumberView extends JComponent
 			_digitWidth = Math.max(fm.charWidth((char)('0' + i)), _digitWidth);
 		}
 		
+		_digitCount = 1 + (int)Math.floor(Math.log10(getLines()));
+		
 		updateSize();
 	}
 	
 	private void updateSize()
 	{
-		Dimension size = new Dimension(5 * _digitWidth + 5, _lineHeight + _text.getHeight());
+		int c = Math.max(_digitCount, 2);
+		Dimension size = new Dimension(1 + c * _digitWidth + 5, _lineHeight + _text.getHeight());
 		setPreferredSize(size);
 		setSize(size);
 	}
 	
-	public void paintComponent(Graphics g)
+	protected void paintComponent(Graphics g)
 	{
 		Rectangle bounds = g.getClipBounds();
-		Element rootElement = _text.getDocument().getDefaultRootElement();
 		int caret = _text.getCaretPosition();
-		int lines = rootElement.getElementCount();
+		int lines = getLines();
+		Element rootElement = _text.getDocument().getDefaultRootElement();
 		int curLine = rootElement.getElementIndex(caret);
 		
 		// background
@@ -195,7 +207,7 @@ public class LineNumberView extends JComponent
 		{
 			String s = Integer.toString(curLine + 1);
 			int w = fm.stringWidth(s);
-			g.drawString(s, getWidth() - w - 5, _top + (curLine + 1) * _lineHeight - fm.getDescent());
+			g.drawString(s, 1 + getWidth() - w - 5, _top + (curLine + 1) * _lineHeight - fm.getDescent());
 		}
 		
 		// line numbers
@@ -208,11 +220,17 @@ public class LineNumberView extends JComponent
 			{
 				String s = Integer.toString(n + 1);
 				int w = fm.stringWidth(s);
-				g.drawString(s, getWidth() - w - 5, y);
+				g.drawString(s, 1 + getWidth() - w - 5, y);
 			}
 			n++;
 		}
 		
 		g2.setRenderingHints(hints);
+	}
+	
+	private int getLines()
+	{
+		Element root = _text.getDocument().getDefaultRootElement();
+		return root.getElementCount();
 	}
 }

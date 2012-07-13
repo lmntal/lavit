@@ -38,7 +38,6 @@ package lavit.ui;
 import java.awt.Color;
 
 import javax.swing.JTextPane;
-import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
@@ -48,8 +47,6 @@ import javax.swing.text.StyleConstants;
 public class ColoredLinePrinter extends JTextPane
 {
 	private static final long serialVersionUID = 1L;
-
-	private static final AttributeSet ATTRIBUTE_PLAIN = new SimpleAttributeSet();
 
 	private int limitLines;
 	private Document doc;
@@ -101,7 +98,7 @@ public class ColoredLinePrinter extends JTextPane
 	{
 		try
 		{
-			doc.insertString(doc.getLength(), "\n", ATTRIBUTE_PLAIN);
+			doc.insertString(doc.getLength(), "\n", null);
 		}
 		catch (BadLocationException e)
 		{

@@ -42,8 +42,8 @@ import java.io.File;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.JWindow;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import lavit.Env;
@@ -51,9 +51,10 @@ import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.util.StringUtils;
 
-@SuppressWarnings("serial")
 public class StartupFrame extends JWindow
 {
+	private static final long serialVersionUID = 1L;
+
 	public StartupFrame()
 	{
 		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
@@ -70,10 +71,9 @@ public class StartupFrame extends JWindow
 		JLabel icon = new JLabel(image);
 		panel.add(icon,BorderLayout.CENTER);
 
-		JTextField text = new JTextField("Version "+Env.APP_VERSION);
-		text.setHorizontalAlignment(JTextField.CENTER);
+		JLabel text = new JLabel("Version "+Env.APP_VERSION);
+		text.setHorizontalAlignment(SwingConstants.CENTER);
 		text.setBackground(new Color(255,255,255));
-		text.setEditable(false);
 	    text.setBorder(null);
 	    panel.add(text,BorderLayout.SOUTH);
 

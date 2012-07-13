@@ -41,9 +41,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
@@ -63,14 +61,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.text.Element;
 
 import lavit.Env;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.ui.ColoredLinePrinter;
 import lavit.util.OuterRunner;
 
 public class SlimInstaller implements OuterRunner
@@ -78,6 +75,8 @@ public class SlimInstaller implements OuterRunner
 	private static Icon ICON_SUCCESS;
 	private static Icon ICON_FAILED;
 
+	private StreamReaderThread outputReader;
+	private StreamReaderThread errorReader;
 	private ThreadRunner runner;
 	private boolean success;
 	private File slimSourceDir;
@@ -158,16 +157,28 @@ public class SlimInstaller implements OuterRunner
 				ProcessBuilder pb = new ProcessBuilder(strList(cmd));
 				Env.setProcessEnvironment(pb.environment());
 				pb.directory(getSlimSourceDir());
-				pb.redirectErrorStream(true);
 				p = pb.start();
-				BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-				String line;
-				while ((line = reader.readLine()) != null)
+				
+				outputReader = new StreamReaderThread(p.getInputStream());
+				outputReader.setPrintLineListener(new PrintLineListener()
 				{
-					window.println(line);
-				}
-				reader.close();
+					public void println(String line)
+					{
+						window.println(line);
+					}
+				});
+				outputReader.start();
+
+				errorReader = new StreamReaderThread(p.getErrorStream());
+				errorReader.setPrintLineListener(new PrintLineListener()
+				{
+					public void println(String line)
+					{
+						window.printError(line);
+					}
+				});
+				errorReader.start();
+				
 				p.waitFor();
 				return p.exitValue();
 			}
@@ -175,7 +186,7 @@ public class SlimInstaller implements OuterRunner
 			{
 				PrintWriter writer = new PrintWriter(new StringWriter());
 				e.printStackTrace(writer);
-				window.println(writer.toString());
+				window.printError(writer.toString());
 			}
 			return 1;
 		}
@@ -273,12 +284,12 @@ public class SlimInstaller implements OuterRunner
 	}
 
 	@SuppressWarnings("serial")
-	private static class InstallWindow extends JFrame implements ActionListener
+	private static class InstallWindow extends JFrame
 	{
 		private static final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
 		private JProgressBar bar;
-		private JTextArea text;
+		private ColoredLinePrinter text;
 		private JButton button;
 
 		private String[] progressMatchString =
@@ -327,16 +338,24 @@ public class SlimInstaller implements OuterRunner
 			bar.setIndeterminate(true);
 			panel.add(bar);
 
-			text = new JTextArea();
+			text = new ColoredLinePrinter();
 			text.setEditable(false);
-			text.setLineWrap(false);
+			//text.setLineWrap(false);
+			text.setBackground(Color.BLACK);
+			text.setForeground(Color.WHITE);
 			text.setFont(new Font(Font.DIALOG, Font.PLAIN, 11));
 			JScrollPane textScrollPane = new JScrollPane(text);
 			textScrollPane.setPreferredSize(new Dimension(image.getIconWidth(),image.getIconHeight()/2));
 			panel.add(textScrollPane);
 
 			button = new JButton("OK");
-			button.addActionListener(this);
+			button.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					dispose();
+				}
+			});
 			button.setEnabled(false);
 			button.setAlignmentX(Component.CENTER_ALIGNMENT);
 			panel.add(button);
@@ -347,12 +366,12 @@ public class SlimInstaller implements OuterRunner
 			setLocationRelativeTo(null);
 		    setVisible(true);
 		}
-
-		private void println(String str)
+		
+		private void progress(String s)
 		{
 			//progress bar¤Î½èÍý
 			for(int i=0;i<progressMatchString.length;++i){
-				if(str.startsWith(progressMatchString[i])){
+				if(s.startsWith(progressMatchString[i])){
 					bar.setIndeterminate(false);
 					final int progress = (i+1)*5;
 					SwingUtilities.invokeLater(new Runnable(){public void run(){
@@ -362,19 +381,29 @@ public class SlimInstaller implements OuterRunner
 					}});
 				}
 			}
+		}
 
+		private void println(String str)
+		{
 			if (str.length() > 0)
 			{
-				text.append(String.format("[%s] %s\n", DATE_FORMAT.format(new Date()), str));
-				Element elem = text.getDocument().getDefaultRootElement();
-				int offs = elem.getElement(elem.getElementCount() - 1).getStartOffset();
-				text.setCaretPosition(offs);
+				progress(str);
+				printColoredLine(str, Color.WHITE);
 			}
 		}
 
-		public void actionPerformed(ActionEvent e)
+		private void printError(String str)
 		{
-			dispose();
+			if (str.length() > 0)
+			{
+				progress(str);
+				printColoredLine(str, Color.GRAY);
+			}
+		}
+		
+		private void printColoredLine(String s, Color c)
+		{
+			text.appendLine(String.format("[%s] %s", DATE_FORMAT.format(new Date()), s), c);
 		}
 
 		public void exit()

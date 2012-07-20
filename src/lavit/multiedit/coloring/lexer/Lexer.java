@@ -58,6 +58,7 @@ public class Lexer
 		lmnKwds.add("ground");
 		lmnKwds.add("string");
 		lmnKwds.add("new");
+		lmnKwds.add("num");
 		lmnKwds.add("hlink");
 
 		javaKwds.add("abstract");

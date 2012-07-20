@@ -39,6 +39,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.io.File;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -63,7 +64,7 @@ public class StartupFrame extends JWindow
 	    setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 
 	    JPanel panel = new JPanel();
-		//panel.setBorder(new LineBorder(new Color(200,200,200), 2, true));
+	    panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		panel.setBackground(new Color(255,255,255));
 		panel.setLayout(new BorderLayout());
 		add(panel);

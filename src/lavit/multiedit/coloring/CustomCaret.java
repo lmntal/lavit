@@ -54,8 +54,7 @@ public class CustomCaret extends DefaultCaret
 {
 	private static final class SelectionPainter implements Highlighter.HighlightPainter
 	{
-		public void paint(Graphics g, int offs0, int offs1, Shape bounds,
-				JTextComponent c)
+		public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c)
 		{
 			Rectangle alloc = bounds.getBounds();
 			try
@@ -94,9 +93,11 @@ public class CustomCaret extends DefaultCaret
 		}
 	}
 
+	private static SelectionPainter painter;
+
 	protected Highlighter.HighlightPainter getSelectionPainter()
 	{
-		return new SelectionPainter();
+		return painter != null ? painter : (painter = new SelectionPainter());
 	}
 
 	protected synchronized void damage(Rectangle r)

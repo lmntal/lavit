@@ -195,7 +195,15 @@ public class LineNumberView extends JComponent
 		
 		Graphics2D g2 = (Graphics2D)g;
 		RenderingHints hints = g2.getRenderingHints();
-		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+		
+		if (g.getFont().getSize() < 24)
+		{
+			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+		}
+		else
+		{
+			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		}
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST, 250);
 		
 		g.setFont(_text.getFont());

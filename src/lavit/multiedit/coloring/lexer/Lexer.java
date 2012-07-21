@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
+import lavit.Env;
 import lavit.util.TrieTreeMatcher;
 
 public class Lexer
@@ -51,15 +52,13 @@ public class Lexer
 
 	static
 	{
-		lmnKwds.add("int");
-		lmnKwds.add("unary");
-		lmnKwds.add("uniq");
-		lmnKwds.add("float");
-		lmnKwds.add("ground");
-		lmnKwds.add("string");
-		lmnKwds.add("new");
-		lmnKwds.add("num");
-		lmnKwds.add("hlink");
+		if (Env.isSet("editor.highlight"))
+		{
+			for (String s : Env.get("editor.highlight").split("\\s+"))
+			{
+				lmnKwds.add(s);
+			}
+		}
 
 		javaKwds.add("abstract");
 		javaKwds.add("assert");

@@ -57,11 +57,11 @@ import java.util.Properties;
 public class Env {
 
 	static public final String APP_NAME = "LaViT";
-	static public final String APP_VERSION = "2.5.2";
-	static public final String APP_DATE = "2012/05/28";
+	static public final String APP_VERSION = "2.5.3";
+	static public final String APP_DATE = "2012/08/10";
 	static public final String APP_HREF = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
 
-	static public final String LMNTAL_VERSION = "LMNtal : 1.20 (2011/01/11)";
+	static public final String LMNTAL_VERSION = "LMNtal : 1.21 (2011/12/26)";
 	static public final String SLIM_VERSION = "SLIM : 2.2.2 (2012/05/12)";
 	static public final String UNYO_VERSION = "UNYO UNYO : 1.1.1 (2010/03/07)";
 

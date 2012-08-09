@@ -35,21 +35,40 @@
 
 package lavit.frame;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.FontUIResource;
 
 import lavit.Env;
 import lavit.FrontEnd;
@@ -59,45 +78,31 @@ import lavit.util.FixFlowLayout;
 @SuppressWarnings("serial")
 public class GeneralSettingFrame extends JDialog
 {
-	JPanel panel;
-	//SlimLibSettingPanel slimLibSettingPanel;
-	EditorColorPanel editorColorPanel;
-	FontSettingPanel fontSettingPanel;
-	EncodingSettingPanel encodingSettingPanel;
-	ViewSettingPanel viewSettingPanel;
-
-	GeneralSettingFrame()
+	public GeneralSettingFrame()
 	{
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setTitle("Preferences");
 		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
-        setAlwaysOnTop(true);
-        setPreferredSize(new Dimension(500, 400));
-        //setResizable(false);
+		setAlwaysOnTop(true);
+		setPreferredSize(new Dimension(500, 400));
 
-        setLayout(new GridLayout(4,1));
+		JPanel panel = new JPanel(new GridLayout(0, 1));
+		panel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 
-        //slimLibSettingPanel = new SlimLibSettingPanel();
-        //add(slimLibSettingPanel);
+		//panel.add(new SlimLibSettingPanel());
+		panel.add(new EditorColorPanel());
+		panel.add(new FontSettingPanel());
+		panel.add(new EncodingSettingPanel());
+		panel.add(new ViewSettingPanel());
+		panel.add(new UIFontSizeSettingPanel());
 
-        editorColorPanel = new EditorColorPanel();
-        add(editorColorPanel);
-
-        fontSettingPanel = new FontSettingPanel();
-        add(fontSettingPanel);
-
-        encodingSettingPanel = new EncodingSettingPanel();
-        add(encodingSettingPanel);
-
-        viewSettingPanel = new ViewSettingPanel();
-        add(viewSettingPanel);
+		add(panel, BorderLayout.CENTER);
 
 		addWindowListener(new ChildWindowListener(this));
 
 		pack();
 		setLocationRelativeTo(FrontEnd.mainFrame);
 		setVisible(true);
-
 	}
 
 	private static class EditorColorPanel extends JPanel implements ActionListener
@@ -112,16 +117,18 @@ public class GeneralSettingFrame extends JDialog
 			setLayout(new FixFlowLayout());
 			setBorder(new TitledBorder("Color"));
 
-			for(int i=0;i<majorOption.length;++i){
+			for (int i = 0; i < majorOption.length; ++i)
+			{
 				optionCheckBox[i] = new JCheckBox(majorOption[i]);
 				add(optionCheckBox[i]);
 			}
 			settingInit();
 
-			for(int i=0;i<majorOption.length;++i){
+			for (int i = 0; i < majorOption.length; ++i)
+			{
 				optionCheckBox[i].addActionListener(this);
 			}
-			
+
 			optShowEols = new JCheckBox("Show Line Delimiters");
 			optShowEols.setSelected(Env.is("SHOW_LINE_DELIMITERS"));
 			add(optShowEols);
@@ -134,7 +141,7 @@ public class GeneralSettingFrame extends JDialog
 					FrontEnd.mainFrame.editorPanel.updateHighlight();
 				}
 			});
-			
+
 			optShowTabs = new JCheckBox("Show Tabs");
 			optShowTabs.setSelected(Env.is("SHOW_TABS"));
 			add(optShowTabs);
@@ -151,13 +158,17 @@ public class GeneralSettingFrame extends JDialog
 
 		private void settingInit()
 		{
-			for(int i=0;i<majorOption.length;++i){
+			for (int i = 0; i < majorOption.length; ++i)
+			{
 				optionCheckBox[i].setSelected(false);
 			}
 			String[] options = Env.get("COLOR_TARGET").split(" ");
-			for(String o : options){
-				for(int i=0;i<majorOption.length;++i){
-					if(majorOption[i].equals(o)){
+			for (String o : options)
+			{
+				for (int i = 0; i < majorOption.length; ++i)
+				{
+					if (majorOption[i].equals(o))
+					{
 						optionCheckBox[i].setSelected(true);
 					}
 				}
@@ -167,37 +178,41 @@ public class GeneralSettingFrame extends JDialog
 		public void actionPerformed(ActionEvent e)
 		{
 			String newOptions = "";
-			for(int i=0;i<majorOption.length;++i){
-				if(optionCheckBox[i].isSelected()){
-					if(newOptions.length()==0){
+			for (int i = 0; i < majorOption.length; ++i)
+			{
+				if (optionCheckBox[i].isSelected())
+				{
+					if (newOptions.length() == 0)
+					{
 						newOptions += optionCheckBox[i].getText();
-					}else{
+					}
+					else
+					{
 						newOptions += " " + optionCheckBox[i].getText();
 					}
 				}
 			}
-			Env.set("COLOR_TARGET",newOptions);
+			Env.set("COLOR_TARGET", newOptions);
 			FrontEnd.mainFrame.editorPanel.updateHighlight();
 		}
 	}
 
-	public class FontSettingPanel extends JPanel implements ActionListener{
+	private class FontSettingPanel extends JPanel implements ActionListener
+	{
+		private String tabSizeList[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
 
-		String fontFamilyList[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-		String tabSizeList[] = {"1","2","3","4","5","6","7","8","9","10"};
+		private JComboBox fontFamilyComboBox;
+		private JComboBox fontSizeComboBox;
+		private JComboBox tabSizeComboBox;
 
-
-		JComboBox fontFamilyComboBox;
-		JComboBox fontSizeComboBox;
-		JComboBox tabSizeComboBox;
-
-		FontSettingPanel(){
-
+		public FontSettingPanel()
+		{
 			setLayout(new FixFlowLayout());
-			setBorder(new TitledBorder("Font & Language"));
+			setBorder(new TitledBorder("Editor Font"));
 
 			add(new JLabel("FontFamily"));
-			fontFamilyComboBox = new JComboBox(fontFamilyList);
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			fontFamilyComboBox = new JComboBox(ge.getAvailableFontFamilyNames());
 			add(fontFamilyComboBox);
 
 			add(new JLabel("FontSize"));
@@ -213,34 +228,20 @@ public class GeneralSettingFrame extends JDialog
 			fontFamilyComboBox.addActionListener(this);
 			fontSizeComboBox.addActionListener(this);
 			tabSizeComboBox.addActionListener(this);
-
 		}
 
-		void settingInit(){
-			for(String str : fontFamilyList){
-				if(str.equals(Env.get("EDITER_FONT_FAMILY"))){
-					fontFamilyComboBox.setSelectedItem(str);
-					break;
-				}
-			}
-			for(String str : Env.FONT_SIZE_LIST){
-				if(str.equals(Env.get("EDITER_FONT_SIZE"))){
-					fontSizeComboBox.setSelectedItem(str);
-					break;
-				}
-			}
-			for(String str : tabSizeList){
-				if(str.equals(Env.get("EDITER_TAB_SIZE"))){
-					tabSizeComboBox.setSelectedItem(str);
-					break;
-				}
-			}
+		private void settingInit()
+		{
+			fontFamilyComboBox.setSelectedItem(Env.get("EDITER_FONT_FAMILY"));
+			fontSizeComboBox.setSelectedItem(Env.get("EDITER_FONT_SIZE"));
+			tabSizeComboBox.setSelectedItem(Env.get("EDITER_TAB_SIZE"));
 		}
 
-		public void actionPerformed(ActionEvent e) {
-			Env.set("EDITER_FONT_FAMILY",(String)fontFamilyComboBox.getSelectedItem());
-			Env.set("EDITER_FONT_SIZE",(String)fontSizeComboBox.getSelectedItem());
-			Env.set("EDITER_TAB_SIZE",(String)tabSizeComboBox.getSelectedItem());
+		public void actionPerformed(ActionEvent e)
+		{
+			Env.set("EDITER_FONT_FAMILY", (String)fontFamilyComboBox.getSelectedItem());
+			Env.set("EDITER_FONT_SIZE", (String)fontSizeComboBox.getSelectedItem());
+			Env.set("EDITER_TAB_SIZE", (String)tabSizeComboBox.getSelectedItem());
 			/*
 			FrontEnd.mainFrame.editorPanel.loadFont();
 			FrontEnd.mainFrame.toolTab.systemPanel.logPanel.loadFont();
@@ -253,16 +254,15 @@ public class GeneralSettingFrame extends JDialog
 
 	}
 
+	private class EncodingSettingPanel extends JPanel implements ActionListener
+	{
+		private String encodingList[] = { "SJIS", "EUC_JP", "ISO2022JP", "UTF8" };
 
-	public class EncodingSettingPanel extends JPanel implements ActionListener{
+		private JComboBox readComboBox;
+		private JComboBox writeComboBox;
 
-		String encodingList[] = {"SJIS", "EUC_JP","ISO2022JP", "UTF8"};
-
-		JComboBox readComboBox;
-		JComboBox writeComboBox;
-
-		EncodingSettingPanel(){
-
+		public EncodingSettingPanel()
+		{
 			setLayout(new FixFlowLayout());
 			setBorder(new TitledBorder("File Encoding"));
 
@@ -278,36 +278,27 @@ public class GeneralSettingFrame extends JDialog
 
 			readComboBox.addActionListener(this);
 			writeComboBox.addActionListener(this);
-
 		}
 
-		void settingInit(){
-			for(String str : encodingList){
-				if(str.equals(Env.get("EDITER_FILE_READ_ENCODING"))){
-					readComboBox.setSelectedItem(str);
-					break;
-				}
-			}
-			for(String str : encodingList){
-				if(str.equals(Env.get("EDITER_FILE_WRITE_ENCODING"))){
-					writeComboBox.setSelectedItem(str);
-					break;
-				}
-			}
+		private void settingInit()
+		{
+			readComboBox.setSelectedItem(Env.get("EDITER_FILE_READ_ENCODING"));
+			writeComboBox.setSelectedItem(Env.get("EDITER_FILE_WRITE_ENCODING"));
 		}
 
-		public void actionPerformed(ActionEvent e) {
-			Env.set("EDITER_FILE_READ_ENCODING",(String)readComboBox.getSelectedItem());
-			Env.set("EDITER_FILE_WRITE_ENCODING",(String)writeComboBox.getSelectedItem());
+		public void actionPerformed(ActionEvent e)
+		{
+			Env.set("EDITER_FILE_READ_ENCODING", (String)readComboBox.getSelectedItem());
+			Env.set("EDITER_FILE_WRITE_ENCODING", (String)writeComboBox.getSelectedItem());
 		}
-
 	}
 
-	public class SlimLibSettingPanel extends JPanel implements ActionListener{
-		JCheckBox useCheckBox;
+	private class SlimLibSettingPanel extends JPanel implements ActionListener
+	{
+		private JCheckBox useCheckBox;
 
-		SlimLibSettingPanel(){
-
+		public SlimLibSettingPanel()
+		{
 			setLayout(new FixFlowLayout());
 			setBorder(new TitledBorder("SLIM LIBRARY"));
 
@@ -315,17 +306,17 @@ public class GeneralSettingFrame extends JDialog
 			useCheckBox.addActionListener(this);
 			useCheckBox.setSelected(Env.is("SLIM_USE_LIBRARY"));
 			add(useCheckBox);
-
 		}
 
-		public void actionPerformed(ActionEvent e) {
-			Env.set("SLIM_USE_LIBRARY",useCheckBox.isSelected());
+		public void actionPerformed(ActionEvent e)
+		{
+			Env.set("SLIM_USE_LIBRARY", useCheckBox.isSelected());
 		}
 	}
 
 	private class ViewSettingPanel extends JPanel
 	{
-		private String langList[] = {"jp", "en"};
+		private String langList[] = { "jp", "en" };
 
 		private JComboBox langComboBox;
 		private JComboBox lookAndFeelComboBox;
@@ -348,7 +339,9 @@ public class GeneralSettingFrame extends JDialog
 					{
 						public void run()
 						{
-							JOptionPane.showMessageDialog(GeneralSettingFrame.this,Lang.f[4],"Change Language",JOptionPane.PLAIN_MESSAGE);
+							JOptionPane.showMessageDialog(
+								GeneralSettingFrame.this, Lang.f[4],
+								"Change Language", JOptionPane.PLAIN_MESSAGE);
 						}
 					});
 				}
@@ -376,6 +369,189 @@ public class GeneralSettingFrame extends JDialog
 				}
 			});
 			add(lookAndFeelComboBox);
+		}
+	}
+
+	private class UIFontSizeSettingPanel extends JPanel
+	{
+		private JButton buttonInc;
+		private JButton buttonDec;
+
+		public UIFontSizeSettingPanel()
+		{
+			setBorder(BorderFactory.createTitledBorder("UI Font Size"));
+
+			buttonInc = new JButton("+");
+			buttonInc.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					addToFontSizeAll(1);
+				}
+			});
+
+			buttonDec = new JButton("-");
+			buttonDec.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					addToFontSizeAll(-1);
+				}
+			});
+
+			add(buttonInc);
+			add(buttonDec);
+		}
+
+		private void addToFontSizeAll(int a)
+		{
+			// set all
+			for (Map.Entry<Object, Object> entry : UIManager.getDefaults().entrySet())
+			{
+				String key = entry.getKey().toString();
+				if (key.toLowerCase().endsWith("font"))
+				{
+					Font font = UIManager.getFont(key);
+					float size = font.getSize() + a;
+					if (size > 0)
+					{
+						UIManager.put(key,
+							new FontUIResource(font.deriveFont(size)));
+					}
+				}
+			}
+
+			// fire updates
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					try
+					{
+						for (Window window : Window.getWindows())
+						{
+							SwingUtilities.updateComponentTreeUI(window);
+						}
+					}
+					catch (Exception e)
+					{
+						FrontEnd.printException(e);
+					}
+				}
+			});
+		}
+	}
+
+	// under developed
+	private class UISettingPanel extends JPanel
+	{
+		private JList uiFontList;
+		private JComboBox uiFonts;
+		private JSpinner uiFontSize;
+		private JButton buttonApply;
+		private JCheckBox isBold;
+		private JCheckBox isItalic;
+
+		public UISettingPanel()
+		{
+			DefaultListModel listModel = new DefaultListModel();
+			List<String> keys = new ArrayList<String>();
+			for (Map.Entry<Object, Object> entry : UIManager.getDefaults().entrySet())
+			{
+				String key = entry.getKey().toString();
+				if (key.toLowerCase().endsWith("font"))
+				{
+					keys.add(key);
+				}
+			}
+			Collections.sort(keys);
+			for (String item : keys) listModel.addElement(item);
+
+			uiFontList = new JList(listModel);
+			uiFontList.setVisibleRowCount(5);
+			uiFontList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			uiFontList.addListSelectionListener(new ListSelectionListener()
+			{
+				@Override
+				public void valueChanged(ListSelectionEvent e)
+				{
+					setSelectedFont();
+				}
+			});
+			add(new JScrollPane(uiFontList));
+
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			uiFonts = new JComboBox(ge.getAvailableFontFamilyNames());
+			add(uiFonts);
+
+			isBold = new JCheckBox("Bold");
+			add(isBold);
+
+			isItalic = new JCheckBox("Italic");
+			add(isItalic);
+
+			uiFontSize = new JSpinner(new SpinnerNumberModel(12, 8, 96, 1));
+			add(uiFontSize);
+
+			buttonApply = new JButton("Apply");
+			buttonApply.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					apply();
+				}
+			});
+			add(buttonApply);
+		}
+
+		private void setSelectedFont()
+		{
+			String key = (String)uiFontList.getSelectedValue();
+			Font font = UIManager.getFont(key);
+			if (font != null)
+			{
+				uiFonts.setSelectedItem(font.getName());
+				uiFontSize.setValue(font.getSize());
+				isBold.setSelected(font.isBold());
+				isItalic.setSelected(font.isItalic());
+			}
+		}
+
+		private void apply()
+		{
+			String key = (String)uiFontList.getSelectedValue();
+
+			String fontName = (String)uiFonts.getSelectedItem();
+			int fontSize = (Integer)uiFontSize.getValue();
+			int style = Font.PLAIN;
+			if (isBold.isSelected()) style |= Font.BOLD;
+			if (isItalic.isSelected()) style |= Font.ITALIC;
+
+			Font font = new Font(fontName, style, fontSize);
+
+			UIManager.put(key, new FontUIResource(font));
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					try
+					{
+						for (Window window : Window.getWindows())
+						{
+							SwingUtilities.updateComponentTreeUI(window);
+						}
+					}
+					catch (Exception e)
+					{
+						FrontEnd.printException(e);
+					}
+				}
+			});
 		}
 	}
 }

@@ -35,7 +35,6 @@
 
 package lavit;
 
-import java.awt.Toolkit;
 import java.awt.Window;
 import java.io.File;
 import java.util.HashSet;
@@ -140,25 +139,6 @@ public class FrontEnd {
 		}
 	}
 
-	static public void updateLookAndFeel(){
-		try{
-			if(Env.get("LookAndFeel").equals("Metal")){
-				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-			}else if(Env.get("LookAndFeel").equals("Motif")){
-				UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-			}else if(Env.get("LookAndFeel").equals("Windows")){
-				UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-			}else if(Env.get("LookAndFeel").equals("WindowsClassic")){
-				UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel");
-			}else if(Env.get("LookAndFeel").equals("SystemDefault")){
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			}
-		}catch(Exception e){
-			FrontEnd.printException(e);
-		}
-
-	}
-
 	public static void setLookAndFeel(LookAndFeelEntry lafEntry)
 	{
 		Env.set("LookAndFeel", lafEntry.getName());
@@ -203,17 +183,14 @@ public class FrontEnd {
 	/**
 	 * @param args
 	 */
-	public static void main(final String[] args) {
-
+	public static void main(final String[] args)
+	{
 		new Env();
 
 		StartupFrame sf;
-		
-		//システムのLookAndFeelのエラーに対応
-		//FrontEnd.updateLookAndFeel();
-		
+
 		setLookAndFeel(LookAndFeelEntry.getLookAndFeelEntry(Env.get("LookAndFeel")));
-		
+
 		try
 		{
 			sf = new StartupFrame();
@@ -221,8 +198,6 @@ public class FrontEnd {
 		catch (Exception e)
 		{
 			FrontEnd.printException(e);
-			Env.set("LookAndFeel", "Metal");
-			FrontEnd.updateLookAndFeel();
 			sf = new StartupFrame();
 		}
 
@@ -246,5 +221,4 @@ public class FrontEnd {
 			}
 		});
 	}
-
 }

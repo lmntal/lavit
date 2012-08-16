@@ -397,21 +397,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         }else if(src == iGeneral) {
         	new GeneralSettingFrame();
         }else if(src == iVersion) {
-        	new VersionFrame();
-        	/*
-        	JOptionPane.showMessageDialog(
-        			FrontEnd.mainFrame,
-        			"LaViT\n"+
-        			"Version : "+Env.APP_VERSION+"\n"+
-        			"Date : "+Env.APP_DATE+"\n"+
-        			"\n"+
-        			Env.LMNTAL_VERSION+"\n"+
-        			Env.SLIM_VERSION+"\n"+
-        			Env.UNYO_VERSION+"\n",
-        			"LaViT",
-        		JOptionPane.PLAIN_MESSAGE
-        	);
-        	*/
+        	VersionFrame.showDialog();
         }else if(src == iRuntime) {
         	JOptionPane.showMessageDialog(
         			FrontEnd.mainFrame,

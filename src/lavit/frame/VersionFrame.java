@@ -37,7 +37,7 @@ package lavit.frame;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.GridLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -47,26 +47,27 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import lavit.Env;
 
 @SuppressWarnings("serial")
 public class VersionFrame extends JDialog
 {
-	private JButton button;
-	private String strTable[] =
-	{
-		"LaViT",
-		"Version : " + Env.APP_VERSION,
-		"Date : " + Env.APP_DATE,
-		"",
-		Env.LMNTAL_VERSION,
-		Env.SLIM_VERSION,
-		Env.UNYO_VERSION
-	};
+	private static final String INFO_TEXT =
+		"LaViT\n" +
+		"Version : " + Env.APP_VERSION + "\n" +
+		"Date : " + Env.APP_DATE + "\n\n" +
+		Env.LMNTAL_VERSION + "\n" +
+		Env.SLIM_VERSION + "\n" +
+		Env.UNYO_VERSION;
 
-	public VersionFrame()
+	private static VersionFrame instance;
+
+	private VersionFrame()
 	{
 		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
 
@@ -74,26 +75,25 @@ public class VersionFrame extends JDialog
 		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 		setResizable(false);
 		setAlwaysOnTop(true);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-	    JPanel panel = new JPanel();
-	    panel.setBackground(new Color(255,255,255));
-	    panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
+		JPanel panel = new JPanel();
+		panel.setBackground(Color.WHITE);
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		add(panel);
 
 		JLabel icon = new JLabel(image);
 		icon.setAlignmentX(Component.CENTER_ALIGNMENT);
 		panel.add(icon);
 
-		JPanel lPanel = new JPanel();
-		lPanel.setBorder(new LineBorder(Color.WHITE , 10));
-		lPanel.setBackground(Color.WHITE);
-		lPanel.setLayout(new GridLayout((int)(strTable.length/1),1));
-		for(String s : strTable){
-			lPanel.add(new JLabel(s));
-		}
-		panel.add(lPanel);
+		JTextArea infoText = new JTextArea(INFO_TEXT);
+		infoText.setAlignmentX(Component.CENTER_ALIGNMENT);
+		infoText.setEditable(false);
+		infoText.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
+		panel.add(new JScrollPane(infoText));
 
-		button = new JButton("OK");
+		JButton button = new JButton("OK");
+		button.setAlignmentX(Component.CENTER_ALIGNMENT);
 		button.addActionListener(new ActionListener()
 		{
 			@Override
@@ -102,13 +102,27 @@ public class VersionFrame extends JDialog
 				dispose();
 			}
 		});
-		button.setAlignmentX(Component.CENTER_ALIGNMENT);
 		panel.add(button);
 
 		addWindowListener(new ChildWindowListener(this));
 
 		pack();
-		setLocationRelativeTo(null);
-	 	setVisible(true);
+	}
+
+	public static void showDialog()
+	{
+		if (instance == null)
+		{
+			instance = new VersionFrame();
+			instance.setLocationRelativeTo(null);
+		}
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				instance.setVisible(true);
+			}
+		});
 	}
 }

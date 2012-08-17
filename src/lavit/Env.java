@@ -54,6 +54,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import lavit.util.IntUtils;
+
 public class Env {
 
 	static public final String APP_NAME = "LaViT";
@@ -326,13 +328,15 @@ public class Env {
 		}
     }
 
-    static public double getPercentage(String key,double per){
-    	String str = get(key);
-		if(str.matches("^[0-9]{1,3}%$")){
-			int t = Integer.parseInt(str.substring(0,str.indexOf('%')));
-			if(t<0){ t=0; }else if(t>100){ t=100; }
-			per = t/100.0;
-        }
+	public static double getPercentage(String key, double per)
+	{
+		String str = get(key);
+		if (str.matches("^[0-9]{1,3}%?$"))
+		{
+			int t = Integer.parseInt(str.substring(0, str.indexOf('%')));
+			t = IntUtils.clamp(t, 0, 100);
+			per = t / 100.0;
+		}
 		return per;
 	}
 
@@ -348,15 +352,11 @@ public class Env {
     	prop.setProperty(key, String.valueOf(value));
     }
 
-	static public void setPercentage(String key,double per){
-		int res = (int)(per*100);
-		if(res<0){
-			set(key,"0%");
-		}else if(res>100){
-			set(key,"100%");
-		}else{
-			set(key,res+"%");
-		}
+	public static void setPercentage(String key, double per)
+	{
+		int res = (int)Math.round(100 * per);
+		res = IntUtils.clamp(res, 0, 100);
+		set(key, res + "%");
 	}
 
     // jarファイル化した場合のファイル入力の差を吸収

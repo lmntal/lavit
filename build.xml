@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="LaViT" basedir="." default="jar">
+
+	<property file="build.properties" />
+
+	<property name="src" location="src" />
+	<property name="bin" location="bin" />
+
+	<property name="java.encoding" value="euc-jp" />
+	<property name="java.target" value="1.6" />
+	<property name="java.source" value="1.6" />
+
+	<property name="target-jar" value="LaViT.jar" />
+
+	<!-- Class Path -->
+	<path id="classpath">
+		<pathelement path="./lib/ant.jar" />
+		<pathelement path="${dir.lib.java3d}/j3dcore.jar" />
+		<pathelement path="${dir.lib.java3d}/j3dutils.jar" />
+		<pathelement path="${dir.lib.java3d}/vecmath.jar" />
+	</path>
+
+	<!-- Create Output Directory -->
+	<target name="mkdir">
+		<mkdir dir="${bin}" />
+	</target>
+
+	<!-- Compile Java Sources -->
+	<target name="javac" depends="mkdir" description="compile all">
+		<javac srcdir="${src}" destdir="${bin}" encoding="${java.encoding}"
+			target="${java.target}" source="${java.source}" includeantruntime="false">
+			<classpath refid="classpath" />
+		</javac>
+	</target>
+
+	<!-- Create JAR -->
+	<target name="jar" depends="javac" description="create jar">
+		<jar destfile="${target-jar}" basedir="${bin}" compress="false" update="true">
+			<manifest>
+				<attribute name="Class-Path" value="lib/ant.jar" />
+				<attribute name="Main-Class" value="lavit.FrontEnd" />
+			</manifest>
+			<fileset file="./img" />
+			<fileset file="./lang" />
+			<fileset file="./env_default.txt" />
+		</jar>
+	</target>
+
+	<!-- Clean -->
+	<target name="clean">
+		<delete dir="${bin}" file="${target-jar}" />
+	</target>
+
+</project>

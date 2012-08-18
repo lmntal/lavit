@@ -35,99 +35,71 @@
 
 package lavit.frame;
 
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import lavit.Env;
-import lavit.FrontEnd;
 
 //言語の設定がされていないときのみ使用
-public class LangSettingFrame extends JFrame {
-	private SelectPanel panel;
+@SuppressWarnings("serial")
+public final class LangSettingFrame
+{
+	private LangSettingFrame() { }
 
-	public LangSettingFrame(){
+	public static boolean showDialog()
+	{
+		SelectPanel sp = new SelectPanel();
+		ModalSettingDialog dialog = ModalSettingDialog.createDialog(sp);
+		dialog.setDialogTitle("Language");
+		dialog.setHeadLineText("Language");
+		dialog.setDescriptionText("Please select your language.");
+		dialog.setDialogResizable(false);
+		dialog.setDialogAlwaysOnTop(true);
+		dialog.setDialogIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setTitle("Language");
-        setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
-        setAlwaysOnTop(true);
-        setResizable(false);
-
-        panel = new SelectPanel(this);
-        add(panel);
-
-        addWindowListener(new ChildWindowListener(this));
-
-        pack();
-        setLocationRelativeTo(FrontEnd.mainFrame);
-        setVisible(true);
+		boolean approved = dialog.showDialog();
+		if (approved)
+		{
+			Env.set("LANG", sp.getSelectedLang());
+		}
+		return approved;
 	}
 
-	private class SelectPanel extends JPanel implements ActionListener {
-		private JFrame frame;
-
-		private ButtonGroup group = new ButtonGroup();
-		private String[] labels = {"English","日本語"};
-		private String[] langs = {"en","jp"};
+	private static class SelectPanel extends JPanel
+	{
+		private String[] labels = { "English", "日本語" };
+		private String[] langs = { "en", "jp" };
 		private JRadioButton[] radios = new JRadioButton[labels.length];
 
-		private JButton ok = new JButton("OK");
+		public SelectPanel()
+		{
+			setLayout(new GridLayout(0, 1));
 
-		SelectPanel(JFrame frame){
-			this.frame = frame;
-
-			setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-
-			JLabel label = new JLabel();
-			label.setText("Please select your languare.");
-			label.setPreferredSize(new Dimension(250, 40));
-			label.setAlignmentX(Component.CENTER_ALIGNMENT);
-			add(label);
-
-			JPanel radioPanel = new JPanel();
-			radioPanel.setLayout(new GridLayout(3,1));
-
-			for(int i=0;i<labels.length;++i){
+			ButtonGroup group = new ButtonGroup();
+			for (int i = 0; i < labels.length; i++)
+			{
 				radios[i] = new JRadioButton(labels[i]);
 				radios[i].setMargin(new Insets(2,10,2,10));
 				group.add(radios[i]);
-				radioPanel.add(radios[i]);
+				add(radios[i]);
 			}
 			radios[0].setSelected(true);
-
-			add(radioPanel);
-
-			JPanel buttonPanel = new JPanel();
-
-			ok.addActionListener(this);
-			buttonPanel.add(ok);
-
-			add(buttonPanel);
-
 		}
 
-		public void actionPerformed(ActionEvent e) {
-			for(int i=0;i<labels.length;++i){
-				if(radios[i].isSelected()){
-					Env.set("LANG",langs[i]);
-					break;
+		public String getSelectedLang()
+		{
+			for (int i = 0; i < labels.length; i++)
+			{
+				if (radios[i].isSelected())
+				{
+					return langs[i];
 				}
 			}
-			frame.dispose();
+			return "";
 		}
-
 	}
-
 }

@@ -84,27 +84,18 @@ public class StartupFrame extends JWindow
 	}
 
 	// TODO: [refactor] initial settings
-	private LangSettingFrame langFrame;
 	private SlimPathSettingFrame slimFrame;
-	private CygwinPathSettingFrame cygwinFrame;
 
 	public void startEnvSet()
 	{
-		if (StringUtils.nullOrEmpty(Env.get("LANG")))
+		if (!Env.isSet("LANG"))
 		{
-			SwingUtilities.invokeLater(new Runnable()
+			Lang.set("en");
+			if (!LangSettingFrame.showDialog())
 			{
-				public void run()
-				{
-					langFrame = new LangSettingFrame();
-				}
-			});
-			while (langFrame == null || langFrame.isDisplayable())
-			{
-				FrontEnd.sleep(200);
+				System.exit(0);
 			}
 		}
-
 		Lang.set(Env.get("LANG"));
 
 		if (Env.isWindows() && !Env.isSet("WINDOWS_CYGWIN_DIR"))

@@ -391,7 +391,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         }else if(src == iReboot) {
         	new RebootFrame();
         }else if(src == iCygwinPath) {
-        	new CygwinPathSettingFrame();
+        	CygwinPathSettingFrame.showDialog();
         }else if(src == iSlimPath) {
         	new SlimPathSettingFrame();
         }else if(src == iGeneral) {

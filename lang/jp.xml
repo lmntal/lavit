@@ -45,7 +45,7 @@
 <entry key="d3">変更</entry>
 <entry key="d4">変更しました</entry>
 <entry key="d5">ファイル</entry>
-<entry key="d6">ＯＫ</entry>
+<entry key="d6">OK</entry>
 <entry key="d7">終了</entry>
 <entry key="d8">反転</entry>
 <entry key="d9">LMNtal 中間命令列</entry>
@@ -58,8 +58,8 @@
 <entry key="f5">編集中</entry>
 <entry key="f6">新UNYO UNYOでは現在ファイル実行はできないようにしています。</entry>
 
-<entry key="w0">参照</entry>
-<entry key="w1">WindowsではCygwinのパスが必要です。（【例】C:\cygwin）</entry>
+<entry key="w0">参照...</entry>
+<entry key="w1">WindowsではCygwinのパスが必要です。 (【例】C:\cygwin)</entry>
 <entry key="w2"></entry>
 <entry key="w3">のインストールを行う</entry>
 <entry key="w4">同封されている</entry>

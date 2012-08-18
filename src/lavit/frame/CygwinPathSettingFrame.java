@@ -35,131 +35,142 @@
 
 package lavit.frame;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import lavit.Env;
-import lavit.FrontEnd;
 import lavit.Lang;
-import lavit.runner.SlimInstaller;
+import lavit.util.StringUtils;
 
-public class CygwinPathSettingFrame extends JFrame  {
-	private SelectPanel panel;
+@SuppressWarnings("serial")
+public final class CygwinPathSettingFrame
+{
+	private static SelectPanel sp;
+	private static ModalSettingDialog dialog;
 
-	public CygwinPathSettingFrame(){
+	private CygwinPathSettingFrame() { }
 
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setTitle("Cygwin");
-		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
-        setAlwaysOnTop(true);
-        setResizable(false);
+	public static void showDialog()
+	{
+		if (dialog == null)
+		{
+			sp = new SelectPanel();
+			dialog = ModalSettingDialog.createDialog(sp);
+			dialog.setDialogTitle("Cygwin Path Setting");
+			dialog.setHeadLineText("Cygwin path setting");
+			dialog.setDescriptionText(Lang.w[1]);
+			dialog.setDialogIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+			dialog.setDialogAlwaysOnTop(true);
+			dialog.setDialogResizable(false);
+		}
 
-		panel = new SelectPanel(this);
-		add(panel);
+		String path = Env.get("WINDOWS_CYGWIN_DIR");
+		if (StringUtils.nullOrEmpty(path))
+		{
+			path = "C:\\cygwin";
+		}
+		sp.setPathString(path);
 
-		addWindowListener(new ChildWindowListener(this));
-
-		pack();
-		setLocationRelativeTo(FrontEnd.mainFrame);
-		setVisible(true);
-
+		boolean approved = dialog.showDialog();
+		if (approved)
+		{
+			Env.set("WINDOWS_CYGWIN_DIR", sp.getPathString());
+		}
 	}
 
-	private class SelectPanel extends JPanel implements ActionListener {
-		private JFrame frame;
+	private static class SelectPanel extends JPanel
+	{
+		private JTextField textPath;
+		private JFileChooser fileChooser;
 
-		private JTextField pathInput = new JTextField();
-		private JButton fileChooser = new JButton(Lang.w[0]);
+		public SelectPanel()
+		{
+			GroupLayout gl = new GroupLayout(this);
+			setLayout(gl);
 
-		private JButton ok = new JButton(Lang.d[6]);
-		private JButton cancel = new JButton(Lang.d[2]);
-
-		SelectPanel(JFrame frame){
-			this.frame = frame;
-
-			setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-
-			JLabel label = new JLabel();
-			label.setText(Lang.w[1]);
-			label.setPreferredSize(new Dimension(350, 40));
-			label.setAlignmentX(Component.CENTER_ALIGNMENT);
+			JLabel label = new JLabel("Cygwin path:");
 			add(label);
 
-			JPanel inputPanel = new JPanel();
+			textPath = new JTextField(20);
+			textPath.setColumns(20);
+			add(textPath);
 
-			pathInput.setPreferredSize(new Dimension(200,20));
-			inputPanel.add(pathInput);
-
-			fileChooser.addActionListener(this);
-			inputPanel.add(fileChooser);
-
-			add(inputPanel);
-
-
-			JPanel buttonPanel = new JPanel();
-
-			ok.addActionListener(this);
-			buttonPanel.add(ok);
-
-			cancel.addActionListener(this);
-			buttonPanel.add(cancel);
-
-			add(buttonPanel);
-
-			if(getCygwinPath().equals("")){
-				pathInput.setText("C:\\cygwin");
-			}else{
-				pathInput.setText(getCygwinPath());
-			}
-
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			Object src = e.getSource();
-			if(src==fileChooser){
-				JFileChooser chooser;
-				String path = pathInput.getText();
-				if((new File(path)).exists()){
-					chooser = new JFileChooser((new File(path)).getParent());
-				}else{
-					chooser = new JFileChooser((new File(".")));
+			JButton buttonBrowse = new JButton(Lang.w[0]);
+			buttonBrowse.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					browse();
 				}
-				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				int res = chooser.showOpenDialog(this);
-				if(res==JFileChooser.APPROVE_OPTION) {
-					pathInput.setText(chooser.getSelectedFile().getAbsolutePath());
-				}
-			}else if(src==cancel){
-				frame.dispose();
-			}else if(src==ok){
-				Env.set("WINDOWS_CYGWIN_DIR",pathInput.getText());
-				frame.dispose();
+			});
+			add(buttonBrowse);
+
+			gl.setAutoCreateContainerGaps(true);
+			gl.setAutoCreateGaps(true);
+			gl.setHorizontalGroup(gl.createParallelGroup(Alignment.LEADING)
+				.addComponent(label)
+				.addGroup(gl.createSequentialGroup()
+					.addComponent(textPath)
+					.addComponent(buttonBrowse)
+				)
+			);
+			gl.setVerticalGroup(gl.createSequentialGroup()
+				.addComponent(label)
+				.addGroup(gl.createParallelGroup(Alignment.BASELINE)
+					.addComponent(textPath)
+					.addComponent(buttonBrowse)
+				)
+			);
+		}
+
+		public String getPathString()
+		{
+			return textPath.getText();
+		}
+
+		public void setPathString(String s)
+		{
+			textPath.setText(s);
+		}
+
+		private void browse()
+		{
+			File file = new File(getPathString());
+			if (file.exists() && file.getParentFile() != null)
+			{
+				file = file.getParentFile();
+			}
+			else
+			{
+				file = new File(".");
+			}
+			JFileChooser chooser = getFileChooser();
+			chooser.setCurrentDirectory(file);
+			int res = chooser.showOpenDialog(this);
+			if (res == JFileChooser.APPROVE_OPTION)
+			{
+				setPathString(chooser.getSelectedFile().getAbsolutePath());
 			}
 		}
 
-		private String getCygwinPath(){
-			String path = Env.get("WINDOWS_CYGWIN_DIR");
-			if(path==null){
-				return "";
-			}else{
-				return path;
+		private JFileChooser getFileChooser()
+		{
+			if (fileChooser == null)
+			{
+				fileChooser = new JFileChooser();
+				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			}
+			return fileChooser;
 		}
-
 	}
 }

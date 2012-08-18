@@ -10,9 +10,11 @@ import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -47,6 +49,7 @@ public final class ModalSettingDialog
 	private JDialog dialog;
 	private JLabel headLabel;
 	private JLabel descLabel;
+	private JButton defaultButton;
 	private boolean approved;
 
 	private ModalSettingDialog(JComponent content)
@@ -122,10 +125,8 @@ public final class ModalSettingDialog
 		buttonPanel.add(cancel);
 		dialog.add(buttonPanel, BorderLayout.SOUTH);
 
-		dialog.getRootPane().setDefaultButton(ok);
+		defaultButton = ok;
 
-		dialog.pack();
-		dialog.setLocationRelativeTo(null);
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
@@ -142,6 +143,16 @@ public final class ModalSettingDialog
 	public void setDialogAlwaysOnTop(boolean alwaysOnTop)
 	{
 		dialog.setAlwaysOnTop(alwaysOnTop);
+	}
+
+	public void setDialogIconImage(Image image)
+	{
+		dialog.setIconImage(image);
+	}
+
+	public void setDialogIconImages(List<? extends Image> icons)
+	{
+		dialog.setIconImages(icons);
 	}
 
 	public void setHeadLineText(String s)
@@ -161,6 +172,7 @@ public final class ModalSettingDialog
 
 	public boolean showDialog(Component parent)
 	{
+		dialog.getRootPane().setDefaultButton(defaultButton);
 		dialog.pack();
 		dialog.setLocationRelativeTo(parent);
 		dialog.setModalityType(ModalityType.APPLICATION_MODAL);

@@ -109,17 +109,7 @@ public class StartupFrame extends JWindow
 
 		if (Env.isWindows() && !Env.isSet("WINDOWS_CYGWIN_DIR"))
 		{
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					cygwinFrame = new CygwinPathSettingFrame();
-				}
-			});
-			while (cygwinFrame == null || cygwinFrame.isDisplayable())
-			{
-				FrontEnd.sleep(200);
-			}
+			CygwinPathSettingFrame.showDialog();
 		}
 
 		File lmntal = new File(Env.LMNTAL_LIBRARY_DIR+File.separator+"bin"+File.separator+"lmntal");

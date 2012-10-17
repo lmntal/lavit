@@ -44,21 +44,18 @@ import javax.swing.JRadioButton;
 
 import lavit.Env;
 
-//言語の設定がされていないときのみ使用
-@SuppressWarnings("serial")
-public final class LangSettingFrame
+public final class LanguageSetting
 {
-	private LangSettingFrame() { }
+	private LanguageSetting() { }
 
 	public static boolean showDialog()
 	{
-		SelectPanel sp = new SelectPanel();
+		LanguageSelectPanel sp = new LanguageSelectPanel();
 		ModalSettingDialog dialog = ModalSettingDialog.createDialog(sp);
 		dialog.setDialogTitle("Language");
 		dialog.setHeadLineText("Language");
 		dialog.setDescriptionText("Please select your language.");
 		dialog.setDialogResizable(false);
-		dialog.setDialogAlwaysOnTop(true);
 		dialog.setDialogIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 
 		boolean approved = dialog.showDialog();
@@ -68,38 +65,39 @@ public final class LangSettingFrame
 		}
 		return approved;
 	}
+}
 
-	private static class SelectPanel extends JPanel
+@SuppressWarnings("serial")
+class LanguageSelectPanel extends JPanel
+{
+	private String[] labels = { "English", "日本語" };
+	private String[] langs = { "en", "jp" };
+	private JRadioButton[] radios = new JRadioButton[labels.length];
+
+	public LanguageSelectPanel()
 	{
-		private String[] labels = { "English", "日本語" };
-		private String[] langs = { "en", "jp" };
-		private JRadioButton[] radios = new JRadioButton[labels.length];
+		setLayout(new GridLayout(0, 1));
 
-		public SelectPanel()
+		ButtonGroup group = new ButtonGroup();
+		for (int i = 0; i < labels.length; i++)
 		{
-			setLayout(new GridLayout(0, 1));
-
-			ButtonGroup group = new ButtonGroup();
-			for (int i = 0; i < labels.length; i++)
-			{
-				radios[i] = new JRadioButton(labels[i]);
-				radios[i].setMargin(new Insets(2,10,2,10));
-				group.add(radios[i]);
-				add(radios[i]);
-			}
-			radios[0].setSelected(true);
+			radios[i] = new JRadioButton(labels[i]);
+			radios[i].setMargin(new Insets(2,10,2,10));
+			group.add(radios[i]);
+			add(radios[i]);
 		}
+		radios[0].setSelected(true);
+	}
 
-		public String getSelectedLang()
+	public String getSelectedLang()
+	{
+		for (int i = 0; i < labels.length; i++)
 		{
-			for (int i = 0; i < labels.length; i++)
+			if (radios[i].isSelected())
 			{
-				if (radios[i].isSelected())
-				{
-					return langs[i];
-				}
+				return langs[i];
 			}
-			return "";
 		}
+		return "";
 	}
 }

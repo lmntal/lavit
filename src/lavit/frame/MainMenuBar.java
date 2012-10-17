@@ -38,7 +38,6 @@ package lavit.frame;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URI;
@@ -52,7 +51,9 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import lavit.*;
+import lavit.Env;
+import lavit.FrontEnd;
+import lavit.Lang;
 
 public class MainMenuBar extends JMenuBar implements ActionListener {
 
@@ -391,9 +392,9 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         }else if(src == iReboot) {
         	new RebootFrame();
         }else if(src == iCygwinPath) {
-        	CygwinPathSettingFrame.showDialog();
+        	CygwinPathSetting.showDialog();
         }else if(src == iSlimPath) {
-        	new SlimPathSettingFrame();
+        	SlimPathSetting.showDialog();
         }else if(src == iGeneral) {
         	new GeneralSettingFrame();
         }else if(src == iVersion) {

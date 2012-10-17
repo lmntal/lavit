@@ -51,13 +51,12 @@ import lavit.Env;
 import lavit.Lang;
 import lavit.util.StringUtils;
 
-@SuppressWarnings("serial")
-public final class CygwinPathSettingFrame
+public final class CygwinPathSetting
 {
 	private static SelectPanel sp;
 	private static ModalSettingDialog dialog;
 
-	private CygwinPathSettingFrame() { }
+	private CygwinPathSetting() { }
 
 	public static void showDialog()
 	{
@@ -69,7 +68,6 @@ public final class CygwinPathSettingFrame
 			dialog.setHeadLineText("Cygwin path setting");
 			dialog.setDescriptionText(Lang.w[1]);
 			dialog.setDialogIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
-			dialog.setDialogAlwaysOnTop(true);
 			dialog.setDialogResizable(false);
 		}
 
@@ -86,91 +84,91 @@ public final class CygwinPathSettingFrame
 			Env.set("WINDOWS_CYGWIN_DIR", sp.getPathString());
 		}
 	}
+}
 
-	private static class SelectPanel extends JPanel
+@SuppressWarnings("serial")
+class SelectPanel extends JPanel
+{
+	private JTextField textPath;
+	private JFileChooser fileChooser;
+
+	public SelectPanel()
 	{
-		private JTextField textPath;
-		private JFileChooser fileChooser;
+		GroupLayout gl = new GroupLayout(this);
+		setLayout(gl);
 
-		public SelectPanel()
+		JLabel label = new JLabel("Cygwin path:");
+		add(label);
+
+		textPath = new JTextField(20);
+		textPath.setColumns(20);
+		add(textPath);
+
+		JButton buttonBrowse = new JButton(Lang.w[0]);
+		buttonBrowse.addActionListener(new ActionListener()
 		{
-			GroupLayout gl = new GroupLayout(this);
-			setLayout(gl);
-
-			JLabel label = new JLabel("Cygwin path:");
-			add(label);
-
-			textPath = new JTextField(20);
-			textPath.setColumns(20);
-			add(textPath);
-
-			JButton buttonBrowse = new JButton(Lang.w[0]);
-			buttonBrowse.addActionListener(new ActionListener()
+			@Override
+			public void actionPerformed(ActionEvent e)
 			{
-				@Override
-				public void actionPerformed(ActionEvent e)
-				{
-					browse();
-				}
-			});
-			add(buttonBrowse);
-
-			gl.setAutoCreateContainerGaps(true);
-			gl.setAutoCreateGaps(true);
-			gl.setHorizontalGroup(gl.createParallelGroup(Alignment.LEADING)
-				.addComponent(label)
-				.addGroup(gl.createSequentialGroup()
-					.addComponent(textPath)
-					.addComponent(buttonBrowse)
-				)
-			);
-			gl.setVerticalGroup(gl.createSequentialGroup()
-				.addComponent(label)
-				.addGroup(gl.createParallelGroup(Alignment.BASELINE)
-					.addComponent(textPath)
-					.addComponent(buttonBrowse)
-				)
-			);
-		}
-
-		public String getPathString()
-		{
-			return textPath.getText();
-		}
-
-		public void setPathString(String s)
-		{
-			textPath.setText(s);
-		}
-
-		private void browse()
-		{
-			File file = new File(getPathString());
-			if (file.exists() && file.getParentFile() != null)
-			{
-				file = file.getParentFile();
+				browse();
 			}
-			else
-			{
-				file = new File(".");
-			}
-			JFileChooser chooser = getFileChooser();
-			chooser.setCurrentDirectory(file);
-			int res = chooser.showOpenDialog(this);
-			if (res == JFileChooser.APPROVE_OPTION)
-			{
-				setPathString(chooser.getSelectedFile().getAbsolutePath());
-			}
-		}
+		});
+		add(buttonBrowse);
 
-		private JFileChooser getFileChooser()
+		gl.setAutoCreateGaps(true);
+		gl.setHorizontalGroup(gl.createParallelGroup(Alignment.LEADING)
+			.addComponent(label)
+			.addGroup(gl.createSequentialGroup()
+				.addComponent(textPath)
+				.addComponent(buttonBrowse)
+			)
+		);
+		gl.setVerticalGroup(gl.createSequentialGroup()
+			.addComponent(label)
+			.addGroup(gl.createParallelGroup(Alignment.BASELINE)
+				.addComponent(textPath)
+				.addComponent(buttonBrowse)
+			)
+		);
+	}
+
+	public String getPathString()
+	{
+		return textPath.getText();
+	}
+
+	public void setPathString(String s)
+	{
+		textPath.setText(s);
+	}
+
+	private void browse()
+	{
+		File file = new File(getPathString());
+		if (file.exists() && file.getParentFile() != null)
 		{
-			if (fileChooser == null)
-			{
-				fileChooser = new JFileChooser();
-				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			}
-			return fileChooser;
+			file = file.getParentFile();
 		}
+		else
+		{
+			file = new File(".");
+		}
+		JFileChooser chooser = getFileChooser();
+		chooser.setCurrentDirectory(file);
+		int res = chooser.showOpenDialog(this);
+		if (res == JFileChooser.APPROVE_OPTION)
+		{
+			setPathString(chooser.getSelectedFile().getAbsolutePath());
+		}
+	}
+
+	private JFileChooser getFileChooser()
+	{
+		if (fileChooser == null)
+		{
+			fileChooser = new JFileChooser();
+			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		}
+		return fileChooser;
 	}
 }

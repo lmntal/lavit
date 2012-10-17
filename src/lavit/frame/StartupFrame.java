@@ -45,10 +45,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
 import lavit.Env;
-import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.util.StringUtils;
 
@@ -84,14 +82,12 @@ public class StartupFrame extends JWindow
 	}
 
 	// TODO: [refactor] initial settings
-	private SlimPathSettingFrame slimFrame;
-
 	public void startEnvSet()
 	{
 		if (!Env.isSet("LANG"))
 		{
 			Lang.set("en");
-			if (!LangSettingFrame.showDialog())
+			if (!LanguageSetting.showDialog())
 			{
 				System.exit(0);
 			}
@@ -100,7 +96,7 @@ public class StartupFrame extends JWindow
 
 		if (Env.isWindows() && !Env.isSet("WINDOWS_CYGWIN_DIR"))
 		{
-			CygwinPathSettingFrame.showDialog();
+			CygwinPathSetting.showDialog();
 		}
 
 		File lmntal = new File(Env.LMNTAL_LIBRARY_DIR+File.separator+"bin"+File.separator+"lmntal");
@@ -111,17 +107,7 @@ public class StartupFrame extends JWindow
 
 		if (StringUtils.nullOrEmpty(Env.get("SLIM_EXE_PATH")))
 		{
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					slimFrame = new SlimPathSettingFrame();
-				}
-			});
-			while (slimFrame == null || !slimFrame.isEnd())
-			{
-				FrontEnd.sleep(200);
-			}
+			SlimPathSetting.showDialog();
 		}
 	}
 }

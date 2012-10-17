@@ -1,3 +1,38 @@
+/*
+ *   Copyright (c) 2008, Ueda Laboratory LMNtal Group <lmntal@ueda.info.waseda.ac.jp>
+ *   All rights reserved.
+ *
+ *   Redistribution and use in source and binary forms, with or without
+ *   modification, are permitted provided that the following conditions are
+ *   met:
+ *
+ *    1. Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *    2. Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in
+ *       the documentation and/or other materials provided with the
+ *       distribution.
+ *
+ *    3. Neither the name of the Ueda Laboratory LMNtal Group nor the
+ *       names of its contributors may be used to endorse or promote
+ *       products derived from this software without specific prior
+ *       written permission.
+ *
+ *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ *   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ *   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package lavit.frame;
 
 import java.awt.BorderLayout;
@@ -27,8 +62,15 @@ import javax.swing.border.Border;
 
 import lavit.Lang;
 
+/**
+ * 設定画面用のダイアログテンプレート。
+ * 中央にコンポーネントを設定して使う。
+ */
 public final class ModalSettingDialog
 {
+	/**
+	 * ヘッダー部のパネル
+	 */
 	@SuppressWarnings("serial")
 	private static class GradientPanel extends JPanel
 	{
@@ -61,11 +103,10 @@ public final class ModalSettingDialog
 		//
 		JPanel header = new GradientPanel();
 		header.setLayout(new BorderLayout(0, 4));
-		header.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+		header.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		header.setOpaque(true);
 		header.setBackground(Color.WHITE);
 		headLabel = new JLabel();
-		headLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 		headLabel.setFont(headLabel.getFont().deriveFont(Font.BOLD));
 		header.add(headLabel, BorderLayout.NORTH);
 		descLabel = new JLabel();
@@ -78,7 +119,7 @@ public final class ModalSettingDialog
 		//
 		Border innerBorder = content.getBorder();
 		content.setBorder(BorderFactory.createCompoundBorder(
-			BorderFactory.createEmptyBorder(8, 8, 8, 8),
+			BorderFactory.createEmptyBorder(16, 16, 16, 16),
 			innerBorder
 		));
 		dialog.add(content, BorderLayout.CENTER);
@@ -88,6 +129,9 @@ public final class ModalSettingDialog
 		//
 		JButton ok = new JButton(Lang.d[6]);
 		JButton cancel = new JButton(Lang.d[2]);
+
+		fixButtons(90, 24, ok, cancel);
+
 		ok.addActionListener(new ActionListener()
 		{
 			@Override
@@ -106,13 +150,6 @@ public final class ModalSettingDialog
 				dialog.dispose();
 			}
 		});
-		Dimension dim1 = ok.getPreferredSize();
-		Dimension dim2 = cancel.getPreferredSize();
-		Dimension size = new Dimension(
-			Math.max(Math.max(dim1.width, dim2.width), 90),
-			Math.max(Math.max(dim1.height, dim2.height), 24));
-		ok.setPreferredSize(size);
-		cancel.setPreferredSize(size);
 
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		buttonPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -192,5 +229,21 @@ public final class ModalSettingDialog
 		settingDialog.setHeadLineText(headline);
 		settingDialog.setDescriptionText(desc);
 		return settingDialog;
+	}
+
+	private static void fixButtons(int minWidth, int minHeight, JButton ... buttons)
+	{
+		int w = minWidth;
+		for (JButton b : buttons)
+		{
+			w = Math.max(w, b.getPreferredSize().width);
+		}
+		for (JButton b : buttons)
+		{
+			Dimension size = b.getPreferredSize();
+			size.width = w;
+			size.height = Math.max(size.height, minHeight);
+			b.setPreferredSize(size);
+		}
 	}
 }

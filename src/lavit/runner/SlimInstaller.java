@@ -97,6 +97,15 @@ public class SlimInstaller implements OuterRunner
 		this.success = false;
 	}
 
+	/**
+	 * Set location of SLIM source directory.
+	 * The default location is: './lmntal/slim-x.y.z'
+	 */
+	public void setSlimSourceDirectory(File dir)
+	{
+		slimSourceDir = dir;
+	}
+
 	@Override
 	public void run()
 	{
@@ -148,6 +157,14 @@ public class SlimInstaller implements OuterRunner
 		public ThreadRunner()
 		{
 			window = new InstallWindow();
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					window.setLocationRelativeTo(null);
+					window.setVisible(true);
+				}
+			});
 		}
 
 		private int execCommand(String cmd)
@@ -158,7 +175,7 @@ public class SlimInstaller implements OuterRunner
 				Env.setProcessEnvironment(pb.environment());
 				pb.directory(getSlimSourceDir());
 				p = pb.start();
-				
+
 				outputReader = new StreamReaderThread(p.getInputStream());
 				outputReader.setPrintLineListener(new PrintLineListener()
 				{
@@ -178,7 +195,7 @@ public class SlimInstaller implements OuterRunner
 					}
 				});
 				errorReader.start();
-				
+
 				p.waitFor();
 				return p.exitValue();
 			}
@@ -282,142 +299,147 @@ public class SlimInstaller implements OuterRunner
 			if (p != null) p.destroy();
 		}
 	}
+}
 
-	@SuppressWarnings("serial")
-	private static class InstallWindow extends JFrame
+@SuppressWarnings("serial")
+class InstallWindow extends JFrame
+{
+	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
+
+	private JProgressBar bar;
+	private ColoredLinePrinter text;
+	private JButton button;
+
+	private String[] progressMatchString =
 	{
-		private static final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
+			"checking for a BSD-compatible install",
+			"checking for style of include used by make",
+			"checking for suffix of object files",
+			"checking whether we are using the GNU C++ compiler",
+			"checking lex library",
+			"checking for C/C++ restrict keyword",
+			"checking for egrep",
+			"checking for memory.h",
+			"checking for unistd.h",
+			"checking for int64_t",
+			"checking for uint16_t",
+			"checking for void*",
+			"checking for strchr",
+			"config.status: creating src/Makefile",
+			"config.status: executing depfiles commands",
+			"configure end.",
+			"gcc: unrecognized option",
+			"make end.",
+			"Making install in doc",
+			"make install end"
+	};
 
-		private JProgressBar bar;
-		private ColoredLinePrinter text;
-		private JButton button;
+	public InstallWindow()
+	{
+		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/slim_c_s.png"));
 
-		private String[] progressMatchString =
+		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setTitle("Installing SLIM...");
+
+	    JPanel panel = new JPanel();
+	    panel.setBackground(Color.WHITE);
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		add(panel);
+
+		JLabel icon = new JLabel(image);
+		icon.setAlignmentX(Component.CENTER_ALIGNMENT);
+		panel.add(icon);
+
+		bar = new JProgressBar(0, 100);
+		bar.setIndeterminate(true);
+		panel.add(bar);
+
+		text = new ColoredLinePrinter();
+		text.setEditable(false);
+		text.setBackground(Color.BLACK);
+		text.setForeground(Color.WHITE);
+		text.setFont(new Font(Font.DIALOG, Font.PLAIN, 11));
+		JScrollPane textScrollPane = new JScrollPane(text);
+		textScrollPane.setPreferredSize(new Dimension(image.getIconWidth(), image.getIconHeight() / 2));
+		panel.add(textScrollPane);
+
+		button = new JButton("OK");
+		button.addActionListener(new ActionListener()
 		{
-				"checking for a BSD-compatible install",
-				"checking for style of include used by make",
-				"checking for suffix of object files",
-				"checking whether we are using the GNU C++ compiler",
-				"checking lex library",
-				"checking for C/C++ restrict keyword",
-				"checking for egrep",
-				"checking for memory.h",
-				"checking for unistd.h",
-				"checking for int64_t",
-				"checking for uint16_t",
-				"checking for void*",
-				"checking for strchr",
-				"config.status: creating src/Makefile",
-				"config.status: executing depfiles commands",
-				"configure end.",
-				"gcc: unrecognized option",
-				"make end.",
-				"Making install in doc",
-				"make install end"
-		};
-
-		public InstallWindow()
-		{
-			ImageIcon image = new ImageIcon(Env.getImageOfFile("img/slim_c_s.png"));
-
-			setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
-			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			setTitle("Installing SLIM...");
-
-		    JPanel panel = new JPanel();
-		    panel.setBackground(new Color(255,255,255));
-			panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
-			add(panel);
-
-			JLabel icon = new JLabel(image);
-			icon.setAlignmentX(Component.CENTER_ALIGNMENT);
-			panel.add(icon);
-
-			bar = new JProgressBar(0,100);
-			//bar.setStringPainted(true);
-			bar.setIndeterminate(true);
-			panel.add(bar);
-
-			text = new ColoredLinePrinter();
-			text.setEditable(false);
-			//text.setLineWrap(false);
-			text.setBackground(Color.BLACK);
-			text.setForeground(Color.WHITE);
-			text.setFont(new Font(Font.DIALOG, Font.PLAIN, 11));
-			JScrollPane textScrollPane = new JScrollPane(text);
-			textScrollPane.setPreferredSize(new Dimension(image.getIconWidth(),image.getIconHeight()/2));
-			panel.add(textScrollPane);
-
-			button = new JButton("OK");
-			button.addActionListener(new ActionListener()
+			public void actionPerformed(ActionEvent e)
 			{
-				public void actionPerformed(ActionEvent e)
-				{
-					dispose();
-				}
-			});
-			button.setEnabled(false);
-			button.setAlignmentX(Component.CENTER_ALIGNMENT);
-			panel.add(button);
+				dispose();
+			}
+		});
+		button.setEnabled(false);
+		button.setAlignmentX(Component.CENTER_ALIGNMENT);
+		panel.add(button);
 
-			addWindowListener(new ChildWindowListener(this));
+		addWindowListener(new ChildWindowListener(this));
 
-			pack();
-			setLocationRelativeTo(null);
-		    setVisible(true);
-		}
-		
-		private void progress(String s)
+		pack();
+	}
+
+	private void progress(String s)
+	{
+		if (bar.isIndeterminate())
 		{
-			//progress bar¤Î½èÍý
-			for(int i=0;i<progressMatchString.length;++i){
-				if(s.startsWith(progressMatchString[i])){
-					bar.setIndeterminate(false);
-					final int progress = (i+1)*5;
-					SwingUtilities.invokeLater(new Runnable(){public void run(){
-						if(bar.getValue()<progress){
+			bar.setIndeterminate(false);
+		}
+
+		for (int i = 0; i < progressMatchString.length; i++)
+		{
+			if (s.startsWith(progressMatchString[i]))
+			{
+				final int progress = (i + 1) * 5;
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						if (bar.getValue() < progress)
+						{
 							bar.setValue(progress);
 						}
-					}});
-				}
+					}
+				});
 			}
 		}
+	}
 
-		private void println(String str)
+	public void println(String str)
+	{
+		if (!str.isEmpty())
 		{
-			if (str.length() > 0)
+			progress(str);
+			printColoredLine(str, Color.WHITE);
+		}
+	}
+
+	public void printError(String str)
+	{
+		if (!str.isEmpty())
+		{
+			progress(str);
+			printColoredLine(str, Color.GRAY);
+		}
+	}
+
+	private void printColoredLine(String s, Color c)
+	{
+		text.appendLine(String.format("[%s] %s", DATE_FORMAT.format(new Date()), s), c);
+	}
+
+	public void exit()
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
 			{
-				progress(str);
-				printColoredLine(str, Color.WHITE);
+				bar.setValue(100);
+				button.setEnabled(true);
+				setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			}
-		}
-
-		private void printError(String str)
-		{
-			if (str.length() > 0)
-			{
-				progress(str);
-				printColoredLine(str, Color.GRAY);
-			}
-		}
-		
-		private void printColoredLine(String s, Color c)
-		{
-			text.appendLine(String.format("[%s] %s", DATE_FORMAT.format(new Date()), s), c);
-		}
-
-		public void exit()
-		{
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					//bar.setIndeterminate(false);
-					bar.setValue(100);
-					button.setEnabled(true);
-					setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-				}
-			});
-		}
+		});
 	}
 }

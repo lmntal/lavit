@@ -38,18 +38,23 @@ package lavit.editor;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import lavit.*;
-import lavit.ltl.LtlButtonPanel;
-import lavit.runner.*;
-import lavit.util.TarGetter;
+import lavit.Env;
+import lavit.FrontEnd;
+import lavit.Lang;
+import lavit.runner.LmntalRunner;
+import lavit.runner.SlimRunner;
+import lavit.runner.UnyoRunner;
 
 public class EditorButtonPanel extends JPanel implements ActionListener {
 
@@ -316,7 +321,28 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 			}})).start();
 
 		}else if (src == svporButton) {
-
+			if (Env.isSet("CUSTOM_COMMAND"))
+			{
+				String cmd = Env.get("CUSTOM_COMMAND");
+				cmd = cmd.replace("<FILE>", editorPanel.getFileName());
+				System.out.println("Custom Command: " + cmd);
+				try
+				{
+					ProcessBuilder pb = new ProcessBuilder(cmd.split("\\s+"));
+					pb.redirectErrorStream(true);
+					Process p = pb.start();
+					BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+					String line;
+					while ((line = reader.readLine()) != null)
+					{
+						System.out.println(line);
+					}
+				}
+				catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+			}
 			/*
 			if(editorPanel.isChanged()){
 				editorPanel.fileSave();

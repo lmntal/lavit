@@ -35,75 +35,69 @@
 
 package lavit.frame;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.io.File;
+import java.awt.GridLayout;
+import java.awt.Insets;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
-import javax.swing.JWindow;
-import javax.swing.SwingConstants;
+import javax.swing.JRadioButton;
 
 import lavit.Env;
-import lavit.Lang;
-import lavit.util.StringUtils;
 
-public class StartupFrame extends JWindow
+public final class LanguageSetting
 {
-	private static final long serialVersionUID = 1L;
+	private LanguageSetting() { }
 
-	public StartupFrame()
+	public static boolean showDialog()
 	{
-		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
+		LanguageSelectPanel sp = new LanguageSelectPanel();
+		ModalSettingDialog dialog = ModalSettingDialog.createDialog(sp);
+		dialog.setDialogTitle("Language");
+		dialog.setHeadLineText("Language");
+		dialog.setDescriptionText("Please select your language.");
+		dialog.setDialogResizable(false);
+		dialog.setDialogIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 
-		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+		boolean approved = dialog.showDialog();
+		if (approved)
+		{
+			Env.set("LANG", sp.getSelectedLang());
+		}
+		return approved;
+	}
+}
 
-		JPanel panel = new JPanel();
-		panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-		panel.setBackground(new Color(255,255,255));
-		panel.setLayout(new BorderLayout());
-		add(panel);
+@SuppressWarnings("serial")
+class LanguageSelectPanel extends JPanel
+{
+	private String[] labels = { "English", "ÆüËÜ¸ì" };
+	private String[] langs = { "en", "jp" };
+	private JRadioButton[] radios = new JRadioButton[labels.length];
 
-		JLabel icon = new JLabel(image);
-		panel.add(icon,BorderLayout.CENTER);
+	public LanguageSelectPanel()
+	{
+		setLayout(new GridLayout(0, 1));
 
-		JLabel text = new JLabel("Version "+Env.APP_VERSION);
-		text.setHorizontalAlignment(SwingConstants.CENTER);
-		text.setBackground(new Color(255,255,255));
-		panel.add(text, BorderLayout.SOUTH);
-
-		pack();
+		ButtonGroup group = new ButtonGroup();
+		for (int i = 0; i < labels.length; i++)
+		{
+			radios[i] = new JRadioButton(labels[i]);
+			radios[i].setMargin(new Insets(2,10,2,10));
+			group.add(radios[i]);
+			add(radios[i]);
+		}
+		radios[0].setSelected(true);
 	}
 
-	// TODO: [refactor] initial settings
-	public void startEnvSet()
+	public String getSelectedLang()
 	{
-		if (!Env.isSet("LANG"))
+		for (int i = 0; i < labels.length; i++)
 		{
-			Lang.set("en");
-			if (!LanguageSetting.showDialog())
+			if (radios[i].isSelected())
 			{
-				System.exit(0);
+				return langs[i];
 			}
 		}
-		Lang.set(Env.get("LANG"));
-
-		if (Env.isWindows() && !Env.isSet("WINDOWS_CYGWIN_DIR"))
-		{
-			CygwinPathSetting.showDialog();
-		}
-
-		File lmntal = new File(Env.LMNTAL_LIBRARY_DIR+File.separator+"bin"+File.separator+"lmntal");
-		if (lmntal.exists() && !lmntal.canExecute())
-		{
-			lmntal.setExecutable(true);
-		}
-
-		if (StringUtils.nullOrEmpty(Env.get("SLIM_EXE_PATH")))
-		{
-			SlimPathSetting.showDialog();
-		}
+		return "";
 	}
 }

@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import lavit.util.IntUtils;
+import lavit.util.StringUtils;
 
 public class Env {
 
@@ -176,13 +177,10 @@ public class Env {
     	return Boolean.valueOf(prop.getProperty(key));
     }
 
-    static public boolean isSet(String key){
-    	if(Env.get(key)==null||Env.get(key).equals("")){
-    		return false;
-    	}else{
-    		return true;
-    	}
-    }
+	public static boolean isSet(String key)
+	{
+		return !StringUtils.nullOrEmpty(get(key));
+	}
 
     static public void setProcessEnvironment(Map<String,String> map){
 

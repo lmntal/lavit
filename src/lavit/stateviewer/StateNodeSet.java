@@ -141,6 +141,7 @@ public class StateNodeSet {
 	}
 
 	public boolean setSlimResult(String str, boolean ltlMode){
+		long time = System.currentTimeMillis();
 
 		int line=0;
 		Long init = -1L;
@@ -343,6 +344,270 @@ public class StateNodeSet {
 
 		updateNodeLooks();
 
+		System.out.println((System.currentTimeMillis() - time) + " [ms]");
+		return true;
+	}
+
+	private static int skipSpaces(String s, int p)
+	{
+		while (p < s.length() && Character.isWhitespace(s.charAt(p))) p++;
+		return p;
+	}
+
+	private static int parseState(String s, int p)
+	{
+		p = skipSpaces(s, p);
+		
+		char c;
+		long n = 0;
+		while (p < s.length() && Character.isDigit(c = s.charAt(p)))
+		{
+			n = 10 * n + (c - '0');
+			p++;
+		}
+		p = skipSpaces(s, p);
+		if (p + 1 < s.length() && s.charAt(p) == ':' && s.charAt(p + 1) == ':')
+		{
+			p += 2;
+			StringBuilder buf = new StringBuilder();
+			while (p < s.length() && s.charAt(p) != '\n')
+			{
+				buf.append(s.charAt(p++));
+			}
+			System.out.println("parsed: " + n + " : " + buf);
+		}
+		return p;
+	}
+
+	public boolean setSlimResult2(String str, boolean ltlMode)
+	{
+		long time = System.currentTimeMillis();
+
+		int p = 0;
+		
+		p = skipSpaces(str, p);
+		
+		if (str.regionMatches(p, stateMarkString, 0, stateMarkString.length()))
+		{
+			p += stateMarkString.length();
+			while (p < str.length())
+			{
+				if (str.charAt(p) == '\n') break;
+				p = parseState(str, p);
+			}
+		}
+		
+		int line=0;
+		Long init = -1L;
+		String[] strs = str.split("\n");
+
+		// cycle parse
+		if (!Env.is("SLIM2"))
+		{
+			if (ltlMode)
+			{
+				// cycle√µ§∑
+				for(;line<strs.length;++line){
+					if(strs[line].equals(cycleMarkString)) break;
+					if(strs[line].equals(cycleEndMarkString)) break;
+				}
+				if(line>=strs.length) return false; //•®•È°º
+
+				// cycle≤Ú¿œ
+				for(line++;line<strs.length;++line){
+					String ss[] = strs[line].split(":",3);
+					if(ss.length<3){ break; }
+
+					long id = getIdFromMemString(ss[2]);
+					StateNode node = getNodeInMaking(id);
+					node.cycle = true;
+					cycleNode.add(node);
+				}
+			}
+		}
+
+		// States√µ§∑
+		for (;line < strs.length; ++line)
+		{
+			if (strs[line].equals(stateMarkString)) break;
+		}
+		if (line >= strs.length) return false; //•®•È°º
+
+		// States≤Ú¿œ
+		for (line++; line < strs.length; ++line)
+		{
+			String ss[] = strs[line].split("::", 2);
+			if (ss.length < 2){ break; }
+
+			long id = getIdFromMemString(ss[0]);
+			StateNode node = getNodeInMaking(id);
+			node.state = ss[1];
+		}
+
+
+		// Transitions√µ§∑
+		for (; line < strs.length; ++line)
+		{
+			if (strs[line].equals(graphMarkString)) break;
+		}
+		if (line >= strs.length) return false; //•®•È°º
+
+		// init≤Ú¿œ
+		line++;
+		if (strs[line].startsWith(initStartMarkString))
+		{
+			init = getIdFromMemString(strs[line].substring(initStartMarkString.length()));
+			StateNode node = getNodeInMaking(init);
+			startNode.add(node);
+		}
+		else
+		{
+			return false; //•®•È°º
+		}
+
+		// Transitions≤Ú¿œ
+		for (line++; line < strs.length; ++line)
+		{
+			String ss[] = strs[line].split("::",2);
+			if (ss.length<2){ break; }
+
+			long id = getIdFromMemString(ss[0]);
+			StateNode from = getNodeInMaking(id);
+			String toIdsStr = ss[1];
+
+			if(toIdsStr.length()>0)
+			{
+				String[] toStrs = toIdsStr.split(",");
+				for(String toIdStr : toStrs){
+					StateNode to = null;
+					Long toId;
+					String rules = "";
+
+					int leftBracketIndex = toIdStr.indexOf("(");
+					int rightBracketIndex = -1;
+					if(leftBracketIndex>0){ rightBracketIndex = toIdStr.indexOf(")",leftBracketIndex); }
+					if(rightBracketIndex>0){
+						toId = getIdFromMemString(toIdStr.substring(0,leftBracketIndex));
+						rules = toIdStr.substring(leftBracketIndex+1,rightBracketIndex);
+					}else{
+						toId = getIdFromMemString(toIdStr);
+					}
+					to = getNodeInMaking(toId);
+
+					StateTransition t = new StateTransition();
+					t.from = from;
+					t.to = to;
+					for(String rule : rules.split(" ")){
+						t.addRules(getRule(rule));
+					}
+
+					t.from.addToTransition(t);
+					t.to.addFromTransition(t);
+					allTransition.add(t);
+				}
+			}
+		}
+
+		// Labels
+		if(ltlMode){
+			// Labels√µ§∑
+			for(;line<strs.length;++line){
+				if(strs[line].equals(labelMarkString)) break;
+			}
+			if(line>=strs.length) return false; //•®•È°º
+
+			// Label≤Ú¿œ
+			for(line++;line<strs.length;++line){
+				String ss[] = strs[line].split("::",2);
+				if(ss.length<2){ break; }
+
+				long id = getIdFromMemString(ss[0]);
+				StateNode node = getNodeInMaking(id);
+				node.label = ss[1];
+				if(node.label.toLowerCase().indexOf("accept")!=-1){
+					node.accept = true;
+				}
+			}
+		}
+
+		if(Env.is("SLIM2")){
+			if(ltlMode){
+				// cycle√µ§∑
+				for(;line<strs.length;++line){
+					if(strs[line].equals(pathsMarkString)) break;
+				}
+				if(line<strs.length){
+					HashMap<Long,ArrayList<Long>> paths = new HashMap<Long,ArrayList<Long>>();
+
+					// CounterExamplePaths≤Ú¿œ
+					for(line++;line<strs.length;++line){
+						String ss[] = strs[line].split("::",2);
+						if(ss.length<2){ break; }
+						long id = getIdFromMemString(ss[0]);
+						ArrayList<Long> ids = new ArrayList<Long>();
+						if(ss[1].trim().length()>0){
+							for(String toStr : ss[1].split(",")){
+								ids.add(getIdFromMemString(toStr.trim()));
+							}
+						}
+						paths.put(id, ids);
+					}
+
+					//cycle≤Ω
+					StateNode node = getNodeInMaking(init);
+					while(!cycleNode.contains(node)){
+						node.cycle = true;
+						cycleNode.add(node);
+						ArrayList<Long> ids = paths.get(node.id);
+						if(ids.size()==0){ break; }
+						node = allNode.get(ids.get(0));
+					}
+
+				}
+			}
+		}
+
+		//parseΩ™Œª
+
+		//endNode§Œ≈–œø
+		for(StateNode node : allNode.values()){
+			if(node.getToTransitions().size()==0){
+				endNode.add(node);
+			}
+		}
+
+		//cycle transition§Œ≈–œø
+		for(int i=0;i<cycleNode.size()-1;++i){
+			StateNode from = cycleNode.get(i);
+			StateNode to = cycleNode.get(i+1);
+			StateTransition t = from.getToTransition(to);
+			t.cycle = true;
+		}
+		//cycle§Œ•Î°º•◊§ŒÃ·§Í§Ú√µ§π
+		if(cycleNode.size()>0){
+			StateNode end = cycleNode.get(cycleNode.size()-1);
+			for(int i = cycleNode.size()-2;i>=0;i--){
+				StateTransition t = end.getToTransition(cycleNode.get(i));
+				if(t!=null){
+					t.cycle = true;
+					break;
+				}
+			}
+		}
+
+		setTreeDepth();
+
+		resetOrder();
+		positionReset();
+
+		if(Env.is("SV_STARTUP_SET_BACKDUMMY")){
+			setBackDummy();
+			dummyCentering();
+		}
+
+		updateNodeLooks();
+
+		System.out.println((System.currentTimeMillis() - time) + " [ms]");
 		return true;
 	}
 

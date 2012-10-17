@@ -33,77 +33,17 @@
  *
  */
 
-package lavit.frame;
+package lavit.util;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.io.File;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JWindow;
-import javax.swing.SwingConstants;
-
-import lavit.Env;
-import lavit.Lang;
-import lavit.util.StringUtils;
-
-public class StartupFrame extends JWindow
+public final class FileUtil
 {
-	private static final long serialVersionUID = 1L;
+	private FileUtil() { }
 
-	public StartupFrame()
+	public static boolean exists(String path)
 	{
-		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
-
-		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
-
-		JPanel panel = new JPanel();
-		panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-		panel.setBackground(new Color(255,255,255));
-		panel.setLayout(new BorderLayout());
-		add(panel);
-
-		JLabel icon = new JLabel(image);
-		panel.add(icon,BorderLayout.CENTER);
-
-		JLabel text = new JLabel("Version "+Env.APP_VERSION);
-		text.setHorizontalAlignment(SwingConstants.CENTER);
-		text.setBackground(new Color(255,255,255));
-		panel.add(text, BorderLayout.SOUTH);
-
-		pack();
-	}
-
-	// TODO: [refactor] initial settings
-	public void startEnvSet()
-	{
-		if (!Env.isSet("LANG"))
-		{
-			Lang.set("en");
-			if (!LanguageSetting.showDialog())
-			{
-				System.exit(0);
-			}
-		}
-		Lang.set(Env.get("LANG"));
-
-		if (Env.isWindows() && !Env.isSet("WINDOWS_CYGWIN_DIR"))
-		{
-			CygwinPathSetting.showDialog();
-		}
-
-		File lmntal = new File(Env.LMNTAL_LIBRARY_DIR+File.separator+"bin"+File.separator+"lmntal");
-		if (lmntal.exists() && !lmntal.canExecute())
-		{
-			lmntal.setExecutable(true);
-		}
-
-		if (StringUtils.nullOrEmpty(Env.get("SLIM_EXE_PATH")))
-		{
-			SlimPathSetting.showDialog();
-		}
+		File file = new File(path);
+		return file.exists();
 	}
 }

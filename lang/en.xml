@@ -50,16 +50,16 @@
 <entry key="d8">Reverse</entry>
 <entry key="d9">LMNtal Intermediate Code</entry>
 
-<entry key="f0"> is already exists. Do you want to overwrite this file ?</entry>
+<entry key="f0"> already exists. Do you want to overwrite it?</entry>
 <entry key="f1">overwrite</entry>
-<entry key="f2"> is not saved, save it now ?</entry>
+<entry key="f2"> has been modified. Save the changes before close?</entry>
 <entry key="f3">no file</entry>
 <entry key="f4">Please restart LaViT for the changes to take effect.</entry>
-<entry key="f5">Editing..</entry>
+<entry key="f5">Editing...</entry>
 <entry key="f6">New UNYO UNYO is unavailable now.</entry>
 
 <entry key="w0">Browse</entry>
-<entry key="w1">In Windows,Cygwin path is needed.¡ÊEx. C:\cygwin¡Ë</entry>
+<entry key="w1">In Windows, Cygwin path is required (for example, C:\cygwin.)</entry>
 <entry key="w2">Install </entry>
 <entry key="w3">.</entry>
 <entry key="w4">Use </entry>
@@ -68,7 +68,7 @@
 <entry key="w7"> path.</entry>
 <entry key="w8">LaViT need </entry>
 <entry key="w9"> path.</entry>
-<entry key="w10">Installation is complete.</entry>
+<entry key="w10">Installation completed.</entry>
 <entry key="w11">Installation failed.</entry>
 <entry key="w12">LTL2BA is not found. </entry>
 <entry key="w13">Use already installed </entry>

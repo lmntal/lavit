@@ -45,16 +45,16 @@
 <entry key="d3">変更</entry>
 <entry key="d4">変更しました</entry>
 <entry key="d5">ファイル</entry>
-<entry key="d6">ＯＫ</entry>
+<entry key="d6">OK</entry>
 <entry key="d7">終了</entry>
 <entry key="d8">反転</entry>
 <entry key="d9">LMNtal 中間命令列</entry>
 
 <entry key="f0"> は既に存在します。上書きしますか？</entry>
 <entry key="f1">上書き保存</entry>
-<entry key="f2"> は変更されています。保存しますか?</entry>
+<entry key="f2"> は変更されています。保存しますか？</entry>
 <entry key="f3">ファイルが無いため実行できません</entry>
-<entry key="f4">LaViTを再起動すると変更が適用されます。</entry>
+<entry key="f4">LaViT を再起動すると変更が適用されます。</entry>
 <entry key="f5">編集中</entry>
 <entry key="f6">新UNYO UNYOでは現在ファイル実行はできないようにしています。</entry>
 

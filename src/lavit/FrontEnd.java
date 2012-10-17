@@ -187,22 +187,19 @@ public class FrontEnd {
 	{
 		new Env();
 
-		StartupFrame sf;
-
 		setLookAndFeel(LookAndFeelEntry.getLookAndFeelEntry(Env.get("LookAndFeel")));
 
-		try
+		final StartupFrame sf = new StartupFrame();
+		sf.setLocationRelativeTo(null);
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			sf = new StartupFrame();
-		}
-		catch (Exception e)
-		{
-			FrontEnd.printException(e);
-			sf = new StartupFrame();
-		}
-
-		sf.startEnvSet();
-		final StartupFrame sf2 = sf;
+			@Override
+			public void run()
+			{
+				sf.setVisible(true);
+			}
+		});
+		sf.startEnvSet(); // TODO: refactor me
 
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -211,7 +208,7 @@ public class FrontEnd {
 				try
 				{
 					new FrontEnd(args);
-					sf2.setVisible(false);
+					sf.setVisible(false);
 				}
 				catch (Exception e)
 				{

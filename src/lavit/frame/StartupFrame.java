@@ -60,11 +60,10 @@ public class StartupFrame extends JWindow
 	{
 		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
 
-		//setSize(image.getIconWidth()+30, image.getIconHeight()+30);
-	    setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
 
-	    JPanel panel = new JPanel();
-	    panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+		JPanel panel = new JPanel();
+		panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		panel.setBackground(new Color(255,255,255));
 		panel.setLayout(new BorderLayout());
 		add(panel);
@@ -75,12 +74,9 @@ public class StartupFrame extends JWindow
 		JLabel text = new JLabel("Version "+Env.APP_VERSION);
 		text.setHorizontalAlignment(SwingConstants.CENTER);
 		text.setBackground(new Color(255,255,255));
-	    text.setBorder(null);
-	    panel.add(text,BorderLayout.SOUTH);
+		panel.add(text, BorderLayout.SOUTH);
 
-	    pack();
-	    setLocationRelativeTo(null);
-	    setVisible(true);
+		pack();
 	}
 
 	// TODO: [refactor] initial settings

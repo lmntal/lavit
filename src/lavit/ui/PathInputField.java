@@ -38,6 +38,7 @@ package lavit.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -179,21 +180,29 @@ public class PathInputField extends JComponent
 	private void initCurrentDirectory()
 	{
 		File file = new File(getPathText());
+
+		try
+		{
+			file = file.getCanonicalFile();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		while (!file.exists() && file.getParentFile() != null)
+		{
+			file = file.getParentFile();
+		}
+		File dir = null;
 		if (file.exists())
 		{
-			fileChooser.setSelectedFile(file);
+			dir = file.getParentFile();
 		}
-		else
+		if (dir == null)
 		{
-			while (!file.exists() && file.getParentFile() != null)
-			{
-				file = file.getParentFile();
-			}
-			if (!file.exists())
-			{
-				file = new File("").getAbsoluteFile();
-			}
-			fileChooser.setCurrentDirectory(file);
+			dir = new File("");
 		}
+		fileChooser.setCurrentDirectory(dir);
 	}
 }

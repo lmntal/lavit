@@ -134,7 +134,7 @@ public class Ltl2baInstaller implements OuterRunner  {
 		runner=null;
 	}
 
-	public boolean isSuccess(){
+	public boolean isSucceeded(){
 		return success;
 	}
 

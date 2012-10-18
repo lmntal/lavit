@@ -69,7 +69,7 @@ import lavit.Lang;
 import lavit.frame.ChildWindowListener;
 import lavit.ui.ColoredLinePrinter;
 import lavit.util.Cygpath;
-import lavit.util.FileUtil;
+import lavit.util.FileUtils;
 import lavit.util.OuterRunner;
 import lavit.util.StringUtils;
 
@@ -123,6 +123,14 @@ public class SlimInstaller implements OuterRunner
 	public void run()
 	{
 		runner.start();
+		try
+		{
+			runner.join();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -148,7 +156,7 @@ public class SlimInstaller implements OuterRunner
 		runner = null;
 	}
 
-	public boolean isSuccess()
+	public boolean isSucceeded()
 	{
 		return success;
 	}
@@ -277,7 +285,7 @@ public class SlimInstaller implements OuterRunner
 			if (succeeded)
 			{
 				String slimPath = getSlimInstallPathName() + File.separator + "bin" + File.separator + Env.getSlimBinaryName();
-				succeeded = FileUtil.exists(slimPath);
+				succeeded = FileUtils.exists(slimPath);
 			}
 
 			if (succeeded)

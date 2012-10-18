@@ -37,9 +37,9 @@ package lavit.util;
 
 import java.io.File;
 
-public final class FileUtil
+public final class FileUtils
 {
-	private FileUtil() { }
+	private FileUtils() { }
 
 	public static boolean exists(String path)
 	{

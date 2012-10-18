@@ -39,7 +39,7 @@ public interface OuterRunner {
 
 	public void run();
 	public boolean isRunning();
-	public boolean isSuccess();
+	public boolean isSucceeded();
 	public void kill();
 
 }

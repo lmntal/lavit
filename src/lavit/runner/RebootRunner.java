@@ -83,7 +83,7 @@ public class RebootRunner implements OuterRunner {
 
 
 	@Override
-	public boolean isSuccess() {
+	public boolean isSucceeded() {
 		return true;
 	}
 

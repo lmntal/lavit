@@ -142,7 +142,7 @@ public class SlimRunner implements OuterRunner {
 		runner=null;
 	}
 
-	public boolean isSuccess(){
+	public boolean isSucceeded(){
 		return success;
 	}
 

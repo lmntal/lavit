@@ -114,7 +114,7 @@ public class LtlNcPanel extends JPanel implements ActionListener,CommonFontUser 
 						while(ltl2baInstaller.isRunning()){
 							FrontEnd.sleep(200);
 						}
-						if(ltl2baInstaller.isSuccess()){
+						if(ltl2baInstaller.isSucceeded()){
 							ltlButton.doClick();
 						}
 					}})).start();

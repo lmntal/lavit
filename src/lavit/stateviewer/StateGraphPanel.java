@@ -693,7 +693,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		while(lr.isRunning()){
 			FrontEnd.sleep(200);
 		}
-		if(lr.isSuccess()){
+		if(lr.isSucceeded()){
 			String str = lr.getBufferString();
 			int sp=str.indexOf("sVr_matches{");
 			if(sp==-1){ return -1; }

@@ -46,6 +46,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.event.ChangeEvent;
@@ -55,12 +56,12 @@ import lavit.Env;
 import lavit.Lang;
 import lavit.runner.SlimInstaller;
 import lavit.ui.PathInputField;
-import lavit.util.FileUtil;
+import lavit.util.FileUtils;
 import lavit.util.StringUtils;
 
 public final class SlimPathSetting
 {
-	public enum Result
+	enum Result
 	{
 		USE_INSTALLED,
 		INSTALL,
@@ -83,6 +84,26 @@ public final class SlimPathSetting
 			dialog.setDialogTitle("SLIM Setting");
 			dialog.setHeadLineText("Setup SLIM path");
 			dialog.setDescriptionText(Lang.w[8] + Env.getSlimBinaryName() + Lang.w[9]);
+			dialog.setNoClose(true);
+			dialog.addOKButtonListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					if (sp.verifyConfiguration())
+					{
+						dialog.closeDialog();
+					}
+				}
+			});
+			dialog.addCancelButtonListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					dialog.closeDialog();
+				}
+			});
 		}
 		boolean approved = dialog.showDialog();
 		if (approved)
@@ -91,19 +112,33 @@ public final class SlimPathSetting
 			{
 				installSlim(sp.getSourceDirectory(), sp.getInstallDirectory());
 			}
-			Env.set("SLIM_EXE_PATH", sp.getSlimBinaryPath());
+			else
+			{
+				Env.set("SLIM_EXE_PATH", sp.getSlimBinaryPath());
+			}
 		}
 	}
 
 	private static void installSlim(String sourceDir, String installDir)
 	{
-		Env.set("path.slim.source", sourceDir);
-		Env.set("path.slim.install", installDir);
+		File installDirFile = new File(installDir);
+		if (!installDirFile.exists())
+		{
+			installDirFile.mkdir();
+		}
 
 		SlimInstaller slimInstaller = new SlimInstaller();
 		slimInstaller.setSlimSourceDirectory(sourceDir);
 		slimInstaller.setSlimInstallDirectory(installDir);
 		slimInstaller.run();
+
+		if (slimInstaller.isSucceeded())
+		{
+			Env.set("path.slim.source", sourceDir);
+			Env.set("path.slim.install", installDir);
+			Env.set("path.slim.exe", sp.getSlimBinaryPath());
+			Env.set("SLIM_EXE_PATH", sp.getSlimBinaryPath());
+		}
 	}
 }
 
@@ -214,7 +249,7 @@ class SlimPathPanel extends JPanel
 	private void initializeFields()
 	{
 		String installedSlimPath = Env.get("SLIM_EXE_PATH");
-		if (!StringUtils.nullOrEmpty(installedSlimPath) && FileUtil.exists(installedSlimPath))
+		if (!StringUtils.nullOrEmpty(installedSlimPath) && FileUtils.exists(installedSlimPath))
 		{
 			// インストール済みのSLIMを選択
 			useInstalled.setSelected(true);
@@ -225,9 +260,6 @@ class SlimPathPanel extends JPanel
 			// SLIMのインストールを選択
 			useInstalled.setEnabled(false);
 			install.setSelected(true);
-			pathSource.setPathText("(slim source)");
-			pathInstall.setPathText(Env.getSlimInstallPath());
-			pathSlim.setPathText(createSlimPath());
 		}
 		updateState();
 	}
@@ -276,6 +308,40 @@ class SlimPathPanel extends JPanel
 		}
 	}
 
+	/**
+	 * 設定項目が適切であるか検査します。
+	 */
+	public boolean verifyConfiguration()
+	{
+		switch (getResult())
+		{
+		case USE_INSTALLED:
+			if (!FileUtils.exists(getSlimBinaryPath()))
+			{
+				showError(getSlimBinaryPath() + " not found.");
+				return false;
+			}
+			break;
+		case INSTALL:
+			if (!FileUtils.exists(getSourceDirectory()))
+			{
+				showError(getSourceDirectory() + " not found.");
+				return false;
+			}
+			else if (!new File(getSourceDirectory()).isDirectory())
+			{
+				showError(getSourceDirectory() + " is not a directory.");
+				return false;
+			}
+			break;
+		case USE_INCLUDED:
+			break;
+		case USE_OTHER:
+			break;
+		}
+		return true;
+	}
+
 	private void updateState()
 	{
 		pathSource.setEnabled(install.isSelected());
@@ -287,8 +353,8 @@ class SlimPathPanel extends JPanel
 		{
 		case USE_INSTALLED:
 			pathSource.setPathText("");
-			pathInstall.setPathText(Env.getSlimInstallPath());
-			pathSlim.setPathText(createSlimPath());
+			pathInstall.setPathText("");
+			pathSlim.setPathText(Env.get("SLIM_EXE_PATH"));
 			break;
 		case USE_INCLUDED:
 			pathSource.setPathText("");
@@ -303,6 +369,7 @@ class SlimPathPanel extends JPanel
 		case USE_OTHER:
 			pathSource.setPathText("");
 			pathInstall.setPathText("");
+			pathSlim.setPathText("");
 			break;
 		}
 	}
@@ -329,6 +396,11 @@ class SlimPathPanel extends JPanel
 			size.height = Math.max(size.height, minHeight);
 			l.setPreferredSize(size);
 		}
+	}
+
+	private void showError(String message)
+	{
+		JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	private class UpdateAction implements ActionListener

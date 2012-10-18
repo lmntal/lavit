@@ -89,10 +89,12 @@ public final class ModalSettingDialog
 	}
 
 	private JDialog dialog;
+	private JButton okButton;
+	private JButton cancelButton;
 	private JLabel headLabel;
 	private JLabel descLabel;
-	private JButton defaultButton;
 	private boolean approved;
+	private boolean noClose;
 
 	private ModalSettingDialog(JComponent content)
 	{
@@ -127,27 +129,33 @@ public final class ModalSettingDialog
 		//
 		// Buttons
 		//
-		JButton ok = new JButton(Lang.d[6]);
-		JButton cancel = new JButton(Lang.d[2]);
+		okButton = new JButton(Lang.d[6]);
+		cancelButton = new JButton(Lang.d[2]);
 
-		fixButtons(90, 24, ok, cancel);
+		fixButtons(90, 24, okButton, cancelButton);
 
-		ok.addActionListener(new ActionListener()
+		okButton.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				approved = true;
-				dialog.dispose();
+				if (!noClose)
+				{
+					dialog.dispose();
+				}
 			}
 		});
-		cancel.addActionListener(new ActionListener()
+		cancelButton.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				approved = false;
-				dialog.dispose();
+				if (!noClose)
+				{
+					dialog.dispose();
+				}
 			}
 		});
 
@@ -158,11 +166,9 @@ public final class ModalSettingDialog
 				BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY),
 				BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE)
 		)));
-		buttonPanel.add(ok);
-		buttonPanel.add(cancel);
+		buttonPanel.add(okButton);
+		buttonPanel.add(cancelButton);
 		dialog.add(buttonPanel, BorderLayout.SOUTH);
-
-		defaultButton = ok;
 
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
@@ -192,6 +198,16 @@ public final class ModalSettingDialog
 		dialog.setIconImages(icons);
 	}
 
+	public void addOKButtonListener(ActionListener l)
+	{
+		okButton.addActionListener(l);
+	}
+
+	public void addCancelButtonListener(ActionListener l)
+	{
+		cancelButton.addActionListener(l);
+	}
+
 	public void setHeadLineText(String s)
 	{
 		headLabel.setText(s);
@@ -202,6 +218,24 @@ public final class ModalSettingDialog
 		descLabel.setText(s);
 	}
 
+	public void setNoClose(boolean b)
+	{
+		noClose = b;
+		if (noClose)
+		{
+			dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		}
+		else
+		{
+			dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		}
+	}
+
+	public void closeDialog()
+	{
+		dialog.dispose();
+	}
+
 	public boolean showDialog()
 	{
 		return showDialog(null);
@@ -209,7 +243,7 @@ public final class ModalSettingDialog
 
 	public boolean showDialog(Component parent)
 	{
-		dialog.getRootPane().setDefaultButton(defaultButton);
+		dialog.getRootPane().setDefaultButton(okButton);
 		dialog.pack();
 		dialog.setLocationRelativeTo(parent);
 		dialog.setModalityType(ModalityType.APPLICATION_MODAL);

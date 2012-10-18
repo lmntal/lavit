@@ -48,12 +48,15 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import lavit.Env;
 import lavit.Lang;
 import lavit.runner.SlimInstaller;
 import lavit.ui.PathInputField;
 import lavit.util.FileUtil;
+import lavit.util.StringUtils;
 
 public final class SlimPathSetting
 {
@@ -88,13 +91,18 @@ public final class SlimPathSetting
 			{
 				installSlim(sp.getSourceDirectory(), sp.getInstallDirectory());
 			}
-			Env.set("SLIM_EXE_PATH", sp.getSLIMPath());
+			Env.set("SLIM_EXE_PATH", sp.getSlimBinaryPath());
 		}
 	}
 
 	private static void installSlim(String sourceDir, String installDir)
 	{
+		Env.set("path.slim.source", sourceDir);
+		Env.set("path.slim.install", installDir);
+
 		SlimInstaller slimInstaller = new SlimInstaller();
+		slimInstaller.setSlimSourceDirectory(sourceDir);
+		slimInstaller.setSlimInstallDirectory(installDir);
 		slimInstaller.run();
 	}
 }
@@ -111,51 +119,17 @@ class SlimPathPanel extends JPanel
 
 	private PathInputField pathSource;
 	private PathInputField pathInstall;
-	private PathInputField pathInput;
+	private PathInputField pathSlim;
 
-	//private String defaultInstallPath = Env.LMNTAL_LIBRARY_DIR+File.separator+Env.getDirNameOfSlim()+File.separator+"src"+File.separator+Env.getSlimBinaryName();
-	private String defaultInstallPath = Env.getSlimInstallPath() + File.separator + "bin" + File.separator + SLIM_BIN;
-	private String defaultIncludePath = Env.LMNTAL_LIBRARY_DIR + File.separator + "bin" + File.separator + SLIM_BIN;
+	private final String defaultIncludeDir = Env.LMNTAL_LIBRARY_DIR;
+	private final String defaultIncludePath = defaultIncludeDir + File.separator + "bin" + File.separator + SLIM_BIN;
 
 	public SlimPathPanel()
 	{
 		setLayout(new GridLayout(0, 1, 0, 4));
 
 		initializeComponents();
-
-		if (!FileUtil.exists(defaultInstallPath))
-		{
-			useInstalled.setEnabled(false);
-		}
-
-		if (getSlimPath().equals("") || getSlimPath().equals(defaultInstallPath))
-		{
-			if (FileUtil.exists(defaultInstallPath))
-			{
-				useInstalled.setSelected(true);
-				useInstalled.requestFocus();
-			}
-			else
-			{
-				install.setSelected(true);
-				install.requestFocus();
-			}
-			pathInput.setPathText(defaultInstallPath);
-		}
-		else if (getSlimPath().equals(defaultIncludePath))
-		{
-			useIncluded.setSelected(true);
-			useIncluded.requestFocus();
-			pathInput.setPathText(defaultIncludePath);
-		}
-		else
-		{
-			useOther.setSelected(true);
-			useOther.requestFocus();
-			pathInput.setPathText(getSlimPath());
-		}
-
-		updateState();
+		initializeFields();
 	}
 
 	private void initializeComponents()
@@ -189,6 +163,13 @@ class SlimPathPanel extends JPanel
 			JFileChooser chooser = new JFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			pathInstall = new PathInputField(chooser, Lang.w[0], 25);
+			pathInstall.addChangeListener(new ChangeListener()
+			{
+				public void stateChanged(ChangeEvent e)
+				{
+					pathSlim.setPathText(createSlimPath());
+				}
+			});
 			panel.add(label2);
 			panel.add(pathInstall);
 			add(panel);
@@ -206,9 +187,9 @@ class SlimPathPanel extends JPanel
 			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 			JFileChooser chooser = new JFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			pathInput = new PathInputField(chooser, Lang.w[0], 25);
+			pathSlim = new PathInputField(chooser, Lang.w[0], 25);
 			panel.add(label3);
-			panel.add(pathInput);
+			panel.add(pathSlim);
 			add(panel);
 		}
 
@@ -227,19 +208,52 @@ class SlimPathPanel extends JPanel
 		group.add(useOther);
 	}
 
+	/**
+	 * 初期の入力状態を構成します。
+	 */
+	private void initializeFields()
+	{
+		String installedSlimPath = Env.get("SLIM_EXE_PATH");
+		if (!StringUtils.nullOrEmpty(installedSlimPath) && FileUtil.exists(installedSlimPath))
+		{
+			// インストール済みのSLIMを選択
+			useInstalled.setSelected(true);
+			pathSlim.setPathText(installedSlimPath);
+		}
+		else
+		{
+			// SLIMのインストールを選択
+			useInstalled.setEnabled(false);
+			install.setSelected(true);
+			pathSource.setPathText("(slim source)");
+			pathInstall.setPathText(Env.getSlimInstallPath());
+			pathSlim.setPathText(createSlimPath());
+		}
+		updateState();
+	}
+
+	/**
+	 * SLIMソースコードディレクトリのパス名を取得します。
+	 */
 	public String getSourceDirectory()
 	{
 		return pathSource.getPathText();
 	}
 
+	/**
+	 * SLIMのインストール先ディレクトリのパス名を取得します。
+	 */
 	public String getInstallDirectory()
 	{
 		return pathInstall.getPathText();
 	}
 
-	public String getSLIMPath()
+	/**
+	 * SLIMバイナリのパス名を取得します。
+	 */
+	public String getSlimBinaryPath()
 	{
-		return pathInput.getPathText();
+		return pathSlim.getPathText();
 	}
 
 	public SlimPathSetting.Result getResult()
@@ -267,29 +281,38 @@ class SlimPathPanel extends JPanel
 		pathSource.setEnabled(install.isSelected());
 		pathInstall.setEnabled(install.isSelected());
 
-		pathInput.setReadOnly(!useOther.isSelected());
+		pathSlim.setReadOnly(!useOther.isSelected());
 
 		switch (getResult())
 		{
 		case USE_INSTALLED:
-			pathInput.setPathText(defaultInstallPath);
+			pathSource.setPathText("");
+			pathInstall.setPathText(Env.getSlimInstallPath());
+			pathSlim.setPathText(createSlimPath());
 			break;
 		case USE_INCLUDED:
-			pathInput.setPathText(defaultIncludePath);
+			pathSource.setPathText("");
+			pathInstall.setPathText(defaultIncludeDir);
+			pathSlim.setPathText(defaultIncludePath);
 			break;
 		case INSTALL:
-			pathInput.setPathText(defaultInstallPath);
+			pathSource.setPathText("lmntal\\slim-X.Y.Z");
+			pathInstall.setPathText(Env.getSlimInstallPath());
+			pathSlim.setPathText(createSlimPath());
 			break;
 		case USE_OTHER:
-			pathInput.setPathText(getSlimPath());
+			pathSource.setPathText("");
+			pathInstall.setPathText("");
 			break;
 		}
 	}
 
-	private String getSlimPath()
+	/**
+	 * 指定されたインストール先パス名からSLIMバイナリのパス名を作成する。
+	 */
+	private String createSlimPath()
 	{
-		String path = Env.get("SLIM_EXE_PATH");
-		return path != null ? path : "";
+		return getInstallDirectory() + File.separator + "bin" + File.separator + SLIM_BIN;
 	}
 
 	private static void fixLabels(int minWidth, int minHeight, JLabel ... labels)

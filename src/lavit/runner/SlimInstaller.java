@@ -68,7 +68,10 @@ import lavit.Env;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
 import lavit.ui.ColoredLinePrinter;
+import lavit.util.Cygpath;
+import lavit.util.FileUtil;
 import lavit.util.OuterRunner;
+import lavit.util.StringUtils;
 
 public class SlimInstaller implements OuterRunner
 {
@@ -79,7 +82,8 @@ public class SlimInstaller implements OuterRunner
 	private StreamReaderThread errorReader;
 	private ThreadRunner runner;
 	private boolean success;
-	private File slimSourceDir;
+	private String slimSourceDir;
+	private String slimInstallDir;
 
 	public SlimInstaller()
 	{
@@ -101,9 +105,18 @@ public class SlimInstaller implements OuterRunner
 	 * Set location of SLIM source directory.
 	 * The default location is: './lmntal/slim-x.y.z'
 	 */
-	public void setSlimSourceDirectory(File dir)
+	public void setSlimSourceDirectory(String dir)
 	{
 		slimSourceDir = dir;
+	}
+
+	/**
+	 * Set location of SLIM install directory.
+	 * The default location is: 'lmntal/installed'
+	 */
+	public void setSlimInstallDirectory(String dir)
+	{
+		slimInstallDir = dir;
 	}
 
 	@Override
@@ -140,13 +153,32 @@ public class SlimInstaller implements OuterRunner
 		return success;
 	}
 
-	private File getSlimSourceDir()
+	private String getAbsolutePath(String path)
 	{
-		if (slimSourceDir == null)
+		return new File(path).getAbsolutePath();
+	}
+
+	private String getSlimSourcePathName()
+	{
+		if (StringUtils.nullOrEmpty(slimSourceDir))
 		{
-			slimSourceDir = new File(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfSlim());
+			slimSourceDir = Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfSlim();
 		}
-		return slimSourceDir;
+		return getAbsolutePath(slimSourceDir);
+	}
+
+	private String getSlimInstallPathName()
+	{
+		if (StringUtils.nullOrEmpty(slimInstallDir))
+		{
+			slimInstallDir = Env.getSlimInstallPath();
+		}
+		return getAbsolutePath(slimInstallDir);
+	}
+
+	private String getLinuxStyleSlimInstallPathName()
+	{
+		return Cygpath.toLinuxStyle(getSlimInstallPathName());
 	}
 
 	private class ThreadRunner extends Thread
@@ -173,7 +205,7 @@ public class SlimInstaller implements OuterRunner
 			{
 				ProcessBuilder pb = new ProcessBuilder(strList(cmd));
 				Env.setProcessEnvironment(pb.environment());
-				pb.directory(getSlimSourceDir());
+				pb.directory(new File(getSlimSourcePathName()));
 				p = pb.start();
 
 				outputReader = new StreamReaderThread(p.getInputStream());
@@ -211,7 +243,7 @@ public class SlimInstaller implements OuterRunner
 		@Override
 		public void run()
 		{
-			String shCmd = Env.getBinaryAbsolutePath("sh") + " configure --prefix=" + Env.getSpaceEscape(Env.getSlimInstallLinuxPath() + "/") + " " + Env.get("SLIM_CONFIGURE_OPTION");
+			String shCmd = Env.getBinaryAbsolutePath("sh") + " configure --prefix=" + getLinuxStyleSlimInstallPathName() + Env.get("SLIM_CONFIGURE_OPTION");
 			String makeCmd = Env.getBinaryAbsolutePath("make");
 			String makeInstallCmd = Env.getBinaryAbsolutePath("make") + " install";
 			boolean succeeded = true;
@@ -244,8 +276,8 @@ public class SlimInstaller implements OuterRunner
 			// slim.exe が無かったら失敗
 			if (succeeded)
 			{
-				File slimBin = new File(Env.getSlimInstallPath() + File.separator + "bin" + File.separator + Env.getSlimBinaryName());
-				succeeded = slimBin.exists();
+				String slimPath = getSlimInstallPathName() + File.separator + "bin" + File.separator + Env.getSlimBinaryName();
+				succeeded = FileUtil.exists(slimPath);
 			}
 
 			if (succeeded)
@@ -306,33 +338,33 @@ class InstallWindow extends JFrame
 {
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
+	private static final String[] PROGRESS_MATCH_STRING =
+	{
+		"checking for a BSD-compatible install",
+		"checking for style of include used by make",
+		"checking for suffix of object files",
+		"checking whether we are using the GNU C++ compiler",
+		"checking lex library",
+		"checking for C/C++ restrict keyword",
+		"checking for egrep",
+		"checking for memory.h",
+		"checking for unistd.h",
+		"checking for int64_t",
+		"checking for uint16_t",
+		"checking for void*",
+		"checking for strchr",
+		"config.status: creating src/Makefile",
+		"config.status: executing depfiles commands",
+		"configure end.",
+		"gcc: unrecognized option",
+		"make end.",
+		"Making install in doc",
+		"make install end"
+	};
+
 	private JProgressBar bar;
 	private ColoredLinePrinter text;
 	private JButton button;
-
-	private String[] progressMatchString =
-	{
-			"checking for a BSD-compatible install",
-			"checking for style of include used by make",
-			"checking for suffix of object files",
-			"checking whether we are using the GNU C++ compiler",
-			"checking lex library",
-			"checking for C/C++ restrict keyword",
-			"checking for egrep",
-			"checking for memory.h",
-			"checking for unistd.h",
-			"checking for int64_t",
-			"checking for uint16_t",
-			"checking for void*",
-			"checking for strchr",
-			"config.status: creating src/Makefile",
-			"config.status: executing depfiles commands",
-			"configure end.",
-			"gcc: unrecognized option",
-			"make end.",
-			"Making install in doc",
-			"make install end"
-	};
 
 	public InstallWindow()
 	{
@@ -388,9 +420,9 @@ class InstallWindow extends JFrame
 			bar.setIndeterminate(false);
 		}
 
-		for (int i = 0; i < progressMatchString.length; i++)
+		for (int i = 0; i < PROGRESS_MATCH_STRING.length; i++)
 		{
-			if (s.startsWith(progressMatchString[i]))
+			if (s.startsWith(PROGRESS_MATCH_STRING[i]))
 			{
 				final int progress = (i + 1) * 5;
 				SwingUtilities.invokeLater(new Runnable()
@@ -425,7 +457,7 @@ class InstallWindow extends JFrame
 		}
 	}
 
-	private void printColoredLine(String s, Color c)
+	private synchronized void printColoredLine(String s, Color c)
 	{
 		text.appendLine(String.format("[%s] %s", DATE_FORMAT.format(new Date()), s), c);
 	}

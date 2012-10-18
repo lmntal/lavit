@@ -35,13 +35,12 @@
 
 	<!-- Create JAR -->
 	<target name="jar" depends="javac" description="create jar">
-		<jar destfile="${target-jar}" basedir="${bin}" compress="false" update="true">
+		<jar destfile="${target-jar}" basedir="${bin}" compress="false" update="false">
 			<manifest>
 				<attribute name="Class-Path" value="lib/ant.jar" />
 				<attribute name="Main-Class" value="lavit.FrontEnd" />
 			</manifest>
-			<fileset file="./img" />
-			<fileset file="./lang" />
+			<fileset dir="." includes="img/*,lang/*.xml" />
 			<fileset file="./env_default.txt" />
 		</jar>
 	</target>

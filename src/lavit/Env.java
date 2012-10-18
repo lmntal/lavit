@@ -154,21 +154,31 @@ public class Env {
 		} catch (IOException e) {
 			System.err.println("save error. check "+ENV_FILE);
 		}
-    }
+	}
 
-    static public String get(String key){
-    	if(!prop.containsKey(key)){
-    		System.err.println("read error. check "+key+" in "+ENV_FILE);
-    	}
-    	return prop.getProperty(key);
-    }
+	public static String get(String key)
+	{
+		return prop.getProperty(key);
+	}
 
-    static public int getInt(String key){
-    	if(!prop.containsKey(key)){
-    		System.err.println("read error. check "+key+" in "+ENV_FILE);
-    	}
-    	return Integer.valueOf(prop.getProperty(key));
-    }
+	public static int getInt(String key) throws NumberFormatException
+	{
+		return Integer.valueOf(prop.getProperty(key));
+	}
+
+	public static int getInt(String key, int defaultValue)
+	{
+		int value;
+		try
+		{
+			value = Integer.parseInt(get(key));
+		}
+		catch (NumberFormatException e)
+		{
+			value = defaultValue;
+		}
+		return value;
+	}
 
     static public boolean is(String key){
     	if(!prop.containsKey(key)){
@@ -225,17 +235,31 @@ public class Env {
     	}
     }
 
-    static public String getSpaceEscape(String path){
-    	if(path.indexOf(" ")==-1){
-    		return path;
-    	}else{
-    		return "\""+path+"\"";
-    	}
-    }
+	/**
+	 * 文字列 {@code path} に半角空白文字 (0x20) が含まれる場合、この文字列を二重引用符で囲んだ文字列を返す。
+	 * 半角空白文字が含まれない場合、{@code path} をそのまま返す。
+	 */
+	public static String getSpaceEscape(String path)
+	{
+		if (path.indexOf(" ") == -1)
+		{
+			return path;
+		}
+		else
+		{
+			return "\"" + path + "\"";
+		}
+	}
 
-    static public String getSlimInstallPath(){
-    	return LMNTAL_LIBRARY_DIR+File.separatorChar+"installed";
-    }
+	public static String getSlimInstallPath()
+	{
+		String path = Env.get("path.slim.install");
+		if (StringUtils.nullOrEmpty(path))
+		{
+			path = LMNTAL_LIBRARY_DIR + File.separator + "installed";
+		}
+		return path;
+	}
 
     static public String getSlimInstallLibraryPath(){
     	return getSlimInstallPath()+File.separator+"share"+File.separator+"slim"+File.separator+"lib";

@@ -54,35 +54,36 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import lavit.util.FileUtils;
 import lavit.util.IntUtils;
 import lavit.util.StringUtils;
 
 public class Env {
 
-	static public final String APP_NAME = "LaViT";
-	static public final String APP_VERSION = "2.5.3";
-	static public final String APP_DATE = "2012/08/10";
-	static public final String APP_HREF = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
+	public static final String APP_NAME = "LaViT";
+	public static final String APP_VERSION = "2.5.3";
+	public static final String APP_DATE = "2012/08/10";
+	public static final String APP_HREF = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
 
-	static public final String LMNTAL_VERSION = "LMNtal : 1.21 (2011/12/26)";
-	static public final String SLIM_VERSION = "SLIM : 2.2.2 (2012/05/12)";
-	static public final String UNYO_VERSION = "UNYO UNYO : 1.1.1 (2010/03/07)";
+	public static final String LMNTAL_VERSION = "LMNtal : 1.21 (2011/12/26)";
+	public static final String SLIM_VERSION = "SLIM : 2.2.2 (2012/05/12)";
+	public static final String UNYO_VERSION = "UNYO UNYO : 1.1.1 (2010/03/07)";
 
-	static public final String DIR_NAME_SLIM = "slim-2.2.2";
-	static public final String DIR_NAME_UNYO = "unyo1_1_1";
-	static public final String DIR_NAME_LTL2BA = "ltl2ba-1.1";
+	public static final String DIR_NAME_SLIM = "slim-2.2.2";
+	public static final String DIR_NAME_UNYO = "unyo1_1_1";
+	public static final String DIR_NAME_LTL2BA = "ltl2ba-1.1";
 
-	static public final String LMNTAL_LIBRARY_DIR = "lmntal";
+	public static final String LMNTAL_LIBRARY_DIR = "lmntal";
 
-	static public Env env = null;
-    static private final String ENV_FILE = "env.txt";
-    static private final String ENV_DEFAULT_FILE = "env_default.txt";
+	public static Env env = null;
+	private static final String ENV_FILE = "env.txt";
+	private static final String ENV_DEFAULT_FILE = "env_default.txt";
 
-    static private Properties prop = new Properties();
+	private static Properties prop = new Properties();
 
-    static public final String IMAGEFILE_ICON = "img/icon.png";
+	public static final String IMAGEFILE_ICON = "img/icon.png";
 
-    static public final String FONT_SIZE_LIST[] = {"8","9","10","11","12","14","16","18","20","24","28","32","36","40","44","48","54","60","66","72","80","88","96","106"};
+	public static final String[] FONT_SIZE_LIST = {"8","9","10","11","12","14","16","18","20","24","28","32","36","40","44","48","54","60","66","72","80","88","96","106"};
 
     public Env(){
     	env = this;
@@ -304,35 +305,34 @@ public class Env {
 		return cmd;
     }
 
-    static public String getBinaryAbsolutePath(String cmd){
-    	String usrLocalBin = File.separatorChar+"usr"+File.separatorChar+"local"+File.separatorChar+"bin"+File.separatorChar+cmd;
+	public static String getBinaryAbsolutePath(String cmd)
+	{
+		String usrLocalBin = File.separatorChar+"usr"+File.separatorChar+"local"+File.separatorChar+"bin"+File.separatorChar+cmd;
 		String usrBin = File.separatorChar+"usr"+File.separatorChar+"bin"+File.separatorChar+cmd;
 		String bin = File.separatorChar+"bin"+File.separatorChar+cmd;
-    	if(Env.isWindows()){
-    		usrLocalBin = get("WINDOWS_CYGWIN_DIR")+usrLocalBin+".exe";
-    		usrBin = get("WINDOWS_CYGWIN_DIR")+usrBin+".exe";
-    		bin = get("WINDOWS_CYGWIN_DIR")+bin+".exe";
-    		if((new File(usrLocalBin)).exists()){
-    			return usrLocalBin;
-    		}else if((new File(usrBin)).exists()){
-    			return usrBin;
-    		}else if((new File(bin)).exists()){
-    			return bin;
-    		}else{
-    			return cmd;
-    		}
-    	}else{
-    		if((new File(usrLocalBin)).exists()){
-    			return usrLocalBin;
-    		}else if((new File(usrBin)).exists()){
-    			return usrBin;
-    		}else if((new File(bin)).exists()){
-    			return bin;
-    		}else{
-    			return cmd;
-    		}
-    	}
-    }
+		if (Env.isWindows())
+		{
+			usrLocalBin = get("WINDOWS_CYGWIN_DIR") + usrLocalBin + ".exe";
+			usrBin = get("WINDOWS_CYGWIN_DIR") + usrBin + ".exe";
+			bin = get("WINDOWS_CYGWIN_DIR") + bin + ".exe";
+		}
+		if (FileUtils.exists(usrLocalBin))
+		{
+			return usrLocalBin;
+		}
+		else if (FileUtils.exists(usrBin))
+		{
+			return usrBin;
+		}
+		else if (FileUtils.exists(bin))
+		{
+			return bin;
+		}
+		else
+		{
+			return cmd;
+		}
+	}
 
     static public String getSlimBinaryName(){
     	if(Env.isWindows()){
@@ -452,5 +452,4 @@ public class Env {
     	}
     	watchSumTimes.clear();
     }
-
 }

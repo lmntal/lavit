@@ -41,6 +41,11 @@ public final class FileUtils
 {
 	private FileUtils() { }
 
+	/**
+	 * パス名文字列 {@code path} が表すファイルの存在を確認します。
+	 * @param path パス名文字列
+	 * @return パス名文字列 {@code path} が表すファイルが存在する場合は {@code true}、そうでない場合は {@code false}。
+	 */
 	public static boolean exists(String path)
 	{
 		File file = new File(path);

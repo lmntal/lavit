@@ -42,6 +42,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -53,23 +54,19 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import lavit.Env;
+import lavit.Lang;
+import lavit.util.StringUtils;
 
 @SuppressWarnings("serial")
 public class VersionFrame extends JDialog
 {
-	private static final String INFO_TEXT =
-		"LaViT\n" +
-		"Version : " + Env.APP_VERSION + "\n" +
-		"Date : " + Env.APP_DATE + "\n\n" +
-		Env.LMNTAL_VERSION + "\n" +
-		Env.SLIM_VERSION + "\n" +
-		Env.UNYO_VERSION;
-
 	private static VersionFrame instance;
+
+	private JTextArea infoText;
 
 	private VersionFrame()
 	{
-		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
+		Icon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
 
 		setTitle("Version information");
 		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
@@ -86,7 +83,7 @@ public class VersionFrame extends JDialog
 		icon.setAlignmentX(Component.CENTER_ALIGNMENT);
 		panel.add(icon);
 
-		JTextArea infoText = new JTextArea(INFO_TEXT);
+		infoText = new JTextArea();
 		infoText.setAlignmentX(Component.CENTER_ALIGNMENT);
 		infoText.setEditable(false);
 		infoText.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
@@ -105,8 +102,23 @@ public class VersionFrame extends JDialog
 		panel.add(button);
 
 		addWindowListener(new ChildWindowListener(this));
+	}
 
-		pack();
+	private void updateInformationText()
+	{
+		String slimVersion = Env.get("version.slim");
+		if (StringUtils.nullOrEmpty(slimVersion))
+		{
+			slimVersion = Lang.w[15];
+		}
+		String info =
+			"LaViT\n" +
+			"Version : " + Env.APP_VERSION + "\n" +
+			"Date : " + Env.APP_DATE + "\n\n" +
+			Env.LMNTAL_VERSION + "\n" +
+			"SLIM : " + slimVersion + "\n" +
+			Env.UNYO_VERSION;
+		infoText.setText(info);
 	}
 
 	public static void showDialog()
@@ -121,6 +133,8 @@ public class VersionFrame extends JDialog
 			@Override
 			public void run()
 			{
+				instance.updateInformationText();
+				instance.pack();
 				instance.setVisible(true);
 			}
 		});

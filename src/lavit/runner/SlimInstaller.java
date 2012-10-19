@@ -41,13 +41,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -331,39 +328,6 @@ public class SlimInstaller implements OuterRunner
 				logWriter.println("  " + s);
 			}
 		}
-	}
-
-	/**
-	 * Reads a string in VERSION file in SLIM source directory.
-	 */
-	public static String getSlimSourceVersion(String dir)
-	{
-		File dirFile = new File(dir);
-		if (dirFile.exists() && dirFile.isDirectory())
-		{
-			for (File file : dirFile.listFiles())
-			{
-				if (file.getName().equals("VERSION"))
-				{
-					String version = "";
-					try
-					{
-						BufferedReader reader = new BufferedReader(new FileReader(file));
-						version = reader.readLine();
-					}
-					catch (FileNotFoundException e)
-					{
-						e.printStackTrace();
-					}
-					catch (IOException e)
-					{
-						e.printStackTrace();
-					}
-					return version;
-				}
-			}
-		}
-		return "";
 	}
 
 	private class ThreadRunner extends Thread

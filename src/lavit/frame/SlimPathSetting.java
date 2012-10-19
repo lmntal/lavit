@@ -39,7 +39,12 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -115,7 +120,9 @@ public final class SlimPathSetting
 			else
 			{
 				Env.set("SLIM_EXE_PATH", sp.getSlimBinaryPath());
+				Env.set("path.slim.exe", sp.getSlimBinaryPath());
 			}
+			Env.set("version.slim", getSlimVersion(Env.get("path.slim.exe")));
 		}
 	}
 
@@ -134,12 +141,53 @@ public final class SlimPathSetting
 
 		if (slimInstaller.isSucceeded())
 		{
-			Env.set("version.slim", SlimInstaller.getSlimSourceVersion(sourceDir));
+			String slimPath = sp.getSlimBinaryPath();
 			Env.set("path.slim.source", sourceDir);
 			Env.set("path.slim.install", installDir);
-			Env.set("path.slim.exe", sp.getSlimBinaryPath());
-			Env.set("SLIM_EXE_PATH", sp.getSlimBinaryPath());
+			Env.set("path.slim.exe", slimPath);
+			Env.set("SLIM_EXE_PATH", slimPath);
 		}
+	}
+
+	/**
+	 * Gets SLIM version by executing {@code slim --version}.
+	 */
+	private static String getSlimVersion(String slimPath)
+	{
+		if (StringUtils.nullOrEmpty(slimPath))
+		{
+			return "";
+		}
+
+		ProcessBuilder pb = new ProcessBuilder(slimPath, "--version");
+		pb.redirectErrorStream(true);
+
+		String version = "";
+		String line = "";
+		try
+		{
+			Process p = pb.start();
+			p.getOutputStream().close();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			line = reader.readLine();
+			p.getInputStream().close();
+			p.getErrorStream().close();
+			p.waitFor();
+		}
+		catch (IOException e)
+		{
+		}
+		catch (InterruptedException e)
+		{
+		}
+
+		Pattern pat = Pattern.compile("\\d+\\.\\d+\\.\\d+");
+		Matcher m = pat.matcher(line);
+		if (m.find())
+		{
+			version = m.group();
+		}
+		return version;
 	}
 }
 
@@ -319,19 +367,19 @@ class SlimPathPanel extends JPanel
 		case USE_INSTALLED:
 			if (!FileUtils.exists(getSlimBinaryPath()))
 			{
-				showError(getSlimBinaryPath() + " not found.");
+				showError("file \"" + getSlimBinaryPath() + "\" is not found.");
 				return false;
 			}
 			break;
 		case INSTALL:
 			if (!FileUtils.exists(getSourceDirectory()))
 			{
-				showError(getSourceDirectory() + " not found.");
+				showError("directory \"" + getSourceDirectory() + "\" is not found.");
 				return false;
 			}
 			else if (!new File(getSourceDirectory()).isDirectory())
 			{
-				showError(getSourceDirectory() + " is not a directory.");
+				showError("\"" + getSourceDirectory() + "\" is not a directory.");
 				return false;
 			}
 			break;

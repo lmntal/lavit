@@ -126,7 +126,6 @@ public class VersionFrame extends JDialog
 		if (instance == null)
 		{
 			instance = new VersionFrame();
-			instance.setLocationRelativeTo(null);
 		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -135,6 +134,7 @@ public class VersionFrame extends JDialog
 			{
 				instance.updateInformationText();
 				instance.pack();
+				instance.setLocationRelativeTo(null);
 				instance.setVisible(true);
 			}
 		});

@@ -41,7 +41,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
@@ -70,20 +74,43 @@ import lavit.frame.ChildWindowListener;
 import lavit.ui.ColoredLinePrinter;
 import lavit.util.Cygpath;
 import lavit.util.FileUtils;
+import lavit.util.IntUtils;
 import lavit.util.OuterRunner;
 import lavit.util.StringUtils;
 
 public class SlimInstaller implements OuterRunner
 {
+	private static final DateFormat HEAD_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static final DateFormat LOG_DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
+
+	private static final String[] PROGRESS_MATCH_STRING =
+	{
+		"checking build system type",
+		"checking lex output file root",
+		"checking for main in -lrt",
+		"checking whether the gcc linker",
+		"checking for glob.h",
+		"checking for backtrace in -lunwind",
+		"configure: creating ./config.status",
+		"config.status: creating src/genconfig",
+		"LaViT: End - configure",
+		"gcc: unrecognized option",
+		"LaViT: End - make (",
+		"Making install in doc",
+		"LaViT: End - make install (",
+	};
+
 	private static Icon ICON_SUCCESS;
 	private static Icon ICON_FAILED;
 
 	private StreamReaderThread outputReader;
 	private StreamReaderThread errorReader;
+	private InstallWindow window;
 	private ThreadRunner runner;
 	private boolean success;
 	private String slimSourceDir;
 	private String slimInstallDir;
+	private PrintWriter logWriter;
 
 	public SlimInstaller()
 	{
@@ -122,6 +149,18 @@ public class SlimInstaller implements OuterRunner
 	@Override
 	public void run()
 	{
+		logStart("slim_install_log.txt");
+
+		window = new InstallWindow(PROGRESS_MATCH_STRING.length - 1);
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				window.setLocationRelativeTo(null);
+				window.setVisible(true);
+			}
+		});
+
 		runner.start();
 		try
 		{
@@ -131,6 +170,27 @@ public class SlimInstaller implements OuterRunner
 		{
 			e.printStackTrace();
 		}
+
+		if (isSucceeded())
+		{
+			logPrintLine("== SLIM INSTALL SUCCEEDED ==");
+			logPrintLine("slim is in " + getSlimInstallPathName());
+			JOptionPane.showMessageDialog(
+				window, Lang.w[10], "SLIM INSTALL",
+				JOptionPane.PLAIN_MESSAGE, ICON_SUCCESS);
+		}
+		else
+		{
+			logPrintLine("== SLIM INSTALL FAILED ==");
+			JOptionPane.showMessageDialog(
+				window, Lang.w[11], "SLIM INSTALL",
+				JOptionPane.PLAIN_MESSAGE, ICON_FAILED);
+		}
+
+		window.exit();
+		exit();
+
+		logEnd();
 	}
 
 	@Override
@@ -189,23 +249,83 @@ public class SlimInstaller implements OuterRunner
 		return Cygpath.toLinuxStyle(getSlimInstallPathName());
 	}
 
+	private static String format(String str)
+	{
+		return String.format("[%s] %s", LOG_DATE_FORMAT.format(new Date()), str);
+	}
+
+	private void logStart(String fileName)
+	{
+		try
+		{
+			logWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName))));
+			logWriter.println("LaViT SLIM Installer Log");
+			logWriter.println("Date: " + HEAD_DATE_FORMAT.format(new Date()));
+			logWriter.println("------------------------------------");
+		}
+		catch (FileNotFoundException e)
+		{
+			logWriter = null;
+		}
+	}
+
+	private void logEnd()
+	{
+		if (logWriter != null)
+		{
+			logWriter.close();
+		}
+	}
+
+	private void logPrintLine(String str)
+	{
+		logPrint(str, false);
+	}
+
+	private void logPrintError(String str)
+	{
+		logPrint(str, true);
+	}
+
+	private void logPrint(String str, boolean error)
+	{
+		String s = format(str);
+		if (window != null)
+		{
+			for (int i = 0; i < PROGRESS_MATCH_STRING.length; i++)
+			{
+				if (str.startsWith(PROGRESS_MATCH_STRING[i]))
+				{
+					window.setProgressValue(i);
+					break;
+				}
+			}
+
+			if (error)
+			{
+				window.printError(s);
+			}
+			else
+			{
+				window.println(s);
+			}
+		}
+		if (logWriter != null)
+		{
+			if (error)
+			{
+				logWriter.println("! " + s);
+			}
+			else
+			{
+				logWriter.println("  " + s);
+			}
+		}
+	}
+
 	private class ThreadRunner extends Thread
 	{
 		private Process p;
-		private InstallWindow window;
-
-		public ThreadRunner()
-		{
-			window = new InstallWindow();
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					window.setLocationRelativeTo(null);
-					window.setVisible(true);
-				}
-			});
-		}
 
 		private int execCommand(String cmd)
 		{
@@ -221,7 +341,7 @@ public class SlimInstaller implements OuterRunner
 				{
 					public void println(String line)
 					{
-						window.println(line);
+						logPrintLine(line);
 					}
 				});
 				outputReader.start();
@@ -231,7 +351,7 @@ public class SlimInstaller implements OuterRunner
 				{
 					public void println(String line)
 					{
-						window.printError(line);
+						logPrintError(line);
 					}
 				});
 				errorReader.start();
@@ -243,7 +363,7 @@ public class SlimInstaller implements OuterRunner
 			{
 				PrintWriter writer = new PrintWriter(new StringWriter());
 				e.printStackTrace(writer);
-				window.printError(writer.toString());
+				logPrintError(writer.toString());
 			}
 			return 1;
 		}
@@ -251,33 +371,33 @@ public class SlimInstaller implements OuterRunner
 		@Override
 		public void run()
 		{
-			String shCmd = Env.getBinaryAbsolutePath("sh") + " configure --prefix=" + getLinuxStyleSlimInstallPathName() + Env.get("SLIM_CONFIGURE_OPTION");
+			String shCmd = Env.getBinaryAbsolutePath("sh") + " configure --prefix=" + getLinuxStyleSlimInstallPathName() + " " + Env.get("SLIM_CONFIGURE_OPTION");
 			String makeCmd = Env.getBinaryAbsolutePath("make");
 			String makeInstallCmd = Env.getBinaryAbsolutePath("make") + " install";
 			boolean succeeded = true;
 			int ret;
 
 			// sh configure起動
-			window.println(shCmd);
+			logPrintLine("LaViT: Execute - " + shCmd);
 			ret = execCommand(shCmd);
-			window.println("configure end. exit=" + ret + ".\n");
+			logPrintLine("LaViT: End - configure (Exit Code = " + ret + ")\n");
 			succeeded = (ret == 0);
 
 			// make起動
 			if (succeeded)
 			{
-				window.println(makeCmd);
+				logPrintLine("LaViT: Execute - " + makeCmd);
 				ret = execCommand(makeCmd);
-				window.println("make end. exit=" + ret + ".\n");
+				logPrintLine("LaViT: End - make (Exit Code = " + ret + ")\n");
 				succeeded = (ret == 0);
 			}
 
 			// make install起動
 			if (succeeded)
 			{
-				window.println(makeInstallCmd);
+				logPrintLine("LaViT: Execute - " + makeInstallCmd);
 				ret = execCommand(makeInstallCmd);
-				window.println("make install end. exit=" + ret + ".\n");
+				logPrintLine("LaViT: End - make install (Exit Code = " + ret + ")\n");
 				succeeded = (ret == 0);
 			}
 
@@ -287,35 +407,7 @@ public class SlimInstaller implements OuterRunner
 				String slimPath = getSlimInstallPathName() + File.separator + "bin" + File.separator + Env.getSlimBinaryName();
 				succeeded = FileUtils.exists(slimPath);
 			}
-
-			if (succeeded)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						JOptionPane.showMessageDialog(
-							window, Lang.w[10], "SLIM INSTALL",
-							JOptionPane.PLAIN_MESSAGE, ICON_SUCCESS);
-					}
-				});
-			}
-			else
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						JOptionPane.showMessageDialog(
-							window, Lang.w[11], "SLIM INSTALL",
-							JOptionPane.PLAIN_MESSAGE, ICON_FAILED);
-					}
-				});
-			}
-
 			success = succeeded;
-			window.exit();
-			exit();
 		}
 
 		private List<String> strList(String str)
@@ -344,37 +436,11 @@ public class SlimInstaller implements OuterRunner
 @SuppressWarnings("serial")
 class InstallWindow extends JFrame
 {
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
-
-	private static final String[] PROGRESS_MATCH_STRING =
-	{
-		"checking for a BSD-compatible install",
-		"checking for style of include used by make",
-		"checking for suffix of object files",
-		"checking whether we are using the GNU C++ compiler",
-		"checking lex library",
-		"checking for C/C++ restrict keyword",
-		"checking for egrep",
-		"checking for memory.h",
-		"checking for unistd.h",
-		"checking for int64_t",
-		"checking for uint16_t",
-		"checking for void*",
-		"checking for strchr",
-		"config.status: creating src/Makefile",
-		"config.status: executing depfiles commands",
-		"configure end.",
-		"gcc: unrecognized option",
-		"make end.",
-		"Making install in doc",
-		"make install end"
-	};
-
 	private JProgressBar bar;
 	private ColoredLinePrinter text;
 	private JButton button;
 
-	public InstallWindow()
+	public InstallWindow(int progressMax)
 	{
 		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/slim_c_s.png"));
 
@@ -391,7 +457,7 @@ class InstallWindow extends JFrame
 		icon.setAlignmentX(Component.CENTER_ALIGNMENT);
 		panel.add(icon);
 
-		bar = new JProgressBar(0, 100);
+		bar = new JProgressBar(0, progressMax);
 		bar.setIndeterminate(true);
 		panel.add(bar);
 
@@ -421,53 +487,31 @@ class InstallWindow extends JFrame
 		pack();
 	}
 
-	private void progress(String s)
+	public void setProgressValue(int value)
 	{
 		if (bar.isIndeterminate())
 		{
 			bar.setIndeterminate(false);
 		}
-
-		for (int i = 0; i < PROGRESS_MATCH_STRING.length; i++)
-		{
-			if (s.startsWith(PROGRESS_MATCH_STRING[i]))
-			{
-				final int progress = (i + 1) * 5;
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						if (bar.getValue() < progress)
-						{
-							bar.setValue(progress);
-						}
-					}
-				});
-			}
-		}
+		bar.setValue(IntUtils.clamp(value, bar.getMinimum(), bar.getMaximum()));
 	}
 
 	public void println(String str)
 	{
-		if (!str.isEmpty())
-		{
-			progress(str);
-			printColoredLine(str, Color.WHITE);
-		}
+		printColoredLine(str, Color.WHITE);
 	}
 
 	public void printError(String str)
 	{
-		if (!str.isEmpty())
-		{
-			progress(str);
-			printColoredLine(str, Color.GRAY);
-		}
+		printColoredLine(str, Color.GRAY);
 	}
 
-	private synchronized void printColoredLine(String s, Color c)
+	private synchronized void printColoredLine(String str, Color c)
 	{
-		text.appendLine(String.format("[%s] %s", DATE_FORMAT.format(new Date()), s), c);
+		if (!str.isEmpty())
+		{
+			text.appendLine(str, c);
+		}
 	}
 
 	public void exit()
@@ -476,7 +520,7 @@ class InstallWindow extends JFrame
 		{
 			public void run()
 			{
-				bar.setValue(100);
+				bar.setValue(bar.getMaximum());
 				button.setEnabled(true);
 				setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			}

@@ -134,6 +134,7 @@ public final class SlimPathSetting
 
 		if (slimInstaller.isSucceeded())
 		{
+			Env.set("version.slim", SlimInstaller.getSlimSourceVersion(sourceDir));
 			Env.set("path.slim.source", sourceDir);
 			Env.set("path.slim.install", installDir);
 			Env.set("path.slim.exe", sp.getSlimBinaryPath());
@@ -362,7 +363,7 @@ class SlimPathPanel extends JPanel
 			pathSlim.setPathText(defaultIncludePath);
 			break;
 		case INSTALL:
-			pathSource.setPathText("lmntal\\slim-X.Y.Z");
+			pathSource.setPathText(Env.estimateSlimSourcePath());
 			pathInstall.setPathText(Env.getSlimInstallPath());
 			pathSlim.setPathText(createSlimPath());
 			break;

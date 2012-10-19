@@ -58,8 +58,8 @@ import lavit.util.FileUtils;
 import lavit.util.IntUtils;
 import lavit.util.StringUtils;
 
-public class Env {
-
+public final class Env
+{
 	public static final String APP_NAME = "LaViT";
 	public static final String APP_VERSION = "2.5.3";
 	public static final String APP_DATE = "2012/08/10";
@@ -334,21 +334,36 @@ public class Env {
 		}
 	}
 
-    static public String getSlimBinaryName(){
-    	if(Env.isWindows()){
-    		return "slim.exe";
-		}else{
-			return "slim";
+	/**
+	 * Finds a directory whose name starts with "slim" in "./lmntal".
+	 * @return If found, returns path string of the directory found first.
+	 * Otherwise, returns empty string.
+	 */
+	public static String estimateSlimSourcePath()
+	{
+		File lmntalDir = new File("lmntal");
+		if (lmntalDir.exists() && lmntalDir.isDirectory())
+		{
+			for (File file : lmntalDir.listFiles())
+			{
+				if (file.isDirectory() && file.getName().startsWith("slim"))
+				{
+					return file.getPath();
+				}
+			}
 		}
-    }
+		return "";
+	}
 
-    static public String getLtl2baBinaryName(){
-    	if(Env.isWindows()){
-    		return "ltl2ba.exe";
-		}else{
-			return "ltl2ba";
-		}
-    }
+	public static String getSlimBinaryName()
+	{
+		return Env.isWindows() ? "slim.exe" : "slim";
+	}
+
+	public static String getLtl2baBinaryName()
+	{
+		return Env.isWindows() ? "ltl2ba.exe" : "ltl2ba";
+	}
 
 	public static double getPercentage(String key, double per)
 	{

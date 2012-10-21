@@ -115,8 +115,8 @@ public final class SlimPathSetting
 			{
 				Env.set("SLIM_EXE_PATH", sp.getSlimBinaryPath());
 				Env.set("path.slim.exe", sp.getSlimBinaryPath());
+				Env.set("version.slim", getSlimVersion(Env.get("path.slim.exe")));
 			}
-			Env.set("version.slim", getSlimVersion(Env.get("path.slim.exe")));
 		}
 		return approved;
 	}
@@ -148,6 +148,7 @@ public final class SlimPathSetting
 					Env.set("path.slim.install", installDir);
 					Env.set("path.slim.exe", slimPath);
 					Env.set("SLIM_EXE_PATH", slimPath);
+					Env.set("version.slim", getSlimVersion(slimPath));
 				}
 			}
 		});

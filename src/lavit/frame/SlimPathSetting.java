@@ -59,6 +59,7 @@ import javax.swing.event.ChangeListener;
 
 import lavit.Env;
 import lavit.Lang;
+import lavit.frame.ModalSettingDialog.ClosingEvent;
 import lavit.runner.SlimInstaller;
 import lavit.ui.PathInputField;
 import lavit.util.FileUtils;
@@ -82,7 +83,7 @@ public final class SlimPathSetting
 	{
 	}
 
-	public void showDialog()
+	public boolean showDialog()
 	{
 		if (dialog == null)
 		{
@@ -92,24 +93,14 @@ public final class SlimPathSetting
 			dialog.setDialogTitle("SLIM Setting");
 			dialog.setHeadLineText("Setup SLIM path");
 			dialog.setDescriptionText(Lang.w[8] + Env.getSlimBinaryName() + Lang.w[9]);
-			dialog.setNoClose(true);
-			dialog.addOKButtonListener(new ActionListener()
+			dialog.setClosingListener(new ModalSettingDialog.ClosingListener()
 			{
-				@Override
-				public void actionPerformed(ActionEvent e)
+				public void dialogClosing(ClosingEvent e)
 				{
-					if (sp.verifyConfiguration())
+					if (e.isApproved() && !sp.verifyConfiguration())
 					{
-						dialog.closeDialog();
+						e.setCanceled(true);
 					}
-				}
-			});
-			dialog.addCancelButtonListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(ActionEvent e)
-				{
-					dialog.closeDialog();
 				}
 			});
 		}
@@ -127,6 +118,7 @@ public final class SlimPathSetting
 			}
 			Env.set("version.slim", getSlimVersion(Env.get("path.slim.exe")));
 		}
+		return approved;
 	}
 
 	public void waitFor()
@@ -145,7 +137,6 @@ public final class SlimPathSetting
 		installer = new SlimInstaller();
 		installer.setSlimSourceDirectory(sourceDir);
 		installer.setSlimInstallDirectory(installDir);
-		installer.run();
 		installer.setFinishListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -160,6 +151,7 @@ public final class SlimPathSetting
 				}
 			}
 		});
+		installer.run();
 	}
 
 	/**

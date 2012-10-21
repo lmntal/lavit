@@ -210,8 +210,10 @@ public class FrontEnd {
 		if (StringUtils.nullOrEmpty(Env.get("SLIM_EXE_PATH")))
 		{
 			SlimPathSetting setting = new SlimPathSetting();
-			setting.showDialog();
-			setting.waitFor();
+			if (setting.showDialog())
+			{
+				setting.waitFor();
+			}
 		}
 	}
 

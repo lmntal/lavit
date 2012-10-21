@@ -129,6 +129,15 @@ public class SlimInstaller implements OuterRunner
 
 		this.runner = new ThreadRunner();
 		this.success = false;
+
+		window = new InstallWindow(PROGRESS_MATCH_STRING.length - 1);
+		window.addWindowListener(new WindowAdapter()
+		{
+			public void windowOpened(WindowEvent e)
+			{
+				runner.start();
+			}
+		});
 	}
 
 	/**
@@ -152,14 +161,6 @@ public class SlimInstaller implements OuterRunner
 	@Override
 	public void run()
 	{
-		window = new InstallWindow(PROGRESS_MATCH_STRING.length - 1);
-		window.addWindowListener(new WindowAdapter()
-		{
-			public void windowOpened(WindowEvent e)
-			{
-				runner.start();
-			}
-		});
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -380,13 +381,13 @@ public class SlimInstaller implements OuterRunner
 
 			logStart("slim_install_log.txt");
 
-			// sh configure起動
+			// execute "sh configure"
 			logPrintLine("LaViT: Execute - " + shCmd);
 			ret = execCommand(shCmd);
 			logPrintLine("LaViT: End - configure (Exit Code = " + ret + ")\n");
 			succeeded = (ret == 0);
 
-			// make起動
+			// execute "make"
 			if (succeeded)
 			{
 				logPrintLine("LaViT: Execute - " + makeCmd);
@@ -395,7 +396,7 @@ public class SlimInstaller implements OuterRunner
 				succeeded = (ret == 0);
 			}
 
-			// make install起動
+			// execute "make install"
 			if (succeeded)
 			{
 				logPrintLine("LaViT: Execute - " + makeInstallCmd);
@@ -404,7 +405,7 @@ public class SlimInstaller implements OuterRunner
 				succeeded = (ret == 0);
 			}
 
-			// slim.exe が無かったら失敗
+			// fail if slim.exe was not created.
 			if (succeeded)
 			{
 				String slimPath = getSlimInstallPathName() + File.separator + "bin" + File.separator + Env.getSlimBinaryName();

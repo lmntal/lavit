@@ -49,6 +49,8 @@ import java.awt.Image;
 import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -68,6 +70,37 @@ import lavit.Lang;
  */
 public final class ModalSettingDialog
 {
+	public static class ClosingEvent
+	{
+		private final boolean approved;
+		private boolean canceled;
+
+		public ClosingEvent(boolean approved)
+		{
+			this.approved = approved;
+		}
+
+		public boolean isApproved()
+		{
+			return approved;
+		}
+
+		public boolean isCanceled()
+		{
+			return canceled;
+		}
+
+		public void setCanceled(boolean b)
+		{
+			canceled = b;
+		}
+	}
+
+	public interface ClosingListener
+	{
+		public void dialogClosing(ClosingEvent e);
+	}
+
 	/**
 	 * ヘッダー部のパネル
 	 */
@@ -94,7 +127,7 @@ public final class ModalSettingDialog
 	private JLabel headLabel;
 	private JLabel descLabel;
 	private boolean approved;
-	private boolean noClose;
+	private ClosingListener closingListener;
 
 	private ModalSettingDialog(JComponent content)
 	{
@@ -140,10 +173,7 @@ public final class ModalSettingDialog
 			public void actionPerformed(ActionEvent e)
 			{
 				approved = true;
-				if (!noClose)
-				{
-					dialog.dispose();
-				}
+				tryClose();
 			}
 		});
 		cancelButton.addActionListener(new ActionListener()
@@ -152,10 +182,7 @@ public final class ModalSettingDialog
 			public void actionPerformed(ActionEvent e)
 			{
 				approved = false;
-				if (!noClose)
-				{
-					dialog.dispose();
-				}
+				tryClose();
 			}
 		});
 
@@ -170,7 +197,15 @@ public final class ModalSettingDialog
 		buttonPanel.add(cancelButton);
 		dialog.add(buttonPanel, BorderLayout.SOUTH);
 
-		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		dialog.addWindowListener(new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent e)
+			{
+				approved = false;
+				tryClose();
+			}
+		});
 	}
 
 	public void setDialogTitle(String title)
@@ -198,16 +233,6 @@ public final class ModalSettingDialog
 		dialog.setIconImages(icons);
 	}
 
-	public void addOKButtonListener(ActionListener l)
-	{
-		okButton.addActionListener(l);
-	}
-
-	public void addCancelButtonListener(ActionListener l)
-	{
-		cancelButton.addActionListener(l);
-	}
-
 	public void setHeadLineText(String s)
 	{
 		headLabel.setText(s);
@@ -218,22 +243,9 @@ public final class ModalSettingDialog
 		descLabel.setText(s);
 	}
 
-	public void setNoClose(boolean b)
+	public void setClosingListener(ClosingListener l)
 	{
-		noClose = b;
-		if (noClose)
-		{
-			dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		}
-		else
-		{
-			dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		}
-	}
-
-	public void closeDialog()
-	{
-		dialog.dispose();
+		closingListener = l;
 	}
 
 	public boolean showDialog()
@@ -249,6 +261,19 @@ public final class ModalSettingDialog
 		dialog.setModalityType(ModalityType.APPLICATION_MODAL);
 		dialog.setVisible(true);
 		return approved;
+	}
+
+	private void tryClose()
+	{
+		ClosingEvent e = new ClosingEvent(approved);
+		if (closingListener != null)
+		{
+			closingListener.dialogClosing(e);
+		}
+		if (!e.isCanceled())
+		{
+			dialog.dispose();
+		}
 	}
 
 	public static ModalSettingDialog createDialog(JComponent content)

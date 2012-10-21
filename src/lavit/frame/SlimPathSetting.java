@@ -163,29 +163,28 @@ public final class SlimPathSetting
 		pb.redirectErrorStream(true);
 
 		String version = "";
-		String line = "";
 		try
 		{
 			Process p = pb.start();
 			p.getOutputStream().close();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			line = reader.readLine();
+			String line = reader.readLine();
 			p.getInputStream().close();
 			p.getErrorStream().close();
 			p.waitFor();
+
+			Pattern pat = Pattern.compile("\\d+\\.\\d+\\.\\d+");
+			Matcher m = pat.matcher(line);
+			if (m.find())
+			{
+				version = m.group();
+			}
 		}
 		catch (IOException e)
 		{
 		}
 		catch (InterruptedException e)
 		{
-		}
-
-		Pattern pat = Pattern.compile("\\d+\\.\\d+\\.\\d+");
-		Matcher m = pat.matcher(line);
-		if (m.find())
-		{
-			version = m.group();
 		}
 		return version;
 	}

@@ -37,6 +37,7 @@ package lavit;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
@@ -53,6 +55,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lavit.util.FileUtils;
 import lavit.util.IntUtils;
@@ -84,6 +88,8 @@ public final class Env
 	public static final String IMAGEFILE_ICON = "img/icon.png";
 
 	public static final String[] FONT_SIZE_LIST = {"8","9","10","11","12","14","16","18","20","24","28","32","36","40","44","48","54","60","66","72","80","88","96","106"};
+
+	private static String cachedLMNtalVersion = null;
 
     public Env(){
     	env = this;
@@ -427,6 +433,52 @@ public final class Env
     	return File.pathSeparatorChar==';';
     }
 
+	/**
+	 * Gets LMNtal version by executing {@code java -jar lmntal.jar --version}.
+	 */
+	public static String getLMNtalVersion()
+	{
+		if (cachedLMNtalVersion != null)
+		{
+			return cachedLMNtalVersion;
+		}
+
+		String lmntalPath = LMNTAL_LIBRARY_DIR + File.separator + "bin" + File.separatorChar + "lmntal.jar";
+
+		ProcessBuilder pb = new ProcessBuilder("java", "-classpath", lmntalPath, "runtime.FrontEnd", "--version");
+		pb.redirectErrorStream(true);
+
+		String version = "";
+		try
+		{
+			Process p = pb.start();
+			p.getOutputStream().close();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = reader.readLine();
+			p.getInputStream().close();
+			p.getErrorStream().close();
+			p.waitFor();
+
+			Pattern pat = Pattern.compile("\\d+\\.\\d+\\.\\d+");
+			Matcher m = pat.matcher(line);
+			if (m.find())
+			{
+				version = m.group();
+			}
+		}
+		catch (IOException e)
+		{
+		}
+		catch (InterruptedException e)
+		{
+		}
+		if (StringUtils.nullOrEmpty(version))
+		{
+			version = "1.21 (2011/12/26)"; // previous version of --version implementation
+		}
+		cachedLMNtalVersion = version;
+		return version;
+	}
 
     static HashMap<String,Long> watchNowTimes = new HashMap<String,Long>();
     static HashMap<String,Long> watchSumTimes = new HashMap<String,Long>();

@@ -111,11 +111,12 @@ public class VersionFrame extends JDialog
 		{
 			slimVersion = Lang.w[15];
 		}
+		String lmntalVersion = Env.getLMNtalVersion();
 		String info =
 			"LaViT\n" +
 			"Version : " + Env.APP_VERSION + "\n" +
 			"Date : " + Env.APP_DATE + "\n\n" +
-			Env.LMNTAL_VERSION + "\n" +
+			"LMNtal : " + lmntalVersion + "\n" +
 			"SLIM : " + slimVersion + "\n" +
 			Env.UNYO_VERSION;
 		infoText.setText(info);

@@ -171,16 +171,22 @@ public class SlimInstaller implements OuterRunner
 		});
 	}
 
-	public void waitFor()
+	public synchronized void waitFor()
 	{
 		try
 		{
+			wait();
 			runner.join();
 		}
 		catch (InterruptedException e)
 		{
 			e.printStackTrace();
 		}
+	}
+
+	private synchronized void notifyEnd()
+	{
+		notifyAll();
 	}
 
 	public void setFinishListener(ActionListener l)
@@ -204,11 +210,6 @@ public class SlimInstaller implements OuterRunner
 			runner.interrupt();
 			runner = null;
 		}
-	}
-
-	public void exit()
-	{
-		runner = null;
 	}
 
 	public boolean isSucceeded()
@@ -429,15 +430,14 @@ public class SlimInstaller implements OuterRunner
 					JOptionPane.PLAIN_MESSAGE, ICON_FAILED);
 			}
 
-			window.exit();
-			exit();
-
 			logEnd();
 
+			window.exit();
 			if (finishListener != null)
 			{
 				finishListener.actionPerformed(null);
 			}
+			notifyEnd();
 		}
 
 		private List<String> strList(String str)

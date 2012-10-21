@@ -42,11 +42,15 @@ import java.util.HashSet;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import lavit.frame.CygwinPathSetting;
+import lavit.frame.LanguageSetting;
 import lavit.frame.LookAndFeelEntry;
 import lavit.frame.MainFrame;
+import lavit.frame.SlimPathSetting;
 import lavit.frame.StartupFrame;
 import lavit.runner.RebootRunner;
 import lavit.util.CommonFontUser;
+import lavit.util.StringUtils;
 
 public class FrontEnd {
 
@@ -180,6 +184,38 @@ public class FrontEnd {
 		}
 	}
 
+	private static void initialSetup()
+	{
+		if (!Env.isSet("LANG"))
+		{
+			Lang.set("en");
+			if (!LanguageSetting.showDialog())
+			{
+				System.exit(0);
+			}
+		}
+		Lang.set(Env.get("LANG"));
+
+		if (Env.isWindows() && !Env.isSet("WINDOWS_CYGWIN_DIR"))
+		{
+			CygwinPathSetting.showDialog();
+		}
+
+		File lmntal = new File(Env.LMNTAL_LIBRARY_DIR+File.separator+"bin"+File.separator+"lmntal");
+		if (lmntal.exists() && !lmntal.canExecute())
+		{
+			lmntal.setExecutable(true);
+		}
+
+		if (StringUtils.nullOrEmpty(Env.get("SLIM_EXE_PATH")))
+		{
+			SlimPathSetting setting = new SlimPathSetting();
+			setting.showDialog();
+			setting.waitFor();
+		}
+	}
+
+
 	/**
 	 * @param args
 	 */
@@ -199,7 +235,8 @@ public class FrontEnd {
 				sf.setVisible(true);
 			}
 		});
-		sf.startEnvSet(); // TODO: refactor me
+
+		initialSetup();
 
 		SwingUtilities.invokeLater(new Runnable()
 		{

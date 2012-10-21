@@ -41,6 +41,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -111,6 +113,7 @@ public class SlimInstaller implements OuterRunner
 	private String slimSourceDir;
 	private String slimInstallDir;
 	private PrintWriter logWriter;
+	private ActionListener finishListener; // TODO: Create unique listener interface instead of ActionListener.
 
 	public SlimInstaller()
 	{
@@ -149,9 +152,14 @@ public class SlimInstaller implements OuterRunner
 	@Override
 	public void run()
 	{
-		logStart("slim_install_log.txt");
-
 		window = new InstallWindow(PROGRESS_MATCH_STRING.length - 1);
+		window.addWindowListener(new WindowAdapter()
+		{
+			public void windowOpened(WindowEvent e)
+			{
+				runner.start();
+			}
+		});
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -160,8 +168,10 @@ public class SlimInstaller implements OuterRunner
 				window.setVisible(true);
 			}
 		});
+	}
 
-		runner.start();
+	public void waitFor()
+	{
 		try
 		{
 			runner.join();
@@ -170,27 +180,11 @@ public class SlimInstaller implements OuterRunner
 		{
 			e.printStackTrace();
 		}
+	}
 
-		if (isSucceeded())
-		{
-			logPrintLine("== SLIM INSTALL SUCCEEDED ==");
-			logPrintLine("slim is in " + getSlimInstallPathName());
-			JOptionPane.showMessageDialog(
-				window, Lang.w[10], "SLIM INSTALL",
-				JOptionPane.PLAIN_MESSAGE, ICON_SUCCESS);
-		}
-		else
-		{
-			logPrintLine("== SLIM INSTALL FAILED ==");
-			JOptionPane.showMessageDialog(
-				window, Lang.w[11], "SLIM INSTALL",
-				JOptionPane.PLAIN_MESSAGE, ICON_FAILED);
-		}
-
-		window.exit();
-		exit();
-
-		logEnd();
+	public void setFinishListener(ActionListener l)
+	{
+		finishListener = l;
 	}
 
 	@Override
@@ -384,6 +378,8 @@ public class SlimInstaller implements OuterRunner
 			boolean succeeded = true;
 			int ret;
 
+			logStart("slim_install_log.txt");
+
 			// sh configureµ¯Æ°
 			logPrintLine("LaViT: Execute - " + shCmd);
 			ret = execCommand(shCmd);
@@ -415,6 +411,32 @@ public class SlimInstaller implements OuterRunner
 				succeeded = FileUtils.exists(slimPath);
 			}
 			success = succeeded;
+
+			if (isSucceeded())
+			{
+				logPrintLine("== SLIM INSTALL SUCCEEDED ==");
+				logPrintLine("slim is in " + getSlimInstallPathName());
+				JOptionPane.showMessageDialog(
+					window, Lang.w[10], "SLIM INSTALL",
+					JOptionPane.PLAIN_MESSAGE, ICON_SUCCESS);
+			}
+			else
+			{
+				logPrintLine("== SLIM INSTALL FAILED ==");
+				JOptionPane.showMessageDialog(
+					window, Lang.w[11], "SLIM INSTALL",
+					JOptionPane.PLAIN_MESSAGE, ICON_FAILED);
+			}
+
+			window.exit();
+			exit();
+
+			logEnd();
+
+			if (finishListener != null)
+			{
+				finishListener.actionPerformed(null);
+			}
 		}
 
 		private List<String> strList(String str)

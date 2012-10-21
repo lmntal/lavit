@@ -394,7 +394,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         }else if(src == iCygwinPath) {
         	CygwinPathSetting.showDialog();
         }else if(src == iSlimPath) {
-        	SlimPathSetting.showDialog();
+        	SlimPathSetting slimPathSetting = new SlimPathSetting();
+        	slimPathSetting.showDialog();
         }else if(src == iGeneral) {
         	new GeneralSettingFrame();
         }else if(src == iVersion) {

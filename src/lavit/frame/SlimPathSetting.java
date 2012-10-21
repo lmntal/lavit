@@ -74,12 +74,15 @@ public final class SlimPathSetting
 		USE_OTHER
 	}
 
-	private static SlimPathPanel sp;
-	private static ModalSettingDialog dialog;
+	private SlimPathPanel sp;
+	private ModalSettingDialog dialog;
+	private SlimInstaller installer;
 
-	private SlimPathSetting() { }
+	public SlimPathSetting()
+	{
+	}
 
-	public static void showDialog()
+	public void showDialog()
 	{
 		if (dialog == null)
 		{
@@ -126,7 +129,12 @@ public final class SlimPathSetting
 		}
 	}
 
-	private static void installSlim(String sourceDir, String installDir)
+	public void waitFor()
+	{
+		installer.waitFor();
+	}
+
+	private void installSlim(final String sourceDir, final String installDir)
 	{
 		File installDirFile = new File(installDir);
 		if (!installDirFile.exists())
@@ -134,19 +142,24 @@ public final class SlimPathSetting
 			installDirFile.mkdir();
 		}
 
-		SlimInstaller slimInstaller = new SlimInstaller();
-		slimInstaller.setSlimSourceDirectory(sourceDir);
-		slimInstaller.setSlimInstallDirectory(installDir);
-		slimInstaller.run();
-
-		if (slimInstaller.isSucceeded())
+		installer = new SlimInstaller();
+		installer.setSlimSourceDirectory(sourceDir);
+		installer.setSlimInstallDirectory(installDir);
+		installer.run();
+		installer.setFinishListener(new ActionListener()
 		{
-			String slimPath = sp.getSlimBinaryPath();
-			Env.set("path.slim.source", sourceDir);
-			Env.set("path.slim.install", installDir);
-			Env.set("path.slim.exe", slimPath);
-			Env.set("SLIM_EXE_PATH", slimPath);
-		}
+			public void actionPerformed(ActionEvent e)
+			{
+				if (installer.isSucceeded())
+				{
+					String slimPath = sp.getSlimBinaryPath();
+					Env.set("path.slim.source", sourceDir);
+					Env.set("path.slim.install", installDir);
+					Env.set("path.slim.exe", slimPath);
+					Env.set("SLIM_EXE_PATH", slimPath);
+				}
+			}
+		});
 	}
 
 	/**

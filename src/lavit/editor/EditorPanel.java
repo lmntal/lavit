@@ -79,19 +79,19 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 {
 	public EditorButtonPanel buttonPanel;
 
-	private TabView _tabview;
-	private int _hlFlags;
+	private TabView tabView;
+	private int hlFlags;
 
 	public EditorPanel()
 	{
 		setLayout(new BorderLayout());
 
-		_tabview = new TabView();
+		tabView = new TabView();
 		
 		loadFont();
 		FrontEnd.addFontUser(this);
 
-		add(_tabview, BorderLayout.CENTER);
+		add(tabView, BorderLayout.CENTER);
 
 		buttonPanel = new EditorButtonPanel(this);
 		add(buttonPanel, BorderLayout.SOUTH);
@@ -119,27 +119,27 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 	public void updateHighlight()
 	{
 		String colortarget = Env.get("COLOR_TARGET");
-		_hlFlags = 0;
+		hlFlags = 0;
 		for (String target : colortarget.split("\\s+"))
 		{
 			if (target.equals("comment"))
 			{
-				_hlFlags |= TokenLabel.COMMENT;
-				_hlFlags |= TokenLabel.STRING;
+				hlFlags |= TokenLabel.COMMENT;
+				hlFlags |= TokenLabel.STRING;
 			}
 			else if (target.equals("symbol"))
 			{
-				_hlFlags |= TokenLabel.OPERATOR;
+				hlFlags |= TokenLabel.OPERATOR;
 			}
 			else if (target.equals("reserved"))
 			{
-				_hlFlags |= TokenLabel.KEYWORD;
+				hlFlags |= TokenLabel.KEYWORD;
 			}
 		}
-		for (EditorPage page : _tabview.getPages())
+		for (EditorPage page : tabView.getPages())
 		{
 			page.removeAllHighlights();
-			page.addHighlight(_hlFlags);
+			page.addHighlight(hlFlags);
 			page.setShowTabs(Env.is("SHOW_TABS"));
 			page.setShowEols(Env.is("SHOW_LINE_DELIMITERS"));
 		}
@@ -148,12 +148,12 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 
 	public JTextPane getSelectedEditor()
 	{
-		return _tabview.getSelectedPage().getJTextPane();
+		return tabView.getSelectedPage().getJTextPane();
 	}
 
 	public File getFile()
 	{
-		return _tabview.getSelectedPage().getFile();
+		return tabView.getSelectedPage().getFile();
 	}
 
 	/**
@@ -184,8 +184,8 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 	public void newFileOpen()
 	{
 		EditorPage page = new EditorPage();
-		_tabview.addPage(page, "untitled", "untitled");
-		page.addHighlight(_hlFlags);
+		tabView.addPage(page, "untitled", "untitled");
+		page.addHighlight(hlFlags);
 		page.setShowTabs(Env.is("SHOW_TABS"));
 		page.setShowEols(Env.is("SHOW_LINE_DELIMITERS"));
 		page.setText("");
@@ -222,8 +222,8 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 			reader.close();
 
 			EditorPage page = new EditorPage();
-			_tabview.addPage(page, file.getName(), file.getAbsolutePath());
-			page.addHighlight(_hlFlags);
+			tabView.addPage(page, file.getName(), file.getAbsolutePath());
+			page.addHighlight(hlFlags);
 			page.setShowTabs(Env.is("SHOW_TABS"));
 			page.setShowEols(Env.is("SHOW_LINE_DELIMITERS"));
 			page.setText(buf.toString());
@@ -245,7 +245,7 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 	 */
 	public boolean fileSave()
 	{
-		EditorPage page = _tabview.getSelectedPage();
+		EditorPage page = tabView.getSelectedPage();
 		try
 		{
 			if (page.hasFile())
@@ -288,57 +288,60 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 
 	private void editorFileSave(File file) throws IOException
 	{
-		EditorPage page = _tabview.getSelectedPage();
+		EditorPage page = tabView.getSelectedPage();
 		String encoding = Env.get("EDITER_FILE_WRITE_ENCODING");
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile()), encoding));
 		page.write(writer);
 		writer.close();
 		page.setFile(file);
 		page.setModified(false);
-		_tabview.setTitle(page, file.getName(), file.getAbsolutePath());
+		tabView.setTitle(page, file.getName(), file.getAbsolutePath());
 		FrontEnd.println("(EDITOR) file save. [ " + file.getName() + " ]");
 	}
 
 	/**
-	 * すべて閉じる
+	 * すべてのページを閉じる。
+	 * ページを閉じ始める前に、変更のあるページについて保存について聞く。
+	 * キャンセルが選択された場合はページは1つも閉じられない。
+	 * @return タブがすべて閉じられた場合は {@code true}、キャンセルされた場合は {@code false}。
 	 */
 	public boolean closeFile()
 	{
-		/*
-		if (editor.isModified())
+		boolean closeAll = true;
+		for (int i = 0; i < tabView.getTabCount(); i++)
 		{
-			String option[] = { Lang.d[0], Lang.d[1], Lang.d[2] };
-			String title = editor.hasFile() ? editor.getFile().getName() : "untitled";
-			String message = title + Lang.f[2];
-			int r = JOptionPane.showOptionDialog(FrontEnd.mainFrame, message, title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, option, option[0]);
-			if (r == JOptionPane.YES_OPTION)
+			if (isChanged(i))
 			{
-				return fileSave();
-			}
-			else if (r == JOptionPane.CANCEL_OPTION || r == JOptionPane.CLOSED_OPTION)
-			{
-				return false;
+				tabView.setSelectedPage(i);
+				int ret = askSaveChangedFile();
+				if (ret == JOptionPane.CANCEL_OPTION)
+				{
+					closeAll = false;
+					break;
+				}
+				else if (ret == JOptionPane.YES_OPTION)
+				{
+					fileSave();
+				}
 			}
 		}
-		return true;
-		*/
-		
-		boolean exit_success = true;
-		while (0 < _tabview.getTabCount())
+		if (closeAll)
 		{
-			_tabview.setSelectedPage(0);
-			boolean ret = closeSelectedPage();
-			exit_success = exit_success && ret;
+			while (0 < tabView.getTabCount())
+			{
+				tabView.setSelectedPage(0);
+				closeSelectedPageDiscardChanges();
+			}
 		}
-		return exit_success;
+		return closeAll;
 	}
-	
+
 	/**
 	 * 選択しているページを閉じる
 	 */
 	public boolean closeSelectedPage()
 	{
-		EditorPage page = _tabview.getSelectedPage();
+		EditorPage page = tabView.getSelectedPage();
 		boolean ret = true;
 		if (page.isModified())
 		{
@@ -357,9 +360,18 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		}
 		if (ret)
 		{
-			_tabview.closeSelectedPage();
+			closeSelectedPageDiscardChanges();
 		}
 		return ret;
+	}
+
+	/**
+	 * 選択しているページを閉じる。
+	 * このメソッドを直接呼んだ場合、閉じられるページの変更内容は破棄される。
+	 */
+	public void closeSelectedPageDiscardChanges()
+	{
+		tabView.closeSelectedPage();
 	}
 
 	private File chooseOpenFile()
@@ -442,42 +454,64 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		}
 	}
 
+	/**
+	 * 変更を保存するか聞く。
+	 */
+	private int askSaveChangedFile()
+	{
+		EditorPage page = tabView.getSelectedPage();
+		String option[] = { Lang.d[0], Lang.d[1], Lang.d[2] };
+		String title = page.hasFile() ? page.getFile().getName() : "untitled";
+		String message = title + Lang.f[2];
+		return JOptionPane.showOptionDialog(FrontEnd.mainFrame,
+			message, title,
+			JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+			null, option, option[0]);
+	}
+
 	public void loadFont()
 	{
 		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
-		_tabview.setFont(font);
+		tabView.setFont(font);
 		setTabWidth(Env.getInt("EDITER_TAB_SIZE"));
 	}
 
 	public boolean isChanged()
 	{
-		if (_tabview.getTabCount() == 0)
+		return isChanged(tabView.getSelectedIndex());
+	}
+
+	public boolean isChanged(int pageIndex)
+	{
+		EditorPage[] pages = tabView.getPages();
+		if (pageIndex < 0 || pages.length < pageIndex)
 		{
 			return false;
 		}
-		return !_tabview.getSelectedPage().hasFile() || _tabview.getSelectedPage().isModified();
+		EditorPage page = pages[pageIndex];
+		return !page.hasFile() || page.isModified();
 	}
 
 	String getFileName()
 	{
-		if (_tabview.getTabCount() == 0)
+		if (tabView.getTabCount() == 0)
 		{
 			return "";
 		}
 
-		if (!_tabview.getSelectedPage().hasFile())
+		if (!tabView.getSelectedPage().hasFile())
 		{
 			return "";
 		}
 		else
 		{
-			return _tabview.getSelectedPage().getFile().getName();
+			return tabView.getSelectedPage().getFile().getName();
 		}
 	}
 
 	private void setTabWidth(int charactersPerTab)
 	{
-		for (EditorPage page : _tabview.getPages())
+		for (EditorPage page : tabView.getPages())
 		{
 			page.setTabWidth(charactersPerTab);
 		}
@@ -579,30 +613,30 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 
 	public boolean canUndo()
 	{
-		if (_tabview.getTabCount() > 0)
+		if (tabView.getTabCount() > 0)
 		{
-			return _tabview.getSelectedPage().canUndo();
+			return tabView.getSelectedPage().canUndo();
 		}
 		return false;
 	}
 
 	public boolean canRedo()
 	{
-		if (_tabview.getTabCount() > 0)
+		if (tabView.getTabCount() > 0)
 		{
-			return _tabview.getSelectedPage().canRedo();
+			return tabView.getSelectedPage().canRedo();
 		}
 		return false;
 	}
 
 	public void editorUndo()
 	{
-		_tabview.getSelectedPage().undo();
+		tabView.getSelectedPage().undo();
 	}
 
 	public void editorRedo()
 	{
-		_tabview.getSelectedPage().redo();
+		tabView.getSelectedPage().redo();
 	}
 
 	public void redoundoUpdate(){

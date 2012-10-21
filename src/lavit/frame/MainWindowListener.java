@@ -56,8 +56,9 @@ public class MainWindowListener implements WindowListener {
 
 	}
 
-	public void windowClosing(WindowEvent e) {
-		FrontEnd.frontEnd.exit();
+	public void windowClosing(WindowEvent e)
+	{
+		FrontEnd.exit();
 	}
 
 	public void windowDeactivated(WindowEvent e) {

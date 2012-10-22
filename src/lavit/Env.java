@@ -90,6 +90,7 @@ public final class Env
 	public static final String[] FONT_SIZE_LIST = {"8","9","10","11","12","14","16","18","20","24","28","32","36","40","44","48","54","60","66","72","80","88","96","106"};
 
 	private static String cachedLMNtalVersion = null;
+	private static String cachedSLIMVersion = null;
 
     public Env(){
     	env = this;
@@ -199,24 +200,27 @@ public final class Env
 		return !StringUtils.nullOrEmpty(get(key));
 	}
 
-    static public void setProcessEnvironment(Map<String,String> map){
+	public static void setProcessEnvironment(Map<String, String> map)
+	{
+		map.put("LMNTAL_HOME",getLmntalLinuxPath());
 
-    	map.put("LMNTAL_HOME",getLmntalLinuxPath());
+		if (Env.isWindows())
+		{
+			String cygwinDir = get("WINDOWS_CYGWIN_DIR");
 
-    	if(Env.isWindows()){
-    		String bin = "";
-    		bin += get("WINDOWS_CYGWIN_DIR")+File.separatorChar+"bin;";
-    		bin += get("WINDOWS_CYGWIN_DIR")+File.separatorChar+"usr"+File.separatorChar+"bin;";
-    		bin += get("WINDOWS_CYGWIN_DIR")+File.separatorChar+"usr"+File.separatorChar+"local"+File.separatorChar+"bin;";
-    		if(map.get("path")!=null) map.put("path",bin+map.get("path"));
-    		if(map.get("Path")!=null) map.put("Path",bin+map.get("Path"));
-    		if(map.get("PATH")!=null) map.put("PATH",bin+map.get("PATH"));
-    		if(map.get("path")==null&&map.get("Path")==null&&map.get("PATH")==null){
-    			map.put("PATH",bin);
-    		}
+			String bin = "";
+			bin += cygwinDir+File.separatorChar+"bin;";
+			bin += cygwinDir+File.separatorChar+"usr"+File.separatorChar+"bin;";
+			bin += cygwinDir+File.separatorChar+"usr"+File.separatorChar+"local"+File.separatorChar+"bin;";
+			if (map.get("path")!=null) map.put("path",bin+map.get("path"));
+			if (map.get("Path")!=null) map.put("Path",bin+map.get("Path"));
+			if (map.get("PATH")!=null) map.put("PATH",bin+map.get("PATH"));
+			if (map.get("path")==null&&map.get("Path")==null&&map.get("PATH")==null)
+			{
+				map.put("PATH",bin);
+			}
 		}
-
-    }
+	}
 
     static public String getDirNameOfSlim(){
     	if(isSet("DIR_NAME_SLIM")){
@@ -478,6 +482,53 @@ public final class Env
 		}
 		cachedLMNtalVersion = version;
 		return version;
+	}
+
+	/**
+	 * Gets SLIM version by executing {@code slim --version}.
+	 */
+	public static String getSlimVersion()
+	{
+		if (cachedSLIMVersion == null)
+		{
+			String slimPath = get("SLIM_EXE_PATH");
+			String version = "";
+			if (!StringUtils.nullOrEmpty(slimPath))
+			{
+				ProcessBuilder pb = new ProcessBuilder(slimPath, "--version");
+				setProcessEnvironment(pb.environment());
+				pb.redirectErrorStream(true);
+
+				try
+				{
+					Process p = pb.start();
+					p.getOutputStream().close();
+					BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+					String line = reader.readLine();
+					p.getInputStream().close();
+					p.getErrorStream().close();
+					p.waitFor();
+
+					if (!StringUtils.nullOrEmpty(line))
+					{
+						Pattern pat = Pattern.compile("\\d+\\.\\d+\\.\\d+");
+						Matcher m = pat.matcher(line);
+						if (m.find())
+						{
+							version = m.group();
+						}
+					}
+				}
+				catch (IOException e)
+				{
+				}
+				catch (InterruptedException e)
+				{
+				}
+			}
+			cachedSLIMVersion = version;
+		}
+		return cachedSLIMVersion;
 	}
 
     static HashMap<String,Long> watchNowTimes = new HashMap<String,Long>();

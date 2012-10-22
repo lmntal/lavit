@@ -39,12 +39,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -115,7 +110,7 @@ public final class SlimPathSetting
 			{
 				Env.set("SLIM_EXE_PATH", sp.getSlimBinaryPath());
 				Env.set("path.slim.exe", sp.getSlimBinaryPath());
-				Env.set("version.slim", getSlimVersion(Env.get("path.slim.exe")));
+				Env.set("version.slim", Env.getSlimVersion());
 			}
 		}
 		return approved;
@@ -148,51 +143,11 @@ public final class SlimPathSetting
 					Env.set("path.slim.install", installDir);
 					Env.set("path.slim.exe", slimPath);
 					Env.set("SLIM_EXE_PATH", slimPath);
-					Env.set("version.slim", getSlimVersion(slimPath));
+					Env.set("version.slim", Env.getSlimVersion());
 				}
 			}
 		});
 		installer.run();
-	}
-
-	/**
-	 * Gets SLIM version by executing {@code slim --version}.
-	 */
-	private static String getSlimVersion(String slimPath)
-	{
-		if (StringUtils.nullOrEmpty(slimPath))
-		{
-			return "";
-		}
-
-		ProcessBuilder pb = new ProcessBuilder(slimPath, "--version");
-		pb.redirectErrorStream(true);
-
-		String version = "";
-		try
-		{
-			Process p = pb.start();
-			p.getOutputStream().close();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line = reader.readLine();
-			p.getInputStream().close();
-			p.getErrorStream().close();
-			p.waitFor();
-
-			Pattern pat = Pattern.compile("\\d+\\.\\d+\\.\\d+");
-			Matcher m = pat.matcher(line);
-			if (m.find())
-			{
-				version = m.group();
-			}
-		}
-		catch (IOException e)
-		{
-		}
-		catch (InterruptedException e)
-		{
-		}
-		return version;
 	}
 }
 

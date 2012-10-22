@@ -230,7 +230,7 @@ class SlimPathPanel extends JPanel
 			panel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
 			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 			JFileChooser chooser = new JFileChooser();
-			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			pathSlim = new PathInputField(chooser, Lang.w[0], 25);
 			panel.add(label3);
 			panel.add(pathSlim);

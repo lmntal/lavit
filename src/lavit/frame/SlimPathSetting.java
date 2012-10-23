@@ -118,7 +118,10 @@ public final class SlimPathSetting
 
 	public void waitFor()
 	{
-		installer.waitFor();
+		if (installer != null)
+		{
+			installer.waitFor();
+		}
 	}
 
 	private void installSlim(final String sourceDir, final String installDir)

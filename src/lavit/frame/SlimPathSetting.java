@@ -196,6 +196,8 @@ class SlimPathPanel extends JPanel
 			panel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
 			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 			JFileChooser chooser = new JFileChooser();
+			chooser.setDialogTitle("SLIM Source Location");
+			chooser.setMultiSelectionEnabled(false);
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			pathSource = new PathInputField(chooser, Lang.w[0], 25);
 			panel.add(label1);
@@ -208,6 +210,7 @@ class SlimPathPanel extends JPanel
 			panel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
 			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 			JFileChooser chooser = new JFileChooser();
+			chooser.setDialogTitle("Install Location");
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			pathInstall = new PathInputField(chooser, Lang.w[0], 25);
 			pathInstall.addChangeListener(new ChangeListener()
@@ -233,6 +236,7 @@ class SlimPathPanel extends JPanel
 			panel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
 			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 			JFileChooser chooser = new JFileChooser();
+			chooser.setDialogTitle("SLIM Location");
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			pathSlim = new PathInputField(chooser, Lang.w[0], 25);
 			panel.add(label3);

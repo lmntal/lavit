@@ -41,6 +41,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -59,7 +60,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lavit.util.FileUtils;
-import lavit.util.IntUtils;
 import lavit.util.StringUtils;
 
 public final class Env
@@ -70,8 +70,8 @@ public final class Env
 	public static final String APP_HREF    = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
 
 	public static final String LMNTAL_VERSION = "LMNtal : 1.21 (2011/12/26)";
-	public static final String SLIM_VERSION = "SLIM : 2.2.2 (2012/05/12)";
-	public static final String UNYO_VERSION = "UNYO UNYO : 1.1.1 (2010/03/07)";
+	public static final String SLIM_VERSION   = "SLIM : 2.2.2 (2012/05/12)";
+	public static final String UNYO_VERSION   = "UNYO UNYO : 1.1.1 (2010/03/07)";
 
 	public static final String DIR_NAME_SLIM = "slim-2.2.2";
 	public static final String DIR_NAME_UNYO = "unyo1_1_1";
@@ -79,87 +79,108 @@ public final class Env
 
 	public static final String LMNTAL_LIBRARY_DIR = "lmntal";
 
-	public static Env env = null;
+	public static final String IMAGEFILE_ICON = "img/icon.png";
+	public static final String[] FONT_SIZE_LIST = {"8","9","10","11","12","14","16","18","20","24","28","32","36","40","44","48","54","60","66","72","80","88","96","106"};
+
 	private static final String ENV_FILE = "env.txt";
 	private static final String ENV_DEFAULT_FILE = "env_default.txt";
 
+	private static Env env = null;
 	private static Properties prop = new Properties();
-
-	public static final String IMAGEFILE_ICON = "img/icon.png";
-
-	public static final String[] FONT_SIZE_LIST = {"8","9","10","11","12","14","16","18","20","24","28","32","36","40","44","48","54","60","66","72","80","88","96","106"};
 
 	private static String cachedLMNtalVersion = null;
 	private static String cachedSLIMVersion = null;
 
-    public Env(){
-    	env = this;
+	public Env()
+	{
+		env = this;
 
-    	//ファイルの作成
-    	boolean firstMake = false;
-    	try{
-    		File e = new File(ENV_FILE);
-    		if(!e.exists()){
-    			System.out.println("make "+ENV_FILE);
-    			e.createNewFile();
-    			firstMake = true;
-    		}
-    	}catch (Exception e){
-    		System.err.println(ENV_FILE+" make error. check "+(new File(".")).getAbsolutePath());
-            System.exit(0);
-    	}
+		//ファイルの作成
+		boolean firstMake = false;
+		try
+		{
+			File e = new File(ENV_FILE);
+			if (!e.exists())
+			{
+				System.out.println("make " + ENV_FILE);
+				e.createNewFile();
+				firstMake = true;
+			}
+		}
+		catch (IOException e)
+		{
+			System.err.println(ENV_FILE + " make error. check " + new File(".").getAbsolutePath());
+			System.exit(0);
+		}
 
-    	//ファイルの読み込み
-    	try {
-    		InputStream in = Env.getInputStreamOfFile(ENV_FILE);
+		//ファイルの読み込み
+		try
+		{
+			InputStream in = getInputStreamOfFile(ENV_FILE);
 			prop.load(in);
 			in.close();
-        } catch (Exception e) {
-        	System.err.println("read error. check "+ENV_FILE);
-            System.exit(0);
-        }
+		}
+		catch (IOException e)
+		{
+			System.err.println("read error. check " + ENV_FILE);
+			System.exit(0);
+		}
 
-        //バージョンアップの処理（設定値がない場合はその値を入れる）
-        Properties default_prop = new Properties();
-        try {
-    		InputStream in = Env.getInputStreamOfFile(ENV_DEFAULT_FILE);
-    		default_prop.load(in);
+		//バージョンアップの処理（設定値がない場合はその値を入れる）
+		Properties default_prop = new Properties();
+		try
+		{
+			InputStream in = getInputStreamOfFile(ENV_DEFAULT_FILE);
+			default_prop.load(in);
 			in.close();
-			for(Object k : default_prop.keySet()){
+			for (Object k : default_prop.keySet())
+			{
 				String key = (String)k;
 				String value = default_prop.getProperty(key);
-				if(!prop.containsKey(key)){
+				if (!prop.containsKey(key))
+				{
 					prop.setProperty(key, value);
-					if(!firstMake){ System.out.println("auto update "+ENV_FILE+" : "+key+"="+value); }
+					if (!firstMake)
+					{
+						System.out.println("auto update " + ENV_FILE + " : " + key + "=" + value);
+					}
 				}
 			}
-        } catch (Exception e) {
-        	System.err.println("read error. check "+ENV_DEFAULT_FILE);
-        }
-    }
+		}
+		catch (IOException e)
+		{
+			System.err.println("read error. check " + ENV_DEFAULT_FILE);
+		}
+	}
 
-    static public void save(){
-		try {
+	public static void save()
+	{
+		try
+		{
 			//普通に保存
 			FileOutputStream out = new FileOutputStream(ENV_FILE);
-			prop.store(out, APP_NAME+" "+APP_VERSION);
-	        out.close();
+			prop.store(out, APP_NAME + " " + APP_VERSION);
+			out.close();
 
-	        //ソートで再保存
-	        LineNumberReader reader = new LineNumberReader(new FileReader(ENV_FILE));
+			//ソートで再保存
+			LineNumberReader reader = new LineNumberReader(new FileReader(ENV_FILE));
 			ArrayList<String> lines = new ArrayList<String>();
 			String line = null;
-			while((line = reader.readLine())!=null){
+			while ((line = reader.readLine()) != null)
+			{
 				lines.add(line);
 			}
 			reader.close();
 			Collections.sort(lines);
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(ENV_FILE)));
-			for(String str : lines){
+			for (String str : lines)
+			{
 				writer.write(str+"\n");
 			}
 			writer.close();
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			System.err.println("save error. check "+ENV_FILE);
 		}
 	}
@@ -169,6 +190,12 @@ public final class Env
 		return prop.getProperty(key);
 	}
 
+	public static String get(String key, String defaultValue)
+	{
+		String value = prop.getProperty(key);
+		return StringUtils.nullOrEmpty(value) ? defaultValue : value;
+	}
+
 	public static int getInt(String key) throws NumberFormatException
 	{
 		return Integer.valueOf(prop.getProperty(key));
@@ -176,24 +203,25 @@ public final class Env
 
 	public static int getInt(String key, int defaultValue)
 	{
-		int value;
+		int value = defaultValue;
 		try
 		{
 			value = Integer.parseInt(get(key));
 		}
 		catch (NumberFormatException e)
 		{
-			value = defaultValue;
 		}
 		return value;
 	}
 
-    static public boolean is(String key){
-    	if(!prop.containsKey(key)){
-    		System.err.println("read error. check "+key+" in "+ENV_FILE);
-    	}
-    	return Boolean.valueOf(prop.getProperty(key));
-    }
+	public static boolean is(String key)
+	{
+		if (!prop.containsKey(key))
+		{
+			System.err.println("read error. check " + key + " in " + ENV_FILE);
+		}
+		return Boolean.valueOf(prop.getProperty(key));
+	}
 
 	public static boolean isSet(String key)
 	{
@@ -202,49 +230,49 @@ public final class Env
 
 	public static void setProcessEnvironment(Map<String, String> map)
 	{
-		map.put("LMNTAL_HOME",getLmntalLinuxPath());
+		map.put("LMNTAL_HOME", getLmntalLinuxPath());
 
-		if (Env.isWindows())
+		if (isWindows())
 		{
+			char sep = File.separatorChar;
 			String cygwinDir = get("WINDOWS_CYGWIN_DIR");
+			String pathes = "";
+			pathes += cygwinDir + sep + "bin";
+			pathes += cygwinDir + sep + "usr" + sep + "bin";
+			pathes += cygwinDir + sep + "usr" + sep + "local" + sep + "bin";
 
-			String bin = "";
-			bin += cygwinDir+File.separatorChar+"bin;";
-			bin += cygwinDir+File.separatorChar+"usr"+File.separatorChar+"bin;";
-			bin += cygwinDir+File.separatorChar+"usr"+File.separatorChar+"local"+File.separatorChar+"bin;";
-			if (map.get("path")!=null) map.put("path",bin+map.get("path"));
-			if (map.get("Path")!=null) map.put("Path",bin+map.get("Path"));
-			if (map.get("PATH")!=null) map.put("PATH",bin+map.get("PATH"));
-			if (map.get("path")==null&&map.get("Path")==null&&map.get("PATH")==null)
+			char pathSep = File.pathSeparatorChar;
+			boolean put = false;
+			for (String key : new String[] { "path", "Path", "PATH" })
 			{
-				map.put("PATH",bin);
+				String value = map.get(key);
+				if (value != null)
+				{
+					map.put(key, pathes + pathSep + value);
+					put = true;
+				}
+			}
+			if (!put)
+			{
+				map.put("PATH", pathes);
 			}
 		}
 	}
 
-    static public String getDirNameOfSlim(){
-    	if(isSet("DIR_NAME_SLIM")){
-    		return Env.get("DIR_NAME_SLIM");
-    	}else{
-    		return DIR_NAME_SLIM;
-    	}
-    }
+	public static String getDirNameOfSlim()
+	{
+		return get("DIR_NAME_SLIM", DIR_NAME_SLIM);
+	}
 
-    static public String getDirNameOfUnyo(){
-    	if(isSet("DIR_NAME_UNYO")){
-    		return Env.get("DIR_NAME_UNYO");
-    	}else{
-    		return DIR_NAME_UNYO;
-    	}
-    }
+	public static String getDirNameOfUnyo()
+	{
+		return get("DIR_NAME_UNYO", DIR_NAME_UNYO);
+	}
 
-    static public String getDirNameOfLtl2ba(){
-    	if(isSet("DIR_NAME_LTL2BA")){
-    		return Env.get("DIR_NAME_LTL2BA");
-    	}else{
-    		return DIR_NAME_LTL2BA;
-    	}
-    }
+	public static String getDirNameOfLtl2ba()
+	{
+		return get("DIR_NAME_LTL2BA", DIR_NAME_LTL2BA);
+	}
 
 	/**
 	 * 文字列 {@code path} に半角空白文字 (0x20) が含まれる場合、この文字列を二重引用符で囲んだ文字列を返す。
@@ -264,84 +292,80 @@ public final class Env
 
 	public static String getSlimInstallPath()
 	{
-		String path = Env.get("path.slim.install");
-		if (StringUtils.nullOrEmpty(path))
+		return get("path.slim.install", LMNTAL_LIBRARY_DIR + File.separator + "installed");
+	}
+
+	public static String getSlimInstallLibraryPath()
+	{
+		char sep = File.separatorChar;
+		return getSlimInstallPath() + sep + "share" + sep + "slim" + sep + "lib";
+	}
+
+	public static String getLmntalLinuxPath()
+	{
+		String path = new File(LMNTAL_LIBRARY_DIR).getAbsolutePath();
+		path = getLinuxStylePath(path);
+		return path;
+	}
+
+	public static String getSlimInstallLinuxPath()
+	{
+		String path = new File(getSlimInstallPath()).getAbsolutePath();
+		path = getLinuxStylePath(path);
+		return path;
+	}
+
+	public static String getLinuxStylePath(String path)
+	{
+		if (File.separatorChar == '\\')
 		{
-			path = LMNTAL_LIBRARY_DIR + File.separator + "installed";
+			path = path.replace('\\', '/');
+			if (path.contains(":"))
+			{
+				String[] part = path.split(":");
+				if (1 < part.length && !part[0].equals(""))
+				{
+					path = "/cygdrive/" + part[0] + part[1];
+				}
+			}
 		}
 		return path;
 	}
 
-    static public String getSlimInstallLibraryPath(){
-    	return getSlimInstallPath()+File.separator+"share"+File.separator+"slim"+File.separator+"lib";
-    }
-
-    static public String getLmntalLinuxPath(){
-    	String path = (new File(LMNTAL_LIBRARY_DIR)).getAbsolutePath();
-    	path = getLinuxStylePath(path);
-    	return path;
-    }
-
-    static public String getSlimInstallLinuxPath(){
-    	String path = (new File(getSlimInstallPath())).getAbsolutePath();
-    	path = getLinuxStylePath(path);
-    	return path;
-    }
-    
-    static public String getLinuxStylePath(String path)
-    {
-    	if (File.separatorChar == '\\')
-    	{
-    		path = path.replace('\\', '/');
-    		if (path.contains(":"))
-    		{
-    			String[] part = path.split(":");
-    			if (1 < part.length && !part[0].equals(""))
-    			{
-    				path = "/cygdrive/" + part[0] + part[1];
-    			}
-    		}
-    	}
-    	return path;
-    }
-    
-    static public String getLmntalCmd(){
-    	String cmd = "java";
+	public static String getLmntalCmd()
+	{
+		char sep = File.separatorChar;
+		String cmd = "java";
 		cmd += " -classpath ";
-		cmd += Env.LMNTAL_LIBRARY_DIR+File.separator+"bin"+File.separator+"lmntal.jar"+File.pathSeparator;
-		cmd += Env.LMNTAL_LIBRARY_DIR+File.separator+"lib"+File.separator+"std_lib.jar";
-		cmd += " -DLMNTAL_HOME="+Env.LMNTAL_LIBRARY_DIR;
+		cmd += LMNTAL_LIBRARY_DIR + sep + "bin" + sep + "lmntal.jar" + File.pathSeparator;
+		cmd += LMNTAL_LIBRARY_DIR + sep + "lib" + sep + "std_lib.jar";
+		cmd += " -DLMNTAL_HOME=" + LMNTAL_LIBRARY_DIR;
 		cmd += " runtime.FrontEnd --interpret ";
 		return cmd;
     }
 
 	public static String getBinaryAbsolutePath(String cmd)
 	{
-		String usrLocalBin = File.separatorChar+"usr"+File.separatorChar+"local"+File.separatorChar+"bin"+File.separatorChar+cmd;
-		String usrBin = File.separatorChar+"usr"+File.separatorChar+"bin"+File.separatorChar+cmd;
-		String bin = File.separatorChar+"bin"+File.separatorChar+cmd;
-		if (Env.isWindows())
+		char sep = File.separatorChar;
+		String cygwinDir = get("WINDOWS_CYGWIN_DIR");
+		String[] pathes =
 		{
-			usrLocalBin = get("WINDOWS_CYGWIN_DIR") + usrLocalBin + ".exe";
-			usrBin = get("WINDOWS_CYGWIN_DIR") + usrBin + ".exe";
-			bin = get("WINDOWS_CYGWIN_DIR") + bin + ".exe";
-		}
-		if (FileUtils.exists(usrLocalBin))
+			sep + "usr" + sep + "local" + sep + "bin" + sep + cmd,
+			sep + "usr" + sep + "bin" + sep + cmd,
+			sep + "bin" + sep + cmd,
+		};
+		for (String path : pathes)
 		{
-			return usrLocalBin;
+			if (isWindows())
+			{
+				path = cygwinDir + path + ".exe";
+			}
+			if (FileUtils.exists(path))
+			{
+				return path;
+			}
 		}
-		else if (FileUtils.exists(usrBin))
-		{
-			return usrBin;
-		}
-		else if (FileUtils.exists(bin))
-		{
-			return bin;
-		}
-		else
-		{
-			return cmd;
-		}
+		return cmd;
 	}
 
 	/**
@@ -367,75 +391,69 @@ public final class Env
 
 	public static String getSlimBinaryName()
 	{
-		return Env.isWindows() ? "slim.exe" : "slim";
+		return isWindows() ? "slim.exe" : "slim";
 	}
 
 	public static String getLtl2baBinaryName()
 	{
-		return Env.isWindows() ? "ltl2ba.exe" : "ltl2ba";
+		return isWindows() ? "ltl2ba.exe" : "ltl2ba";
 	}
 
-	public static double getPercentage(String key, double per)
+	public static void set(String key, String value)
 	{
-		String str = get(key);
-		if (str.matches("^[0-9]{1,3}%?$"))
+		prop.setProperty(key, value);
+	}
+
+	public static void set(String key, boolean value)
+	{
+		prop.setProperty(key, String.valueOf(value));
+	}
+
+	public static void set(String key, int value)
+	{
+		prop.setProperty(key, String.valueOf(value));
+	}
+
+	// jarファイル化した場合のファイル入力の差を吸収
+	public static InputStream getInputStreamOfFile(String filename)
+	{
+		InputStream in = null;
+		try
 		{
-			int t = Integer.parseInt(str.substring(0, str.indexOf('%')));
-			t = IntUtils.clamp(t, 0, 100);
-			per = t / 100.0;
+			if (FileUtils.exists(filename))
+			{
+				in = new FileInputStream(filename);
+			}
+			else
+			{
+				in = env.getClass().getResourceAsStream("/" + filename);
+			}
 		}
-		return per;
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		return in;
 	}
 
-    static public void set(String key,String value){
-    	prop.setProperty(key, value);
-    }
-
-    static public void set(String key,boolean value){
-    	prop.setProperty(key, String.valueOf(value));
-    }
-
-    static public void set(String key,int value){
-    	prop.setProperty(key, String.valueOf(value));
-    }
-
-	public static void setPercentage(String key, double per)
+	// jarファイル化した場合のファイル入力の差を吸収
+	public static Image getImageOfFile(String filename)
 	{
-		int res = (int)Math.round(100 * per);
-		res = IntUtils.clamp(res, 0, 100);
-		set(key, res + "%");
+		if (FileUtils.exists(filename))
+		{
+			return Toolkit.getDefaultToolkit().getImage(filename);
+		}
+		else
+		{
+			URL fileUrl = Env.class.getResource("/" + filename);
+			return Toolkit.getDefaultToolkit().getImage(fileUrl);
+		}
 	}
 
-    // jarファイル化した場合のファイル入力の差を吸収
-    static public InputStream getInputStreamOfFile(String filename){
-    	InputStream in = null;
-    	File file = new File(filename);
-    	try {
-    		if(file.exists()){
-    			in = new FileInputStream(file);
-    		}else{
-    			in = env.getClass().getResourceAsStream("/"+filename);
-    		}
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	}
-    	return in;
-    }
-
-    // jarファイル化した場合のファイル入力の差を吸収
-    static public Image getImageOfFile(String filename){
-    	File file = new File(filename);
-    	if(file.exists()){
-    		return Toolkit.getDefaultToolkit().getImage(file.getPath());
-    	}else{
-    		URL fileUrl = env.getClass().getResource("/"+filename);
-    		return Toolkit.getDefaultToolkit().getImage(fileUrl);
-    	}
-    }
-
-    static public boolean isWindows(){
-    	return File.pathSeparatorChar==';';
-    }
+	public static boolean isWindows()
+	{
+		return File.pathSeparatorChar == ';';
+	}
 
 	/**
 	 * Gets LMNtal version by executing {@code java -jar lmntal.jar --version}.
@@ -463,11 +481,14 @@ public final class Env
 			p.getErrorStream().close();
 			p.waitFor();
 
-			Pattern pat = Pattern.compile("\\d+\\.\\d+\\.\\d+");
-			Matcher m = pat.matcher(line);
-			if (m.find())
+			if (!StringUtils.nullOrEmpty(line))
 			{
-				version = m.group();
+				Pattern pat = Pattern.compile("\\d+\\.\\d+\\.\\d+");
+				Matcher m = pat.matcher(line);
+				if (m.find())
+				{
+					version = m.group();
+				}
 			}
 		}
 		catch (IOException e)
@@ -531,43 +552,57 @@ public final class Env
 		return cachedSLIMVersion;
 	}
 
-    static HashMap<String,Long> watchNowTimes = new HashMap<String,Long>();
-    static HashMap<String,Long> watchSumTimes = new HashMap<String,Long>();
-    static HashMap<String,Integer> watchCount = new HashMap<String,Integer>();
+	// TODO: expel timer logics
 
-    static public void startWatch(String key){
-    	watchNowTimes.put(key, System.currentTimeMillis());
-    }
+	private static Map<String, Long> watchNowTimes = new HashMap<String, Long>();
+	private static Map<String, Long> watchSumTimes = new HashMap<String, Long>();
+	private static Map<String, Integer> watchCount = new HashMap<String, Integer>();
 
-    static public void stopWatch(String key){
-    	long t;
-    	if(watchNowTimes.containsKey(key)){
-    		t = System.currentTimeMillis() - watchNowTimes.get(key);
-    	}else{
-    		t = 0;
-    	}
-    	if(watchSumTimes.containsKey(key)){
-    		long sum = watchSumTimes.get(key);
-    		watchSumTimes.put(key, sum+t);
-    		watchCount.put(key, watchCount.get(key)+1);
-    	}else{
-    		watchSumTimes.put(key, t);
-    		watchCount.put(key, 1);
-    	}
-    }
+	public static void startWatch(String key)
+	{
+		watchNowTimes.put(key, System.currentTimeMillis());
+	}
 
-    static public void dumpWatch(){
-    	DecimalFormat f = new DecimalFormat("####.##");
-    	if(watchSumTimes.size()>0){
-    		System.out.println("---- watch = "+watchSumTimes.size()+" ----");
-    	}
-    	for(String key : watchSumTimes.keySet()){
-    		double t = watchSumTimes.get(key)/1000.0;
-    		System.out.println("watch[" + key + "] : " + f.format(t) + " ("+watchCount.get(key)+")");
-    	}
-    	if(watchSumTimes.size()>0){
-    		System.out.println();
-    	}
-    	watchSumTimes.clear();
-    }
+	public static void stopWatch(String key)
+	{
+		long t;
+		if (watchNowTimes.containsKey(key))
+		{
+			t = System.currentTimeMillis() - watchNowTimes.get(key);
+		}
+		else
+		{
+			t = 0;
+		}
+		if (watchSumTimes.containsKey(key))
+		{
+			long sum = watchSumTimes.get(key);
+			watchSumTimes.put(key, sum + t);
+			watchCount.put(key, watchCount.get(key) + 1);
+		}
+		else
+		{
+			watchSumTimes.put(key, t);
+			watchCount.put(key, 1);
+		}
+	}
+
+	public static void dumpWatch()
+	{
+		DecimalFormat f = new DecimalFormat("####.##");
+		if (watchSumTimes.size() > 0)
+		{
+			System.out.println("---- watch = " + watchSumTimes.size() + " ----");
+		}
+		for (String key : watchSumTimes.keySet())
+		{
+			double t = watchSumTimes.get(key) / 1000.0;
+			System.out.println("watch[" + key + "] : " + f.format(t) + " (" + watchCount.get(key) + ")");
+		}
+		if (watchSumTimes.size() > 0)
+		{
+			System.out.println();
+		}
+		watchSumTimes.clear();
+	}
 }

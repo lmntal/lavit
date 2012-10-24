@@ -55,6 +55,7 @@ import lavit.editor.EditorPanel;
 import lavit.runner.ILRunner;
 import lavit.runner.PrintLineListener;
 import lavit.ui.FlatSplitPaneUI;
+import lavit.util.IntUtils;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame{
@@ -120,7 +121,7 @@ public class MainFrame extends JFrame{
 
 		toolTab = new ToolTab();
 
-		double editerPer = Env.getPercentage("WINDOW_EDITER_PERCENTAGE",50);
+		double editerPer = IntUtils.clamp(Env.getInt("window.divider_location", 50), 0, 100) / 100.0;
 		jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, editorPanel, toolTab)
 		{
 			public void setBorder(Border b)
@@ -133,8 +134,7 @@ public class MainFrame extends JFrame{
 		jsp.setUI(new FlatSplitPaneUI());
 		jsp.setOneTouchExpandable(true);
         jsp.setResizeWeight(0.5);
-        //jsp.setDividerLocation((int)(Env.getInt("WINDOW_WIDTH")*editerPer));
-        jsp.setDividerLocation((int)(getWidth()*editerPer));
+        jsp.setDividerLocation((int)Math.round(getWidth() * editerPer));
         setContentPane(jsp);
 
         addWindowListener(new MainWindowListener(this));
@@ -228,6 +228,6 @@ public class MainFrame extends JFrame{
 		Env.set("WINDOW_WIDTH", sizeSave.width);
 		Env.set("WINDOW_HEIGHT", sizeSave.height);
 		Env.set("WINDOW_STATE", getExtendedState() == JFrame.MAXIMIZED_BOTH ? "maximized" : "normal");
-		Env.setPercentage("WINDOW_EDITER_PERCENTAGE",(double)jsp.getDividerLocation()/(double)getWidth());
+		Env.set("window.divider_location", (int)Math.round(100.0 * jsp.getDividerLocation() / getWidth()));
 	}
 }

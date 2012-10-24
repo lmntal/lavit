@@ -35,109 +35,24 @@
 
 package lavit.option;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
-import lavit.Env;
-import lavit.util.FixFlowLayout;
-
-public class OptionUnyoPanel extends JPanel implements ActionListener,DocumentListener{
-
-	String majorOption[] = {
-			"-t",
-			"-O1",
-			"-O2",
-			"-O3",
-			"-s1",
-			"-s2",
-			"-s3",
-			"--hideruleset",
-			" --hiderule"
+@SuppressWarnings("serial")
+class OptionUnyoPanel extends AbstractOptionPanel
+{
+	private static final String[] OPTIONS =
+	{
+		"-t",
+		"-O1",
+		"-O2",
+		"-O3",
+		"-s1",
+		"-s2",
+		"-s3",
+		"--hideruleset",
+		" --hiderule",
 	};
-	JCheckBox optionCheckBox[] = new JCheckBox[majorOption.length];
-	JTextField optionField = new JTextField(15);
 
-	OptionUnyoPanel(){
-
-		setLayout(new FixFlowLayout());
-		setBorder(new TitledBorder("UNYO Option"));
-
-		for(int i=0;i<majorOption.length;++i){
-			optionCheckBox[i] = new JCheckBox(majorOption[i]);
-			add(optionCheckBox[i]);
-		}
-		add(optionField);
-
-		settingInit();
-
-		for(int i=0;i<majorOption.length;++i){
-			optionCheckBox[i].addActionListener(this);
-		}
-		optionField.getDocument().addDocumentListener(this);
-
+	public OptionUnyoPanel()
+	{
+		super("UNYO Option", "UNYO_OPTION", OPTIONS);
 	}
-
-	void settingInit(){
-		for(int i=0;i<majorOption.length;++i){
-			optionCheckBox[i].setSelected(false);
-		}
-		optionField.setText("");
-
-		String[] options = Env.get("UNYO_OPTION").split(" ");
-		for(String o : options){
-			boolean exist = false;
-			for(int i=0;i<majorOption.length;++i){
-				if(majorOption[i].equals(o)){
-					optionCheckBox[i].setSelected(true);
-					exist = true;
-				}
-			}
-			if(!exist){
-				String text = optionField.getText();
-				if(text.length()==0){
-					optionField.setText(o);
-				}else{
-					optionField.setText(text+" "+o);
-				}
-			}
-		}
-	}
-
-	public void actionPerformed(ActionEvent e) {
-		String newOptions = "";
-		for(int i=0;i<majorOption.length;++i){
-			if(optionCheckBox[i].isSelected()){
-				if(newOptions.length()==0){
-					newOptions += optionCheckBox[i].getText();
-				}else{
-					newOptions += " " + optionCheckBox[i].getText();
-				}
-			}
-		}
-		String field = optionField.getText();
-		if(field.length()>0){
-			newOptions += " " + optionField.getText();
-		}
-		Env.set("UNYO_OPTION",newOptions);
-	}
-
-	public void changedUpdate(DocumentEvent e) {
-		actionPerformed(null);
-	}
-
-	public void insertUpdate(DocumentEvent e) {
-		actionPerformed(null);
-	}
-
-	public void removeUpdate(DocumentEvent e) {
-		actionPerformed(null);
-	}
-
 }

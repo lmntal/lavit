@@ -35,22 +35,10 @@
 
 package lavit.option;
 
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
-import lavit.*;
-
-public class OptionSlimPanel extends JPanel implements ActionListener,DocumentListener {
-
-	private String majorOption[] =
+@SuppressWarnings("serial")
+class OptionSlimPanel extends AbstractOptionPanel
+{
+	private static final String[] OPTIONS =
 	{
 		"-t",
 		"--nd",
@@ -66,84 +54,8 @@ public class OptionSlimPanel extends JPanel implements ActionListener,DocumentLi
 		"--use-builtin-rule",
 	};
 
-	JCheckBox optionCheckBox[] = new JCheckBox[majorOption.length];
-	JTextField optionField = new JTextField(15);
-
-	OptionSlimPanel(){
-
-		setLayout(new FlowLayout());
-		setBorder(new TitledBorder("Slim Option"));
-
-		for(int i=0;i<majorOption.length;++i){
-			optionCheckBox[i] = new JCheckBox(majorOption[i]);
-			add(optionCheckBox[i]);
-		}
-		add(optionField);
-
-		settingInit();
-
-		for(int i=0;i<majorOption.length;++i){
-			optionCheckBox[i].addActionListener(this);
-		}
-		optionField.getDocument().addDocumentListener(this);
-
+	public OptionSlimPanel()
+	{
+		super("SLIM Option", "SLIM_OPTION", OPTIONS);
 	}
-
-	void settingInit(){
-		for(int i=0;i<majorOption.length;++i){
-			optionCheckBox[i].setSelected(false);
-		}
-		optionField.setText("");
-
-		String[] options = Env.get("SLIM_OPTION").split(" ");
-		for(String o : options){
-			boolean exist = false;
-			for(int i=0;i<majorOption.length;++i){
-				if(majorOption[i].equals(o)){
-					optionCheckBox[i].setSelected(true);
-					exist = true;
-				}
-			}
-			if(!exist){
-				String text = optionField.getText();
-				if(text.length()==0){
-					optionField.setText(o);
-				}else{
-					optionField.setText(text+" "+o);
-				}
-			}
-		}
-	}
-
-	public void actionPerformed(ActionEvent e) {
-		String newOptions = "";
-		for(int i=0;i<majorOption.length;++i){
-			if(optionCheckBox[i].isSelected()){
-				if(newOptions.length()==0){
-					newOptions += optionCheckBox[i].getText();
-				}else{
-					newOptions += " " + optionCheckBox[i].getText();
-				}
-			}
-		}
-		String field = optionField.getText();
-		if(field.length()>0){
-			newOptions += " " + optionField.getText();
-		}
-		Env.set("SLIM_OPTION",newOptions);
-	}
-
-	public void changedUpdate(DocumentEvent e) {
-		actionPerformed(null);
-	}
-
-	public void insertUpdate(DocumentEvent e) {
-		actionPerformed(null);
-	}
-
-	public void removeUpdate(DocumentEvent e) {
-		actionPerformed(null);
-	}
-
-
 }

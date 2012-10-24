@@ -38,8 +38,9 @@ package lavit.option;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-public class OptionPanel extends JPanel {
-
+@SuppressWarnings("serial")
+public class OptionPanel extends JPanel
+{
 	private OptionLMNtalPanel optionLMNtalPanel;
 	private OptionUnyoPanel optionUnyoPanel;
 	private OptionCompilePanel optionCompilePanel;
@@ -48,9 +49,9 @@ public class OptionPanel extends JPanel {
 	private OptionSVDepthPanel optionSVDepthPanel;
 	private OptionLtlPanel optionLtlPanel;
 
-	public OptionPanel(){
-
-		setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
+	public OptionPanel()
+	{
+		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
 		optionLMNtalPanel = new OptionLMNtalPanel();
 		add(optionLMNtalPanel);
@@ -85,6 +86,4 @@ public class OptionPanel extends JPanel {
 		//generalSettingPanel = new GeneralSettingPanel();
 		//add(generalSettingPanel);
 	}
-
-
 }

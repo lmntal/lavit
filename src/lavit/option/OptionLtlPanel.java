@@ -35,105 +35,20 @@
 
 package lavit.option;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
-import lavit.Env;
-import lavit.util.FixFlowLayout;
-
-public class OptionLtlPanel extends JPanel implements ActionListener,DocumentListener{
-
-	String majorOption[] = {
-			"--hide-ruleset",
-			"-t",
-			"--dump-lavit",
-			"--mem-enc",
-			"--show-transition"
+@SuppressWarnings("serial")
+public class OptionLtlPanel extends AbstractOptionPanel
+{
+	private static final String[] OPTIONS =
+	{
+		"--hide-ruleset",
+		"-t",
+		"--dump-lavit",
+		"--mem-enc",
+		"--show-transition",
 	};
-	JCheckBox optionCheckBox[] = new JCheckBox[majorOption.length];
-	JTextField optionField = new JTextField(15);
 
-	OptionLtlPanel(){
-
-		setLayout(new FixFlowLayout());
-		setBorder(new TitledBorder("LTL Model Check SLIM Option"));
-
-		for(int i=0;i<majorOption.length;++i){
-			optionCheckBox[i] = new JCheckBox(majorOption[i]);
-			add(optionCheckBox[i]);
-		}
-		add(optionField);
-
-		settingInit();
-
-		for(int i=0;i<majorOption.length;++i){
-			optionCheckBox[i].addActionListener(this);
-		}
-		optionField.getDocument().addDocumentListener(this);
-
+	public OptionLtlPanel()
+	{
+		super("LTL Model Check SLIM Option", "LTL_OPTION", OPTIONS);
 	}
-
-	void settingInit(){
-		for(int i=0;i<majorOption.length;++i){
-			optionCheckBox[i].setSelected(false);
-		}
-		optionField.setText("");
-
-		String[] options = Env.get("LTL_OPTION").split(" ");
-		for(String o : options){
-			boolean exist = false;
-			for(int i=0;i<majorOption.length;++i){
-				if(majorOption[i].equals(o)){
-					optionCheckBox[i].setSelected(true);
-					exist = true;
-				}
-			}
-			if(!exist){
-				String text = optionField.getText();
-				if(text.length()==0){
-					optionField.setText(o);
-				}else{
-					optionField.setText(text+" "+o);
-				}
-			}
-		}
-	}
-
-	public void actionPerformed(ActionEvent e) {
-		String newOptions = "";
-		for(int i=0;i<majorOption.length;++i){
-			if(optionCheckBox[i].isSelected()){
-				if(newOptions.length()==0){
-					newOptions += optionCheckBox[i].getText();
-				}else{
-					newOptions += " " + optionCheckBox[i].getText();
-				}
-			}
-		}
-		String field = optionField.getText();
-		if(field.length()>0){
-			newOptions += " " + optionField.getText();
-		}
-		Env.set("LTL_OPTION",newOptions);
-	}
-
-	public void changedUpdate(DocumentEvent e) {
-		actionPerformed(null);
-	}
-
-	public void insertUpdate(DocumentEvent e) {
-		actionPerformed(null);
-	}
-
-	public void removeUpdate(DocumentEvent e) {
-		actionPerformed(null);
-	}
-
 }

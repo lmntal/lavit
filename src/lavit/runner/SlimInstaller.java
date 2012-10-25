@@ -474,7 +474,7 @@ class InstallWindow extends JFrame
 	{
 		ImageIcon image = new ImageIcon(Env.getImageOfFile("img/slim_c_s.png"));
 
-		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+		setIconImages(Env.getApplicationIcons());
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setTitle("Installing SLIM...");
 

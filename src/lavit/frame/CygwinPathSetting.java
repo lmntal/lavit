@@ -67,7 +67,7 @@ public final class CygwinPathSetting
 			dialog.setDialogTitle("Cygwin Path Setting");
 			dialog.setHeadLineText("Cygwin path setting");
 			dialog.setDescriptionText(Lang.w[1]);
-			dialog.setDialogIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+			dialog.setDialogIconImages(Env.getApplicationIcons());
 			dialog.setDialogResizable(false);
 		}
 

@@ -62,7 +62,7 @@ public class RebootFrame extends JDialog
 	{
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("LaViT Reboot");
-		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+		setIconImages(Env.getApplicationIcons());
 		setAlwaysOnTop(true);
 		setResizable(false);
 

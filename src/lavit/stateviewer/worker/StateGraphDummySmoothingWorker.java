@@ -190,7 +190,7 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			setTitle("Dummy Smoothing");
-			setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+			setIconImages(Env.getApplicationIcons());
 			setAlwaysOnTop(true);
 			setResizable(false);
 

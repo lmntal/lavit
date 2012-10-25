@@ -82,7 +82,7 @@ public class GeneralSettingFrame extends JDialog
 	{
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setTitle("Preferences");
-		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+		setIconImages(Env.getApplicationIcons());
 		setAlwaysOnTop(true);
 		setPreferredSize(new Dimension(500, 400));
 

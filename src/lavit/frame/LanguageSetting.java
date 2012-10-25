@@ -39,6 +39,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -56,7 +57,7 @@ public final class LanguageSetting
 		dialog.setHeadLineText("Language");
 		dialog.setDescriptionText("Please select your language.");
 		dialog.setDialogResizable(false);
-		dialog.setDialogIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+		dialog.setDialogIconImages(Env.getApplicationIcons());
 
 		boolean approved = dialog.showDialog();
 		if (approved)

@@ -271,7 +271,7 @@ public class Ltl2baInstaller implements OuterRunner  {
 
 		InstallWindow(){
 
-			setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+			setIconImages(Env.getApplicationIcons());
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			setAlwaysOnTop(true);
 			//setUndecorated(true);

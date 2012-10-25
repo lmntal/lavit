@@ -116,7 +116,7 @@ public class TemplateSelectDialog extends JDialog
 	{
 		super(owner);
 
-		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+		setIconImages(Env.getApplicationIcons());
 		setTitle("Load template");
 		setModalityType(ModalityType.APPLICATION_MODAL);
 

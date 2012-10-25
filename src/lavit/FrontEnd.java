@@ -38,6 +38,7 @@ package lavit;
 import java.awt.Window;
 import java.io.File;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -52,17 +53,14 @@ import lavit.runner.RebootRunner;
 import lavit.util.CommonFontUser;
 import lavit.util.StringUtils;
 
-public class FrontEnd {
+public class FrontEnd
+{
+	public static MainFrame mainFrame;
 
-	static public FrontEnd frontEnd;
-	static public MainFrame mainFrame;
+	public static Set<CommonFontUser> fontUsers = new HashSet<CommonFontUser>();
 
-	static public HashSet<CommonFontUser> fontUsers = new HashSet<CommonFontUser>();
-
-	public FrontEnd(String[] args){
-
-		frontEnd    = this;
-
+	public FrontEnd(String[] args)
+	{
 		mainFrame   = new MainFrame();
         mainFrame.editorPanel.firstFileOpen();
 
@@ -73,72 +71,109 @@ public class FrontEnd {
         println("(SYSTEM) Ready.");
 	}
 
-	void loadArgs(String[] args){
-		for(int i=0;i<args.length;i++){
-			if(args[i].length()==0){ continue; }
-			if(args[i].charAt(0)!='-'){ continue; }
+	private static void loadArgs(String[] args)
+	{
+		for (int i = 0; i < args.length; i++)
+		{
+			if (args[i].isEmpty() || args[i].charAt(0) != '-')
+			{
+				continue;
+			}
 
-			if (args[i].equals("--stateviewer")) {
-				if(i+1<args.length){
-					File file = new File(args[i+1]);
-					if(file.exists()){
+			if (args[i].equals("--stateviewer"))
+			{
+				if (i + 1 < args.length)
+				{
+					File file = new File(args[i + 1]);
+					if (file.exists())
+					{
 						//mainFrame.jsp.setDividerLocation(0);
 						mainFrame.toolTab.statePanel.loadFile(file);
 					}
 				}
-			}else{
+			}
+			else
+			{
 				println("invalid option: " + args[i]);
 			}
 		}
 	}
 
-	static public void reboot(){
-		if(!mainFrame.editorPanel.closeFile()){return;}
+	public static void reboot()
+	{
+		if (!mainFrame.editorPanel.closeFile())
+		{
+			return;
+		}
 		mainFrame.exit();
 		Env.save();
 		mainFrame.dispose();
 		System.out.println("LaViT reboot.");
 
-		RebootRunner rebootRunner = new RebootRunner("-Xms16M -Xmx"+Env.get("REBOOT_MAX_MEMORY"));
+		RebootRunner rebootRunner = new RebootRunner("-Xms16M -Xmx" + Env.get("REBOOT_MAX_MEMORY"));
 		rebootRunner.run();
-		while(rebootRunner.isRunning()){
+		while (rebootRunner.isRunning())
+		{
 			FrontEnd.sleep(200);
 		}
 		System.exit(0);
 	}
 
-	static public void exit(){
-		if(!mainFrame.editorPanel.closeFile()){return;}
+	public static void exit()
+	{
+		if (!mainFrame.editorPanel.closeFile())
+		{
+			return;
+		}
 		mainFrame.exit();
-		if(Env.is("WATCH_DUMP")) Env.dumpWatch();
+		if (Env.is("WATCH_DUMP")) Env.dumpWatch();
 		Env.save();
 		System.out.println("LaViT end.");
 		System.exit(0);
 	}
 
-	static public void println(final String str){
-		javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-			mainFrame.toolTab.systemPanel.logPanel.println(str);
-		}});
+	public static void println(final String str)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				mainFrame.toolTab.systemPanel.logPanel.println(str);
+			}
+		});
 	}
 
-	static public void errPrintln(final String str){
-		javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-			mainFrame.toolTab.systemPanel.logPanel.errPrintln(str);
-		}});
+	public static void errPrintln(final String str)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				mainFrame.toolTab.systemPanel.logPanel.errPrintln(str);
+			}
+		});
 	}
 
-	static public void printException(final Exception e){
-		javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-			mainFrame.toolTab.systemPanel.logPanel.printException(e);
-		}});
+	public static void printException(final Exception e)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				mainFrame.toolTab.systemPanel.logPanel.printException(e);
+			}
+		});
 		e.printStackTrace();
 	}
 
-	static public void sleep(long millis){
-		try {
+	public static void sleep(long millis)
+	{
+		try
+		{
 			Thread.sleep(millis);
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e)
+		{
 			FrontEnd.printException(e);
 		}
 	}
@@ -170,16 +205,20 @@ public class FrontEnd {
 		});
 	}
 
-	static public void addFontUser(CommonFontUser user){
+	public static void addFontUser(CommonFontUser user)
+	{
 		fontUsers.add(user);
 	}
 
-	static public void removeFontUser(CommonFontUser user){
+	public static void removeFontUser(CommonFontUser user)
+	{
 		fontUsers.remove(user);
 	}
 
-	static public void loadAllFont(){
-		for(CommonFontUser user : fontUsers){
+	public static void loadAllFont()
+	{
+		for (CommonFontUser user : fontUsers)
+		{
 			user.loadFont();
 		}
 	}

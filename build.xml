@@ -40,7 +40,7 @@
 				<attribute name="Class-Path" value="lib/ant.jar" />
 				<attribute name="Main-Class" value="lavit.FrontEnd" />
 			</manifest>
-			<fileset dir="." includes="img/*,lang/*.xml" />
+			<fileset dir="." includes="img/**/*,lang/*.xml" />
 			<fileset file="./env_default.txt" />
 		</jar>
 	</target>

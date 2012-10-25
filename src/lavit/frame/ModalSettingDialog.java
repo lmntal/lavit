@@ -57,6 +57,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
@@ -129,9 +130,9 @@ public final class ModalSettingDialog
 	private boolean approved;
 	private ClosingListener closingListener;
 
-	private ModalSettingDialog(JComponent content)
+	private ModalSettingDialog(JFrame owner, JComponent content)
 	{
-		dialog = new JDialog();
+		dialog = new JDialog(owner);
 
 		//
 		// Header
@@ -281,9 +282,19 @@ public final class ModalSettingDialog
 		return createDialog(content, "", "", "");
 	}
 
+	public static ModalSettingDialog createDialog(JFrame owner, JComponent content)
+	{
+		return createDialog(owner, content, "", "", "");
+	}
+
 	public static ModalSettingDialog createDialog(JComponent content, String title, String headline, String desc)
 	{
-		ModalSettingDialog settingDialog = new ModalSettingDialog(content);
+		return createDialog(null, content, title, headline, desc);
+	}
+
+	public static ModalSettingDialog createDialog(JFrame owner, JComponent content, String title, String headline, String desc)
+	{
+		ModalSettingDialog settingDialog = new ModalSettingDialog(owner, content);
 		settingDialog.setDialogTitle(title);
 		settingDialog.setHeadLineText(headline);
 		settingDialog.setDescriptionText(desc);

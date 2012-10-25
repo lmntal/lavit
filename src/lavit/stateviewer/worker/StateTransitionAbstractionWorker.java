@@ -251,7 +251,7 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			setTitle("Transition Abstraction");
-			setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+			setIconImages(Env.getApplicationIcons());
 			setAlwaysOnTop(true);
 			setResizable(false);
 

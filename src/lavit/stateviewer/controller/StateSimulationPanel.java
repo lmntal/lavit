@@ -480,7 +480,7 @@ public class StateSimulationPanel extends JPanel {
 
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			setTitle("Rules");
-	        setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+	        setIconImages(Env.getApplicationIcons());
 	        setAlwaysOnTop(true);
 	        setResizable(false);
 

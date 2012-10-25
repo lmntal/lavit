@@ -56,7 +56,7 @@ public class StartupFrame extends JWindow
 	{
 		Icon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
 
-		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+		setIconImages(Env.getApplicationIcons());
 
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));

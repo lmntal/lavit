@@ -97,7 +97,7 @@ public class SelectStateTransitionRuleFrame extends JFrame implements ActionList
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("Rules");
-        setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+        setIconImages(Env.getApplicationIcons());
         setAlwaysOnTop(true);
         setResizable(false);
 

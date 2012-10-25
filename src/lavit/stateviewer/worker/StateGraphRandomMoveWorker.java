@@ -205,7 +205,7 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			setTitle("Genetic Algorithm");
-			setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+			setIconImages(Env.getApplicationIcons());
 			setAlwaysOnTop(true);
 			setResizable(false);
 

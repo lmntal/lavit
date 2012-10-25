@@ -84,7 +84,7 @@ public final class SlimPathSetting
 		{
 			sp = new SlimPathPanel();
 			dialog = ModalSettingDialog.createDialog(sp);
-			dialog.setDialogIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+			dialog.setDialogIconImages(Env.getApplicationIcons());
 			dialog.setDialogTitle("SLIM Setting");
 			dialog.setHeadLineText("Setup SLIM path");
 			dialog.setDescriptionText(Lang.w[8] + Env.getSlimBinaryName() + Lang.w[9]);

@@ -69,7 +69,7 @@ public class VersionFrame extends JDialog
 		Icon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
 
 		setTitle("Version information");
-		setIconImage(Env.getImageOfFile(Env.IMAGEFILE_ICON));
+		setIconImages(Env.getApplicationIcons());
 		setResizable(false);
 		setAlwaysOnTop(true);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

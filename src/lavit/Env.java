@@ -54,6 +54,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -79,7 +80,6 @@ public final class Env
 
 	public static final String LMNTAL_LIBRARY_DIR = "lmntal";
 
-	public static final String IMAGEFILE_ICON = "img/icon.png";
 	public static final String[] FONT_SIZE_LIST = {"8","9","10","11","12","14","16","18","20","24","28","32","36","40","44","48","54","60","66","72","80","88","96","106"};
 
 	private static final String ENV_FILE = "env.txt";
@@ -90,6 +90,8 @@ public final class Env
 
 	private static String cachedLMNtalVersion = null;
 	private static String cachedSLIMVersion = null;
+
+	private static List<Image> appIcons;
 
 	public Env()
 	{
@@ -453,6 +455,20 @@ public final class Env
 	public static boolean isWindows()
 	{
 		return File.pathSeparatorChar == ';';
+	}
+
+	public static List<Image> getApplicationIcons()
+	{
+		if (appIcons == null)
+		{
+			List<Image> icons = new ArrayList<Image>();
+			icons.add(Env.getImageOfFile("img/app_icons/app_icon_16.png"));
+			icons.add(Env.getImageOfFile("img/app_icons/app_icon_32.png"));
+			icons.add(Env.getImageOfFile("img/app_icons/app_icon_48.png"));
+			icons.add(Env.getImageOfFile("img/app_icons/app_icon_64.png"));
+			appIcons = Collections.unmodifiableList(icons);
+		}
+		return appIcons;
 	}
 
 	/**

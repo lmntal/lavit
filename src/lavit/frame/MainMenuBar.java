@@ -366,7 +366,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         }else if(src == iSVOpen){
         	FrontEnd.mainFrame.toolTab.statePanel.loadFile();
         }else if(src == iExit) {
-        	FrontEnd.frontEnd.exit();
+        	FrontEnd.exit();
         }else if(src == iCopy) {
         	FrontEnd.mainFrame.editorPanel.getSelectedEditor().copy();
         }else if(src == iCut) {

@@ -49,6 +49,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -84,6 +86,7 @@ public final class Env
 
 	private static final String ENV_FILE = "env.txt";
 	private static final String ENV_DEFAULT_FILE = "env_default.txt";
+	private static final String DIR_NAME_PROPERTIES = "properties";
 
 	private static Env env = null;
 	private static Properties prop = new Properties();
@@ -239,10 +242,10 @@ public final class Env
 			char sep = File.separatorChar;
 			char pathSep = File.pathSeparatorChar;
 			String cygwinDir = get("WINDOWS_CYGWIN_DIR");
-			String pathes = "";
-			pathes += cygwinDir + sep + "bin" + pathSep;
-			pathes += cygwinDir + sep + "usr" + sep + "bin" + pathSep;
-			pathes += cygwinDir + sep + "usr" + sep + "local" + sep + "bin";
+			String paths = "";
+			paths += cygwinDir + sep + "bin" + pathSep;
+			paths += cygwinDir + sep + "usr" + sep + "bin" + pathSep;
+			paths += cygwinDir + sep + "usr" + sep + "local" + sep + "bin";
 
 			boolean put = false;
 			for (String key : new String[] { "path", "Path", "PATH" })
@@ -250,13 +253,13 @@ public final class Env
 				String value = map.get(key);
 				if (value != null)
 				{
-					map.put(key, pathes + pathSep + value);
+					map.put(key, paths + pathSep + value);
 					put = true;
 				}
 			}
 			if (!put)
 			{
-				map.put("PATH", pathes);
+				map.put("PATH", paths);
 			}
 		}
 	}
@@ -469,6 +472,63 @@ public final class Env
 			appIcons = Collections.unmodifiableList(icons);
 		}
 		return appIcons;
+	}
+
+	public static List<File> loadLastFiles()
+	{
+		List<File> files = new ArrayList<File>();
+		String fileName = DIR_NAME_PROPERTIES + File.separator + "lastfiles";
+		String charset = "UTF-8";
+		try
+		{
+			BufferedReader reader = new BufferedReader(
+				new InputStreamReader(new FileInputStream(fileName), charset));
+			String line;
+			while ((line = reader.readLine()) != null)
+			{
+				files.add(new File(line));
+			}
+			reader.close();
+		}
+		catch (FileNotFoundException e)
+		{
+		}
+		catch (IOException e)
+		{
+		}
+		return files;
+	}
+
+	public static void saveOpenedFilePathes(List<File> files)
+	{
+		File dirProp = new File(DIR_NAME_PROPERTIES);
+		if (!dirProp.exists())
+		{
+			if (!dirProp.mkdir())
+			{
+				System.err.println("Could not create directory '" + DIR_NAME_PROPERTIES + "'");
+				return;
+			}
+		}
+
+		String fileName = DIR_NAME_PROPERTIES + File.separator + "lastfiles";
+		String charset = "UTF-8";
+		try
+		{
+			PrintWriter out = new PrintWriter(new BufferedWriter(
+				new OutputStreamWriter(new FileOutputStream(fileName), charset)));
+			for (File file : files)
+			{
+				out.println(file.getAbsolutePath());
+			}
+			out.close();
+		}
+		catch (FileNotFoundException e)
+		{
+		}
+		catch (UnsupportedEncodingException e)
+		{
+		}
 	}
 
 	/**

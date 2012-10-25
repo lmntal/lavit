@@ -101,10 +101,11 @@ public class FrontEnd
 
 	public static void reboot()
 	{
-		if (!mainFrame.editorPanel.closeFile())
+		if (!mainFrame.editorPanel.askSaveAllChangedFiles())
 		{
 			return;
 		}
+		Env.saveOpenedFilePathes(mainFrame.editorPanel.getFiles());
 		mainFrame.exit();
 		Env.save();
 		mainFrame.dispose();
@@ -121,10 +122,11 @@ public class FrontEnd
 
 	public static void exit()
 	{
-		if (!mainFrame.editorPanel.closeFile())
+		if (!mainFrame.editorPanel.askSaveAllChangedFiles())
 		{
 			return;
 		}
+		Env.saveOpenedFilePathes(mainFrame.editorPanel.getFiles());
 		mainFrame.exit();
 		if (Env.is("WATCH_DUMP")) Env.dumpWatch();
 		Env.save();

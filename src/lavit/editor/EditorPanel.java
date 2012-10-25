@@ -158,6 +158,20 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		return tabView.getSelectedPage().getFile();
 	}
 
+	public List<File> getFiles()
+	{
+		List<File> files = new ArrayList<File>();
+		EditorPage[] pages = tabView.getPages();
+		for (EditorPage page : pages)
+		{
+			if (page.hasFile())
+			{
+				files.add(page.getFile());
+			}
+		}
+		return files;
+	}
+
 	/**
 	 * first.lmn を開く
 	 */
@@ -185,20 +199,11 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 	 */
 	public void openInitialFiles()
 	{
-		List<String> fileNames = new ArrayList<String>();
-		for (String s : Env.get("editor.lastfiles", "").split("\\s+"))
+		List<File> files = Env.loadLastFiles();
+		if (!files.isEmpty())
 		{
-			s = s.trim();
-			if (!s.isEmpty())
+			for (File file : files)
 			{
-				fileNames.add(s);
-			}
-		}
-		if (!fileNames.isEmpty())
-		{
-			for (String fileName : fileNames)
-			{
-				File file = new File(fileName);
 				if (file.exists())
 				{
 					openInnerEditorFile(file);
@@ -334,15 +339,13 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 	}
 
 	/**
-	 * すべてのページを閉じる。
-	 * ページを閉じ始める前に、変更のあるページについて保存について聞く。
+	 * 変更のあるすべてのページについて保存について聞く。
 	 * キャンセルが選択された場合はページは1つも閉じられない。
-	 * @return タブがすべて閉じられた場合は {@code true}、キャンセルされた場合は {@code false}。
+	 * @return すべての確認で「はい」か「いいえ」が選択された場合は {@code true}、ある確認について「キャンセル」が選択された場合は {@code false}
 	 */
-	public boolean closeFile()
+	public boolean askSaveAllChangedFiles()
 	{
-		String lastFiles = "";
-		boolean closeAll = true;
+		boolean approved = true;
 		for (int i = 0; i < tabView.getTabCount(); i++)
 		{
 			if (isChanged(i))
@@ -351,7 +354,7 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 				int ret = askSaveChangedFile();
 				if (ret == JOptionPane.CANCEL_OPTION)
 				{
-					closeAll = false;
+					approved = false;
 					break;
 				}
 				else if (ret == JOptionPane.YES_OPTION)
@@ -359,17 +362,8 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 					fileSave();
 				}
 			}
-			if (i != 0)
-			{
-				lastFiles += " ";
-			}
-			lastFiles += tabView.getPages()[i].getFile().getAbsolutePath();
 		}
-		if (closeAll)
-		{
-			Env.set("editor.lastfiles", lastFiles);
-		}
-		return closeAll;
+		return approved;
 	}
 
 	/**
@@ -635,15 +629,18 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 	}
 	*/
 
-	public void changedUpdate(DocumentEvent e) {
+	public void changedUpdate(DocumentEvent e)
+	{
 	}
 
-	public void insertUpdate(DocumentEvent e) {
+	public void insertUpdate(DocumentEvent e)
+	{
 		//commonUpdate(e);
 		//checkIndent(e);
 	}
 
-	public void removeUpdate(DocumentEvent e) {
+	public void removeUpdate(DocumentEvent e)
+	{
 		//commonUpdate(e);
 	}
 
@@ -675,15 +672,18 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		tabView.getSelectedPage().redo();
 	}
 
-	public void redoundoUpdate(){
+	public void redoundoUpdate()
+	{
 		//FrontEnd.mainFrame.mainMenuBar.updateUndoRedo(undoredoManager.canUndo(), undoredoManager.canRedo());
 	}
 
 	/**
 	 * カーソルの移動を監視するクラス
 	 */
-	private class RowColumnListener implements CaretListener{
-		public void caretUpdate(CaretEvent e) {
+	private class RowColumnListener implements CaretListener
+	{
+		public void caretUpdate(CaretEvent e)
+		{
 			/*
 			try {
 				int pos = editor.getCaretPosition();

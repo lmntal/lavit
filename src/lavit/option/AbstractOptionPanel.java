@@ -37,6 +37,8 @@ package lavit.option;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -56,7 +58,7 @@ import lavit.util.FixFlowLayout;
 abstract class AbstractOptionPanel extends JPanel
 {
 	private String propertyName;
-	private String[] majorOptions;
+	private List<String> majorOptions = new ArrayList<String>();
 	private JCheckBox[] optionBoxes;
 	private JTextField optionField;
 
@@ -67,17 +69,24 @@ abstract class AbstractOptionPanel extends JPanel
 	 */
 	protected AbstractOptionPanel(String title, String propertyName, String[] options)
 	{
-		majorOptions = options;
 		this.propertyName = propertyName;
+
+		for (String option : options)
+		{
+			if (!option.isEmpty() && !majorOptions.contains(option))
+			{
+				majorOptions.add(option);
+			}
+		}
 
 		setLayout(new FixFlowLayout());
 		setBorder(new TitledBorder(title));
 
 		ChangeHandler handler = new ChangeHandler();
-		optionBoxes = new JCheckBox[majorOptions.length];
-		for (int i = 0; i < majorOptions.length; i++)
+		optionBoxes = new JCheckBox[majorOptions.size()];
+		for (int i = 0; i < majorOptions.size(); i++)
 		{
-			optionBoxes[i] = new JCheckBox(majorOptions[i]);
+			optionBoxes[i] = new JCheckBox(majorOptions.get(i));
 			optionBoxes[i].addActionListener(handler);
 			add(optionBoxes[i]);
 		}
@@ -101,9 +110,9 @@ abstract class AbstractOptionPanel extends JPanel
 		for (String o : options)
 		{
 			boolean exist = false;
-			for (int i = 0; i < majorOptions.length; i++)
+			for (int i = 0; i < majorOptions.size(); i++)
 			{
-				if (majorOptions[i].equals(o))
+				if (majorOptions.get(i).equals(o))
 				{
 					optionBoxes[i].setSelected(true);
 					exist = true;

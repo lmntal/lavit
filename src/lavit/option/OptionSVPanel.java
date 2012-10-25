@@ -38,16 +38,8 @@ package lavit.option;
 @SuppressWarnings("serial")
 class OptionSVPanel extends AbstractOptionPanel
 {
-	private static final String[] OPTIONS =
+	public OptionSVPanel(String[] options)
 	{
-		"--hide-ruleset",
-		"--mem-enc",
-		"--show-transition",
-		"--use-builtin-rule",
-	};
-
-	public OptionSVPanel()
-	{
-		super("StateViewer SLIM Option", "SV_OPTION", OPTIONS);
+		super("StateViewer SLIM Option", "SV_OPTION", options);
 	}
 }

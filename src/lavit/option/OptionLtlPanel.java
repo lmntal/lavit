@@ -38,17 +38,8 @@ package lavit.option;
 @SuppressWarnings("serial")
 public class OptionLtlPanel extends AbstractOptionPanel
 {
-	private static final String[] OPTIONS =
+	public OptionLtlPanel(String[] options)
 	{
-		"--hide-ruleset",
-		"-t",
-		"--dump-lavit",
-		"--mem-enc",
-		"--show-transition",
-	};
-
-	public OptionLtlPanel()
-	{
-		super("LTL Model Check SLIM Option", "LTL_OPTION", OPTIONS);
+		super("LTL Model Check SLIM Option", "LTL_OPTION", options);
 	}
 }

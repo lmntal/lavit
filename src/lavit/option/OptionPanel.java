@@ -38,6 +38,8 @@ package lavit.option;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
+import lavit.Env;
+
 @SuppressWarnings("serial")
 public class OptionPanel extends JPanel
 {
@@ -53,25 +55,25 @@ public class OptionPanel extends JPanel
 	{
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-		optionLMNtalPanel = new OptionLMNtalPanel();
+		optionLMNtalPanel = new OptionLMNtalPanel(readOptions("options.lmntal"));
 		add(optionLMNtalPanel);
 
-		optionUnyoPanel = new OptionUnyoPanel();
+		optionUnyoPanel = new OptionUnyoPanel(readOptions("options.unyo"));
 		add(optionUnyoPanel);
 
-		optionCompilePanel = new OptionCompilePanel();
+		optionCompilePanel = new OptionCompilePanel(readOptions("options.lmntal_slim"));
 		add(optionCompilePanel);
 
-		optionSlimPanel = new OptionSlimPanel();
+		optionSlimPanel = new OptionSlimPanel(readOptions("options.slim"));
 		add(optionSlimPanel);
 
 		//optionSVDepthPanel = new OptionSVDepthPanel();
 		//add(optionSVDepthPanel);
 
-		optionSVPanel = new OptionSVPanel();
+		optionSVPanel = new OptionSVPanel(readOptions("options.stateviewer"));
 		add(optionSVPanel);
 
-		optionLtlPanel = new OptionLtlPanel();
+		optionLtlPanel = new OptionLtlPanel(readOptions("options.ltl"));
 		add(optionLtlPanel);
 
 		//fontSettingPanel = new FontSettingPanel();
@@ -85,5 +87,10 @@ public class OptionPanel extends JPanel
 
 		//generalSettingPanel = new GeneralSettingPanel();
 		//add(generalSettingPanel);
+	}
+
+	private static String[] readOptions(String key)
+	{
+		return Env.get(key, "").split("\\s+");
 	}
 }

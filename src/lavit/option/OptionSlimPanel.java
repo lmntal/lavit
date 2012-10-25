@@ -38,24 +38,8 @@ package lavit.option;
 @SuppressWarnings("serial")
 class OptionSlimPanel extends AbstractOptionPanel
 {
-	private static final String[] OPTIONS =
+	public OptionSlimPanel(String[] options)
 	{
-		"-t",
-		"--nd",
-		"--dump-lmn",
-		"--dump-inc",
-		"--mem-enc",
-		"--delta-mem",
-		"--show-proxy",
-		"--hide-ruleset",
-		"--show-transition",
-		"--show-ends",
-		"--hl",
-		"--use-builtin-rule",
-	};
-
-	public OptionSlimPanel()
-	{
-		super("SLIM Option", "SLIM_OPTION", OPTIONS);
+		super("SLIM Option", "SLIM_OPTION", options);
 	}
 }

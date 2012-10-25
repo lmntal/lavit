@@ -38,21 +38,8 @@ package lavit.option;
 @SuppressWarnings("serial")
 class OptionUnyoPanel extends AbstractOptionPanel
 {
-	private static final String[] OPTIONS =
+	public OptionUnyoPanel(String[] options)
 	{
-		"-t",
-		"-O1",
-		"-O2",
-		"-O3",
-		"-s1",
-		"-s2",
-		"-s3",
-		"--hideruleset",
-		" --hiderule",
-	};
-
-	public OptionUnyoPanel()
-	{
-		super("UNYO Option", "UNYO_OPTION", OPTIONS);
+		super("UNYO Option", "UNYO_OPTION", options);
 	}
 }

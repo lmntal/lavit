@@ -38,16 +38,8 @@ package lavit.option;
 @SuppressWarnings("serial")
 public class OptionCompilePanel extends AbstractOptionPanel
 {
-	private static final String[] OPTIONS =
+	public OptionCompilePanel(String[] options)
 	{
-		"--interpret",
-		"--slimcode",
-		"--hl-opt",
-		"--optimize-slimoptimizer",
-	};
-
-	public OptionCompilePanel()
-	{
-		super("SLIM Compile Option", "SLIM_LMNTAL_COMPILE_OPTION", OPTIONS);
+		super("SLIM Compile Option", "SLIM_LMNTAL_COMPILE_OPTION", options);
 	}
 }

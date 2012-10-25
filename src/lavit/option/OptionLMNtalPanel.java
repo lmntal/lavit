@@ -38,27 +38,8 @@ package lavit.option;
 @SuppressWarnings("serial")
 class OptionLMNtalPanel extends AbstractOptionPanel
 {
-	private static final String[] OPTIONS =
+	public OptionLMNtalPanel(String[] options)
 	{
-		"-t",
-		"-p1",
-		"-p2",
-		"-p3",
-		"-O1",
-		"-O2",
-		"-O3",
-		"-s1",
-		"-s2",
-		"-s3",
-		"--hideruleset",
-		"--hiderule",
-		"--slimcode",
-		"--compileonly",
-		"--type-verbose",
-	};
-
-	public OptionLMNtalPanel()
-	{
-		super("LMNtal Option", "LMNTAL_OPTION", OPTIONS);
+		super("LMNtal Option", "LMNTAL_OPTION", options);
 	}
 }

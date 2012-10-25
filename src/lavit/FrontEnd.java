@@ -62,7 +62,7 @@ public class FrontEnd
 	public FrontEnd(String[] args)
 	{
 		mainFrame   = new MainFrame();
-        mainFrame.editorPanel.firstFileOpen();
+        mainFrame.editorPanel.openInitialFiles();
 
         sleep(500);
 

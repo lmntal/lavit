@@ -49,6 +49,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -176,6 +178,38 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		}
 		openInnerEditorFile(first);
 		FrontEnd.mainFrame.toolTab.ltlPanel.loadFile("0");
+	}
+
+	/**
+	 * 前回開いていたファイルを開く
+	 */
+	public void openInitialFiles()
+	{
+		List<String> fileNames = new ArrayList<String>();
+		for (String s : Env.get("editor.lastfiles", "").split("\\s+"))
+		{
+			s = s.trim();
+			if (!s.isEmpty())
+			{
+				fileNames.add(s);
+			}
+		}
+		if (!fileNames.isEmpty())
+		{
+			for (String fileName : fileNames)
+			{
+				File file = new File(fileName);
+				if (file.exists())
+				{
+					openInnerEditorFile(file);
+				}
+			}
+			tabView.setSelectedIndex(0);
+		}
+		else
+		{
+			firstFileOpen();
+		}
 	}
 
 	/**
@@ -307,6 +341,7 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 	 */
 	public boolean closeFile()
 	{
+		String lastFiles = "";
 		boolean closeAll = true;
 		for (int i = 0; i < tabView.getTabCount(); i++)
 		{
@@ -324,14 +359,15 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 					fileSave();
 				}
 			}
+			if (i != 0)
+			{
+				lastFiles += " ";
+			}
+			lastFiles += tabView.getPages()[i].getFile().getAbsolutePath();
 		}
 		if (closeAll)
 		{
-			while (0 < tabView.getTabCount())
-			{
-				tabView.setSelectedPage(0);
-				closeSelectedPageDiscardChanges();
-			}
+			Env.set("editor.lastfiles", lastFiles);
 		}
 		return closeAll;
 	}

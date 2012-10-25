@@ -237,13 +237,13 @@ public final class Env
 		if (isWindows())
 		{
 			char sep = File.separatorChar;
+			char pathSep = File.pathSeparatorChar;
 			String cygwinDir = get("WINDOWS_CYGWIN_DIR");
 			String pathes = "";
-			pathes += cygwinDir + sep + "bin";
-			pathes += cygwinDir + sep + "usr" + sep + "bin";
+			pathes += cygwinDir + sep + "bin" + pathSep;
+			pathes += cygwinDir + sep + "usr" + sep + "bin" + pathSep;
 			pathes += cygwinDir + sep + "usr" + sep + "local" + sep + "bin";
 
-			char pathSep = File.pathSeparatorChar;
 			boolean put = false;
 			for (String key : new String[] { "path", "Path", "PATH" })
 			{
@@ -558,9 +558,11 @@ public final class Env
 				}
 				catch (IOException e)
 				{
+					e.printStackTrace();
 				}
 				catch (InterruptedException e)
 				{
+					e.printStackTrace();
 				}
 			}
 			cachedSLIMVersion = version;

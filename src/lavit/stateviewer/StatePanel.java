@@ -103,7 +103,7 @@ public class StatePanel extends JPanel{
 		FrontEnd.println("(StateViewer) parsing.");
 		boolean res = false;
 		try{
-			res = drawNodes.setSlimResult2(str, ltlMode);
+			res = drawNodes.setSlimResult(str, ltlMode);
 		}catch(NumberFormatException e){
 			FrontEnd.printException(e);
 		}

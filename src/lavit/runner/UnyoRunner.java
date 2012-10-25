@@ -37,72 +37,82 @@ package lavit.runner;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.util.OuterRunner;
 
-public class UnyoRunner implements OuterRunner {
-
+public class UnyoRunner implements OuterRunner
+{
 	private ThreadRunner runner;
 
 	private String option;
 	private File targetFile;
 	private boolean success;
 
-	public UnyoRunner(String option){
-		this(option,FrontEnd.mainFrame.editorPanel.getFile());
+	public UnyoRunner(String option)
+	{
+		this(option, FrontEnd.mainFrame.editorPanel.getFile());
 	}
 
-	public UnyoRunner(String option,File targetFile){
+	public UnyoRunner(String option, File targetFile)
+	{
 		this.option = option;
 		this.targetFile = targetFile;
 		runner = new ThreadRunner();
 		success = false;
 	}
 
-	public void run() {
+	public void run()
+	{
 		runner.start();
 	}
 
-	public boolean isRunning() {
-		if(runner==null) return false;
-		return true;
+	public synchronized boolean isRunning()
+	{
+		return runner != null;
 	}
 
-	public void kill() {
-		if (runner!=null) {
+	public synchronized void kill()
+	{
+		if (runner != null)
+		{
 			runner.kill();
 			runner.interrupt();
-			runner=null;
+			runner = null;
 		}
 	}
 
-	public void exit(){
-		runner=null;
+	public void exit()
+	{
+		runner = null;
 	}
 
-	public boolean isSucceeded(){
+	public boolean isSucceeded()
+	{
 		return success;
 	}
 
-	private class ThreadRunner extends Thread {
-
+	private class ThreadRunner extends Thread
+	{
 		private Process p;
 
-		public void run() {
-			try {
-				String cmd = "java -jar unyo.jar "+option+" "+Env.getSpaceEscape(targetFile.getAbsolutePath());
+		public void run()
+		{
+			try
+			{
+				String cmd = "java -jar unyo.jar " + option + " " + Env.getSpaceEscape(targetFile.getAbsolutePath());
 
-				FrontEnd.println("(UNYO) "+cmd);
+				FrontEnd.println("(UNYO) " + cmd);
 
 				ProcessBuilder pb = new ProcessBuilder(strList(cmd));
 				Env.setProcessEnvironment(pb.environment());
-				pb.directory(new File(Env.LMNTAL_LIBRARY_DIR+File.separator+Env.getDirNameOfUnyo()));
-				//pb.redirectErrorStream(true);
+				pb.directory(new File(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfUnyo()));
 				p = pb.start();
 				BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				ErrorStreamPrinter err = new ErrorStreamPrinter(p.getErrorStream());
@@ -111,7 +121,8 @@ public class UnyoRunner implements OuterRunner {
 				output.outputStart("java -jar unyo.jar", option, targetFile);
 				err.start();
 				String str;
-				while ((str=in.readLine())!=null) {
+				while ((str = in.readLine()) != null)
+				{
 					output.outputLine(str);
 				}
 				err.join();
@@ -121,34 +132,43 @@ public class UnyoRunner implements OuterRunner {
 				p.waitFor();
 
 				success = true;
-
-			}catch(Exception e){
+			}
+			catch (IOException e)
+			{
 				FrontEnd.printException(e);
-
-			}finally{
+			}
+			catch (InterruptedException e)
+			{
+				FrontEnd.printException(e);
+			}
+			finally
+			{
 				exit();
 			}
 		}
 
-		ArrayList<String> strList(String str){
-			ArrayList<String> cmdList = new ArrayList<String>();
+		private List<String> strList(String str)
+		{
+			List<String> cmdList = new ArrayList<String>();
 			StringTokenizer st = new StringTokenizer(str);
-			while(st.hasMoreTokens()){
+			while (st.hasMoreTokens())
+			{
 				String s = st.nextToken();
-				if(s.length()>=2&&s.charAt(0)=='"'&&s.charAt(s.length()-1)=='"'){
-					s = s.substring(1,s.length()-1);
+				if (s.length() >= 2 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"')
+				{
+					s = s.substring(1, s.length() - 1);
 				}
 				cmdList.add(s);
 			}
 			return cmdList;
 		}
 
-		private void kill() {
-			if(p!=null){
+		private void kill()
+		{
+			if (p != null)
+			{
 				p.destroy();
 			}
 		}
-
 	}
-
 }

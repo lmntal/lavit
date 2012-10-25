@@ -39,30 +39,36 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.runner.LmntalRunner;
+import lavit.runner.ProcessTask;
 import lavit.runner.SlimRunner;
 import lavit.runner.UnyoRunner;
 
-public class EditorButtonPanel extends JPanel implements ActionListener {
-
+@SuppressWarnings("serial")
+public class EditorButtonPanel extends JPanel implements ActionListener
+{
 	private EditorPanel editorPanel;
 
 	private LmntalRunner lmntalRunner;
 	private SlimRunner slimRunner;
 	private UnyoRunner unyoRunner;
+	private List<ProcessTask> processTasks = new ArrayList<ProcessTask>();
 
 	private JPanel buttonPanel;
 	public JButton lmntalButton;
@@ -235,31 +241,54 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 				}});
 			}})).start();
 
-		}else if (src == unyoButton) {
-
-			if(editorPanel.isChanged()){
+		}
+		else if (src == unyoButton)
+		{
+			if (editorPanel.isChanged())
+			{
 				editorPanel.fileSave();
 			}
 
-			setButtonEnable(false);
+			//setButtonEnable(false);
 
 			FrontEnd.mainFrame.toolTab.setTab("System");
 
+			/*
 			FrontEnd.println("(UNYO) Doing...");
 			unyoRunner = new UnyoRunner(Env.get("UNYO_OPTION"));
 			unyoRunner.run();
-			(new Thread(new Runnable() { public void run() {
-				while(unyoRunner.isRunning()){
-					FrontEnd.sleep(200);
+			new Thread(new Runnable()
+			{
+				public void run()
+				{
+					while (unyoRunner.isRunning())
+					{
+						FrontEnd.sleep(200);
+					}
+					FrontEnd.println("(UNYO) Done!");
+					unyoRunner = null;
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							setButtonEnable(true);
+						}
+					});
 				}
-				FrontEnd.println("(UNYO) Done!");
-				unyoRunner = null;
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-					setButtonEnable(true);
-				}});
-			}})).start();
-
-		}else if (src == slimButton) {
+			}).start();
+			*/
+			List<String> args = new ArrayList<String>();
+			args.addAll(Arrays.asList(Env.get("UNYO_OPTION").split("\\s+")));
+			args.add(FrontEnd.mainFrame.editorPanel.getFile().getAbsolutePath());
+			ProcessTask unyoTask = ProcessTask.createJarProcessTask("unyo.jar", args);
+			unyoTask.setDirectory(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfUnyo());
+			if (unyoTask.execute())
+			{
+				processTasks.add(unyoTask);
+				killButton.setEnabled(true);
+			}
+		}
+		else if (src == slimButton) {
 
 			if(editorPanel.isChanged()){
 				editorPanel.fileSave();
@@ -430,21 +459,31 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 				}
 				FrontEnd.println("(StateProfiler) Done!");
 				slimRunner = null;
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
+				SwingUtilities.invokeLater(new Runnable(){public void run() {
 					setButtonEnable(true);
 				}});
 			}})).start();
 
 
-		}else if (src == killButton) {
-
-			if(lmntalRunner!=null) lmntalRunner.kill();
-			if(slimRunner!=null) slimRunner.kill();
-			if(unyoRunner!=null) unyoRunner.kill();
+		}
+		else if (src == killButton)
+		{
+			if (lmntalRunner != null) lmntalRunner.kill();
+			if (slimRunner != null) slimRunner.kill();
+			if (unyoRunner != null) unyoRunner.kill();
 			FrontEnd.mainFrame.killILRunner();
 			FrontEnd.mainFrame.toolTab.ltlPanel.ltlButtonPanel.runnerKill();
-			FrontEnd.errPrintln("Kill");
 
+			for (ProcessTask task : processTasks)
+			{
+				if (!task.isTerminated())
+				{
+					task.abort();
+				}
+			}
+			processTasks.clear();
+
+			FrontEnd.errPrintln("Kill");
 		}
 	}
 

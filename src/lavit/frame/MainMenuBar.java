@@ -362,7 +362,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
         }else if(src == iClose) {
         	FrontEnd.mainFrame.editorPanel.closeSelectedPage();
         }else if(src == iCloseAll) {
-        	FrontEnd.mainFrame.editorPanel.closeFile();
+        	FrontEnd.mainFrame.editorPanel.closeAllPages();
         }else if(src == iSVOpen){
         	FrontEnd.mainFrame.toolTab.statePanel.loadFile();
         }else if(src == iExit) {

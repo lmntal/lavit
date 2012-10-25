@@ -367,6 +367,21 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 	}
 
 	/**
+	 * すべて閉じる
+	 */
+	public void closeAllPages()
+	{
+		if (askSaveAllChangedFiles())
+		{
+			while (0 < tabView.getTabCount())
+			{
+				tabView.setSelectedPage(0);
+				closeSelectedPageDiscardChanges();
+			}
+		}
+	}
+
+	/**
 	 * 選択しているページを閉じる
 	 */
 	public boolean closeSelectedPage()

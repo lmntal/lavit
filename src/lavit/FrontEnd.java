@@ -37,7 +37,11 @@ package lavit;
 
 import java.awt.Window;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.SwingUtilities;
@@ -49,6 +53,8 @@ import lavit.frame.LookAndFeelEntry;
 import lavit.frame.MainFrame;
 import lavit.frame.SlimPathSetting;
 import lavit.frame.StartupFrame;
+import lavit.runner.ProcessFinishListener;
+import lavit.runner.ProcessTask;
 import lavit.runner.RebootRunner;
 import lavit.util.CommonFontUser;
 import lavit.util.StringUtils;
@@ -58,6 +64,8 @@ public class FrontEnd
 	public static MainFrame mainFrame;
 
 	public static Set<CommonFontUser> fontUsers = new HashSet<CommonFontUser>();
+
+	private static List<ProcessTask> processTasks = new ArrayList<ProcessTask>();
 
 	public FrontEnd(String[] args)
 	{
@@ -95,6 +103,93 @@ public class FrontEnd
 			else
 			{
 				println("invalid option: " + args[i]);
+			}
+		}
+	}
+
+	public static void executeUnyo(File file)
+	{
+		FrontEnd.println("(UNYO) executing...");
+
+		List<String> args = new ArrayList<String>();
+		args.addAll(Arrays.asList(Env.get("UNYO_OPTION").split("\\s+")));
+		args.add(file.getAbsolutePath());
+		ProcessTask unyoTask = ProcessTask.createJarProcessTask("unyo.jar", args);
+		unyoTask.setDirectory(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfUnyo());
+		unyoTask.addProcessFinishListener(new ProcessFinishListener()
+		{
+			public void processFinished(int id, int exitCode, boolean isAborted)
+			{
+				if (isAborted)
+				{
+					FrontEnd.println(String.format("(UNYO) terminated. (Task[%d])", id));
+				}
+				else
+				{
+					FrontEnd.errPrintln(String.format("(UNYO) aborted. (Task[%d])", id));
+				}
+			}
+		});
+		if (unyoTask.execute())
+		{
+			FrontEnd.addProcessTask(unyoTask);
+		}
+	}
+
+	public static void addProcessTask(final ProcessTask task)
+	{
+		task.addProcessFinishListener(new ProcessFinishListener()
+		{
+			public void processFinished(int id, int exitCode, boolean isAborted)
+			{
+				if (!isAborted)
+				{
+					cleanProcessTasks();
+				}
+			}
+		});
+		synchronized (processTasks)
+		{
+			processTasks.add(task);
+		}
+		mainFrame.editorPanel.buttonPanel.killButton.setEnabled(true);
+	}
+
+	public static void detachProcessTask(ProcessTask task)
+	{
+		synchronized (processTasks)
+		{
+			processTasks.remove(task);
+		}
+	}
+
+	public static void abortAllProcessTasks()
+	{
+		synchronized (processTasks)
+		{
+			for (ProcessTask task : processTasks)
+			{
+				if (!task.isTerminated())
+				{
+					task.abort();
+				}
+			}
+			processTasks.clear();
+		}
+	}
+
+	private static void cleanProcessTasks()
+	{
+		synchronized (processTasks)
+		{
+			Iterator<ProcessTask> it = processTasks.iterator();
+			while (it.hasNext())
+			{
+				ProcessTask task = it.next();
+				if (task.isTerminated())
+				{
+					it.remove();
+				}
 			}
 		}
 	}
@@ -257,7 +352,6 @@ public class FrontEnd
 			}
 		}
 	}
-
 
 	/**
 	 * @param args

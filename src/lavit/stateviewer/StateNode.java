@@ -36,13 +36,8 @@
 package lavit.stateviewer;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.Window;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
@@ -54,26 +49,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.TreeSet;
-
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.editor.AutoStyledDocument;
-import lavit.editor.NoWrapEditorKit;
-import lavit.frame.ChildWindowListener;
 import lavit.runner.LmntalRunner;
-import lavit.runner.UnyoRunner;
 import lavit.util.StateDraw;
 import lavit.util.UtilTextFrame;
 
@@ -714,16 +696,21 @@ public class StateNode implements Shape {
 		(new LmntalRunner("-g "+Env.get("UNYO_OPTION"),f)).run();
 	}
 
-	public void runUnyo3(){
-		File f = new File("temp.lmn");
-		try {
-			FileWriter fp = new FileWriter(f);
-			fp.write(state);
-			fp.close();
-		} catch (IOException e) {
+	public void runUnyo3()
+	{
+		File tempFile = new File("temp.lmn");
+		try
+		{
+			FileWriter writer = new FileWriter(tempFile);
+			writer.write(state);
+			writer.close();
+
+			FrontEnd.executeUnyo(tempFile);
+		}
+		catch (IOException e)
+		{
 			FrontEnd.printException(e);
 		}
-		(new UnyoRunner(Env.get("UNYO_OPTION"),f)).run();
 	}
 
 	boolean isMatch(String str){

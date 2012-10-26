@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lavit.Env;
-import lavit.FrontEnd;
 
 /**
  * TODO: 起動プロセスの標準入力への書き込みに対応する。
@@ -59,6 +58,8 @@ public class ProcessTask
 	private PrintLineListener stderrListener;
 	private MonitorThread monitorThread;
 	private boolean terminated;
+	private boolean aborted;
+	private List<ProcessFinishListener> finishListeners = new ArrayList<ProcessFinishListener>();
 
 	public ProcessTask(List<String> commands)
 	{
@@ -80,6 +81,24 @@ public class ProcessTask
 	public void setStandardErrorListener(PrintLineListener l)
 	{
 		stderrListener = l;
+	}
+
+	public void addProcessFinishListener(ProcessFinishListener l)
+	{
+		finishListeners.add(l);
+	}
+
+	public void removeProcessFinishListener(ProcessFinishListener l)
+	{
+		finishListeners.remove(l);
+	}
+
+	private void deliverProcessFinishEvent(int exitCode)
+	{
+		for (ProcessFinishListener l : finishListeners)
+		{
+			l.processFinished(id, exitCode, aborted);
+		}
 	}
 
 	public boolean isTerminated()
@@ -123,6 +142,7 @@ public class ProcessTask
 			return;
 		}
 
+		aborted = true;
 		p.destroy();
 		monitorThread.interrupt();
 		try
@@ -193,7 +213,7 @@ public class ProcessTask
 				closeStreams();
 				waitReaderThreads();
 				terminated = true;
-				FrontEnd.println(String.format("Task[%d] terminated (exitcode = %d).", id, p.exitValue()));
+				deliverProcessFinishEvent(p.exitValue());
 			}
 		}
 	}

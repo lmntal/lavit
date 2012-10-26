@@ -39,12 +39,8 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -56,9 +52,7 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.runner.LmntalRunner;
-import lavit.runner.ProcessTask;
 import lavit.runner.SlimRunner;
-import lavit.runner.UnyoRunner;
 
 @SuppressWarnings("serial")
 public class EditorButtonPanel extends JPanel implements ActionListener
@@ -67,8 +61,6 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 
 	private LmntalRunner lmntalRunner;
 	private SlimRunner slimRunner;
-	private UnyoRunner unyoRunner;
-	private List<ProcessTask> processTasks = new ArrayList<ProcessTask>();
 
 	private JPanel buttonPanel;
 	public JButton lmntalButton;
@@ -248,45 +240,8 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 			{
 				editorPanel.fileSave();
 			}
-
-			//setButtonEnable(false);
-
 			FrontEnd.mainFrame.toolTab.setTab("System");
-
-			/*
-			FrontEnd.println("(UNYO) Doing...");
-			unyoRunner = new UnyoRunner(Env.get("UNYO_OPTION"));
-			unyoRunner.run();
-			new Thread(new Runnable()
-			{
-				public void run()
-				{
-					while (unyoRunner.isRunning())
-					{
-						FrontEnd.sleep(200);
-					}
-					FrontEnd.println("(UNYO) Done!");
-					unyoRunner = null;
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							setButtonEnable(true);
-						}
-					});
-				}
-			}).start();
-			*/
-			List<String> args = new ArrayList<String>();
-			args.addAll(Arrays.asList(Env.get("UNYO_OPTION").split("\\s+")));
-			args.add(FrontEnd.mainFrame.editorPanel.getFile().getAbsolutePath());
-			ProcessTask unyoTask = ProcessTask.createJarProcessTask("unyo.jar", args);
-			unyoTask.setDirectory(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfUnyo());
-			if (unyoTask.execute())
-			{
-				processTasks.add(unyoTask);
-				killButton.setEnabled(true);
-			}
+			FrontEnd.executeUnyo(FrontEnd.mainFrame.editorPanel.getFile());
 		}
 		else if (src == slimButton) {
 
@@ -470,19 +425,9 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		{
 			if (lmntalRunner != null) lmntalRunner.kill();
 			if (slimRunner != null) slimRunner.kill();
-			if (unyoRunner != null) unyoRunner.kill();
 			FrontEnd.mainFrame.killILRunner();
 			FrontEnd.mainFrame.toolTab.ltlPanel.ltlButtonPanel.runnerKill();
-
-			for (ProcessTask task : processTasks)
-			{
-				if (!task.isTerminated())
-				{
-					task.abort();
-				}
-			}
-			processTasks.clear();
-
+			FrontEnd.abortAllProcessTasks();
 			FrontEnd.errPrintln("Kill");
 		}
 	}

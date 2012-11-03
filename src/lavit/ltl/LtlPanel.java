@@ -45,102 +45,170 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.util.FileUtils;
 
-
-public class LtlPanel extends JPanel {
+@SuppressWarnings("serial")
+public class LtlPanel extends JPanel
+{
+	private File targetLMNtalFile;
+	private File targetPSymFile;
+	private File targetNCFile;
 
 	private LtlSymbolPanel ltlSymbolPanel;
 	private LtlNcPanel ltlNcPanel;
-	public LtlButtonPanel ltlButtonPanel;
+	private LtlButtonPanel ltlButtonPanel;
 
-	public LtlPanel(){
+	public LtlPanel()
+	{
 		setLayout(new BorderLayout());
 
 		ltlSymbolPanel = new LtlSymbolPanel();
 		ltlNcPanel = new LtlNcPanel();
-		JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT,ltlSymbolPanel,ltlNcPanel);
-        jsp.setResizeWeight(0.5);
+		JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, ltlSymbolPanel, ltlNcPanel);
+		jsp.setResizeWeight(0.5);
 		add(jsp, BorderLayout.CENTER);
 
 		ltlButtonPanel = new LtlButtonPanel(this);
 		add(ltlButtonPanel, BorderLayout.SOUTH);
-
 	}
 
-	public File getSymbolFile(String no){
-		return new File(getFilename()+no+".psym");
+	public void setButtonsEnabled(boolean b)
+	{
+		ltlButtonPanel.setAllEnable(b);
 	}
 
-	public File getNcFile(String no){
-		return new File(getFilename()+no+".nc");
+	// TODO: そもそも、プロセス起動をLaViTシステム管理のタスクマネージャに委託する
+	public void killLtlSlimRunner()
+	{
+		ltlButtonPanel.runnerKill();
 	}
 
-	public void saveFile(String no){
-
-		writeFile(getSymbolFile(no),ltlSymbolPanel.getText());
-		writeFile(getNcFile(no),ltlNcPanel.getText());
-
+	/**
+	 * Set LMNtal source file (*.lmn) as the target for LTL model checking.
+	 */
+	public void setTargetLMNtalFile(File lmnFile)
+	{
+		targetLMNtalFile = lmnFile;
+		setSelectedSuffix("0");
 	}
 
-	public void loadFile(String no){
-
-	    ltlSymbolPanel.setText(openFile(getSymbolFile(no)));
-	    ltlNcPanel.setText(openFile(getNcFile(no)));
-	    ltlButtonPanel.setSelected(no);
-
+	// TODO: モデル検査用ファイルの名前管理方法を検討する
+	public void setSelectedSuffix(String suffix)
+	{
+		if (targetLMNtalFile != null)
+		{
+			ltlButtonPanel.setSelected(suffix);
+			String baseName = FileUtils.removeExtension(targetLMNtalFile.getAbsolutePath());
+			targetPSymFile = new File(baseName + suffix + ".psym");
+			targetNCFile = new File(baseName + suffix + ".nc");
+		}
 	}
 
-	private String getFilename(){
-		File file = FrontEnd.mainFrame.editorPanel.getFile().getAbsoluteFile();
-		String name = file.getName();
-
-		//拡張子を取り除く
-		int point = name.lastIndexOf(".");
-	    if (point != -1) name = name.substring(0, point);
-
-	    return file.getParent()+File.separator+name;
-
+	public void unloadFiles()
+	{
+		targetLMNtalFile = null;
+		targetPSymFile = null;
+		targetNCFile = null;
+		ltlButtonPanel.setSelected("0");
+		ltlSymbolPanel.setText("");
+		ltlNcPanel.clearText();
 	}
 
-	private String openFile(File file){
-		if(!file.exists()) return "";
-		try {
+	public void loadFiles()
+	{
+		if (targetPSymFile != null && targetPSymFile.exists())
+		{
+			ltlSymbolPanel.setText(openFile(targetPSymFile));
+		}
+		else
+		{
+			ltlSymbolPanel.setText("");
+		}
+
+		if (targetNCFile != null && targetNCFile.exists())
+		{
+			ltlNcPanel.setText(openFile(targetNCFile));
+		}
+		else
+		{
+			ltlNcPanel.clearText();
+		}
+	}
+
+	public void saveFiles()
+	{
+		if (targetPSymFile != null)
+		{
+			writeFile(targetPSymFile, ltlSymbolPanel.getText());
+		}
+		if (targetNCFile != null)
+		{
+			writeFile(targetNCFile, ltlNcPanel.getText());
+		}
+	}
+
+	public File getTargetPSymFile()
+	{
+		return targetPSymFile;
+	}
+
+	public File getTargetNCFile()
+	{
+		return targetNCFile;
+	}
+
+	private static String openFile(File file)
+	{
+		if (!file.exists())
+		{
+			return "";
+		}
+
+		try
+		{
 			String encoding = Env.get("EDITER_FILE_READ_ENCODING");
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
+			BufferedReader reader = new BufferedReader(
+				new InputStreamReader(new FileInputStream(file), encoding));
 
-			StringBuffer buf = new StringBuffer("");
-			String strLine;
-			if((strLine = reader.readLine()) != null){
-				buf.append(strLine);
+			StringBuilder buf = new StringBuilder();
+			String line;
+			if ((line = reader.readLine()) != null)
+			{
+				buf.append(line);
 			}
-			while ((strLine = reader.readLine()) != null) {
-				buf.append("\r\n" + strLine);
+			while ((line = reader.readLine()) != null)
+			{
+				buf.append("\r\n" + line);
 			}
 			reader.close();
 
 			return buf.toString();
-		}catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			FrontEnd.printException(e);
 		}
 		return "";
 	}
 
-	private void writeFile(File file,String str){
-		try {
+	private static void writeFile(File file, String str)
+	{
+		try
+		{
 			String encoding = Env.get("EDITER_FILE_WRITE_ENCODING");
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), encoding));
-			writer.write(str+"\r\n");
+			BufferedWriter writer = new BufferedWriter(
+				new OutputStreamWriter(new FileOutputStream(file), encoding));
+			writer.write(str + "\r\n");
 			writer.close();
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			FrontEnd.printException(e);
 		}
-
 	}
-
 }

@@ -46,6 +46,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.undo.UndoManager;
 
@@ -54,14 +55,13 @@ import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.runner.Ltl2baInstaller;
 import lavit.runner.Ltl2baRunner;
-import lavit.runner.SlimInstaller;
-import lavit.runner.SlimRunner;
 import lavit.util.CommonFontUser;
 import lavit.util.SimpleUndoKeyListener;
 import lavit.util.SimpleUndoableEditListener;
 
-public class LtlNcPanel extends JPanel implements ActionListener,CommonFontUser {
-
+@SuppressWarnings("serial")
+class LtlNcPanel extends JPanel implements ActionListener, CommonFontUser
+{
 	private JPanel panel;
 	private JTextField ltlText;
 	private UndoManager ltlUndoManager = new UndoManager();
@@ -69,8 +69,8 @@ public class LtlNcPanel extends JPanel implements ActionListener,CommonFontUser 
 
 	private JTextArea ncArea;
 
-	LtlNcPanel(){
-
+	public LtlNcPanel()
+	{
 		setBorder(new TitledBorder("Never Claims"));
 		setLayout(new BorderLayout());
 
@@ -91,78 +91,112 @@ public class LtlNcPanel extends JPanel implements ActionListener,CommonFontUser 
 
 		loadFont();
 		FrontEnd.addFontUser(this);
-
 	}
 
-	public void loadFont(){
+	public void loadFont()
+	{
 		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
 		ncArea.setFont(font);
 		ltlText.setFont(font);
 		revalidate();
 	}
 
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent e)
+	{
 		Object src = e.getSource();
-		if(src==ltlButton||src==ltlText){
-
+		if (src == ltlButton || src == ltlText)
+		{
 			final Ltl2baInstaller ltl2baInstaller = new Ltl2baInstaller();
-			if(ltl2baInstaller.isNeedInstall()){
-				if(ltl2baInstaller.isInstallable()){
+			if (ltl2baInstaller.isNeedInstall())
+			{
+				if (ltl2baInstaller.isInstallable())
+				{
 					ltl2baInstaller.run();
 
-					(new Thread(new Runnable() { public void run() {
-						while(ltl2baInstaller.isRunning()){
-							FrontEnd.sleep(200);
+					new Thread()
+					{
+						public void run()
+						{
+							while (ltl2baInstaller.isRunning())
+							{
+								FrontEnd.sleep(200);
+							}
+							if (ltl2baInstaller.isSucceeded())
+							{
+								ltlButton.doClick();
+							}
 						}
-						if(ltl2baInstaller.isSucceeded()){
-							ltlButton.doClick();
+					}.start();
+				}
+				else
+				{
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							JOptionPane.showMessageDialog(
+								FrontEnd.mainFrame,
+								Lang.w[12]+" (lmntal/"+Env.getDirNameOfLtl2ba()+")",
+								"LTL2BA INSTALL",
+								JOptionPane.PLAIN_MESSAGE);
 						}
-					}})).start();
-				}else{
-					javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
-							FrontEnd.mainFrame,
-							Lang.w[12]+" (lmntal/"+Env.getDirNameOfLtl2ba()+")",
-							"LTL2BA INSTALL",
-							JOptionPane.PLAIN_MESSAGE
-					);}});
+					});
 				}
 				return;
 			}
 
 			final Ltl2baRunner runner = new Ltl2baRunner(ltlText.getText());
 			runner.run();
-			(new Thread(new Runnable() { public void run() {
-				while(runner.isRunning()){
-					FrontEnd.sleep(200);
+			new Thread()
+			{
+				public void run()
+				{
+					while (runner.isRunning())
+					{
+						FrontEnd.sleep(200);
+					}
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							ncArea.setText(runner.getOutput());
+						}
+					});
 				}
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-					ncArea.setText(runner.getOutput());
-				}});
-			}})).start();
+			}.start();
 		}
 	}
 
-	public void setText(String str){
+	public void setText(String str)
+	{
 		ncArea.setText(str);
 
 		int l = str.indexOf("/*");
 		int r = str.indexOf("*/");
-		if(!(l>0&&r>0&&l<r)) return;
+		if (!(l > 0 && r > 0 && l < r)) return;
 
-		String ltl = str.substring(l+2,r).trim();
+		String ltl = str.substring(l + 2, r).trim();
 
-		if(ltl.startsWith("!(")&&ltl.endsWith(")")){
-			ltlText.setText(ltl.substring(2,ltl.length()-1).replaceAll("!!",""));
-		}else{
-			ltlText.setText(("!"+ltl).replaceAll("!!",""));
+		if (ltl.startsWith("!(") && ltl.endsWith(")"))
+		{
+			ltlText.setText(ltl.substring(2, ltl.length() - 1).replaceAll("!!", ""));
+		}
+		else
+		{
+			ltlText.setText(("!" + ltl).replaceAll("!!", ""));
 		}
 
 		ltlUndoManager.discardAllEdits();
-
 	}
 
-	public String getText(){
+	public void clearText()
+	{
+		ltlText.setText("");
+		ncArea.setText("");
+	}
+
+	public String getText()
+	{
 		return ncArea.getText();
 	}
-
 }

@@ -36,7 +36,6 @@
 package lavit.ltl;
 
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -45,17 +44,18 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.editor.EditorButtonPanel;
 import lavit.editor.EditorPanel;
 import lavit.runner.SlimRunner;
 import lavit.util.FixFlowLayout;
 
-public class LtlButtonPanel extends JPanel implements ActionListener {
-
+@SuppressWarnings("serial")
+class LtlButtonPanel extends JPanel implements ActionListener
+{
 	public LtlPanel ltlPanel;
 
 	private SlimRunner slimRunner;
@@ -71,8 +71,8 @@ public class LtlButtonPanel extends JPanel implements ActionListener {
 	private JButton ltlndButton;
 	private JButton ltlsvButton;
 
-	LtlButtonPanel(LtlPanel ltlPanel){
-
+	public LtlButtonPanel(LtlPanel ltlPanel)
+	{
 		this.ltlPanel = ltlPanel;
 
 		setLayout(new FixFlowLayout());
@@ -122,44 +122,59 @@ public class LtlButtonPanel extends JPanel implements ActionListener {
 		setAllEnable(true);
 
 		add(buttonPanel);
-
 	}
 
-	public void setAllEnable(boolean enable){
+	public void setAllEnable(boolean enable)
+	{
 		ltlButton.setEnabled(enable);
 		ltlallButton.setEnabled(enable);
 		//ltlndButton.setEnabled(enable);
 		ltlsvButton.setEnabled(enable);
 	}
 
-	private void setButtonEnable(boolean enable){
+	private void setButtonEnable(boolean enable)
+	{
 		setAllEnable(enable);
 		FrontEnd.mainFrame.editorPanel.buttonPanel.setAllEnable(enable);
 	}
 
-	public void setSelected(String no){
+	public void setSelected(String no)
+	{
 		combo.setSelectedItem(no);
 	}
 
-	public String getSelectedNo(){
+	public String getSelectedNo()
+	{
 		return (String)combo.getSelectedItem();
 	}
 
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent e)
+	{
 		Object src = e.getSource();
-		if(src==loadButton){
-			ltlPanel.loadFile(getSelectedNo());
-		}else if(src==saveButton){
-			ltlPanel.saveFile(getSelectedNo());
-		}else if(src==ltlButton||src==ltlallButton||src==ltlndButton){
-
+		if (src == loadButton)
+		{
+			//ltlPanel.loadFile(getSelectedNo());
+			ltlPanel.setSelectedSuffix(getSelectedNo());
+			ltlPanel.loadFiles();
+		}
+		else if(src == saveButton)
+		{
+			//ltlPanel.saveFile(getSelectedNo());
+			ltlPanel.setSelectedSuffix(getSelectedNo());
+			ltlPanel.saveFiles();
+		}
+		else if (src == ltlButton || src == ltlallButton || src == ltlndButton)
+		{
 			EditorPanel editorPanel = FrontEnd.mainFrame.editorPanel;
 
-			if(editorPanel.isChanged()){
+			if (editorPanel.isChanged())
+			{
 				editorPanel.fileSave();
 			}
 
-			ltlPanel.saveFile(getSelectedNo());
+			//ltlPanel.saveFile(getSelectedNo());
+			ltlPanel.setSelectedSuffix(getSelectedNo());
+			ltlPanel.saveFiles();
 
 			setButtonEnable(false);
 
@@ -168,46 +183,72 @@ public class LtlButtonPanel extends JPanel implements ActionListener {
 			FrontEnd.println("(SLIM) Doing...");
 
 			String option = "";
-			if(Env.is("SLIM2")){
-				if(src==ltlButton){
+			if (Env.is("SLIM2"))
+			{
+				if (src == ltlButton)
+				{
 					option = "--ltl "+Env.get("LTL_OPTION");
-				}else if(src==ltlallButton){
+				}
+				else if (src == ltlallButton)
+				{
 					option = "--ltl-all "+Env.get("LTL_OPTION");
 				}
-			}else{
-				if(src==ltlButton){
+			}
+			else
+			{
+				if (src == ltlButton)
+				{
 					option = "--ltl "+Env.get("LTL_OPTION");
-				}else if(src==ltlallButton){
+				}
+				else if (src == ltlallButton)
+				{
 					option = "--ltl_all "+Env.get("LTL_OPTION");
-				}else if(src==ltlndButton){
+				}
+				else if (src == ltlndButton)
+				{
 					option = "--ltl_nd "+Env.get("LTL_OPTION");
 				}
 			}
 
 			slimRunner = new SlimRunner(option);
-			slimRunner.setSymbolFile(ltlPanel.getSymbolFile(getSelectedNo()));
-			slimRunner.setNcFile(ltlPanel.getNcFile(getSelectedNo()));
+			//slimRunner.setSymbolFile(ltlPanel.getSymbolFile(getSelectedNo()));
+			//slimRunner.setNcFile(ltlPanel.getNcFile(getSelectedNo()));
+			ltlPanel.setSelectedSuffix(getSelectedNo());
+			slimRunner.setSymbolFile(ltlPanel.getTargetPSymFile());
+			slimRunner.setNcFile(ltlPanel.getTargetNCFile());
 			slimRunner.run();
-			(new Thread(new Runnable() { public void run() {
-				while(slimRunner.isRunning()){
-					FrontEnd.sleep(200);
+			new Thread()
+			{
+				public void run()
+				{
+					while (slimRunner.isRunning())
+					{
+						FrontEnd.sleep(200);
+					}
+					FrontEnd.println("(SLIM) Done!");
+					slimRunner = null;
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							setButtonEnable(true);
+						}
+					});
 				}
-				FrontEnd.println("(SLIM) Done!");
-				slimRunner = null;
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-					setButtonEnable(true);
-				}});
-			}})).start();
-
-		}else if(src==ltlsvButton){
-
+			}.start();
+		}
+		else if (src == ltlsvButton)
+		{
 			EditorPanel editorPanel = FrontEnd.mainFrame.editorPanel;
 
-			if(editorPanel.isChanged()){
+			if (editorPanel.isChanged())
+			{
 				editorPanel.fileSave();
 			}
 
-			ltlPanel.saveFile(getSelectedNo());
+			//ltlPanel.saveFile(getSelectedNo());
+			ltlPanel.setSelectedSuffix(getSelectedNo());
+			ltlPanel.saveFiles();
 
 			setButtonEnable(false);
 
@@ -215,33 +256,48 @@ public class LtlButtonPanel extends JPanel implements ActionListener {
 
 			FrontEnd.println("(StateViewer) Doing...");
 
-			if(Env.is("SLIM2")){
+			if (Env.is("SLIM2"))
+			{
 				slimRunner = new SlimRunner("--ltl-all -t --dump-lavit "+Env.get("LTL_OPTION"));
-			}else{
+			}
+			else
+			{
 				slimRunner = new SlimRunner("--ltl_nd "+Env.get("LTL_OPTION"));
 			}
-			slimRunner.setSymbolFile(ltlPanel.getSymbolFile(getSelectedNo()));
-			slimRunner.setNcFile(ltlPanel.getNcFile(getSelectedNo()));
+			//slimRunner.setSymbolFile(ltlPanel.getSymbolFile(getSelectedNo()));
+			//slimRunner.setNcFile(ltlPanel.getNcFile(getSelectedNo()));
+			ltlPanel.setSelectedSuffix(getSelectedNo());
+			slimRunner.setSymbolFile(ltlPanel.getTargetPSymFile());
+			slimRunner.setNcFile(ltlPanel.getTargetNCFile());
 			slimRunner.setBuffering(true);
 			slimRunner.run();
-			(new Thread(new Runnable() { public void run() {
-				while(slimRunner.isRunning()){
-					FrontEnd.sleep(200);
+			new Thread()
+			{
+				public void run()
+				{
+					while (slimRunner.isRunning())
+					{
+						FrontEnd.sleep(200);
+					}
+					if (slimRunner.isSucceeded())
+					{
+						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), true);
+					}
+					slimRunner = null;
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							setButtonEnable(true);
+						}
+					});
 				}
-				if(slimRunner.isSucceeded()){
-					FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(),true);
-				}
-				slimRunner = null;
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-					setButtonEnable(true);
-				}});
-			}})).start();
-
+			}.start();
 		}
 	}
 
-	public void runnerKill(){
-		if(slimRunner!=null) slimRunner.kill();
+	public void runnerKill()
+	{
+		if (slimRunner != null) slimRunner.kill();
 	}
-
 }

@@ -51,4 +51,14 @@ public final class FileUtils
 		File file = new File(path);
 		return file.exists();
 	}
+
+	public static String removeExtension(String fileName)
+	{
+		int i = fileName.lastIndexOf('.');
+		if (i != -1)
+		{
+			fileName = fileName.substring(0, i);
+		}
+		return fileName;
+	}
 }

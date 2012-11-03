@@ -37,15 +37,11 @@ package lavit.ltl;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.UndoManager;
 
 import lavit.Env;
@@ -54,39 +50,40 @@ import lavit.util.CommonFontUser;
 import lavit.util.SimpleUndoKeyListener;
 import lavit.util.SimpleUndoableEditListener;
 
-public class LtlSymbolPanel extends JPanel implements CommonFontUser {
-
+@SuppressWarnings("serial")
+class LtlSymbolPanel extends JPanel implements CommonFontUser
+{
 	private JTextArea symbolArea;
 	private UndoManager symbolUndoManager = new UndoManager();
 
-	LtlSymbolPanel(){
-
+	public LtlSymbolPanel()
+	{
 		setBorder(new TitledBorder("Propositional Symbols"));
 		setLayout(new BorderLayout());
 
 		symbolArea = new JTextArea();
-		add(new JScrollPane(symbolArea), BorderLayout.CENTER);
-
 		symbolArea.getDocument().addUndoableEditListener(new SimpleUndoableEditListener(symbolUndoManager));
 		symbolArea.addKeyListener(new SimpleUndoKeyListener(symbolUndoManager));
+		add(new JScrollPane(symbolArea), BorderLayout.CENTER);
 
 		loadFont();
 		FrontEnd.addFontUser(this);
-
 	}
 
-	public void loadFont(){
+	public void loadFont()
+	{
 		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
 		symbolArea.setFont(font);
 	}
 
-	public void setText(String str){
+	public void setText(String str)
+	{
 		symbolArea.setText(str);
 		symbolUndoManager.discardAllEdits();
 	}
 
-	public String getText(){
+	public String getText()
+	{
 		return symbolArea.getText();
 	}
-
 }

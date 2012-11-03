@@ -179,7 +179,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 
 	private void setButtonEnable(boolean enable){
 		setAllEnable(enable);
-		FrontEnd.mainFrame.toolTab.ltlPanel.ltlButtonPanel.setAllEnable(enable);
+		FrontEnd.mainFrame.toolTab.ltlPanel.setButtonsEnabled(enable);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -426,7 +426,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 			if (lmntalRunner != null) lmntalRunner.kill();
 			if (slimRunner != null) slimRunner.kill();
 			FrontEnd.mainFrame.killILRunner();
-			FrontEnd.mainFrame.toolTab.ltlPanel.ltlButtonPanel.runnerKill();
+			FrontEnd.mainFrame.toolTab.ltlPanel.killLtlSlimRunner();
 			FrontEnd.abortAllProcessTasks();
 			FrontEnd.errPrintln("Kill");
 		}

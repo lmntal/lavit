@@ -71,6 +71,7 @@ import javax.swing.filechooser.FileFilter;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
+import lavit.event.TabChangeListener;
 import lavit.multiedit.EditorPage;
 import lavit.multiedit.TabView;
 import lavit.multiedit.coloring.lexer.TokenLabel;
@@ -89,7 +90,7 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		setLayout(new BorderLayout());
 
 		tabView = new TabView();
-		
+
 		loadFont();
 		FrontEnd.addFontUser(this);
 
@@ -172,6 +173,11 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		return files;
 	}
 
+	public void addTabChangeListener(TabChangeListener l)
+	{
+		tabView.addTabChangeListener(l);
+	}
+
 	/**
 	 * first.lmn ¤ò³«¤¯
 	 */
@@ -191,7 +197,7 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 			}
 		}
 		openInnerEditorFile(first);
-		FrontEnd.mainFrame.toolTab.ltlPanel.loadFile("0");
+		//FrontEnd.mainFrame.toolTab.ltlPanel.loadFile("0");
 	}
 
 	/**
@@ -244,7 +250,7 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		if (file != null)
 		{
 			openInnerEditorFile(file);
-			FrontEnd.mainFrame.toolTab.ltlPanel.loadFile("0");
+			//FrontEnd.mainFrame.toolTab.ltlPanel.loadFile("0");
 		}
 	}
 

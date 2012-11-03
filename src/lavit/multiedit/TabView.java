@@ -40,6 +40,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -47,16 +49,28 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.event.TabChangeListener;
 import lavit.ui.FlatButton;
 
 @SuppressWarnings("serial")
 public class TabView extends JTabbedPane
 {
+	private List<TabChangeListener> tabChangeListeners = new ArrayList<TabChangeListener>();
+
 	public TabView()
 	{
+		addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				dispatchTabChangeEvent();
+			}
+		});
 	}
 
 	public void setFont(Font font)
@@ -155,5 +169,24 @@ public class TabView extends JTabbedPane
 			pages[i] = (EditorPage)getComponentAt(i);
 		}
 		return pages;
+	}
+
+	public void addTabChangeListener(TabChangeListener l)
+	{
+		tabChangeListeners.add(l);
+	}
+
+	public void removeTabChangeListener(TabChangeListener l)
+	{
+		tabChangeListeners.remove(l);
+	}
+
+	private void dispatchTabChangeEvent()
+	{
+		EditorPage selectedPage = getSelectedPage();
+		for (TabChangeListener l : tabChangeListeners)
+		{
+			l.tabChanged(selectedPage);
+		}
 	}
 }

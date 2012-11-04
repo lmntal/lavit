@@ -124,11 +124,11 @@ public class MainFrame extends JFrame
 		editorPanel = new EditorPanel();
 		editorPanel.addTabChangeListener(new TabChangeListener()
 		{
-			public void tabChanged(EditorPage selectedPage)
+			public void tabChanged()
 			{
-				if (selectedPage.hasFile())
+				if (editorPanel.getTabCount() > 0)
 				{
-					loadLTLFile(selectedPage.getFile());
+					loadLTLFile(editorPanel.getFile());
 				}
 				else
 				{

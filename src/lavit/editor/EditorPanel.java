@@ -75,6 +75,7 @@ import lavit.event.TabChangeListener;
 import lavit.multiedit.EditorPage;
 import lavit.multiedit.TabView;
 import lavit.multiedit.coloring.lexer.TokenLabel;
+import lavit.system.FileHistory;
 import lavit.util.CommonFontUser;
 
 @SuppressWarnings("serial")
@@ -173,6 +174,14 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		return files;
 	}
 
+	/**
+	 * Returns a number of opend tabs.
+	 */
+	public int getTabCount()
+	{
+		return tabView.getTabCount();
+	}
+
 	public void addTabChangeListener(TabChangeListener l)
 	{
 		tabView.addTabChangeListener(l);
@@ -196,7 +205,7 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 				FrontEnd.printException(e);
 			}
 		}
-		openInnerEditorFile(first);
+		openFile(first);
 		//FrontEnd.mainFrame.toolTab.ltlPanel.loadFile("0");
 	}
 
@@ -212,7 +221,7 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 			{
 				if (file.exists())
 				{
-					openInnerEditorFile(file);
+					openFile(file);
 				}
 			}
 			tabView.setSelectedIndex(0);
@@ -242,19 +251,23 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 	}
 
 	/**
-	 * ファイルを開く
+	 * 開くファイルを選択する。
 	 */
+	 //TODO: このパネルの仕事ではない。
 	public void fileOpen()
 	{
 		File file = chooseOpenFile();
 		if (file != null)
 		{
-			openInnerEditorFile(file);
+			openFile(file);
 			//FrontEnd.mainFrame.toolTab.ltlPanel.loadFile("0");
 		}
 	}
 
-	private void openInnerEditorFile(File file)
+	/**
+	 * ファイルを開く。
+	 */
+	public void openFile(File file)
 	{
 		try
 		{
@@ -267,7 +280,6 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 			reader.close();
 
 			EditorPage page = new EditorPage();
-			tabView.addPage(page, file.getName(), file.getAbsolutePath());
 			page.addHighlight(hlFlags);
 			page.setShowTabs(Env.is("SHOW_TABS"));
 			page.setShowEols(Env.is("SHOW_LINE_DELIMITERS"));
@@ -277,12 +289,17 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 			page.setFile(file);
 			page.clearUndo();
 
+			// タブ変更イベントとの関係上、タブの設定終了後に追加する
+			tabView.addPage(page, file.getName(), file.getAbsolutePath());
+
 			FrontEnd.println("(EDITOR) file open. [ " + file.getName() + " ]");
 		}
 		catch (Exception e)
 		{
 			FrontEnd.printException(e);
 		}
+
+		FileHistory.get().add(file);
 	}
 
 	/**

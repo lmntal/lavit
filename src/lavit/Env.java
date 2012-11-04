@@ -474,15 +474,35 @@ public final class Env
 		return appIcons;
 	}
 
+	public static File getPropertyFile(String fileName)
+	{
+		File dir = new File(DIR_NAME_PROPERTIES);
+		if (!dir.exists())
+		{
+			if (!dir.mkdir())
+			{
+				System.err.println("Could not create directory '" + dir + "'");
+				return null;
+			}
+		}
+		return new File(dir.getAbsolutePath() + File.separator + fileName);
+	}
+
 	public static List<File> loadLastFiles()
 	{
 		List<File> files = new ArrayList<File>();
-		String fileName = DIR_NAME_PROPERTIES + File.separator + "lastfiles";
+
+		File propFile = getPropertyFile("lastfiles");
+		if (propFile == null)
+		{
+			return files;
+		}
+
 		String charset = "UTF-8";
 		try
 		{
 			BufferedReader reader = new BufferedReader(
-				new InputStreamReader(new FileInputStream(fileName), charset));
+				new InputStreamReader(new FileInputStream(propFile), charset));
 			String line;
 			while ((line = reader.readLine()) != null)
 			{
@@ -501,22 +521,18 @@ public final class Env
 
 	public static void saveOpenedFilePathes(List<File> files)
 	{
-		File dirProp = new File(DIR_NAME_PROPERTIES);
-		if (!dirProp.exists())
+		File propFile = getPropertyFile("lastfiles");
+
+		if (propFile == null)
 		{
-			if (!dirProp.mkdir())
-			{
-				System.err.println("Could not create directory '" + DIR_NAME_PROPERTIES + "'");
-				return;
-			}
+			return;
 		}
 
-		String fileName = DIR_NAME_PROPERTIES + File.separator + "lastfiles";
 		String charset = "UTF-8";
 		try
 		{
 			PrintWriter out = new PrintWriter(new BufferedWriter(
-				new OutputStreamWriter(new FileOutputStream(fileName), charset)));
+				new OutputStreamWriter(new FileOutputStream(propFile), charset)));
 			for (File file : files)
 			{
 				out.println(file.getAbsolutePath());

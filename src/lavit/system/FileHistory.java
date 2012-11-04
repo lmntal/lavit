@@ -10,9 +10,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import lavit.Env;
 
 /**
  * <p>開いたファイルの履歴を管理します。</p>
@@ -25,8 +28,11 @@ public class FileHistory
 	 */
 	public static final int DEFAULT_LIMIT = 8;
 
-	private int _limit = DEFAULT_LIMIT;
-	private LinkedList<File> _files = new LinkedList<File>();
+	private static final String HISTORY_FILE = "recentfiles";
+	private static FileHistory instance;
+
+	private int limit = DEFAULT_LIMIT;
+	private LinkedList<File> files = new LinkedList<File>();
 
 	/**
 	 * <p>このファイル履歴オブジェクトに設定されているファイルリストの要素数の上限値を取得します。</p>
@@ -34,7 +40,7 @@ public class FileHistory
 	 */
 	public int getLimit()
 	{
-		return _limit;
+		return limit;
 	}
 
 	/**
@@ -43,7 +49,7 @@ public class FileHistory
 	 */
 	public void setLimit(int limit)
 	{
-		_limit = limit;
+		this.limit = limit;
 		trimSize();
 	}
 
@@ -52,7 +58,7 @@ public class FileHistory
 	 */
 	public void clear()
 	{
-		_files.clear();
+		files.clear();
 	}
 
 	/**
@@ -62,14 +68,23 @@ public class FileHistory
 	 */
 	public void add(File file)
 	{
-		int index = _files.indexOf(file);
+		try
+		{
+			file = file.getCanonicalFile();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		int index = files.indexOf(file);
 
 		if (index != -1)
 		{
-			_files.remove(index);
+			files.remove(index);
 		}
 
-		_files.addFirst(file);
+		files.addFirst(file);
 		trimSize();
 	}
 
@@ -79,21 +94,21 @@ public class FileHistory
 	 */
 	public List<File> getFiles()
 	{
-		return Collections.unmodifiableList(_files);
+		return Collections.unmodifiableList(files);
 	}
 
 	/**
 	 * <p>ファイル履歴のリストをファイルに保存します。</p>
-	 * @param fileName 保存するファイル名
 	 */
-	public void save(String fileName)
+	private void save()
 	{
+		File historyFile = Env.getPropertyFile(HISTORY_FILE);
+		String charset = "UTF-8";
 		try
 		{
 			PrintWriter writer = new PrintWriter(new BufferedWriter(
-					new OutputStreamWriter(new FileOutputStream(fileName))));
-
-			for (File file : _files)
+				new OutputStreamWriter(new FileOutputStream(historyFile), charset)));
+			for (File file : files)
 			{
 				writer.println(file.getAbsolutePath());
 			}
@@ -103,32 +118,38 @@ public class FileHistory
 		{
 			e.printStackTrace();
 		}
+		catch (UnsupportedEncodingException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/**
 	 * <p>ファイルからファイル履歴のリストを読み込みます。</p>
-	 * @param fileName 読み込むファイル名
 	 * @return ファイル履歴オブジェクト
 	 */
-	public static FileHistory fromFile(String fileName)
+	public static FileHistory get()
 	{
-		File file = new File(fileName);
-
-		FileHistory history = new FileHistory();
-
-		if (file.exists())
+		if (instance != null)
 		{
+			return instance;
+		}
+
+		instance = new FileHistory();
+		File historyFile = Env.getPropertyFile(HISTORY_FILE);
+		if (historyFile.exists())
+		{
+			String charset = "UTF-8";
 			try
 			{
 				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(new FileInputStream(file)));
-
-				String line;
+					new InputStreamReader(new FileInputStream(historyFile), charset));
 				try
 				{
+					String line;
 					while ((line = reader.readLine()) != null)
 					{
-						history.add(new File(line));
+						instance.add(new File(line));
 					}
 				}
 				catch (IOException e)
@@ -149,7 +170,14 @@ public class FileHistory
 				e.printStackTrace();
 			}
 		}
-		return history;
+		Runtime.getRuntime().addShutdownHook(new Thread()
+		{
+			public void run()
+			{
+				instance.save();
+			}
+		});
+		return instance;
 	}
 
 	/**
@@ -157,15 +185,15 @@ public class FileHistory
 	 */
 	private void trimSize()
 	{
-		if (_files.size() > _limit)
+		if (files.size() > limit)
 		{
-			if (_files.size() == _limit + 1)
+			if (files.size() == limit + 1)
 			{
-				_files.remove(_files.size() - 1);
+				files.remove(files.size() - 1);
 			}
 			else
 			{
-				_files = (LinkedList<File>) _files.subList(0, _limit - 1);
+				files = (LinkedList<File>)files.subList(0, limit - 1);
 			}
 		}
 	}

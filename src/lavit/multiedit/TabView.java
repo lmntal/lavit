@@ -177,10 +177,9 @@ public class TabView extends JTabbedPane
 
 	private void dispatchTabChangeEvent()
 	{
-		EditorPage selectedPage = getSelectedPage();
 		for (TabChangeListener l : tabChangeListeners)
 		{
-			l.tabChanged(selectedPage);
+			l.tabChanged();
 		}
 	}
 

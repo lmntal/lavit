@@ -35,9 +35,7 @@
 
 package lavit.event;
 
-import lavit.multiedit.EditorPage;
-
 public interface TabChangeListener
 {
-	public void tabChanged(EditorPage selectedPage);
+	public void tabChanged();
 }

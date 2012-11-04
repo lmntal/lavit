@@ -60,6 +60,12 @@ import lavit.ui.FlatButton;
 @SuppressWarnings("serial")
 public class TabView extends JTabbedPane
 {
+	private static Icon ICON_TAB_LMN;
+	private static Icon ICON_TAB_IL;
+	private static Icon ICON_TAB_OTHERS;
+	private static Icon ICON_TAB_CLOSE_COOL;
+	private static Icon ICON_TAB_CLOSE_HOT;
+
 	private List<TabChangeListener> tabChangeListeners = new ArrayList<TabChangeListener>();
 
 	public TabView()
@@ -105,26 +111,14 @@ public class TabView extends JTabbedPane
 		header.setPreferredSize(dim);
 		hp.add(header, BorderLayout.CENTER);
 
-		Icon icon;
-		if (title.endsWith(".lmn"))
-		{
-			icon = new ImageIcon(Env.getImageOfFile("img/tab_icon_lmn.png"));
-		}
-		else if (title.endsWith(".il") || title.endsWith(".tal"))
-		{
-			icon = new ImageIcon(Env.getImageOfFile("img/tab_icon_il.png"));
-		}
-		else
-		{
-			icon = new ImageIcon(Env.getImageOfFile("img/tab_icon.png"));
-		}
+		Icon icon = getFileIcon(title);
 		JLabel iconLabel = new JLabel(icon);
 		iconLabel.setPreferredSize(new Dimension(16, 16));
 		hp.add(iconLabel, BorderLayout.WEST);
 
 		JButton closeButton = new FlatButton();
-		closeButton.setIcon(new ImageIcon(Env.getImageOfFile("img/tab_close_cold.png")));
-		closeButton.setRolloverIcon(new ImageIcon(Env.getImageOfFile("img/tab_close_hot.png")));
+		closeButton.setIcon(getTabCloseCoolIcon());
+		closeButton.setRolloverIcon(getTabCloseHotIcon());
 		closeButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent event)
@@ -188,5 +182,51 @@ public class TabView extends JTabbedPane
 		{
 			l.tabChanged(selectedPage);
 		}
+	}
+
+	private static Icon getFileIcon(String title)
+	{
+		if (title.endsWith(".lmn"))
+		{
+			if (ICON_TAB_LMN == null)
+			{
+				ICON_TAB_LMN = new ImageIcon(Env.getImageOfFile("img/tab_icon_lmn.png"));
+			}
+			return ICON_TAB_LMN;
+		}
+		else if (title.endsWith(".il") || title.endsWith(".tal"))
+		{
+			if (ICON_TAB_IL == null)
+			{
+				ICON_TAB_IL = new ImageIcon(Env.getImageOfFile("img/tab_icon_il.png"));
+			}
+			return ICON_TAB_IL;
+		}
+		else
+		{
+			if (ICON_TAB_OTHERS == null)
+			{
+				ICON_TAB_OTHERS = new ImageIcon(Env.getImageOfFile("img/tab_icon.png"));
+			}
+			return ICON_TAB_OTHERS;
+		}
+	}
+
+	private static Icon getTabCloseCoolIcon()
+	{
+		if (ICON_TAB_CLOSE_COOL == null)
+		{
+			ICON_TAB_CLOSE_COOL = new ImageIcon(Env.getImageOfFile("img/tab_close_cold.png"));
+		}
+		return ICON_TAB_CLOSE_COOL;
+	}
+
+	private static Icon getTabCloseHotIcon()
+	{
+		if (ICON_TAB_CLOSE_HOT == null)
+		{
+			ICON_TAB_CLOSE_HOT = new ImageIcon(Env.getImageOfFile("img/tab_close_hot.png"));
+		}
+		return ICON_TAB_CLOSE_HOT;
 	}
 }

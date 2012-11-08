@@ -55,7 +55,6 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.editor.EditorPanel;
 import lavit.event.TabChangeListener;
-import lavit.multiedit.EditorPage;
 import lavit.runner.ILRunner;
 import lavit.runner.PrintLineListener;
 import lavit.ui.FlatSplitPaneUI;

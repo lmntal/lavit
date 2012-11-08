@@ -45,6 +45,9 @@ import java.io.Writer;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
+import extgui.filedrop.FileDropTransferHandler;
+import extgui.filedrop.event.FileDropListener;
+
 import lavit.multiedit.coloring.LmnTextPane;
 import lavit.multiedit.coloring.lexer.TokenLabel;
 
@@ -53,10 +56,13 @@ public class EditorPage extends JScrollPane
 {
 	private LmnTextPane text;
 	private File file;
+	private FileDropTransferHandler fileDropHandler;
 
 	public EditorPage()
 	{
 		text = new LmnTextPane();
+		fileDropHandler = new FileDropTransferHandler(text.getTransferHandler());
+		text.setTransferHandler(fileDropHandler);
 
 		setRowHeaderView(new LineNumberView(text));
 		setViewportView(text);
@@ -197,19 +203,29 @@ public class EditorPage extends JScrollPane
 	{
 		text.updateHighlight();
 	}
-	
+
 	public void copy()
 	{
 		text.copy();
 	}
-	
+
 	public void cut()
 	{
 		text.cut();
 	}
-	
+
 	public void paste()
 	{
 		text.paste();
+	}
+
+	public void addFileDropListener(FileDropListener listener)
+	{
+		fileDropHandler.addFileDropListener(listener);
+	}
+
+	public void removeFileDropListener(FileDropListener listener)
+	{
+		fileDropHandler.removeFileDropListener(listener);
 	}
 }

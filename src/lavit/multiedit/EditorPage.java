@@ -51,16 +51,15 @@ import lavit.multiedit.coloring.lexer.TokenLabel;
 @SuppressWarnings("serial")
 public class EditorPage extends JScrollPane
 {
-	private LmnTextPane _text;
-	private File        _file;
+	private LmnTextPane text;
+	private File file;
 
 	public EditorPage()
 	{
-		_text = new LmnTextPane();
-		//_text.setTransferHandler(null);
+		text = new LmnTextPane();
 
-		setRowHeaderView(new LineNumberView(_text));
-		setViewportView(_text);
+		setRowHeaderView(new LineNumberView(text));
+		setViewportView(text);
 
 		getVerticalScrollBar().setUnitIncrement(15);
 
@@ -68,103 +67,103 @@ public class EditorPage extends JScrollPane
 		{
 			public void focusGained(FocusEvent e)
 			{
-				_text.requestFocus();
+				text.requestFocus();
 			}
 		});
 	}
 
 	public boolean hasFile()
 	{
-		return _file != null;
+		return file != null;
 	}
 
 	public File getFile()
 	{
-		return _file;
+		return file;
 	}
 
 	public void setFile(File file)
 	{
-		this._file = file;
+		this.file = file;
 	}
 
 	public String getText()
 	{
-		return _text.getText();
+		return text.getText();
 	}
 
 	public void setText(String t)
 	{
-		_text.setText(t);
+		text.setText(t);
 	}
 
 	public boolean isModified()
 	{
-		return _text.isModified();
+		return text.isModified();
 	}
 
 	public void setModified(boolean b)
 	{
-		_text.setModified(b);
+		text.setModified(b);
 	}
 
 	public boolean canUndo()
 	{
-		return _text.canUndo();
+		return text.canUndo();
 	}
 	
 	public boolean canRedo()
 	{
-		return _text.canRedo();
+		return text.canRedo();
 	}
 	
 	public void undo()
 	{
-		_text.undo();
+		text.undo();
 	}
 	
 	public void redo()
 	{
-		_text.redo();
+		text.redo();
 	}
 	
 	public void clearUndo()
 	{
-		_text.clearUndo();
+		text.clearUndo();
 	}
 
 	public void setFont(Font font)
 	{
 		super.setFont(font);
-		if (_text != null)
+		if (text != null)
 		{
-			_text.setFont(font);
+			text.setFont(font);
 		}
 	}
 
 	public void setTabWidth(int numSpace)
 	{
-		_text.setTabWidth(numSpace);
+		text.setTabWidth(numSpace);
 	}
 
 	public void setCaretPosition(int position)
 	{
-		_text.setCaretPosition(position);
+		text.setCaretPosition(position);
 	}
 
 	public JTextPane getJTextPane()
 	{
-		return _text;
+		return text;
 	}
 
 	public void write(Writer out) throws IOException
 	{
-		_text.write(out);
+		text.write(out);
 	}
 
 	public void removeAllHighlights()
 	{
-		_text.removeHighlight(
+		text.removeHighlight(
 				  TokenLabel.KEYWORD
 				| TokenLabel.COMMENT
 				| TokenLabel.STRING
@@ -173,7 +172,7 @@ public class EditorPage extends JScrollPane
 
 	public void addHighlight(int kind)
 	{
-		_text.addHighlight(kind);
+		text.addHighlight(kind);
 	}
 	
 	/**
@@ -182,7 +181,7 @@ public class EditorPage extends JScrollPane
 	 */
 	public void setShowTabs(boolean b)
 	{
-		_text.setShowTabs(b);
+		text.setShowTabs(b);
 	}
 	
 	/**
@@ -191,26 +190,26 @@ public class EditorPage extends JScrollPane
 	 */
 	public void setShowEols(boolean b)
 	{
-		_text.setShowEols(b);
+		text.setShowEols(b);
 	}
 
 	public void updateHighlight()
 	{
-		_text.updateHighlight();
+		text.updateHighlight();
 	}
 	
 	public void copy()
 	{
-		_text.copy();
+		text.copy();
 	}
 	
 	public void cut()
 	{
-		_text.cut();
+		text.cut();
 	}
 	
 	public void paste()
 	{
-		_text.paste();
+		text.paste();
 	}
 }

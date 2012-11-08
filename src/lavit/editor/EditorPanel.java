@@ -64,8 +64,6 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 
 import lavit.Env;
@@ -79,7 +77,7 @@ import lavit.system.FileHistory;
 import lavit.util.CommonFontUser;
 
 @SuppressWarnings("serial")
-public class EditorPanel extends JPanel implements DocumentListener, CommonFontUser
+public class EditorPanel extends JPanel implements CommonFontUser
 {
 	public EditorButtonPanel buttonPanel;
 
@@ -583,103 +581,6 @@ public class EditorPanel extends JPanel implements DocumentListener, CommonFontU
 		{
 			page.setTabWidth(charactersPerTab);
 		}
-	}
-
-	/*
-	private int getLineOfOffset(int offset) throws BadLocationException {
-		if (offset < 0) {
-			throw new BadLocationException("Can't translate offset to line", -1);
-		} else if (offset > doc.getLength()) {
-			throw new BadLocationException("Can't translate offset to line", doc.getLength()+1);
-		} else {
-			Element map = doc.getDefaultRootElement();
-			return map.getElementIndex(offset);
-		}
-	}
-
-	private int getLineStartOffset(int line) throws BadLocationException {
-		int lineCount = getLineCount();
-		if (line < 0) {
-			throw new BadLocationException("Negative line", -1);
-		} else if (line >= lineCount) {
-			throw new BadLocationException("No such line", doc.getLength()+1);
-		} else {
-			Element map = doc.getDefaultRootElement();
-			Element lineElem = map.getElement(line);
-			return lineElem.getStartOffset();
-		}
-	}
-
-	private int getLineCount() {
-		Element map = doc.getDefaultRootElement();
-		return map.getElementCount();
-	}
-	*/
-
-	/*
-	private void commonUpdate(DocumentEvent e) {
-		if (e.getDocument() == doc) {
-			editorChange(true);
-			if(!e.getClass().getName().equals("javax.swing.text.AbstractDocument$UndoRedoDocumentEvent")){
-				doc.colorUpdate();
-			}
-		}
-	}
-	*/
-
-	/*
-	private void checkIndent(DocumentEvent e){
-		try {
-			if(doc.getText(e.getOffset(),e.getLength()).endsWith("\n")){
-				String text = doc.getText(0,e.getOffset());
-				int pos = text.lastIndexOf("\n");
-				if(pos>=0){
-					text = text.substring(pos+1);
-				}
-
-				String indentString = "";
-				for(int i=0;i<text.length();++i){
-					if(text.charAt(i)==' '){
-						indentString+=" ";
-					}else if(text.charAt(i)=='\t'){
-						indentString+="\t";
-					}else{
-						break;
-					}
-				}
-				final String findentString = indentString;
-				final int insertPos = e.getOffset()+e.getLength();
-
-				SwingUtilities.invokeLater(new Runnable(){
-					public void run() {
-						try {
-							doc.insertString(insertPos,findentString,null);
-						} catch (BadLocationException e) {
-							FrontEnd.printException(e);
-						}
-					}
-				});
-
-			}
-		} catch (BadLocationException ex) {
-			FrontEnd.printException(ex);
-		}
-	}
-	*/
-
-	public void changedUpdate(DocumentEvent e)
-	{
-	}
-
-	public void insertUpdate(DocumentEvent e)
-	{
-		//commonUpdate(e);
-		//checkIndent(e);
-	}
-
-	public void removeUpdate(DocumentEvent e)
-	{
-		//commonUpdate(e);
 	}
 
 	public boolean canUndo()

@@ -40,6 +40,7 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
@@ -70,45 +71,45 @@ public class LineNumberView extends JComponent
 	private static final Color DEFAULT_HIGHLIGHT_BACKGROUND  = new Color(100, 200, 255);
 	private static final Color DEFAULT_LINE_COLOR            = new Color(  0, 128, 192);
 	private static final Color DEFAULT_SHADOW_COLOR          = new Color(220, 220, 220);
-	
-	private JTextComponent _text;
-	private int            _top;
-	private int            _lineHeight;
-	
+
+	private JTextComponent text;
+	private int top;
+	private int lineHeight;
+
 	/**
 	 * <p>設定されたフォントにおける数字の最大幅を保持します。</p>
 	 */
-	private int            _digitWidth;
-	
+	private int digitWidth;
+
 	/**
 	 * <p>テキストの最大行数の桁数を保持します。</p>
 	 */
-	private int            _digitCount;
-	
-	public LineNumberView(JTextComponent text)
+	private int digitCount;
+
+	public LineNumberView(JTextComponent textComponent)
 	{
-		_text = text;
-		
-		_text.getDocument().addDocumentListener(new DocumentListener()
+		this.text = textComponent;
+
+		text.getDocument().addDocumentListener(new DocumentListener()
 		{
 			public void removeUpdate(DocumentEvent e)
 			{
 				updateRange();
 				repaint();
 			}
-			
+
 			public void insertUpdate(DocumentEvent e)
 			{
 				updateRange();
 				repaint();
 			}
-			
+
 			public void changedUpdate(DocumentEvent e)
 			{
 			}
 		});
-		
-		_text.addComponentListener(new ComponentAdapter()
+
+		text.addComponentListener(new ComponentAdapter()
 		{
 			public void componentResized(ComponentEvent e)
 			{
@@ -116,16 +117,16 @@ public class LineNumberView extends JComponent
 				repaint();
 			}
 		});
-		
-		_text.addCaretListener(new CaretListener()
+
+		text.addCaretListener(new CaretListener()
 		{
 			public void caretUpdate(CaretEvent e)
 			{
 				repaint();
 			}
 		});
-		
-		_text.addPropertyChangeListener("font", new PropertyChangeListener()
+
+		text.addPropertyChangeListener("font", new PropertyChangeListener()
 		{
 			public void propertyChange(PropertyChangeEvent e)
 			{
@@ -133,69 +134,74 @@ public class LineNumberView extends JComponent
 				repaint();
 			}
 		});
-		
+
 		updateRange();
 	}
-	
+
+	public void updateUI()
+	{
+		super.updateUI();
+		updateRange();
+	}
+
 	private void updateRange()
 	{
-		setFont(_text.getFont());
-		
-		_top = _text.getMargin().top;
-		
-		FontMetrics fm = getFontMetrics(_text.getFont());
-		_lineHeight = fm.getHeight();
-		
-		_digitWidth = 0;
+		setFont(text.getFont());
+
+		Insets margin = text.getMargin();
+		top = margin != null ? margin.top : 0;
+
+		FontMetrics fm = getFontMetrics(text.getFont());
+		lineHeight = fm.getHeight();
+
+		digitWidth = 0;
 		for (int i = 0; i < 10; i++)
 		{
-			_digitWidth = Math.max(fm.charWidth((char)('0' + i)), _digitWidth);
+			digitWidth = Math.max(fm.charWidth((char)('0' + i)), digitWidth);
 		}
-		
-		_digitCount = 1 + (int)Math.floor(Math.log10(getLines()));
-		
+
+		digitCount = 1 + (int)Math.floor(Math.log10(getLines()));
+
 		updateSize();
 	}
-	
+
 	private void updateSize()
 	{
-		int c = Math.max(_digitCount, 2);
-		Dimension size = new Dimension(1 + c * _digitWidth + 5, _lineHeight + _text.getHeight());
+		int c = Math.max(digitCount, 2);
+		Dimension size = new Dimension(1 + c * digitWidth + 5, lineHeight + text.getHeight());
 		setPreferredSize(size);
 		setSize(size);
 	}
-	
+
 	protected void paintComponent(Graphics g)
 	{
-		Rectangle bounds = g.getClipBounds();
-		int caret = _text.getCaretPosition();
+		Rectangle rc = getVisibleRect();
+		int caret = text.getCaretPosition();
 		int lines = getLines();
-		Element rootElement = _text.getDocument().getDefaultRootElement();
+		Element rootElement = text.getDocument().getDefaultRootElement();
 		int curLine = rootElement.getElementIndex(caret);
-		
+
 		// background
 		g.setColor(DEFAULT_BACKGROUND);
-		g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
-		
+		g.fillRect(rc.x, rc.y, rc.width, rc.height);
+
 		// line
 		g.setColor(DEFAULT_LINE_COLOR);
-		g.drawLine(bounds.x + bounds.width - 2, bounds.y,
-				bounds.x + bounds.width - 2, bounds.y + bounds.height);
-		
+		g.drawLine(rc.x + rc.width - 2, rc.y, rc.x + rc.width - 2, rc.y + rc.height);
+
 		// shadow line
 		g.setColor(DEFAULT_SHADOW_COLOR);
-		g.drawLine(bounds.x + bounds.width - 1, bounds.y,
-				bounds.x + bounds.width - 1, bounds.y + bounds.height);
-		
-		FontMetrics fm = g.getFontMetrics(_text.getFont());
-		
-		int snap = Math.max(bounds.y - Math.max(bounds.y - _top, 0) % _lineHeight, _top);
-		int baseY = snap + _lineHeight - fm.getDescent();
-		int endY = snap + bounds.height + _lineHeight;
-		
+		g.drawLine(rc.x + rc.width - 1, rc.y, rc.x + rc.width - 1, rc.y + rc.height);
+
+		FontMetrics fm = g.getFontMetrics(text.getFont());
+
+		int snap = Math.max(rc.y - Math.max(rc.y - top, 0) % lineHeight, top);
+		int baseY = snap + lineHeight - fm.getDescent();
+		int endY = snap + rc.height + lineHeight;
+
 		Graphics2D g2 = (Graphics2D)g;
 		RenderingHints hints = g2.getRenderingHints();
-		
+
 		if (g.getFont().getSize() < 24)
 		{
 			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
@@ -205,24 +211,24 @@ public class LineNumberView extends JComponent
 			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		}
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST, 250);
-		
-		g.setFont(_text.getFont());
-		
+
+		g.setFont(text.getFont());
+
 		// highlight current line
 		g.setColor(DEFAULT_HIGHLIGHT_BACKGROUND);
-		g.fillRect(bounds.x, _top + curLine * _lineHeight, bounds.width - 2, _lineHeight);
+		g.fillRect(rc.x, top + curLine * lineHeight, rc.width - 2, lineHeight);
 		g.setColor(DEFAULT_HIGHLIGHT_FOREGROUND);
 		{
 			String s = Integer.toString(curLine + 1);
 			int w = fm.stringWidth(s);
-			g.drawString(s, 1 + getWidth() - w - 5, _top + (curLine + 1) * _lineHeight - fm.getDescent());
+			g.drawString(s, 1 + getWidth() - w - 5, top + (curLine + 1) * lineHeight - fm.getDescent());
 		}
-		
+
 		// line numbers
 		g.setColor(DEFAULT_FOREGROUND);
-		
-		int n = Math.max(bounds.y - _top, 0) / _lineHeight;
-		for (int y = baseY; y < endY && n < lines; y += _lineHeight)
+
+		int n = Math.max(rc.y - top, 0) / lineHeight;
+		for (int y = baseY; y < endY && n < lines; y += lineHeight)
 		{
 			if (n != curLine)
 			{
@@ -232,13 +238,13 @@ public class LineNumberView extends JComponent
 			}
 			n++;
 		}
-		
+
 		g2.setRenderingHints(hints);
 	}
-	
+
 	private int getLines()
 	{
-		Element root = _text.getDocument().getDefaultRootElement();
+		Element root = text.getDocument().getDefaultRootElement();
 		return root.getElementCount();
 	}
 }

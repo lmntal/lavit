@@ -36,6 +36,7 @@
 package lavit.frame;
 
 import java.awt.Desktop;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -112,19 +113,16 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		file.add(iNew);
 		iNew.addActionListener(this);
 		iNew.setMnemonic(KeyEvent.VK_N);
-		iNew.setAccelerator(KeyStroke.getKeyStroke("control N"));
 
 		iOpen = new JMenuItem(Lang.m[2]);
 		file.add(iOpen);
 		iOpen.addActionListener(this);
 		iOpen.setMnemonic(KeyEvent.VK_O);
-		iOpen.setAccelerator(KeyStroke.getKeyStroke("control O"));
 
 		iSave = new JMenuItem(Lang.m[3]);
 		file.add(iSave);
 		iSave.addActionListener(this);
 		iSave.setMnemonic(KeyEvent.VK_S);
-		iSave.setAccelerator(KeyStroke.getKeyStroke("control S"));
 
 		iSaveAs = new JMenuItem(Lang.m[4]);
 		file.add(iSaveAs);
@@ -170,14 +168,12 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		iUndo.setEnabled(false);
 		iUndo.addActionListener(this);
 		iUndo.setMnemonic(KeyEvent.VK_U);
-		iUndo.setAccelerator(KeyStroke.getKeyStroke("control Z"));
 
 		iRedo = new JMenuItem(Lang.m[17]);
 		edit.add(iRedo);
 		iRedo.setEnabled(false);
 		iRedo.addActionListener(this);
 		iRedo.setMnemonic(KeyEvent.VK_R);
-		iRedo.setAccelerator(KeyStroke.getKeyStroke("control Y"));
 
 		edit.addSeparator();
 
@@ -185,19 +181,16 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		edit.add(iCopy);
 		iCopy.addActionListener(this);
 		iCopy.setMnemonic(KeyEvent.VK_C);
-		iCopy.setAccelerator(KeyStroke.getKeyStroke("control C"));
 
 		iCut = new JMenuItem(Lang.m[8]);
 		edit.add(iCut);
 		iCut.addActionListener(this);
 		iCut.setMnemonic(KeyEvent.VK_T);
-		iCut.setAccelerator(KeyStroke.getKeyStroke("control X"));
 
 		iPaste = new JMenuItem(Lang.m[9]);
 		edit.add(iPaste);
 		iPaste.addActionListener(this);
 		iPaste.setMnemonic(KeyEvent.VK_P);
-		iPaste.setAccelerator(KeyStroke.getKeyStroke("control V"));
 
 		edit.addMenuListener(new MenuListener()
 		{
@@ -223,7 +216,6 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		iTemplate.setMnemonic(KeyEvent.VK_T);
 		iTemplate.addActionListener(new ActionListener()
 		{
-			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				FrontEnd.mainFrame.loadTemplate();
@@ -240,25 +232,21 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		run.add(iLMNtal);
 		iLMNtal.addActionListener(this);
 		iLMNtal.setMnemonic(KeyEvent.VK_L);
-		iLMNtal.setAccelerator(KeyStroke.getKeyStroke("F1"));
 
 		iLMNtalg = new JMenuItem(Lang.m[12]);
 		run.add(iLMNtalg);
 		iLMNtalg.addActionListener(this);
 		iLMNtalg.setMnemonic(KeyEvent.VK_G);
-		iLMNtalg.setAccelerator(KeyStroke.getKeyStroke("F2"));
 
 		iUNYO = new JMenuItem(Lang.m[13]);
 		run.add(iUNYO);
 		iUNYO.addActionListener(this);
 		iUNYO.setMnemonic(KeyEvent.VK_U);
-		iUNYO.setAccelerator(KeyStroke.getKeyStroke("F3"));
 
 		iSLIM = new JMenuItem(Lang.m[14]);
 		run.add(iSLIM);
 		iSLIM.addActionListener(this);
 		iSLIM.setMnemonic(KeyEvent.VK_S);
-		iSLIM.setAccelerator(KeyStroke.getKeyStroke("F4"));
 
 		run.addSeparator();
 
@@ -292,7 +280,6 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		run.add(iSViewer);
 		iSViewer.addActionListener(this);
 		iSViewer.setMnemonic(KeyEvent.VK_V);
-		iSViewer.setAccelerator(KeyStroke.getKeyStroke("F5"));
 
 		iStateProfiler = new JMenuItem(Lang.m[21]);
 		run.add(iStateProfiler);
@@ -303,7 +290,6 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		run.add(iKill);
 		iKill.addActionListener(this);
 		iKill.setMnemonic(KeyEvent.VK_K);
-		iKill.setAccelerator(KeyStroke.getKeyStroke("ESCAPE"));
 
 		run.addSeparator();
 
@@ -343,6 +329,21 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		help.add(iBrowse);
 		iBrowse.addActionListener(this);
 
+		int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		setAccelerator(iNew, KeyEvent.VK_N, mask);
+		setAccelerator(iOpen, KeyEvent.VK_O, mask);
+		setAccelerator(iSave, KeyEvent.VK_S, mask);
+		setAccelerator(iUndo, KeyEvent.VK_Z, mask);
+		setAccelerator(iRedo, KeyEvent.VK_Y, mask);
+		setAccelerator(iCopy, KeyEvent.VK_C, mask);
+		setAccelerator(iCut, KeyEvent.VK_X, mask);
+		setAccelerator(iPaste, KeyEvent.VK_V, mask);
+		setAccelerator(iLMNtal, KeyEvent.VK_F1, 0);
+		setAccelerator(iLMNtalg, KeyEvent.VK_F2, 0);
+		setAccelerator(iUNYO, KeyEvent.VK_F3, 0);
+		setAccelerator(iSLIM, KeyEvent.VK_F4, 0);
+		setAccelerator(iSViewer, KeyEvent.VK_F5, 0);
+		setAccelerator(iKill, KeyEvent.VK_ESCAPE, 0);
 	}
 
 	public void updateUndoRedo(boolean undo, boolean redo)
@@ -460,6 +461,11 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		{
 			openInBrowser(Env.APP_HREF);
 		}
+	}
+
+	private static void setAccelerator(JMenuItem item, int keyCode, int modifier)
+	{
+		item.setAccelerator(KeyStroke.getKeyStroke(keyCode, modifier));
 	}
 
 	private static JMenu createRecentFilesMenu(JMenu owner)

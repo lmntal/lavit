@@ -122,11 +122,11 @@ public class FrontEnd
 			{
 				if (isAborted)
 				{
-					FrontEnd.println(String.format("(UNYO) terminated. (Task[%d])", id));
+					FrontEnd.errPrintln(String.format("(UNYO) aborted. (Task[%d])", id));
 				}
 				else
 				{
-					FrontEnd.errPrintln(String.format("(UNYO) aborted. (Task[%d])", id));
+					FrontEnd.println(String.format("(UNYO) terminated. (Task[%d])", id));
 				}
 			}
 		});

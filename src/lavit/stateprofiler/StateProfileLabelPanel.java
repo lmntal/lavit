@@ -33,24 +33,22 @@
  *
  */package lavit.stateprofiler;
 
-import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.text.DecimalFormat;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
-public class StateProfileLabelPanel extends JPanel{
-
-	StateProfilePanel profile;
+@SuppressWarnings("serial")
+class StateProfileLabelPanel extends JPanel
+{
 	private JLabel all;
 	private JLabel speed;
 	private JLabel clock;
 
-	StateProfileLabelPanel(StateProfilePanel p){
-		profile = p;
-
-		setLayout(new GridLayout(1,2));
+	public StateProfileLabelPanel()
+	{
+		setLayout(new GridLayout(1, 2));
 
 		all = new JLabel();
 		all.setHorizontalAlignment(JLabel.RIGHT);
@@ -64,29 +62,19 @@ public class StateProfileLabelPanel extends JPanel{
 		speed.setHorizontalAlignment(JLabel.RIGHT);
 		add(speed);
 
-		update();
-
+		setStatus(0, 0, 0);
 	}
 
-	//スレッドセーフ
-	public void update(){
-		javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-			int r0 = 0;
-			if(profile.timeLine.size()>1){
-				r0 = profile.allState.size();
+	public void setStatus(final int states, final int time, final int rate)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				all.setText("State : " + states + " state");
+				clock.setText("Clock : " + time + " sec");
+				speed.setText("Speed : " + rate + " state/sec");
 			}
-			int r1 = 0;
-			if(profile.timeLine.size()>1){
-				r1 = profile.timeLine.size()-1;
-			}
-			int r2 = 0;
-			if(r1>0){
-				r2 = r0/r1;
-			}
-			all.setText(" State : "+r0+" state ");
-			clock.setText(" Clock : "+r1+" sec ");
-			speed.setText(" Speed : "+r2+" state/sec ");
-		}});
+		});
 	}
-
 }

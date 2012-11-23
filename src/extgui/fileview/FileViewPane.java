@@ -220,7 +220,6 @@ public class FileViewPane extends FlatSplitPane
 
 	private void restoreDividerStatus()
 	{
-		System.out.println("restore");
 		setDividerSize(savedDividerSize);
 		setDividerLocation(savedDividerLocation);
 	}

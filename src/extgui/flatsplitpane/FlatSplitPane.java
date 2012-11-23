@@ -33,34 +33,62 @@
  *
  */
 
-package lavit.system;
+package extgui.flatsplitpane;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
+import javax.swing.BorderFactory;
 import javax.swing.JSplitPane;
+import javax.swing.border.Border;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import extgui.flatsplitpane.FlatSplitPane;
-
+/**
+ * @author Yuuki.S
+ */
 @SuppressWarnings("serial")
-public class SystemPanel extends JPanel
+public class FlatSplitPane extends JSplitPane
 {
-	public OutputPanel outputPanel;
-	public LogPanel logPanel;
+	public FlatSplitPane()
+	{
+		super();
+	}
 
-	public SystemPanel(){
-		setLayout(new BorderLayout());
+	public void updateUI()
+	{
+		super.updateUI();
+		setUI(new FlatSplitPaneUI());
+	}
+}
 
-		outputPanel = new OutputPanel();
-		logPanel = new LogPanel();
+class FlatSplitPaneUI extends BasicSplitPaneUI
+{
+	private BasicSplitPaneDivider divider;
 
-		JSplitPane jsp = new FlatSplitPane();
-		jsp.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		jsp.setTopComponent(outputPanel);
-		jsp.setBottomComponent(logPanel);
-		jsp.setOneTouchExpandable(true);
-		jsp.setResizeWeight(0.7);
+	public BasicSplitPaneDivider createDefaultDivider()
+	{
+		if (divider == null)
+		{
+			divider = new EmptyDivider(this);
+		}
+		return divider;
+	}
 
-		add(jsp, BorderLayout.CENTER);
+	protected void installDefaults()
+	{
+		super.installDefaults();
+		splitPane.setBorder(null);
+	}
+
+	@SuppressWarnings("serial")
+	private static class EmptyDivider extends BasicSplitPaneDivider
+	{
+		public EmptyDivider(BasicSplitPaneUI ui)
+		{
+			super(ui);
+			super.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+		}
+
+		public void setBorder(Border b)
+		{
+		}
 	}
 }

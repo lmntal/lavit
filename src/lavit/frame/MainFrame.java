@@ -40,6 +40,8 @@ import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
@@ -48,7 +50,6 @@ import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
-import javax.swing.border.Border;
 import javax.swing.text.BadLocationException;
 
 import lavit.Env;
@@ -57,8 +58,8 @@ import lavit.editor.EditorPanel;
 import lavit.event.TabChangeListener;
 import lavit.runner.ILRunner;
 import lavit.runner.PrintLineListener;
-import lavit.ui.FlatSplitPaneUI;
 import lavit.util.IntUtils;
+import extgui.flatsplitpane.FlatSplitPane;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame
@@ -121,6 +122,7 @@ public class MainFrame extends JFrame
 		setJMenuBar(mainMenuBar);
 
 		editorPanel = new EditorPanel();
+		editorPanel.setFileViewVisible(Env.is("window.fileview.visible"));
 		editorPanel.addTabChangeListener(new TabChangeListener()
 		{
 			public void tabChanged()
@@ -138,20 +140,21 @@ public class MainFrame extends JFrame
 
 		toolTab = new ToolTab();
 
-		double editerPer = IntUtils.clamp(Env.getInt("window.divider_location", 50), 0, 100) / 100.0;
-		jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, editorPanel, toolTab)
-		{
-			public void setBorder(Border b)
-			{
-			}
-			public void updateUI()
-			{
-			}
-		};
-		jsp.setUI(new FlatSplitPaneUI());
+		final double editerPer = IntUtils.clamp(Env.getInt("window.divider_location", 50), 0, 100) / 100.0;
+		jsp = new FlatSplitPane();
+		jsp.setLeftComponent(editorPanel);
+		jsp.setRightComponent(toolTab);
 		jsp.setOneTouchExpandable(true);
 		jsp.setResizeWeight(0.5);
-		jsp.setDividerLocation((int)Math.round(getWidth() * editerPer));
+		addWindowListener(new WindowAdapter()
+		{
+			public void windowOpened(WindowEvent e)
+			{
+				int location = Env.getInt("window.fileview.divider", 25);
+				editorPanel.setFileViewDividerLocation(location);
+				jsp.setDividerLocation((int)Math.round(getWidth() * editerPer));
+			}
+		});
 		setContentPane(jsp);
 
 		addWindowListener(new MainWindowListener(this));
@@ -175,6 +178,16 @@ public class MainFrame extends JFrame
 		{
 			w.setVisible(visible);
 		}
+	}
+
+	public void setFileViewVisible(boolean b)
+	{
+		editorPanel.setFileViewVisible(b);
+	}
+
+	public boolean isFileViewVisible()
+	{
+		return editorPanel.isFileViewVisible();
 	}
 
 	public void dispose()
@@ -251,6 +264,8 @@ public class MainFrame extends JFrame
 		Env.set("WINDOW_HEIGHT", sizeSave.height);
 		Env.set("WINDOW_STATE", getExtendedState() == JFrame.MAXIMIZED_BOTH ? "maximized" : "normal");
 		Env.set("window.divider_location", (int)Math.round(100.0 * jsp.getDividerLocation() / getWidth()));
+		Env.set("window.fileview.visible", editorPanel.isFileViewVisible());
+		Env.set("window.fileview.divider", editorPanel.getFileViewDividerLocation());
 	}
 
 	private void loadLTLFile(File lmntalFile)

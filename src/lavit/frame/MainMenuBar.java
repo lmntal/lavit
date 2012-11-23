@@ -46,6 +46,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -223,6 +224,33 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		});
 		edit.add(iTemplate);
 		*/
+
+		JMenu menuView = new JMenu(Lang.m[36]);
+		add(menuView);
+		final JCheckBoxMenuItem itemShowFileView = new JCheckBoxMenuItem(Lang.m[37]);
+		itemShowFileView.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				FrontEnd.mainFrame.setFileViewVisible(itemShowFileView.isSelected());
+			}
+		});
+		menuView.addMenuListener(new MenuListener()
+		{
+			public void menuSelected(MenuEvent e)
+			{
+				itemShowFileView.setSelected(FrontEnd.mainFrame.isFileViewVisible());
+			}
+
+			public void menuDeselected(MenuEvent e)
+			{
+			}
+
+			public void menuCanceled(MenuEvent e)
+			{
+			}
+		});
+		menuView.add(itemShowFileView);
 
 		run = new JMenu(Lang.m[10]);
 		add(run);

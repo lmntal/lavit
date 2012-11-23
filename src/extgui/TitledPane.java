@@ -33,43 +33,89 @@
  *
  */
 
-package lavit.ui;
+package extgui;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.border.Border;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 /**
- * <p>Flattened SplitPaneUI.</p>
- * @author Yuuki SHINOBU
- * @since December 26, 2011
+ * @author Yuuki.S
  */
-public class FlatSplitPaneUI extends BasicSplitPaneUI
+@SuppressWarnings("serial")
+public class TitledPane extends JPanel
 {
-	public BasicSplitPaneDivider createDefaultDivider()
+	private JLabel titleLabel;
+
+	public TitledPane()
 	{
-		return new FlatDivider(this);
+		this("");
 	}
 
-	protected void installDefaults()
+	public TitledPane(String title)
 	{
-		super.installDefaults();
-		splitPane.setBorder(null);
+		this(title, new JLabel("content"));
 	}
 
-	private static final class FlatDivider extends BasicSplitPaneDivider
+	public TitledPane(String title, JComponent contentView)
 	{
-		private static final long serialVersionUID = 1L;
+		setLayout(new BorderLayout());
 
-		public FlatDivider(BasicSplitPaneUI ui)
-		{
-			super(ui);
-			super.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-		}
+		Border border = BorderFactory.createCompoundBorder(
+			BorderFactory.createEmptyBorder(2, 2, 2, 2),
+			BorderFactory.createLineBorder(Color.GRAY));
+		setBorder(border);
 
-		public void setBorder(Border b)
+		titleLabel = new JLabel(title);
+		titleLabel.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
+
+		JPanel panel = new GradientPanel();
+		panel.setLayout(new BorderLayout());
+		panel.add(titleLabel);
+
+		add(panel, BorderLayout.NORTH);
+
+		setContentView(contentView);
+	}
+
+	public void setContentView(JComponent comp)
+	{
+		add(comp, BorderLayout.CENTER);
+		validate();
+	}
+
+	public void setTitle(String title)
+	{
+		titleLabel.setText(title);
+	}
+
+	public String getTitle()
+	{
+		return titleLabel.getText();
+	}
+
+	private static final class GradientPanel extends JPanel
+	{
+		protected void paintComponent(Graphics g)
 		{
+			Rectangle bounds = getBounds();
+			int y1 = bounds.y;
+			int y2 = bounds.y + bounds.height;
+			Color c1 = new Color(240, 240, 255);
+			Color c2 = c1.darker();
+
+			Graphics2D g2 = (Graphics2D)g;
+			g2.setPaint(new GradientPaint(0, y1, c1, 0, y2, c2));
+			g2.fillRect(0, 0, getWidth(), getHeight());
 		}
 	}
 }

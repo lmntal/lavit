@@ -31,6 +31,10 @@
 			target="${java.target}" source="${java.source}" includeantruntime="false">
 			<classpath refid="classpath" />
 		</javac>
+		<!-- copy resources -->
+		<copy todir="${bin}">
+			<fileset dir="${src}" includes="**/*.png,**/*.gif,**/*.jpg" />
+		</copy>
 	</target>
 
 	<!-- Create JAR -->

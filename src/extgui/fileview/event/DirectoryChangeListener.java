@@ -33,34 +33,15 @@
  *
  */
 
-package lavit.system;
+package extgui.fileview.event;
 
-import java.awt.BorderLayout;
+import java.io.File;
+import java.util.EventListener;
 
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-
-import extgui.flatsplitpane.FlatSplitPane;
-
-@SuppressWarnings("serial")
-public class SystemPanel extends JPanel
+/**
+ * @author Yuuki.S
+ */
+public interface DirectoryChangeListener extends EventListener
 {
-	public OutputPanel outputPanel;
-	public LogPanel logPanel;
-
-	public SystemPanel(){
-		setLayout(new BorderLayout());
-
-		outputPanel = new OutputPanel();
-		logPanel = new LogPanel();
-
-		JSplitPane jsp = new FlatSplitPane();
-		jsp.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		jsp.setTopComponent(outputPanel);
-		jsp.setBottomComponent(logPanel);
-		jsp.setOneTouchExpandable(true);
-		jsp.setResizeWeight(0.7);
-
-		add(jsp, BorderLayout.CENTER);
-	}
+	public void directoryChanged(File dir);
 }

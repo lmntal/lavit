@@ -77,12 +77,15 @@ import lavit.multiedit.coloring.lexer.TokenLabel;
 import lavit.system.FileHistory;
 import lavit.util.CommonFontUser;
 import extgui.filedrop.event.FileDropListener;
+import extgui.fileview.FileViewPane;
+import extgui.fileview.event.FileSelectedListener;
 
 @SuppressWarnings("serial")
 public class EditorPanel extends JPanel implements CommonFontUser
 {
 	public EditorButtonPanel buttonPanel;
 
+	private FileViewPane fileView;
 	private TabView tabView;
 	private int hlFlags;
 	private FileDropListener fileDropListener = new FileDropAction();
@@ -96,7 +99,15 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		loadFont();
 		FrontEnd.addFontUser(this);
 
-		add(tabView, BorderLayout.CENTER);
+		fileView = new FileViewPane(tabView);
+		fileView.addFileSelectedListener(new FileSelectedListener()
+		{
+			public void fileSelected(File selectedFile)
+			{
+				openFile(selectedFile);
+			}
+		});
+		add(fileView, BorderLayout.CENTER);
 
 		buttonPanel = new EditorButtonPanel(this);
 		add(buttonPanel, BorderLayout.SOUTH);
@@ -186,6 +197,26 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	public void addTabChangeListener(TabChangeListener l)
 	{
 		tabView.addTabChangeListener(l);
+	}
+
+	public void setFileViewVisible(boolean b)
+	{
+		fileView.setFileViewVisible(b);
+	}
+
+	public boolean isFileViewVisible()
+	{
+		return fileView.isFileViewVisible();
+	}
+
+	public void setFileViewDividerLocation(int location)
+	{
+		fileView.setDividerLocation(location);
+	}
+
+	public int getFileViewDividerLocation()
+	{
+		return fileView.getDividerLocation();
 	}
 
 	/**

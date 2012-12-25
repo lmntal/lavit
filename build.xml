@@ -6,7 +6,7 @@
 	<property name="src" location="src" />
 	<property name="bin" location="bin" />
 
-	<property name="java.encoding" value="euc-jp" />
+	<property name="java.encoding" value="UTF-8" />
 	<property name="java.target" value="1.6" />
 	<property name="java.source" value="1.6" />
 

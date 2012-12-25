@@ -1,70 +1,70 @@
 ||||
-|version2.6.1 | 2012/11/23 | LTL�p�l���̓��e���J���Ă���t�@�C���Ɠ�������悤�ɂ��A�s��C���B�ŋߊJ�����t�@�C���������B�I�[�g�C���f���g������C���B�t�@�C���h���b�v�ŊJ���@�\�������B�A�N�Z�����[�^�L�[�̐ݒ��Mac���l���ɓ����悤�C���B�t�@�C���V�X�e���r���[�����B|
-|version2.6.0 | 2012/10/26 | �����ݒ�_�C�A���O�̕s��C���B�I�v�V�����p�l���ɕ\������I�v�V������env.txt�Ŏw��\�ɁB�A�v���P�[�V�����A�C�R���ύX�BUNYO�̕����N�����\�ɁB�N�����ɑO��J���Ă����t�@�C�����J���悤�ɂ����B���t�@�N�^�����O�B|
+|version2.6.1 | 2012/11/23 | LTLパネルの内容を開いているファイルと同期するようにし、不具合修正。最近開いたファイルを実装。オートインデント周りを修正。ファイルドロップで開く機能を実装。アクセラレータキーの設定をMacを考慮に入れるよう修正。ファイルシステムビュー実装。|
+|version2.6.0 | 2012/10/26 | 初期設定ダイアログの不具合修正。オプションパネルに表示するオプションをenv.txtで指定可能に。アプリケーションアイコン変更。UNYOの複数起動が可能に。起動時に前回開いていたファイルを開くようにした。リファクタリング。|
 ||||
-|version2.5.4 | 2012/10/21 | �ݒ�_�C�A���O�̃f�U�C���ύX�BSLIM�C���X�g�[���[������C���A���O�o�͒ǉ��BSLIM��lmntal�̃o�[�W�����擾�𓮓I�ȕ��@�ɕύX�B�I�����Ƀt�@�C���ۑ��𕷂��_�C�A���O�����[�v����s����C���BSLIM��lmntal���A�b�v�f�[�g�B|
-|version2.5.3 | 2012/08/10 | �s�ԍ��G���A���ϕ��ɂ��ďȃX�y�[�X���B�n�C���C�g�Ώۂ̃L�[���[�h���O�����BUI�t�H���g�T�C�Y�̒��ߋ@�\�����B�ݒ��ʎ�������t�@�N�^�����O�Blmntal��1.21�ɃA�b�v�f�[�g�B|
-|version2.5.2 | 2012/05/18 | SLIM �� Version 2.2.2 �ɃA�b�v�f�[�g�B�y���ȃo�O�C���B |
-|version2.5.1 | 2012/04/10 | ����{�^���̕s��C���B�^�u�����E���s�����̕\����؂�ւ��\�ɁB |
-|version2.5.0 | 2012/04/03 | �^�u���ӂ�UI�����B���Ԗ��ߗ�̎��s��ǉ��B�ׂ��������̃��t�@�N�^�����O�A�o�O�C���B |
+|version2.5.4 | 2012/10/21 | 設定ダイアログのデザイン変更。SLIMインストーラー周りを修正、ログ出力追加。SLIMとlmntalのバージョン取得を動的な方法に変更。終了時にファイル保存を聞くダイアログがループする不具合を修正。SLIMとlmntalをアップデート。|
+|version2.5.3 | 2012/08/10 | 行番号エリアを可変幅にして省スペース化。ハイライト対象のキーワードを外部化。UIフォントサイズの調節機能実装。設定画面周りをリファクタリング。lmntalを1.21にアップデート。|
+|version2.5.2 | 2012/05/18 | SLIM を Version 2.2.2 にアップデート。軽微なバグ修正。 |
+|version2.5.1 | 2012/04/10 | 閉じるボタンの不具合修正。タブ文字・改行文字の表示を切り替え可能に。 |
+|version2.5.0 | 2012/04/03 | タブ周辺のUI整備。中間命令列の実行を追加。細かい部分のリファクタリング、バグ修正。 |
 ||||
-|version2.4.5 | 2011/12/16 | �G�f�B�^�����̎�����啝�ɕύX�B |
-|version2.4.4 | 2011/08/08 | slim��lmntal���A�b�v�f�[�g�B |
-|version2.4.3 | 2011/03/24 | slim��lmntal���A�b�v�f�[�g�B |
-|version2.4.2 | 2011/01/18 | 3D�@�\��YZ��]�@�\�̒ǉ��B2DStateViewer�ɃA���`�G�C���A�X�@�\�̒ǉ��B |
-|version2.4.1 | 2011/01/13 | 3D�@�\�Ɏ������C�A�E�g�@�\�̒ǉ��BSLIM�̃o�[�W�������A�b�v�B |
-|version2.4.0 | 2011/01/12 | StateViewer��3D�@�\��ǉ�(�vjava3D)�B |
+|version2.4.5 | 2011/12/16 | エディタ部分の実装を大幅に変更。 |
+|version2.4.4 | 2011/08/08 | slimとlmntalをアップデート。 |
+|version2.4.3 | 2011/03/24 | slimとlmntalをアップデート。 |
+|version2.4.2 | 2011/01/18 | 3D機能にYZ回転機能の追加。2DStateViewerにアンチエイリアス機能の追加。 |
+|version2.4.1 | 2011/01/13 | 3D機能に自動レイアウト機能の追加。SLIMのバージョンをアップ。 |
+|version2.4.0 | 2011/01/12 | StateViewerに3D機能を追加(要java3D)。 |
 ||||
-|version2.3.1 | 2010/12/07 | �b��I��SLIM2.0.7�ɑΉ��BSTART UP ABSTRACTION�̋@�\��ǉ��B |
-|version2.3.0 | 2010/10/26 | StateViewer�ɃV�~�����[�V�����@�\��ǉ��BDraw Mode�I���@�\�̒ǉ��BReset�Ńf�b�h���b�N����o�O���C���B |
+|version2.3.1 | 2010/12/07 | 暫定的にSLIM2.0.7に対応。START UP ABSTRACTIONの機能を追加。 |
+|version2.3.0 | 2010/10/26 | StateViewerにシミュレーション機能を追加。Draw Mode選択機能の追加。Resetでデッドロックするバグを修正。 |
 ||||
-|version2.2.1 | 2010/10/19 | StateViewer��StartReset�@�\�ASimpleMode�ݒ��ǉ��B�������o�O���C���B |
-|version2.2.0 | 2010/10/14 | �傫��StateViewer���C���B���샌�C�A�E�g�̕ύX�B�������B |
+|version2.2.1 | 2010/10/19 | StateViewerにStartReset機能、SimpleMode設定を追加。いくつかバグを修正。 |
+|version2.2.0 | 2010/10/14 | 大きくStateViewerを修正。操作レイアウトの変更。高速化。 |
 ||||
-|version2.1.1 | 2010/07/12 | auto adjust�@�\�̒ǉ��B�ׂ����o�O�̏C���B |
-|version2.1.0 | 2010/06/10 | ���ۉ��@�\�̒ǉ��B�S�̓I�ȍ������B |
+|version2.1.1 | 2010/07/12 | auto adjust機能の追加。細かいバグの修正。 |
+|version2.1.0 | 2010/06/10 | 抽象化機能の追加。全体的な高速化。 |
 ||||
-|version2.0.0 | 2010/05/25 | �����n�̖��O��LMNtalEditor����LaViT�ɕύX�B |
+|version2.0.0 | 2010/05/25 | 処理系の名前をLMNtalEditorからLaViTに変更。 |
 ||||
-|version1.3.5 | 2010/04/22 | �󗝃T�C�N���𕪂���₷������Adjust(Find) Reset�@�\�ASearch Short Cycle�@�\��ǉ��B|
-|version1.3.4 | 2010/04/13 | �V����Cygwin�ɑΉ��BUYNO�̐V�o�[�W�����ɑΉ��Benv.txt�̕⊮�@�\�ǉ��B|
-|version1.3.3 | 2010/01/29 | ��ԒT���󋵂̕\���@�\��MC Profiler��V����StateProfiler�Ƃ��ĕ����B|
-|version1.3.2 | 2009/12/24 | StateViewer�ɐ[�������@�\��ǉ��BSLIM�̃C���X�g�[�����@�̓����ύX�B|
-|version1.3.1 | 2009/12/13 | LTL2BA�̎����𓀋@�\��ǉ��B|
-|version1.3.0 | 2009/12/06 | State Viewer�ɓK�p���[�����̕\���@�\�̒ǉ��B���[�����ł̌����@�\�ǉ��B|
+|version1.3.5 | 2010/04/22 | 受理サイクルを分かりやすくするAdjust(Find) Reset機能、Search Short Cycle機能を追加。|
+|version1.3.4 | 2010/04/13 | 新しいCygwinに対応。UYNOの新バージョンに対応。env.txtの補完機能追加。|
+|version1.3.3 | 2010/01/29 | 状態探索状況の表示機能のMC Profilerを新たにStateProfilerとして復活。|
+|version1.3.2 | 2009/12/24 | StateViewerに深さ制限機能を追加。SLIMのインストール方法の内部変更。|
+|version1.3.1 | 2009/12/13 | LTL2BAの自動解凍機能を追加。|
+|version1.3.0 | 2009/12/06 | State Viewerに適用ルール名の表示機能の追加。ルール名での検索機能追加。|
 ||||
-|version1.2.2 | 2009/11/23 | LMNtal�����n�ASLIM�̐V�o�[�W�����ɑΉ��B�N���I�v�V����--stateviewer��ǉ��B|
-|version1.2.1 | 2009/10/20 | State Viewer�̃Y�[����0.01%�`400%�܂Ŋg���B�͊w���f���̒��߂ł���p�����[�^�̑����B|
-|version1.2.0 | 2009/10/07 | State Viewer�Ɉ�`�I�A���S���Y���A�͊w���f���𓱓��B|
+|version1.2.2 | 2009/11/23 | LMNtal処理系、SLIMの新バージョンに対応。起動オプション--stateviewerを追加。|
+|version1.2.1 | 2009/10/20 | State Viewerのズームを0.01%〜400%まで拡張。力学モデルの調節できるパラメータの増加。|
+|version1.2.0 | 2009/10/07 | State Viewerに遺伝的アルゴリズム、力学モデルを導入。|
 ||||
-|version1.1.6 | 2009/09/28 | State Viewer��SLIM����̏�ԑJ�ڃO���t�̕ۑ��A�ǂݍ��݂��\�ɁB|
-|version1.1.5 | 2009/08/31 | SLIM�̃o�[�W�������A�b�v�BUNYO���N���ł��Ȃ��o�O���C���B|
-|version1.1.4 | 2009/08/16 | SLIM�̃o�[�W�������A�b�v�BLTL�̃I�v�V�����ύX���\�ɁB|
-|version1.1.3 | 2009/08/14 | SLIM�̃o�[�W�������A�b�v�B����ɔ���StateViewer���ύX�B|
-|version1.1.2 | 2009/06/11 | LMNtal�R���p�C���ASLIM�̃o�[�W�������A�b�v�BLMNtal Editor�̃������g�p�ʕύX�@�\��ǉ��BState Viewer�̓���m�[�h�̏�ԑJ�ڋ����@�\��ǉ��B|
-|version1.1.1 | 2009/05/21 | State Viewer�̃o�O���C���B�m�[�h�Ԃ̋������l�߂邱�Ƃ��ł���@�\��ǉ��B|
-|version1.1.0 | 2009/05/18 | State Viewer�Ƀ_�~�[�m�[�h�@�\�A�������팸�@�\��ǉ��B��Ԑ��Ȃǂ̏��̕\���ʒu���ύX�B|
+|version1.1.6 | 2009/09/28 | State ViewerでSLIMからの状態遷移グラフの保存、読み込みを可能に。|
+|version1.1.5 | 2009/08/31 | SLIMのバージョンをアップ。UNYOが起動できないバグを修正。|
+|version1.1.4 | 2009/08/16 | SLIMのバージョンをアップ。LTLのオプション変更を可能に。|
+|version1.1.3 | 2009/08/14 | SLIMのバージョンをアップ。それに伴いStateViewerも変更。|
+|version1.1.2 | 2009/06/11 | LMNtalコンパイラ、SLIMのバージョンをアップ。LMNtal Editorのメモリ使用量変更機能を追加。State Viewerの特定ノードの状態遷移強調機能を追加。|
+|version1.1.1 | 2009/05/21 | State Viewerのバグを修正。ノード間の距離を詰めることができる機能を追加。|
+|version1.1.0 | 2009/05/18 | State Viewerにダミーノード機能、交差数削減機能を追加。状態数などの情報の表示位置も変更。|
 ||||
-|version1.0.3 | 2009/04/16 | State Viewer�̃��Z�b�g�@�\�̋����Bunyo0.5.3�ɑΉ��Bunyo�p�I�v�V�����w��p�l����V�݁B|
-|version1.0.2 | 2009/03/09 | �o�͐����@�\�̒ǉ��B�ꕔ�@�\�̃f�o�b�O�B|
-|version1.0.1 | 2009/02/13 | POR���܂�StateViewer���\��|
-|version1.0.0 | 2009/01/19 | �ׂ����o�O���C�����ă��f�������������Ƃ��Ċ���|
+|version1.0.3 | 2009/04/16 | State Viewerのリセット機能の強化。unyo0.5.3に対応。unyo用オプション指定パネルを新設。|
+|version1.0.2 | 2009/03/09 | 出力制限機能の追加。一部機能のデバッグ。|
+|version1.0.1 | 2009/02/13 | PORを含んだStateViewerを可能に|
+|version1.0.0 | 2009/01/19 | 細かいバグを修正してモデル検査統合環境として完成|
 ||||
-|version0.9.7 | 2008/12/30 | LTL�̃V�X�e���L�q�̕ύX�ɑΉ�����LTL�^�u��V�݁B|
-|version0.9.6 | 2008/12/25 | LTL��STATEVIEWER�̎����B�C���X�g�[���̉��P�B|
-|version0.9.5 | 2008/12/20 | UNYO UNYO 3G�𐧌������ŋN���ł���悤�ɁBState Viewer�̃X�P�[���r���e�B�̑啝����Badjust reset������ɉ��ǁB|
-|version0.9.4 | 2008/12/12 | SLIM�̃C���X�g�[����ǉ��Badjust reset�����ǁB|
-|version0.9.3 | 2008/12/09 | State Viewer�iadjust reset,group move,�����@�\�̌��Ղ�����,�O���t�`�ʂɏ���,�L�[�{�[�h�Ή��j�̉��ǁB�G�f�B�^�̃t�@�C���̈�������ύX�Bslimcode�t�@�C���̍팸�B|
-|version0.9.2 | 2008/11/24 | MC Profiler��ǉ��BState Viewer�̏�Ԃ̃_�u���N���b�N�ŕʃE�B���h�E�N���B|
-|version0.9.1 | 2008/11/11 | STATEVIEWER�Ō����@�\��ǉ��BLook&Feel,�^�u�̑傫���̕ύX���\�ɁB�I�[�g�C���f���g�@�\�ǉ��B|
-|version0.9.0 | 2008/11/06 | �̈���Q�������c�[�����^�u�Ő؂�ւ�����悤�ɉ��ǁB�E�N���b�N���ł���ȂǑ啝��STATEVIEWER��ύX�B|
+|version0.9.7 | 2008/12/30 | LTLのシステム記述の変更に対応してLTLタブを新設。|
+|version0.9.6 | 2008/12/25 | LTLのSTATEVIEWERの実装。インストーラの改善。|
+|version0.9.5 | 2008/12/20 | UNYO UNYO 3Gを制限無しで起動できるように。State Viewerのスケーラビリティの大幅向上。adjust resetをさらに改良。|
+|version0.9.4 | 2008/12/12 | SLIMのインストーラを追加。adjust resetを改良。|
+|version0.9.3 | 2008/12/09 | State Viewer（adjust reset,group move,検索機能の見易さ向上,グラフ描写に順位,キーボード対応）の改良。エディタのファイルの扱い方を変更。slimcodeファイルの削減。|
+|version0.9.2 | 2008/11/24 | MC Profilerを追加。State Viewerの状態のダブルクリックで別ウィンドウ起動。|
+|version0.9.1 | 2008/11/11 | STATEVIEWERで検索機能を追加。Look&Feel,タブの大きさの変更を可能に。オートインデント機能追加。|
+|version0.9.0 | 2008/11/06 | 領域を２分割しツールをタブで切り替えられるように改良。右クリックができるなど大幅にSTATEVIEWERを変更。|
 ||||
-|version0.8.2 | 2008/10/18 | slim0.4.0�ɕύX�BDot�t�@�C���̐��������ǁB|
-|version0.8.1 | 2008/10/11 | RedoUndo�̃o�O�̏����BDot�t�@�C���̐����BSTATEVIEWER�̏�ԕ\�����@�̕ύX�B|
-|version0.8.0 | 2008/10/01 | �v�]��������A���K�Ɏg����悤�ɗl�X�ȍׂ����������C���B�v���O�����̐F�t�����J�n�B|
+|version0.8.2 | 2008/10/18 | slim0.4.0に変更。Dotファイルの生成を改良。|
+|version0.8.1 | 2008/10/11 | RedoUndoのバグの除去。Dotファイルの生成。STATEVIEWERの状態表示方法の変更。|
+|version0.8.0 | 2008/10/01 | 要望を取り入れ、快適に使えるように様々な細かい部分を修正。プログラムの色付けも開始。|
 ||||
-|version0.7.4 | 2008/09/05 | �����_�ł͐VUNYO�̃p�l���\����p�~�B�\�[�X���`�F�b�N����wCHECK�x�{�^���V�݁B�������o�O�o���B|
-|version0.7.3 | 2008/08/23 | io�Ȃǂ̃��C�u�������g�p���ł���悤�ɉ���|
-|version0.7.2 | 2008/08/01 | �t�@�C���I���̏����f�B���N�g����demo�ɂȂ�悤�ɉ���|
-|version0.7.1 | 2008/08/01 | slim�̃p�X��ύX�\�ɉ���|
-|version0.7.0 | 2008/07/23 | LMNtalEditor�����t�����J�J�n|
+|version0.7.4 | 2008/09/05 | 現時点では新UNYOのパネル表示を廃止。ソースをチェックする『CHECK』ボタン新設。もろもろバグ出し。|
+|version0.7.3 | 2008/08/23 | ioなどのライブラリが使用をできるように改良|
+|version0.7.2 | 2008/08/01 | ファイル選択の初期ディレクトリをdemoになるように改良|
+|version0.7.1 | 2008/08/01 | slimのパスを変更可能に改良|
+|version0.7.0 | 2008/07/23 | LMNtalEditor制限付き公開開始|

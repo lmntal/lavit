@@ -290,7 +290,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		iILJavaRun.setMnemonic(KeyEvent.VK_I);
 
 		/*
-		iILSlimRun = new JMenuItem("Ãæ´ÖÌ¿ÎáÎó¤òSLIM¤Ç¼Â¹Ô(M)");
+		iILSlimRun = new JMenuItem("ä¸­é–“å‘½ä»¤åˆ—ã‚’SLIMã§å®Ÿè¡Œ(M)");
 		run.add(iILSlimRun);
 		iILSlimRun.addActionListener(new ActionListener()
 		{

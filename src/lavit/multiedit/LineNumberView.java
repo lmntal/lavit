@@ -57,8 +57,8 @@ import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 
 /**
- * <p>¹ÔÈÖ¹æ¤òÉ½¼¨¤¹¤ë¥³¥ó¥İ¡¼¥Í¥ó¥È¡£</p>
- * <p>{@code JTextComponent} ¤ò´Æ»ë¤·¡¢¹Ô¤Ë´Ø¤¹¤ë¾ğÊó¤òÉ½¼¨¤·¤Ş¤¹¡£</p>
+ * <p>è¡Œç•ªå·ã‚’è¡¨ç¤ºã™ã‚‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã€‚</p>
+ * <p>{@code JTextComponent} ã‚’ç›£è¦–ã—ã€è¡Œã«é–¢ã™ã‚‹æƒ…å ±ã‚’è¡¨ç¤ºã—ã¾ã™ã€‚</p>
  * @since  December 2, 2011
  * @author Yuuki SHINOBU
  */
@@ -77,12 +77,12 @@ public class LineNumberView extends JComponent
 	private int lineHeight;
 
 	/**
-	 * <p>ÀßÄê¤µ¤ì¤¿¥Õ¥©¥ó¥È¤Ë¤ª¤±¤ë¿ô»ú¤ÎºÇÂçÉı¤òÊİ»ı¤·¤Ş¤¹¡£</p>
+	 * <p>è¨­å®šã•ã‚ŒãŸãƒ•ã‚©ãƒ³ãƒˆã«ãŠã‘ã‚‹æ•°å­—ã®æœ€å¤§å¹…ã‚’ä¿æŒã—ã¾ã™ã€‚</p>
 	 */
 	private int digitWidth;
 
 	/**
-	 * <p>¥Æ¥­¥¹¥È¤ÎºÇÂç¹Ô¿ô¤Î·å¿ô¤òÊİ»ı¤·¤Ş¤¹¡£</p>
+	 * <p>ãƒ†ã‚­ã‚¹ãƒˆã®æœ€å¤§è¡Œæ•°ã®æ¡æ•°ã‚’ä¿æŒã—ã¾ã™ã€‚</p>
 	 */
 	private int digitCount;
 

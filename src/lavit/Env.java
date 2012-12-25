@@ -100,7 +100,7 @@ public final class Env
 	{
 		env = this;
 
-		//¥Õ¥¡¥¤¥ë¤ÎºîÀ®
+		//ãƒ•ã‚¡ã‚¤ãƒ«ã®ä½œæˆ
 		boolean firstMake = false;
 		try
 		{
@@ -118,7 +118,7 @@ public final class Env
 			System.exit(0);
 		}
 
-		//¥Õ¥¡¥¤¥ë¤ÎÆÉ¤ß¹ş¤ß
+		//ãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿
 		try
 		{
 			InputStream in = getInputStreamOfFile(ENV_FILE);
@@ -131,7 +131,7 @@ public final class Env
 			System.exit(0);
 		}
 
-		//¥Ğ¡¼¥¸¥ç¥ó¥¢¥Ã¥×¤Î½èÍı¡ÊÀßÄêÃÍ¤¬¤Ê¤¤¾ì¹ç¤Ï¤½¤ÎÃÍ¤òÆş¤ì¤ë¡Ë
+		//ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚¢ãƒƒãƒ—ã®å‡¦ç†ï¼ˆè¨­å®šå€¤ãŒãªã„å ´åˆã¯ãã®å€¤ã‚’å…¥ã‚Œã‚‹ï¼‰
 		Properties default_prop = new Properties();
 		try
 		{
@@ -162,12 +162,12 @@ public final class Env
 	{
 		try
 		{
-			//ÉáÄÌ¤ËÊİÂ¸
+			//æ™®é€šã«ä¿å­˜
 			FileOutputStream out = new FileOutputStream(ENV_FILE);
 			prop.store(out, APP_NAME + " " + APP_VERSION);
 			out.close();
 
-			//¥½¡¼¥È¤ÇºÆÊİÂ¸
+			//ã‚½ãƒ¼ãƒˆã§å†ä¿å­˜
 			LineNumberReader reader = new LineNumberReader(new FileReader(ENV_FILE));
 			ArrayList<String> lines = new ArrayList<String>();
 			String line = null;
@@ -280,8 +280,8 @@ public final class Env
 	}
 
 	/**
-	 * Ê¸»úÎó {@code path} ¤ËÈ¾³Ñ¶õÇòÊ¸»ú (0x20) ¤¬´Ş¤Ş¤ì¤ë¾ì¹ç¡¢¤³¤ÎÊ¸»úÎó¤òÆó½Å°úÍÑÉä¤Ç°Ï¤ó¤ÀÊ¸»úÎó¤òÊÖ¤¹¡£
-	 * È¾³Ñ¶õÇòÊ¸»ú¤¬´Ş¤Ş¤ì¤Ê¤¤¾ì¹ç¡¢{@code path} ¤ò¤½¤Î¤Ş¤ŞÊÖ¤¹¡£
+	 * æ–‡å­—åˆ— {@code path} ã«åŠè§’ç©ºç™½æ–‡å­— (0x20) ãŒå«ã¾ã‚Œã‚‹å ´åˆã€ã“ã®æ–‡å­—åˆ—ã‚’äºŒé‡å¼•ç”¨ç¬¦ã§å›²ã‚“ã æ–‡å­—åˆ—ã‚’è¿”ã™ã€‚
+	 * åŠè§’ç©ºç™½æ–‡å­—ãŒå«ã¾ã‚Œãªã„å ´åˆã€{@code path} ã‚’ãã®ã¾ã¾è¿”ã™ã€‚
 	 */
 	public static String getSpaceEscape(String path)
 	{
@@ -419,7 +419,7 @@ public final class Env
 		prop.setProperty(key, String.valueOf(value));
 	}
 
-	// jar¥Õ¥¡¥¤¥ë²½¤·¤¿¾ì¹ç¤Î¥Õ¥¡¥¤¥ëÆşÎÏ¤Îº¹¤òµÛ¼ı
+	// jarãƒ•ã‚¡ã‚¤ãƒ«åŒ–ã—ãŸå ´åˆã®ãƒ•ã‚¡ã‚¤ãƒ«å…¥åŠ›ã®å·®ã‚’å¸å
 	public static InputStream getInputStreamOfFile(String filename)
 	{
 		InputStream in = null;
@@ -441,7 +441,7 @@ public final class Env
 		return in;
 	}
 
-	// jar¥Õ¥¡¥¤¥ë²½¤·¤¿¾ì¹ç¤Î¥Õ¥¡¥¤¥ëÆşÎÏ¤Îº¹¤òµÛ¼ı
+	// jarãƒ•ã‚¡ã‚¤ãƒ«åŒ–ã—ãŸå ´åˆã®ãƒ•ã‚¡ã‚¤ãƒ«å…¥åŠ›ã®å·®ã‚’å¸å
 	public static Image getImageOfFile(String filename)
 	{
 		if (FileUtils.exists(filename))

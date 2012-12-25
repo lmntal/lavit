@@ -149,14 +149,14 @@ public class StateNodeSet {
 		// cycle parse
 		if(!Env.is("SLIM2")){
 			if(ltlMode){
-				// cycleÃµ¤·
+				// cycleæ¢ã—
 				for(;line<strs.length;++line){
 					if(strs[line].equals(cycleMarkString)) break;
 					if(strs[line].equals(cycleEndMarkString)) break;
 				}
-				if(line>=strs.length) return false; //¥¨¥é¡¼
+				if(line>=strs.length) return false; //ã‚¨ãƒ©ãƒ¼
 
-				// cycle²òÀÏ
+				// cycleè§£æ
 				for(line++;line<strs.length;++line){
 					String ss[] = strs[line].split(":",3);
 					if(ss.length<3){ break; }
@@ -169,13 +169,13 @@ public class StateNodeSet {
 			}
 		}
 
-		// StatesÃµ¤·
+		// Statesæ¢ã—
 		for(;line<strs.length;++line){
 			if(strs[line].equals(stateMarkString)) break;
 		}
-		if(line>=strs.length) return false; //¥¨¥é¡¼
+		if(line>=strs.length) return false; //ã‚¨ãƒ©ãƒ¼
 
-		// States²òÀÏ
+		// Statesè§£æ
 		for(line++;line<strs.length;++line){
 			String ss[] = strs[line].split("::",2);
 			if(ss.length<2){ break; }
@@ -186,23 +186,23 @@ public class StateNodeSet {
 		}
 
 
-		// TransitionsÃµ¤·
+		// Transitionsæ¢ã—
 		for(;line<strs.length;++line){
 			if(strs[line].equals(graphMarkString)) break;
 		}
-		if(line>=strs.length) return false; //¥¨¥é¡¼
+		if(line>=strs.length) return false; //ã‚¨ãƒ©ãƒ¼
 
-		// init²òÀÏ
+		// initè§£æ
 		line++;
 		if(strs[line].startsWith(initStartMarkString)){
 			init = getIdFromMemString(strs[line].substring(initStartMarkString.length()));
 			StateNode node = getNodeInMaking(init);
 			startNode.add(node);
 		}else{
-			return false; //¥¨¥é¡¼
+			return false; //ã‚¨ãƒ©ãƒ¼
 		}
 
-		// Transitions²òÀÏ
+		// Transitionsè§£æ
 		for(line++;line<strs.length;++line){
 			String ss[] = strs[line].split("::",2);
 			if(ss.length<2){ break; }
@@ -246,13 +246,13 @@ public class StateNodeSet {
 
 		// Labels
 		if(ltlMode){
-			// LabelsÃµ¤·
+			// Labelsæ¢ã—
 			for(;line<strs.length;++line){
 				if(strs[line].equals(labelMarkString)) break;
 			}
-			if(line>=strs.length) return false; //¥¨¥é¡¼
+			if(line>=strs.length) return false; //ã‚¨ãƒ©ãƒ¼
 
-			// Label²òÀÏ
+			// Labelè§£æ
 			for(line++;line<strs.length;++line){
 				String ss[] = strs[line].split("::",2);
 				if(ss.length<2){ break; }
@@ -268,14 +268,14 @@ public class StateNodeSet {
 
 		if(Env.is("SLIM2")){
 			if(ltlMode){
-				// cycleÃµ¤·
+				// cycleæ¢ã—
 				for(;line<strs.length;++line){
 					if(strs[line].equals(pathsMarkString)) break;
 				}
 				if(line<strs.length){
 					HashMap<Long,ArrayList<Long>> paths = new HashMap<Long,ArrayList<Long>>();
 
-					// CounterExamplePaths²òÀÏ
+					// CounterExamplePathsè§£æ
 					for(line++;line<strs.length;++line){
 						String ss[] = strs[line].split("::",2);
 						if(ss.length<2){ break; }
@@ -289,7 +289,7 @@ public class StateNodeSet {
 						paths.put(id, ids);
 					}
 
-					//cycle²½
+					//cycleåŒ–
 					StateNode node = getNodeInMaking(init);
 					while(!cycleNode.contains(node)){
 						node.cycle = true;
@@ -303,23 +303,23 @@ public class StateNodeSet {
 			}
 		}
 
-		//parse½ªÎ»
+		//parseçµ‚äº†
 
-		//endNode¤ÎÅĞÏ¿
+		//endNodeã®ç™»éŒ²
 		for(StateNode node : allNode.values()){
 			if(node.getToTransitions().size()==0){
 				endNode.add(node);
 			}
 		}
 
-		//cycle transition¤ÎÅĞÏ¿
+		//cycle transitionã®ç™»éŒ²
 		for(int i=0;i<cycleNode.size()-1;++i){
 			StateNode from = cycleNode.get(i);
 			StateNode to = cycleNode.get(i+1);
 			StateTransition t = from.getToTransition(to);
 			t.cycle = true;
 		}
-		//cycle¤Î¥ë¡¼¥×¤ÎÌá¤ê¤òÃµ¤¹
+		//cycleã®ãƒ«ãƒ¼ãƒ—ã®æˆ»ã‚Šã‚’æ¢ã™
 		if(cycleNode.size()>0){
 			StateNode end = cycleNode.get(cycleNode.size()-1);
 			for(int i = cycleNode.size()-2;i>=0;i--){
@@ -350,14 +350,14 @@ public class StateNodeSet {
 
 		StateNode loopStartNode = cycleNode.get(cycleNode.size()-1).getToCycleNode();
 
-		//loopÉô¤ÈstraightÉô¤Ë¤ï¤±¤ë
+		//loopéƒ¨ã¨straightéƒ¨ã«ã‚ã‘ã‚‹
 		ArrayList<StateNode> cycleStraightNode =  new ArrayList<StateNode>();
 		ArrayList<StateNode> cycleLoopNode =  new ArrayList<StateNode>();
 		if(loopStartNode==null){
 			for(int i=0;i<cycleNode.size()-1;++i){
 				cycleStraightNode.add(cycleNode.get(i));
 			}
-			//ºÇ¸å¤Î¥Î¡¼¥É¤À¤±¥ë¡¼¥×¤ËÆş¤ì¤ë
+			//æœ€å¾Œã®ãƒãƒ¼ãƒ‰ã ã‘ãƒ«ãƒ¼ãƒ—ã«å…¥ã‚Œã‚‹
 			cycleLoopNode.add(cycleNode.get(cycleNode.size()-1));
 		}else{
 			boolean onLoop = false;
@@ -375,7 +375,7 @@ public class StateNodeSet {
 			}
 		}
 
-		//cycle¤Î¥ê¥»¥Ã¥È
+		//cycleã®ãƒªã‚»ãƒƒãƒˆ
 		for(StateTransition t : getAllTransition()){
 			t.cycle = false;
 		}
@@ -385,13 +385,13 @@ public class StateNodeSet {
 		cycleNode.clear();
 
 
-		//¹½ÃÛ
+		//æ§‹ç¯‰
 		ArrayList<StateNode> newCycleStraightNode =  new ArrayList<StateNode>();
 		ArrayList<StateNode> newCycleLoopNode =  new ArrayList<StateNode>();
 
-		//Ä¾ÀşÉô¤Î¹½ÃÛ
+		//ç›´ç·šéƒ¨ã®æ§‹ç¯‰
 		{
-			//¥µ¥¤¥¯¥ëÃæ¤«¤é°ìÈÖ¿¼¤µ¤¬¾®¤µ¤¤Êª¤òÃµ¤¹
+			//ã‚µã‚¤ã‚¯ãƒ«ä¸­ã‹ã‚‰ä¸€ç•ªæ·±ã•ãŒå°ã•ã„ç‰©ã‚’æ¢ã™
 			StateNode node = null;
 			int minDepth = Integer.MAX_VALUE;
 			for(StateNode n : cycleLoopNode){
@@ -401,23 +401,23 @@ public class StateNodeSet {
 				}
 			}
 
-			//Æş¸ı¤Î¹¹¿·
+			//å…¥å£ã®æ›´æ–°
 			if(loopStartNode!=null){
 				loopStartNode = node;
 			}
 
-			//°ìÈÖ¿¼¤µ¤¬¾®¤µ¤¤¤â¤Î¤«¤éºÇÃ»¤ò¥µ¥¤¥¯¥ë¤ËÆş¤ì¤ë
+			//ä¸€ç•ªæ·±ã•ãŒå°ã•ã„ã‚‚ã®ã‹ã‚‰æœ€çŸ­ã‚’ã‚µã‚¤ã‚¯ãƒ«ã«å…¥ã‚Œã‚‹
 			while((node = node.getFromNearNode())!=null){
 				newCycleStraightNode.add(node);
 			}
 			Collections.reverse(newCycleStraightNode);
 		}
 
-		//¥ë¡¼¥×Éô¤Î¹½ÃÛ
+		//ãƒ«ãƒ¼ãƒ—éƒ¨ã®æ§‹ç¯‰
 		if(loopStartNode==null){
 			newCycleLoopNode.add(cycleLoopNode.get(0));
 		}else{
-			//¥ë¡¼¥×¤Î³«»Ï¥Î¡¼¥É¤«¤é¤Î°ì¼ş¤Ë¤¹¤ë
+			//ãƒ«ãƒ¼ãƒ—ã®é–‹å§‹ãƒãƒ¼ãƒ‰ã‹ã‚‰ã®ä¸€å‘¨ã«ã™ã‚‹
 			int start;
 			for(start = 0;start<cycleLoopNode.size();++start){
 				if(cycleLoopNode.get(start)==loopStartNode){
@@ -433,7 +433,7 @@ public class StateNodeSet {
 		}
 
 
-		//cycle²½
+		//cycleåŒ–
 		for(StateNode node : newCycleStraightNode){
 			node.cycle = true;
 			cycleNode.add(node);
@@ -443,14 +443,14 @@ public class StateNodeSet {
 			cycleNode.add(node);
 		}
 
-		//cycle transition¤ÎÅĞÏ¿
+		//cycle transitionã®ç™»éŒ²
 		for(int i=0;i<cycleNode.size()-1;++i){
 			StateNode from = cycleNode.get(i);
 			StateNode to = cycleNode.get(i+1);
 			StateTransition t = from.getToTransition(to);
 			t.cycle = true;
 		}
-		//cycle¤Î¥ë¡¼¥×¤ÎÌá¤ê¤òÃµ¤¹
+		//cycleã®ãƒ«ãƒ¼ãƒ—ã®æˆ»ã‚Šã‚’æ¢ã™
 		if(cycleNode.size()>0){
 			StateNode end = cycleNode.get(cycleNode.size()-1);
 			for(int i = cycleNode.size()-2;i>=0;i--){
@@ -466,23 +466,23 @@ public class StateNodeSet {
 
 	public void setSubNode(Collection<StateNode> nodes, Collection<StateTransition> allTrans, Collection<StateTransition> outTrans){
 
-		//node¤ÎÅĞÏ¿
+		//nodeã®ç™»éŒ²
 		for(StateNode node : nodes){
 			addNode(node);
 			node.parentSet = this;
 		}
 
-		//allTransition¤ÎÅĞÏ¿
+		//allTransitionã®ç™»éŒ²
 		for(StateTransition trans : allTrans){
 			allTransition.add(trans);
 		}
 
-		//outTransition¤ÎÅĞÏ¿
+		//outTransitionã®ç™»éŒ²
 		for(StateTransition trans : outTrans){
 			outTransition.add(trans);
 		}
 
-		//startNode ¤È endNode¤ÎÅĞÏ¿
+		//startNode ã¨ endNodeã®ç™»éŒ²
 		for(StateNode node : nodes){
 			if(node.getFromNodes().size()==0){
 				startNode.add(node);
@@ -492,7 +492,7 @@ public class StateNodeSet {
 			}
 		}
 
-		//startNode¤¬¤Ê¤¤¾ì¹ç¤Ï¿¼¤µ¤Ç·è¤á¤ë
+		//startNodeãŒãªã„å ´åˆã¯æ·±ã•ã§æ±ºã‚ã‚‹
 		if(startNode.size()==0){
 			StateNode minNode = null;
 			for(StateNode node : nodes){
@@ -504,7 +504,7 @@ public class StateNodeSet {
 			startNode.add(minNode);
 		}
 
-		//startNode¤«¤éÁ´¤ÆÁ«°Ü¤Ç¤­¤ë¤«¥Á¥§¥Ã¥¯
+		//startNodeã‹ã‚‰å…¨ã¦é·ç§»ã§ãã‚‹ã‹ãƒã‚§ãƒƒã‚¯
 		ArrayList<StateNode> aN = new ArrayList<StateNode>(getAllNode());
 		while(aN.size()>0){
 			LinkedList<StateNode> queue = new LinkedList<StateNode>();
@@ -547,7 +547,7 @@ public class StateNodeSet {
 		updateNodeLooks();
 
 		/*
-		//Ãê¾İ²½¾õÂÖ¤Ø¤Îtransition¤Ïºï½ü
+		//æŠ½è±¡åŒ–çŠ¶æ…‹ã¸ã®transitionã¯å‰Šé™¤
 		for(StateTransition t : new LinkedList<StateTransition>(outTrans)){
 			if(t.from.childSet!=null||t.to.childSet!=null){
 				outTrans.remove(t);
@@ -556,13 +556,13 @@ public class StateNodeSet {
 		this.outTransition = outTrans;
 
 
-		//node¤ÎÅĞÏ¿
+		//nodeã®ç™»éŒ²
 		for(StateNode node : nodes){
 			allNode.put(node.id, node);
 			node.parentSet = this;
 		}
 
-		//transition¤ÎÅĞÏ¿,Æâ¤Ç¤Ê¤¤transition¤òºï½ü
+		//transitionã®ç™»éŒ²,å†…ã§ãªã„transitionã‚’å‰Šé™¤
 		for(StateNode node : nodes){
 			// to
 			for(StateTransition t : new ArrayList<StateTransition>(node.getToTransitions())){
@@ -582,7 +582,7 @@ public class StateNodeSet {
 			}
 		}
 
-		//from¤ÎÅĞÏ¿
+		//fromã®ç™»éŒ²
 		for(StateNode node : nodes){
 			node.resetFromTransition();
 			for(StateTransition t : node.getToTransitions()){
@@ -590,7 +590,7 @@ public class StateNodeSet {
 			}
 		}
 
-		//startNode ¤È endNode¤ÎÅĞÏ¿
+		//startNode ã¨ endNodeã®ç™»éŒ²
 		for(StateNode node : nodes){
 			if(node.getFromNodes().size()==0){
 				startNode.add(node);
@@ -608,7 +608,7 @@ public class StateNodeSet {
 		//}
 
 
-		//startNode¤«¤éÁ´¤ÆÁ«°Ü¤Ç¤­¤ë¤«¥Á¥§¥Ã¥¯
+		//startNodeã‹ã‚‰å…¨ã¦é·ç§»ã§ãã‚‹ã‹ãƒã‚§ãƒƒã‚¯
 		ArrayList<StateNode> aN = new ArrayList<StateNode>(getAllNode());
 		while(aN.size()>0){
 			LinkedList<StateNode> queue = new LinkedList<StateNode>();
@@ -812,7 +812,7 @@ public class StateNodeSet {
 		return allNode.values();
 	}
 
-	//before¥Î¡¼¥É¤Î¤¢¤È¤ËÄÉ²Ã¤¹¤ë
+	//beforeãƒãƒ¼ãƒ‰ã®ã‚ã¨ã«è¿½åŠ ã™ã‚‹
 	public void addCycleNode(StateNode node, StateNode before){
 		int pos = cycleNode.indexOf(before);
 		cycleNode.add(pos+1, node);
@@ -910,12 +910,12 @@ public class StateNodeSet {
 			setLastOrder(t);
 		}
 
-		//ºÇ½ª¾õÂÖ¤ò¾å¤ËÉ½¼¨
+		//æœ€çµ‚çŠ¶æ…‹ã‚’ä¸Šã«è¡¨ç¤º
 		for(StateNode node : endNode){
 			setLastOrderNodeAndTrans(node);
 		}
 
-		//cycle¤ò¾å¤ËÉ½¼¨
+		//cycleã‚’ä¸Šã«è¡¨ç¤º
 		for(StateNode node : cycleNode){
 			setLastOrder(node);
 			for(StateTransition t : node.getToTransitions()){
@@ -1015,7 +1015,7 @@ public class StateNodeSet {
 
 
 	void removeInnerTransitionData(StateNode node){
-		//¥»¥ë¥Õ¥ë¡¼¥×¤ò¤Ş¤ººï½ü
+		//ã‚»ãƒ«ãƒ•ãƒ«ãƒ¼ãƒ—ã‚’ã¾ãšå‰Šé™¤
 		for(StateTransition t : new ArrayList<StateTransition>(node.getToTransitions())){
 			if(t.to==node&&t.from==node){
 				node.removeToTransition(t);
@@ -1027,16 +1027,16 @@ public class StateNodeSet {
 		ArrayList<StateTransition> ft = new ArrayList<StateTransition>(node.getFromTransitions());
 		ArrayList<StateTransition> tt = new ArrayList<StateTransition>(node.getToTransitions());
 
-		//fromºï½ü
+		//fromå‰Šé™¤
 		for(StateTransition f : ft){
 			f.from.removeToTransition(f);
 			node.removeFromTransition(f);
 			removeTransition(f);
 
-			//from¤òto¤Ë·ë¤ÓÉÕ¤±¤ë
+			//fromã‚’toã«çµã³ä»˜ã‘ã‚‹
 			for(StateTransition t : tt){
-				if(f.from==t.to){ continue; } //¥»¥ë¥Õ¥ë¡¼¥×¤Ïºî¤é¤»¤Ê¤¤
-				if(f.from.getToTransition(t.to)!=null){ continue; } //´û¤ËÁ«°Ü¤¬¤¢¤ë¾ì¹çºî¤é¤»¤Ê¤¤
+				if(f.from==t.to){ continue; } //ã‚»ãƒ«ãƒ•ãƒ«ãƒ¼ãƒ—ã¯ä½œã‚‰ã›ãªã„
+				if(f.from.getToTransition(t.to)!=null){ continue; } //æ—¢ã«é·ç§»ãŒã‚ã‚‹å ´åˆä½œã‚‰ã›ãªã„
 
 				StateTransition newTrans = new StateTransition(f.from, t.to, f.cycle && t.cycle, f.weak && t.weak);
 
@@ -1057,7 +1057,7 @@ public class StateNodeSet {
 
 		}
 
-		//toºï½ü
+		//toå‰Šé™¤
 		for(StateTransition t : tt){
 			node.removeToTransition(t);
 			t.to.removeFromTransition(t);
@@ -1065,7 +1065,7 @@ public class StateNodeSet {
 		}
 
 		/*
-		//to:1,from:1¤Î¾ì¹ç¤Ï·ë¤Ó¤Ä¤±¤ë
+		//to:1,from:1ã®å ´åˆã¯çµã³ã¤ã‘ã‚‹
 		if(ft.size()==1&&tt.size()==1){
 			StateTransition f = ft.get(0);
 			StateTransition t = tt.get(0);
@@ -1294,7 +1294,7 @@ public class StateNodeSet {
 						to.addFromNode(dummy);
 						to.removeFromNode(from);
 
-						//¼¡¤Î¥ë¡¼¥×¤Î½àÈ÷
+						//æ¬¡ã®ãƒ«ãƒ¼ãƒ—ã®æº–å‚™
 						from = dummy;
 						dummyDepth--;
 					}
@@ -1553,11 +1553,11 @@ public class StateNodeSet {
 		Env.stopWatch("parsing[1]");
 		Env.startWatch("parsing[2]");
 
-		// StatesÃµ¤·
+		// Statesæ¢ã—
 		for(;line<strs.length;++line){
 			if(strs[line].equals(stateMarkString)) break;
 		}
-		if(line>=strs.length) return false; //¥¨¥é¡¼
+		if(line>=strs.length) return false; //ã‚¨ãƒ©ãƒ¼
 
 		int no = 0;
 		for(line++;line<strs.length;++line){
@@ -1569,11 +1569,11 @@ public class StateNodeSet {
 			temps.put(id,node);
 		}
 
-		// TransitionsÃµ¤·
+		// Transitionsæ¢ã—
 		for(;line<strs.length;++line){
 			if(strs[line].equals(graphMarkString)) break;
 		}
-		if(line>=strs.length) return false; //¥¨¥é¡¼
+		if(line>=strs.length) return false; //ã‚¨ãƒ©ãƒ¼
 
 		// init
 		line++;
@@ -1581,7 +1581,7 @@ public class StateNodeSet {
 			long id = Long.parseLong(strs[line].substring(initStartMarkString.length()));
 			startNode = temps.get(id);
 		}else{
-			 return false; //¥¨¥é¡¼
+			 return false; //ã‚¨ãƒ©ãƒ¼
 		}
 
 		for(line++;line<strs.length;++line){
@@ -1594,7 +1594,7 @@ public class StateNodeSet {
 			node.setToId(ss[1]);
 		}
 
-		//¥¨¥é¡¼
+		//ã‚¨ãƒ©ãƒ¼
 		if(startNode==null) return false;
 
 
@@ -1634,13 +1634,13 @@ public class StateNodeSet {
 
 		String[] strs = str.split("\n");
 
-		// StatesÃµ¤·
+		// Statesæ¢ã—
 		int findCycle = 0;
 		for(;line<strs.length;++line){
 
 			String ss[] = strs[line].split(":",3);
 
-			//cycle¤Î¾õÂÖ¤ò¼èÆÀ
+			//cycleã®çŠ¶æ…‹ã‚’å–å¾—
 			if(findCycle<=1&&ss.length==3&&ss[0].length()*ss[1].length()*ss[2].length()>0){
 				long id = Long.parseLong(ss[2].trim());
 				cycles.add(id);
@@ -1652,7 +1652,7 @@ public class StateNodeSet {
 			if(strs[line].equals(stateMarkString)) break;
 		}
 
-		//¥¨¥é¡¼
+		//ã‚¨ãƒ©ãƒ¼
 		if(line>=strs.length) return false;
 
 		int no = 0;
@@ -1666,11 +1666,11 @@ public class StateNodeSet {
 		}
 
 
-		// TransitionsÃµ¤·
+		// Transitionsæ¢ã—
 		for(;line<strs.length;++line){
 			if(strs[line].equals(graphMarkString)) break;
 		}
-		if(line>=strs.length) return false; //¥¨¥é¡¼
+		if(line>=strs.length) return false; //ã‚¨ãƒ©ãƒ¼
 
 		// init
 		line++;
@@ -1678,7 +1678,7 @@ public class StateNodeSet {
 			long id = Long.parseLong(strs[line].substring(initStartMarkString.length()));
 			startNode = temps.get(id);
 		}else{
-			 return false; //¥¨¥é¡¼
+			 return false; //ã‚¨ãƒ©ãƒ¼
 		}
 
 		for(line++;line<strs.length;++line){
@@ -1692,14 +1692,14 @@ public class StateNodeSet {
 		}
 
 
-		// LabelsÃµ¤·
+		// Labelsæ¢ã—
 		for(;line<strs.length;++line){
 			if(strs[line].equals(labelMarkString)) break;
 		}
-		if(line>=strs.length) return false; //¥¨¥é¡¼
+		if(line>=strs.length) return false; //ã‚¨ãƒ©ãƒ¼
 
 		for(line++;line<strs.length;++line){
-			//¾õÂÖÌ¾¤ò²òÀÏ
+			//çŠ¶æ…‹åã‚’è§£æ
 			String ss[] = strs[line].split("::",2);
 			if(ss.length<2){ break; }
 
@@ -1716,7 +1716,7 @@ public class StateNodeSet {
 			node.inCycle = true;
 		}
 
-		//¥¨¥é¡¼
+		//ã‚¨ãƒ©ãƒ¼
 		if(startNode==null) return false;
 
 		setNodeFrom(temps);
@@ -1777,11 +1777,11 @@ public class StateNodeSet {
 		dummy.dummy = true;
 		dummy.weak = weak;
 
-		// °ÌÃÖ¤ÎÀßÄê
+		// ä½ç½®ã®è¨­å®š
 		dummy.setX(depthNode.get(depth).get(0).getX());
 		dummy.setY(y);
 
-		// depth, nth¤ÎÀßÄê
+		// depth, nthã®è¨­å®š
 		insertDepthNode(dummy,depth);
 
 		return dummy;

@@ -66,8 +66,8 @@ import javax.swing.border.Border;
 import lavit.Lang;
 
 /**
- * ÀßÄê²èÌÌÍÑ¤Î¥À¥¤¥¢¥í¥°¥Æ¥ó¥×¥ì¡¼¥È¡£
- * Ãæ±û¤Ë¥³¥ó¥İ¡¼¥Í¥ó¥È¤òÀßÄê¤·¤Æ»È¤¦¡£
+ * è¨­å®šç”»é¢ç”¨ã®ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã€‚
+ * ä¸­å¤®ã«ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’è¨­å®šã—ã¦ä½¿ã†ã€‚
  */
 public final class ModalSettingDialog
 {
@@ -103,7 +103,7 @@ public final class ModalSettingDialog
 	}
 
 	/**
-	 * ¥Ø¥Ã¥À¡¼Éô¤Î¥Ñ¥Í¥ë
+	 * ãƒ˜ãƒƒãƒ€ãƒ¼éƒ¨ã®ãƒ‘ãƒãƒ«
 	 */
 	@SuppressWarnings("serial")
 	private static class GradientPanel extends JPanel

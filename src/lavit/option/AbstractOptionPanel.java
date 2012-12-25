@@ -51,8 +51,8 @@ import lavit.Env;
 import lavit.util.FixFlowLayout;
 
 /**
- * е│е▐еєе╔ещедеєеке╫е╖ечеє└▀─ъе╤е═еыд╬╜ш═¤дЄ╢ж─╠▓╜д╖д┐б╩┬╨╛╔╬┼╦б┼кб╦├ъ╛▌е│еєе▌б╝е═еєе╚бг
- * ╖╤╛╡д╬╔м┴│└нд╧д╩дпбве│еєе▌е╕е├е╚д╚е╒ебепе╚еъд╦дшды└▀╖╫д╦└┌дъ┬╪диды▓─╟╜└ндтдвдыбг
+ * уВ│уГЮуГ│уГЙуГйуВдуГ│уВкуГЧуВ╖уГзуГ│шинхоЪуГСуГНуГлуБохЗжчРЖуВТхЕ▒щАЪхМЦуБЧуБЯя╝Ихп╛чЧЗчЩВц│ХчЪДя╝ЙцК╜ш▒буВ│уГ│уГЭуГ╝уГНуГ│уГИуАВ
+ * ч╢ЩцЙ┐уБох┐ЕчД╢цАзуБпуБкуБПуАБуВ│уГ│уГЭуВ╕уГГуГИуБиуГХуВбуВпуГИуГкуБлуВИуВЛшиншиИуБлхИЗуВКцЫ┐уБИуВЛхПпшГ╜цАзуВВуБВуВЛуАВ
  */
 @SuppressWarnings("serial")
 abstract class AbstractOptionPanel extends JPanel
@@ -63,9 +63,9 @@ abstract class AbstractOptionPanel extends JPanel
 	private JTextField optionField;
 
 	/**
-	 * @param title е╤е═еыд╬е┐еде╚еы
-	 * @param propertyName env.txt д╦╩▌┬╕д╣ды└▀─ъд╬енб╝╠╛
-	 * @param options е┴езе├епе▄е├епе╣дЄ╔╜╝ид╣дыеке╫е╖ечеє╠╛д╬╟█╬є
+	 * @param title уГСуГНуГлуБоуВ┐уВдуГИуГл
+	 * @param propertyName env.txt уБлф┐ЭхнШуБЩуВЛшинхоЪуБоуВнуГ╝хРН
+	 * @param options уГБуВзуГГуВпуГЬуГГуВпуВ╣уВТшбичд║уБЩуВЛуВкуГЧуВ╖уГзуГ│хРНуБощЕНхИЧ
 	 */
 	protected AbstractOptionPanel(String title, String propertyName, String[] options)
 	{

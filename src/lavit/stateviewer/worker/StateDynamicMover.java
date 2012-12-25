@@ -94,7 +94,7 @@ public class StateDynamicMover extends Thread {
 						springLength = drawNodes.getDepthNode().get(1).get(0).getX() - drawNodes.getDepthNode().get(0).get(0).getX();
 					}
 
-					//§–§Õ
+					//„Å∞„Å≠
 					for(StateNode node : drawNodes.getAllNode()){
 						for(StateNode to : node.getToNodes()){
 							double l = Math.sqrt((node.getX()-to.getX())*(node.getX()-to.getX())+(node.getY()-to.getY())*(node.getY()-to.getY()));
@@ -112,7 +112,7 @@ public class StateDynamicMover extends Thread {
 						}
 					}
 
-					//¿ÕŒœ
+					//Êñ•Âäõ
 					int d = 10;
 					for(ArrayList<StateNode> nodes : drawNodes.getDepthNode()){
 						for(StateNode node : nodes){
@@ -143,12 +143,12 @@ public class StateDynamicMover extends Thread {
 						}
 					}
 
-					//À‡ª§Œœ
+					//Êë©Êì¶Âäõ
 					for(StateNode node : drawNodes.getAllNode()){
 						node.ddy += -0.5 * (node.dy+node.ddy);
 					}
 
-					//∞‹∆∞
+					//ÁßªÂãï
 					for(StateNode node : drawNodes.getAllNode()){
 						if(panel.getSelectNodes().contains(node)&&panel.isDragg()) continue;
 						node.dy += node.ddy;
@@ -157,7 +157,7 @@ public class StateDynamicMover extends Thread {
 						}else if(node.dy<-maxSpeed){
 							node.move(0,-maxSpeed);
 						}else{
-							//dy§¨§™§´§∑§Ø§ §√§øæÏπÁ§œ0§À§π§Î
+							//dy„Åå„Åä„Åã„Åó„Åè„Å™„Å£„ÅüÂ†¥Âêà„ÅØ0„Å´„Åô„Çã
 							if(!(-1000000000<node.dy&&node.dy<1000000000)){ node.dy=0; node.ddy=0; }
 							node.move(0,node.dy);
 						}

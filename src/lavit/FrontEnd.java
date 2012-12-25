@@ -74,7 +74,7 @@ public class FrontEnd
 
         sleep(500);
 
-        loadArgs(args); //╡п╞░еке╫е╖ечеєд╬╞╔д▀╣■д▀
+        loadArgs(args); //ш╡╖хЛХуВкуГЧуВ╖уГзуГ│уБошкнуБ┐ш╛╝уБ┐
 
         println("(SYSTEM) Ready.");
 	}

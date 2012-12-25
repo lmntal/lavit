@@ -251,7 +251,7 @@ public class StateSimulationPanel extends JPanel {
 			if(nowNode!=null){
 				ArrayList<StateTransition> trans = new ArrayList<StateTransition>(nowNode.getToTransitions());
 
-				//Á«°ÜÀè¤ò¸«¤Æ¥½¡¼¥È¤¹¤ë
+				//é·ç§»å…ˆã‚’è¦‹ã¦ã‚½ãƒ¼ãƒˆã™ã‚‹
 				Collections.sort(trans, new Comparator<StateTransition>() {
 					public int compare(StateTransition t1, StateTransition t2) {
 						StateNode n1 = t1.to;
@@ -279,7 +279,7 @@ public class StateSimulationPanel extends JPanel {
 					}
 				});
 
-				//¥é¥Ù¥ë¤ò¤Ä¤±¤Ê¤¬¤éÉ½¼¨
+				//ãƒ©ãƒ™ãƒ«ã‚’ã¤ã‘ãªãŒã‚‰è¡¨ç¤º
 				boolean forwardLabel=false,backLabel = false;
 				for(StateTransition t : trans){
 					//System.out.println(t.to.depth+" : "+t.to);
@@ -391,7 +391,7 @@ public class StateSimulationPanel extends JPanel {
 			println(str,attribute);
 		}
 
-		//¥¹¥ì¥Ã¥É¥»¡¼¥Õ
+		//ã‚¹ãƒ¬ãƒƒãƒ‰ã‚»ãƒ¼ãƒ•
 		public void println(final String str,final SimpleAttributeSet attribute){
 			javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
 				try {

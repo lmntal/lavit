@@ -82,7 +82,7 @@ public class LtlPanel extends JPanel
 		ltlButtonPanel.setAllEnable(b);
 	}
 
-	// TODO: ¤½¤â¤½¤â¡¢¥×¥í¥»¥¹µ¯Æ°¤òLaViT¥·¥¹¥Æ¥à´ÉÍı¤Î¥¿¥¹¥¯¥Ş¥Í¡¼¥¸¥ã¤Ë°ÑÂ÷¤¹¤ë
+	// TODO: ãã‚‚ãã‚‚ã€ãƒ—ãƒ­ã‚»ã‚¹èµ·å‹•ã‚’LaViTã‚·ã‚¹ãƒ†ãƒ ç®¡ç†ã®ã‚¿ã‚¹ã‚¯ãƒãƒãƒ¼ã‚¸ãƒ£ã«å§”è¨—ã™ã‚‹
 	public void killLtlSlimRunner()
 	{
 		ltlButtonPanel.runnerKill();
@@ -97,7 +97,7 @@ public class LtlPanel extends JPanel
 		setSelectedSuffix("0");
 	}
 
-	// TODO: ¥â¥Ç¥ë¸¡ººÍÑ¥Õ¥¡¥¤¥ë¤ÎÌ¾Á°´ÉÍıÊıË¡¤ò¸¡Æ¤¤¹¤ë
+	// TODO: ãƒ¢ãƒ‡ãƒ«æ¤œæŸ»ç”¨ãƒ•ã‚¡ã‚¤ãƒ«ã®åå‰ç®¡ç†æ–¹æ³•ã‚’æ¤œè¨ã™ã‚‹
 	public void setSelectedSuffix(String suffix)
 	{
 		if (targetLMNtalFile != null)

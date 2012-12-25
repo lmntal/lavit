@@ -40,7 +40,7 @@ import javax.swing.JPanel;
 public class SVControlPanel extends JPanel {
 
 	public SVControlPanel(SVPanel panel) {
-		// TODO ¼«Æ°À¸À®¤µ¤ì¤¿¥³¥ó¥¹¥È¥é¥¯¥¿¡¼¡¦¥¹¥¿¥Ö
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ãƒ¼ãƒ»ã‚¹ã‚¿ãƒ–
 	}
 
 }

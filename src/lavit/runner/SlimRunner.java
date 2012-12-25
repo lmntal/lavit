@@ -160,10 +160,10 @@ public class SlimRunner implements OuterRunner {
 		public void run() {
 			try {
 
-				//·×Â¬³«»Ï
+				//è¨ˆæ¸¬é–‹å§‹
 				long startTimeMillis = System.currentTimeMillis();
 
-				// LMNtalµ¯Æ°
+				// LMNtalèµ·å‹•
 				String cmd1 = Env.getLmntalCmd()+" "+Env.get("SLIM_LMNTAL_COMPILE_OPTION")+" "+Env.getSpaceEscape(targetFile.getAbsolutePath());
 
 				if(!quiet) FrontEnd.println("(SLIM) "+cmd1);
@@ -177,7 +177,7 @@ public class SlimRunner implements OuterRunner {
 				ErrorStreamPrinter err1 = new ErrorStreamPrinter(p1.getErrorStream());
 				err1.start();
 
-				// SLIMµ¯Æ°
+				// SLIMèµ·å‹•
 				//String cmd2 = slim_path+" -Ilmntal"+File.separator+Env.getDirNameOfSlim()+File.separator+"lib"+File.separator+" "+option;
 				//if(Env.is("SLIM_USE_LIBRARY")){
 				//	cmd2 += " -I"+Env.getSlimInstallLibraryPath();
@@ -204,21 +204,21 @@ public class SlimRunner implements OuterRunner {
 				BufferedReader in2 = new BufferedReader(new InputStreamReader(p2.getInputStream()));
 				ErrorStreamPrinter err2 = new ErrorStreamPrinter(p2.getErrorStream());
 
-				// SLIM¤ØÎ®¤·¹ş¤à
+				// SLIMã¸æµã—è¾¼ã‚€
 				int b;
 				while ((b = in1.read()) != -1) {
 					out2.write(b);
 				}
 				try {
 					out2.flush();
-				}catch(Exception e){ if(!quiet) FrontEnd.printException(e); } //É¸½àÆşÎÏ¤òÂÔ¤¿¤º¤ËSLIM¤¬½ªÎ»¤·¤¿¾ì¹ç
+				}catch(Exception e){ if(!quiet) FrontEnd.printException(e); } //æ¨™æº–å…¥åŠ›ã‚’å¾…ãŸãšã«SLIMãŒçµ‚äº†ã—ãŸå ´åˆ
 
 				out2.close();
 				in1.close();
 				err1.join();
 				p1.waitFor();
 
-				// SLIM¤Î½ĞÎÏ¤òÆÀ¤ë
+				// SLIMã®å‡ºåŠ›ã‚’å¾—ã‚‹
 				if(buffer==null){
 					if(output==null){
 						output = FrontEnd.mainFrame.toolTab.systemPanel.outputPanel;

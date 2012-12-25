@@ -182,8 +182,8 @@ public class EditorPage extends JScrollPane
 	}
 	
 	/**
-	 * <p>¥¿¥ÖÊ¸»ú¤Î²Ä»ëÀ­¤òÀßÄê¤·¤Ş¤¹¡£</p>
-	 * @param b ²Ä»ë¤Ë¤¹¤ë¾ì¹ç¤Ï {@code true}
+	 * <p>ã‚¿ãƒ–æ–‡å­—ã®å¯è¦–æ€§ã‚’è¨­å®šã—ã¾ã™ã€‚</p>
+	 * @param b å¯è¦–ã«ã™ã‚‹å ´åˆã¯ {@code true}
 	 */
 	public void setShowTabs(boolean b)
 	{
@@ -191,8 +191,8 @@ public class EditorPage extends JScrollPane
 	}
 	
 	/**
-	 * <p>²ş¹ÔÊ¸»ú¤Î²Ä»ëÀ­¤òÀßÄê¤·¤Ş¤¹¡£</p>
-	 * @param b ²Ä»ë¤Ë¤¹¤ë¾ì¹ç¤Ï {@code true}
+	 * <p>æ”¹è¡Œæ–‡å­—ã®å¯è¦–æ€§ã‚’è¨­å®šã—ã¾ã™ã€‚</p>
+	 * @param b å¯è¦–ã«ã™ã‚‹å ´åˆã¯ {@code true}
 	 */
 	public void setShowEols(boolean b)
 	{

@@ -72,7 +72,7 @@ public class StateAbstractionMaker {
 
 			for(StateTransition t : new LinkedList<StateTransition>(node.getToTransitions())){
 				if(!groupNodes.contains(t.to)){
-					//¥°¥ë¡¼¥×³°¤Ø¤ÎÁ«°Ü
+					//ã‚°ãƒ«ãƒ¼ãƒ—å¤–ã¸ã®é·ç§»
 					if(!newNode.isToNode(t.to)){
 						StateTransition newTrans = new StateTransition(newNode, t.to, t.cycle, t.weak);
 						newTrans.addRules(t.getRules());
@@ -86,7 +86,7 @@ public class StateAbstractionMaker {
 					drawNodes.removeTransition(t);
 					outTrans.add(t);
 				}else{
-					//¥°¥ë¡¼¥×Æâ¤Ø¤ÎÁ«°Ü
+					//ã‚°ãƒ«ãƒ¼ãƒ—å†…ã¸ã®é·ç§»
 					drawNodes.removeTransition(t);
 					allTrans.add(t);
 				}
@@ -94,7 +94,7 @@ public class StateAbstractionMaker {
 
 			for(StateTransition t : new LinkedList<StateTransition>(node.getFromTransitions())){
 				if(!groupNodes.contains(t.from)){
-					//¥°¥ë¡¼¥×³°¤Ø¤ÎÁ«°Ü
+					//ã‚°ãƒ«ãƒ¼ãƒ—å¤–ã¸ã®é·ç§»
 					if(!newNode.isFromNode(t.from)){
 						StateTransition newTrans = new StateTransition(t.from, newNode, t.cycle, t.weak);
 						newTrans.addRules(t.getRules());
@@ -108,7 +108,7 @@ public class StateAbstractionMaker {
 					drawNodes.removeTransition(t);
 					outTrans.add(t);
 				}else{
-					//¥°¥ë¡¼¥×Æâ¤Ø¤ÎÁ«°Ü
+					//ã‚°ãƒ«ãƒ¼ãƒ—å†…ã¸ã®é·ç§»
 					drawNodes.removeTransition(t);
 					allTrans.add(t);
 				}
@@ -116,9 +116,9 @@ public class StateAbstractionMaker {
 			drawNodes.removeInnerNodeData(node);
 		}
 
-		//¥µ¥¤¥¯¥ë·Ï¤â¤Á¤ã¤ó¤È½èÍı¤¹¤ë
+		//ã‚µã‚¤ã‚¯ãƒ«ç³»ã‚‚ã¡ã‚ƒã‚“ã¨å‡¦ç†ã™ã‚‹
 
-		//¿·¤·¤¤°ÌÃÖ¤Î·èÄê
+		//æ–°ã—ã„ä½ç½®ã®æ±ºå®š
 		double x=0,y=0;
 		for(StateNode node : groupNodes){
 			x+=node.getX();
@@ -173,7 +173,7 @@ public class StateAbstractionMaker {
 			for(StateTransition t : node.getToTransition()){
 				if(!groupNodes.contains(t.to)){
 
-					//¿·¤·¤¤trans¤òÄÉ²Ã
+					//æ–°ã—ã„transã‚’è¿½åŠ 
 					StateTransition existTrans = getInToTransition(toes, t.to);
 					if(existTrans==null){
 						StateTransition newTrans = new StateTransition(newNode, t.to, t.em);
@@ -189,7 +189,7 @@ public class StateAbstractionMaker {
 						}
 					}
 					t.to.addFromNode(newNode);
-					//ºï½ü
+					//å‰Šé™¤
 					removeToes.add(t.to);
 					t.to.removeFromNode(node);
 				}
@@ -203,12 +203,12 @@ public class StateAbstractionMaker {
 
 				StateTransition t =  f.getToTransition(node);
 				if(!groupNodes.contains(f)){
-					//¿·¤·¤¤from¤òÄÉ²Ã
+					//æ–°ã—ã„fromã‚’è¿½åŠ 
 					if(!fromNodes.contains(f)){
 						fromNodes.add(f);
 					}
 					drawNodes.addTransition(f.addToNode(newNode, t.getRules(), t.em));
-					//ºï½ü
+					//å‰Šé™¤
 					removeFroms.add(f);
 					f.removeToNode(node);
 				}
@@ -233,7 +233,7 @@ public class StateAbstractionMaker {
 
 		newNode.init("","", accept, inCycle);
 
-		//¿·¤·¤¤°ÌÃÖ¤Î·èÄê
+		//æ–°ã—ã„ä½ç½®ã®æ±ºå®š
 		double x=0,y=0;
 		for(StateNode node : groupNodes){
 			x+=node.getX();

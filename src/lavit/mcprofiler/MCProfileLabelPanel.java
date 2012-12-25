@@ -73,7 +73,7 @@ public class MCProfileLabelPanel extends JPanel{
 
 	}
 
-	//¥¹¥ì¥Ã¥É¥»¡¼¥Õ
+	//ã‚¹ãƒ¬ãƒƒãƒ‰ã‚»ãƒ¼ãƒ•
 	public void update(){
 		javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
 			int r1 = 0;

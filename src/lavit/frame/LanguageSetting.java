@@ -71,7 +71,7 @@ public final class LanguageSetting
 @SuppressWarnings("serial")
 class LanguageSelectPanel extends JPanel
 {
-	private String[] labels = { "English", "ÆüËÜ¸ì" };
+	private String[] labels = { "English", "æ—¥æœ¬èªž" };
 	private String[] langs = { "en", "jp" };
 	private JRadioButton[] radios = new JRadioButton[labels.length];
 

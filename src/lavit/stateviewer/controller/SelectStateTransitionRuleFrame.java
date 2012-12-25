@@ -159,7 +159,7 @@ public class SelectStateTransitionRuleFrame extends JFrame implements ActionList
 
 		SelectPanel(){
 
-			//¥ë¡¼¥ëÌ¾¤Î½¸¹ç
+			//ãƒ«ãƒ¼ãƒ«åã®é›†åˆ
 			ArrayList<String> rns = new ArrayList<String>();
 			for(StateRule r : rules.keySet()){
 				rns.add(r.getName());

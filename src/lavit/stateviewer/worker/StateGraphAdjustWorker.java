@@ -151,16 +151,16 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		if(yInterval>30&&(w/(drawNodes.getDepth()+1))>30){ xInterval=yInterval=30; }
 		if(yInterval<10){ yInterval=10; }
 
-		//Å¬Åö¤ÊxÇÛÃÖ
+		//é©å½“ãªxé…ç½®
 		for(StateNode node : drawNodes.getAllNode()){
 			node.setPosition((node.depth+1)*yInterval,node.getY());
 		}
 
-		//½é´ü¾õÂÖ¤«¤é¤ÎÁ«°Ü¸µÊ¿¶ÑÃÍÇÛÃÖ
+		//åˆæœŸçŠ¶æ…‹ã‹ã‚‰ã®é·ç§»å…ƒå¹³å‡å€¤é…ç½®
 		ArrayList<ArrayList<StateNode>> depthNode = drawNodes.getDepthNode();
 		for(ArrayList<StateNode> nodes : depthNode){
 
-			//Ê¿¶Ñ¾ì½ê·èÄê
+			//å¹³å‡å ´æ‰€æ±ºå®š
 			for(StateNode node : nodes){
 				int c = 0;
 				double t = 0;
@@ -177,16 +177,16 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 				}
 			}
 
-			//¤Û¤°¤¹
+			//ã»ãã™
 			detanglingNodes(nodes,yInterval);
 
-			//progress¹¹¿·
+			//progressæ›´æ–°
 			endNode += nodes.size();
 			setProgress(100*endNode/(drawNodes.size()*3));
 			if(isCancelled()){ end(); return null; }
 
 			/*
-			//¹â¤µ¤ò¼èÆÀ¤·ÊİÂ¸
+			//é«˜ã•ã‚’å–å¾—ã—ä¿å­˜
 			double minY = Double.MAX_VALUE, maxY = Double.MIN_VALUE;
 			for(StateNode node : nodes){
 				if(node.getY()<minY){
@@ -199,7 +199,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 			*/
 		}
 		/*
-		//ºÇÂç¹â¤µ¤Î¿¼¤µ¤òµá¤á¤ë
+		//æœ€å¤§é«˜ã•ã®æ·±ã•ã‚’æ±‚ã‚ã‚‹
 		int maxDepth = 0;
 		double maxHeight = Double.MIN_VALUE;
 		for(int i=0;i<depthHeight.size();++i){
@@ -209,12 +209,12 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 			}
 		}
 
-		//ºÇÂç¹â¤µ¤«¤é¤ÎÁ«°ÜÀèÊ¿¶ÑÇÛÃÖ¥Ğ¥Ã¥¯¥È¥é¥Ã¥¯
+		//æœ€å¤§é«˜ã•ã‹ã‚‰ã®é·ç§»å…ˆå¹³å‡é…ç½®ãƒãƒƒã‚¯ãƒˆãƒ©ãƒƒã‚¯
 		for(int i=maxDepth-1;i>=0;--i){
 
 			ArrayList<StateNode> nodes = depthNode.get(i);
 
-			//Ê¿¶Ñ¾ì½ê·èÄê
+			//å¹³å‡å ´æ‰€æ±ºå®š
 			for(StateNode node : nodes){
 				int c = 0;
 				double t = 0;
@@ -229,7 +229,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 				}
 			}
 
-			//¤Û¤°¤¹(counterÂÇ¤ÁÀÚ¤ê)
+			//ã»ãã™(counteræ‰“ã¡åˆ‡ã‚Š)
 			for(int counter=0;counter<100;++counter){
 				boolean res = detanglingNodes(nodes,yInterval*3/2);
 				if(!res) break;
@@ -237,12 +237,12 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		}
 		*/
 
-		//ºÇ¿¼¥Î¡¼¥É¤«¤é¤ÎÁ«°ÜÀèÊ¿¶ÑÃÍÇÛÃÖ
+		//æœ€æ·±ãƒãƒ¼ãƒ‰ã‹ã‚‰ã®é·ç§»å…ˆå¹³å‡å€¤é…ç½®
 		for(int i=depthNode.size()-1;i>=0;--i){
 
 			ArrayList<StateNode> nodes = depthNode.get(i);
 
-			//Ê¿¶Ñ¾ì½ê·èÄê
+			//å¹³å‡å ´æ‰€æ±ºå®š
 			for(StateNode node : nodes){
 				int c = 0;
 				double t = 0;
@@ -257,22 +257,22 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 				}
 			}
 
-			//¤Û¤°¤¹
+			//ã»ãã™
 			detanglingNodes(nodes,yInterval);
 
-			//progress¹¹¿·
+			//progressæ›´æ–°
 			endNode += nodes.size();
 			setProgress(100*endNode/(drawNodes.size()*3));
 			if(isCancelled()){ end(); return null; }
 		}
 
 
-		//½é´ü¥Î¡¼¥É¤«¤é¤ÎÁ«°ÜÀè¡¦Á«°Ü¸µÊ¿¶ÑÃÍÇÛÃÖ
+		//åˆæœŸãƒãƒ¼ãƒ‰ã‹ã‚‰ã®é·ç§»å…ˆãƒ»é·ç§»å…ƒå¹³å‡å€¤é…ç½®
 		for(int i=0;i<depthNode.size();++i){
 
 			ArrayList<StateNode> nodes = depthNode.get(i);
 
-			//Ê¿¶Ñ¾ì½ê·èÄê
+			//å¹³å‡å ´æ‰€æ±ºå®š
 			for(StateNode node : nodes){
 				int c = 0;
 				double t = 0;
@@ -293,10 +293,10 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 				}
 			}
 
-			//¤Û¤°¤¹
+			//ã»ãã™
 			detanglingNodes(nodes,yInterval);
 
-			//progress¹¹¿·
+			//progressæ›´æ–°
 			endNode += nodes.size();
 			setProgress(100*endNode/(drawNodes.size()*3));
 			if(isCancelled()){ end(); return null; }
@@ -307,23 +307,23 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		return null;
 	}
 
-//	¤Û¤°¤¹
+//	ã»ãã™
 	private void detanglingNodes(ArrayList<StateNode> nodes,double yInterval){
 
-		//¥½¡¼¥È¤¹¤ë
+		//ã‚½ãƒ¼ãƒˆã™ã‚‹
 		ArrayList<StateNode> sortNodes = new ArrayList<StateNode>(nodes);
 		Collections.sort(sortNodes, new NodeYComparator());
 
 		ArrayList<StateNode> revsortNodes = new ArrayList<StateNode>(sortNodes);
 		Collections.reverse(revsortNodes);
 
-		//µ÷Î¥¤¬0¤Î¥Î¡¼¥É¤ò¤Û¤°¤¹
+		//è·é›¢ãŒ0ã®ãƒãƒ¼ãƒ‰ã‚’ã»ãã™
 		while(true){
 			boolean res = zeroDetanlingNodes(sortNodes,revsortNodes,yInterval);
 			if(!res||isCancelled()) break;
 		}
 
-		//Âç¤Ş¤«¤Ê´Ö³Ö¶õ¤±
+		//å¤§ã¾ã‹ãªé–“éš”ç©ºã‘
 		double minY=Double.MAX_VALUE,maxY=Double.MIN_VALUE;
 		for(StateNode node: nodes){
 			minY = Math.min(minY,node.getY());
@@ -337,7 +337,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 			}
 		}
 
-		//¥Î¡¼¥ÉÃê½Ğ´Ö³Ö¶õ¤±
+		//ãƒãƒ¼ãƒ‰æŠ½å‡ºé–“éš”ç©ºã‘
 		for(int counter=0;counter<100;++counter){
 			boolean res = nonzeroDetanlingNodes(sortNodes,revsortNodes,yInterval);
 			if(!res||isCancelled()) break;
@@ -346,7 +346,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 
 	private boolean zeroDetanlingNodes(ArrayList<StateNode> sortNodes,ArrayList<StateNode> revsortNodes,double yInterval){
 
-		//µ÷Î¥¤¬0¤Î¥Î¡¼¥É¤ò¸«¤Ä¤±¤ë
+		//è·é›¢ãŒ0ã®ãƒãƒ¼ãƒ‰ã‚’è¦‹ã¤ã‘ã‚‹
 		double zoreY = 0;
 		HashSet<StateNode> zeroDistances = new HashSet<StateNode>();
 
@@ -369,15 +369,15 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		}
 
 
-		//µ÷Î¥¤¬0¤Î¥Î¡¼¥É¤¬Ìµ¤¯¤Ê¤Ã¤¿¤é½ªÎ»
+		//è·é›¢ãŒ0ã®ãƒãƒ¼ãƒ‰ãŒç„¡ããªã£ãŸã‚‰çµ‚äº†
 		if(zeroDistances.size()==0){ return false; }
 
 
-		//ºÇ¾®µ÷Î¥¤Î£²¤Ä¤Î¥Î¡¼¥É¤Î°ÜÆ°¤ÈÎÎ°è·×»»¤Î½àÈ÷
-		double dy;    //°ÜÆ°ÎÌ
-		double pivot; //Ãæ¿´ÃÍ
-		double moveMaxY; //°ÜÆ°ÎÎ°è¾å¸Â
-		double moveMinY; //°ÜÆ°ÎÎ°è²¼¸Â
+		//æœ€å°è·é›¢ã®ï¼’ã¤ã®ãƒãƒ¼ãƒ‰ã®ç§»å‹•ã¨é ˜åŸŸè¨ˆç®—ã®æº–å‚™
+		double dy;    //ç§»å‹•é‡
+		double pivot; //ä¸­å¿ƒå€¤
+		double moveMaxY; //ç§»å‹•é ˜åŸŸä¸Šé™
+		double moveMinY; //ç§»å‹•é ˜åŸŸä¸‹é™
 
 		for(StateNode n : sortNodes){ n.unmark(); }
 
@@ -387,7 +387,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		moveMaxY = zoreY+dy+yInterval*3;
 		moveMinY = zoreY-dy-yInterval*3;
 
-		//no¤Ç¥½¡¼¥È¤¹¤ë
+		//noã§ã‚½ãƒ¼ãƒˆã™ã‚‹
 		List<StateNode> list = new ArrayList<StateNode>(zeroDistances);
 		Collections.sort(list, new Comparator<StateNode>() {
 			public int compare(StateNode n1, StateNode n2) {
@@ -409,7 +409,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		}
 
 
-		//°ÜÆ°ÎÎ°è¤ò·×»»¤·¤Ê¤¬¤é¥Î¡¼¥É°ÜÆ°
+		//ç§»å‹•é ˜åŸŸã‚’è¨ˆç®—ã—ãªãŒã‚‰ãƒãƒ¼ãƒ‰ç§»å‹•
 		for(StateNode n : sortNodes){
 			if(n.isMarked()) continue;
 			if(n.getY()<pivot) continue;
@@ -432,7 +432,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 
 	private boolean nonzeroDetanlingNodes(ArrayList<StateNode> sortNodes,ArrayList<StateNode> revsortNodes,double yInterval){
 
-		//ºÇ¾®µ÷Î¥¤Î£²¤Ä¤Î¥Î¡¼¥É¤ò¸«¤Ä¤±¤ë
+		//æœ€å°è·é›¢ã®ï¼’ã¤ã®ãƒãƒ¼ãƒ‰ã‚’è¦‹ã¤ã‘ã‚‹
 		StateNode move1=null,move2=null;
 		double distanceMin = Double.MAX_VALUE;
 
@@ -448,14 +448,14 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 			}
 		}
 
-		//½Å¤Ê¤ë¤â¤Î¤¬Ìµ¤¯¤Ê¤Ã¤¿¤é½ªÎ»
+		//é‡ãªã‚‹ã‚‚ã®ãŒç„¡ããªã£ãŸã‚‰çµ‚äº†
 		if(distanceMin>yInterval){ return false; }
 
-		//ºÇ¾®µ÷Î¥¤Î£²¤Ä¤Î¥Î¡¼¥É¤Î°ÜÆ°¤ÈÎÎ°è·×»»¤Î½àÈ÷
-		double dy;    //°ÜÆ°ÎÌ
-		double pivot; //Ãæ¿´ÃÍ
-		double moveMaxY; //°ÜÆ°ÎÎ°è¾å¸Â
-		double moveMinY; //°ÜÆ°ÎÎ°è²¼¸Â
+		//æœ€å°è·é›¢ã®ï¼’ã¤ã®ãƒãƒ¼ãƒ‰ã®ç§»å‹•ã¨é ˜åŸŸè¨ˆç®—ã®æº–å‚™
+		double dy;    //ç§»å‹•é‡
+		double pivot; //ä¸­å¿ƒå€¤
+		double moveMaxY; //ç§»å‹•é ˜åŸŸä¸Šé™
+		double moveMinY; //ç§»å‹•é ˜åŸŸä¸‹é™
 
 		for(StateNode n : sortNodes){ n.unmark(); }
 
@@ -481,7 +481,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		}
 
 
-		//°ÜÆ°ÎÎ°è¤ò·×»»¤·¤Ê¤¬¤é¥Î¡¼¥É°ÜÆ°
+		//ç§»å‹•é ˜åŸŸã‚’è¨ˆç®—ã—ãªãŒã‚‰ãƒãƒ¼ãƒ‰ç§»å‹•
 		for(StateNode n : sortNodes){
 			if(n.isMarked()) continue;
 			if(n.getY()<pivot) continue;
@@ -505,7 +505,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 
 	private boolean innerDetanlingNodes(ArrayList<StateNode> sortNodes,ArrayList<StateNode> revsortNodes,double yInterval){
 
-		//ºÇ¾®µ÷Î¥¤Î£²¤Ä¤Î¥Î¡¼¥É¤ò¸«¤Ä¤±¤ë
+		//æœ€å°è·é›¢ã®ï¼’ã¤ã®ãƒãƒ¼ãƒ‰ã‚’è¦‹ã¤ã‘ã‚‹
 		StateNode move1=null,move2=null;
 		double distanceMin = Double.MAX_VALUE;
 		double zoreY = 0;
@@ -559,14 +559,14 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 			}
 		}
 
-		//½Å¤Ê¤ë¤â¤Î¤¬Ìµ¤¯¤Ê¤Ã¤¿¤é½ªÎ»
+		//é‡ãªã‚‹ã‚‚ã®ãŒç„¡ããªã£ãŸã‚‰çµ‚äº†
 		if(distanceMin>yInterval){ return false; }
 
-		//ºÇ¾®µ÷Î¥¤Î£²¤Ä¤Î¥Î¡¼¥É¤Î°ÜÆ°¤ÈÎÎ°è·×»»¤Î½àÈ÷
-		double dy;    //°ÜÆ°ÎÌ
-		double pivot; //Ãæ¿´ÃÍ
-		double moveMaxY; //°ÜÆ°ÎÎ°è¾å¸Â
-		double moveMinY; //°ÜÆ°ÎÎ°è²¼¸Â
+		//æœ€å°è·é›¢ã®ï¼’ã¤ã®ãƒãƒ¼ãƒ‰ã®ç§»å‹•ã¨é ˜åŸŸè¨ˆç®—ã®æº–å‚™
+		double dy;    //ç§»å‹•é‡
+		double pivot; //ä¸­å¿ƒå€¤
+		double moveMaxY; //ç§»å‹•é ˜åŸŸä¸Šé™
+		double moveMinY; //ç§»å‹•é ˜åŸŸä¸‹é™
 
 		for(StateNode n : sortNodes){ n.unmark(); }
 
@@ -601,7 +601,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 			moveMaxY = zoreY+dy+yInterval*3;
 			moveMinY = zoreY-dy-yInterval*3;
 
-			//no¤Ç¥½¡¼¥È¤¹¤ë
+			//noã§ã‚½ãƒ¼ãƒˆã™ã‚‹
 			List<StateNode> list = new ArrayList<StateNode>(zeroDistances);
 			Collections.sort(list, new Comparator<StateNode>() {
 				public int compare(StateNode n1, StateNode n2) {
@@ -623,7 +623,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 			}
 		}
 
-		//°ÜÆ°ÎÎ°è¤ò·×»»¤·¤Ê¤¬¤é¥Î¡¼¥É°ÜÆ°
+		//ç§»å‹•é ˜åŸŸã‚’è¨ˆç®—ã—ãªãŒã‚‰ãƒãƒ¼ãƒ‰ç§»å‹•
 		for(StateNode n : sortNodes){
 			if(n.isMarked()) continue;
 			if(n.getY()<pivot) continue;
@@ -678,7 +678,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 				}
 			}
 		}
-		//¿·¤·¤¯¥Ò¥Ã¥È¤·¤¿¥Î¡¼¥É¤¬¤¢¤ì¤Ğ¡¢ºÆµ¢Åª¤Ë¤µ¤é¤Ë¿·¤·¤¯¥Ò¥Ã¥È¤¹¤ë¥Î¡¼¥É¤òÃµ¤¹
+		//æ–°ã—ããƒ’ãƒƒãƒˆã—ãŸãƒãƒ¼ãƒ‰ãŒã‚ã‚Œã°ã€å†å¸°çš„ã«ã•ã‚‰ã«æ–°ã—ããƒ’ãƒƒãƒˆã™ã‚‹ãƒãƒ¼ãƒ‰ã‚’æ¢ã™
 		if(newhits.size()>0){
 			noes.removeAll(newhits);
 			hits.addAll(newhits);

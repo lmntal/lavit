@@ -74,7 +74,7 @@ public class StateNode implements Shape {
 	public int nth;
 
 	public boolean dummy;
-	public boolean backDummy; //dummy=true¤Î¾ì¹ç¤Î¤ßtrue¤Ë¤Ê¤ë²ÄÇ½À­¤¬¤¢¤ë
+	public boolean backDummy; //dummy=trueã®å ´åˆã®ã¿trueã«ãªã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹
 	public boolean weak;
 
 	private LinkedHashSet<StateTransition> toes = new LinkedHashSet<StateTransition>();
@@ -87,7 +87,7 @@ public class StateNode implements Shape {
 	private double radius;
 	private Color color;
 
-	//ÊªÍı¥â¥Ç¥ëÍÑÊÑ¿ô
+	//ç‰©ç†ãƒ¢ãƒ‡ãƒ«ç”¨å¤‰æ•°
 	public double dy;
 	public double ddy;
 
@@ -222,7 +222,7 @@ public class StateNode implements Shape {
 
 
 	/*
-	 * to·Ï¥á¥½¥Ã¥É
+	 * toç³»ãƒ¡ã‚½ãƒƒãƒ‰
 	 */
 
 	StateTransition addToTransition(StateTransition t){
@@ -342,7 +342,7 @@ public class StateNode implements Shape {
 	}
 
 	/*
-	 * from·Ï¥á¥½¥Ã¥É
+	 * fromç³»ãƒ¡ã‚½ãƒƒãƒ‰
 	 */
 
 	StateTransition addFromTransition(StateTransition f){
@@ -481,7 +481,7 @@ public class StateNode implements Shape {
 
 
 	/*
-	 * Layer·Ï¥á¥½¥Ã¥É
+	 * Layerç³»ãƒ¡ã‚½ãƒƒãƒ‰
 	 */
 
 
@@ -550,7 +550,7 @@ public class StateNode implements Shape {
 
 
 	/*
-	 * Subset·Ï
+	 * Subsetç³»
 	 */
 
 	public boolean hasSubset(){

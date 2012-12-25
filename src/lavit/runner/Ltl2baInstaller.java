@@ -195,7 +195,7 @@ public class Ltl2baInstaller implements OuterRunner  {
 				String str;
 				String makeCmd = Env.getBinaryAbsolutePath("make");
 
-				// makeµ¯Æ°
+				// makeèµ·å‹•
 				window.println(makeCmd);
 
 				pb = new ProcessBuilder(strList(makeCmd));

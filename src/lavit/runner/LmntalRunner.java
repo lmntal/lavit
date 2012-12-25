@@ -127,10 +127,10 @@ public class LmntalRunner implements OuterRunner {
 		public void run() {
 			try {
 
-				//·×Â¬³«»Ï
+				//è¨ˆæ¸¬é–‹å§‹
 				long startTimeMillis = System.currentTimeMillis();
 
-				//¥ª¥×¥·¥ç¥ó
+				//ã‚ªãƒ—ã‚·ãƒ§ãƒ³
 				String cmd = Env.getLmntalCmd()+option+" "+Env.getSpaceEscape(targetFile.getAbsolutePath());
 
 				FrontEnd.println("(LMNtal) "+cmd);

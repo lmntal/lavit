@@ -41,12 +41,12 @@ public class GraphSet {
 	public int generation;
 
 	public boolean setSlimResult(String str, boolean ltlMode) {
-		// TODO ¼«Æ°À¸À®¤µ¤ì¤¿¥á¥½¥Ã¥É¡¦¥¹¥¿¥Ö
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸãƒ¡ã‚½ãƒƒãƒ‰ãƒ»ã‚¹ã‚¿ãƒ–
 		return false;
 	}
 
 	public int size() {
-		// TODO ¼«Æ°À¸À®¤µ¤ì¤¿¥á¥½¥Ã¥É¡¦¥¹¥¿¥Ö
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸãƒ¡ã‚½ãƒƒãƒ‰ãƒ»ã‚¹ã‚¿ãƒ–
 		return 0;
 	}
 

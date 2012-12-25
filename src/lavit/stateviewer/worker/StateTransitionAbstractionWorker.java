@@ -121,7 +121,7 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 		this.rules = rules;
 		this.trans = new LinkedHashSet<StateTransition>();
 
-		//¥À¥ß¡¼¤¬´Ş¤Ş¤ì¤ë¤¿¤áºÆ¹½ÃÛ
+		//ãƒ€ãƒŸãƒ¼ãŒå«ã¾ã‚Œã‚‹ãŸã‚å†æ§‹ç¯‰
 		for(StateTransition t : panel.getDrawNodes().getAllTransition()){
 			rule: for(StateRule r : t.getRules()){
 				if(rules.contains(r)){

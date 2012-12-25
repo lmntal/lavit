@@ -641,14 +641,14 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		HashSet<StateNode> hits = new HashSet<StateNode>();
 
-		//¸¡º÷
+		//æ¤œç´¢
 		for(StateNode node : new LinkedList<StateNode>(drawNodes.getAllNode())){
 			if(node.isMatch(str)){
 				hits.add(node);
 			}
 		}
 
-		//½èÍı
+		//å‡¦ç†
 		for(StateNode node : hits){
 			drawNodes.setLastOrder(node);
 			node.weak = false;
@@ -717,7 +717,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			return -1;
 		}
 
-		//½èÍı
+		//å‡¦ç†
 		for(StateNode node : hits){
 			drawNodes.setLastOrder(node);
 			node.weak = false;
@@ -768,7 +768,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			cyclestart = cycles.get(cycles.size()-1);
 		}
 
-		//¥ë¡¼¥×¤·¤Æ¤¤¤ë¥Î¡¼¥É¤ÎÃµº÷
+		//ãƒ«ãƒ¼ãƒ—ã—ã¦ã„ã‚‹ãƒãƒ¼ãƒ‰ã®æ¢ç´¢
 		ArrayList<StateNode> loopNodes = new ArrayList<StateNode>();
 		if(loop){
 			node = cyclestart.getEmToNode();
@@ -781,7 +781,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 
 		if(loop){
-			//¥ë¡¼¥×¤ò½Ì¾®
+			//ãƒ«ãƒ¼ãƒ—ã‚’ç¸®å°
 			while(true){
 				ArrayList<StateNode> newLoopNodes = new ArrayList<StateNode>();
 				for(StateNode n : loopNodes){ newLoopNodes.add(n); }
@@ -818,7 +818,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				}
 			}
 
-			//¥ë¡¼¥×Æâ¤Î¶¯Ä´¤ò¹¹¿·
+			//ãƒ«ãƒ¼ãƒ—å†…ã®å¼·èª¿ã‚’æ›´æ–°
 			for(int i=0;i<loopNodes.size();++i){
 				StateNode n = loopNodes.get(i);
 				StateNode t = loopNodes.get((i+1)%loopNodes.size());
@@ -826,7 +826,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				n.setCycleToNode(t,true);
 			}
 
-			//¥ë¡¼¥×¤ÎÆş¤ê¸ı¤ò¹¹¿·
+			//ãƒ«ãƒ¼ãƒ—ã®å…¥ã‚Šå£ã‚’æ›´æ–°
 			for(StateNode n : loopNodes){
 				if(n.depth<cyclestart.depth){
 					cyclestart = n;
@@ -834,7 +834,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			}
 		}
 
-		//¥ë¡¼¥×Ãæ°Ê³°¤ÏÉÔ¼õÍı²½
+		//ãƒ«ãƒ¼ãƒ—ä¸­ä»¥å¤–ã¯ä¸å—ç†åŒ–
 		for(StateNode n : new LinkedList<StateNode>(drawNodes.getAllNode())){
 			if(loopNodes.contains(n)){
 				n.cycle = true;
@@ -848,7 +848,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			n.updateLooks();
 		}
 
-		//¥ë¡¼¥×¤ÎÆş¸ı¤«¤é½é´ü¾õÂÖ¤Ş¤ÇºÇÃ»¤Ç¼õÍı²½
+		//ãƒ«ãƒ¼ãƒ—ã®å…¥å£ã‹ã‚‰åˆæœŸçŠ¶æ…‹ã¾ã§æœ€çŸ­ã§å—ç†åŒ–
 		StateNode tn = cyclestart;
 		node = cyclestart.getOneFromNode();
 		while(node!=null){
@@ -990,12 +990,12 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		g2.setFont(font);
 
-		//¥Õ¥ì¡¼¥à¤Î½é´ü²½
+		//ãƒ•ãƒ¬ãƒ¼ãƒ ã®åˆæœŸåŒ–
 		g2.setColor(Color.white);
 		g2.fillRect(0, 0, getWidth(), getHeight());
 
 		if(!isActive()){ return; }
-		//¥°¥é¥ÕÉÁ²è
+		//ã‚°ãƒ©ãƒ•æç”»
 
 		double startTime = System.currentTimeMillis();
 
@@ -1004,7 +1004,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		draw.drawGraph(g2);
 
-		//ÁªÂò»ş¤Î»Í³Ñ¤ÎÉ½¼¨
+		//é¸æŠæ™‚ã®å››è§’ã®è¡¨ç¤º
 		if(selectSquare&&lastPoint!=null&&startPoint!=null){
 			Point p1 = new Point((int)((double)lastPoint.getX()/zoom), (int)((double)lastPoint.getY()/zoom));
 			Point p2 = new Point((int)((double)startPoint.getX()/zoom), (int)((double)startPoint.getY()/zoom));
@@ -1088,9 +1088,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		Point p = new Point((int)((double)e.getX()/zoom), (int)((double)e.getY()/zoom));
 
 
-		//¥Î¡¼¥É¤ÎÁªÂò
+		//ãƒãƒ¼ãƒ‰ã®é¸æŠ
 
-		//¤¢¤ëÄøÅÙ³ÈÂç¤·¤Æ¤¤¤Ê¤¤¤ÈÁªÂò¤Ç¤­¤Ê¤¤
+		//ã‚ã‚‹ç¨‹åº¦æ‹¡å¤§ã—ã¦ã„ãªã„ã¨é¸æŠã§ããªã„
 		StateNode selectNode = null;
 		if(zoom>0.3){
 			selectNode = drawNodes.pickANode(p);
@@ -1128,7 +1128,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		}
 
 
-		//¥È¥é¥ó¥¸¥·¥ç¥ó¤ÎÁªÂò
+		//ãƒˆãƒ©ãƒ³ã‚¸ã‚·ãƒ§ãƒ³ã®é¸æŠ
 		if(selectNode==null&&selectNodes.size()==0){
 			if(zoom>0.3){
 				selectTransition = drawNodes.pickATransition(p);
@@ -1142,7 +1142,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			selectTransition = null;
 		}
 
-		//±¦¥¯¥ê¥Ã¥¯À©¸æ
+		//å³ã‚¯ãƒªãƒƒã‚¯åˆ¶å¾¡
 		if(SwingUtilities.isRightMouseButton(e)){
 			(new StateRightMenu(this)).show(e.getComponent(), e.getX(), e.getY());
 		}

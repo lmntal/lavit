@@ -43,7 +43,7 @@ import java.util.List;
 import lavit.Env;
 
 /**
- * TODO: µ¯Æ°¥×¥í¥»¥¹¤ÎÉ¸½àÆşÎÏ¤Ø¤Î½ñ¤­¹ş¤ß¤ËÂĞ±ş¤¹¤ë¡£
+ * TODO: èµ·å‹•ãƒ—ãƒ­ã‚»ã‚¹ã®æ¨™æº–å…¥åŠ›ã¸ã®æ›¸ãè¾¼ã¿ã«å¯¾å¿œã™ã‚‹ã€‚
  */
 public class ProcessTask
 {

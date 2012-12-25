@@ -220,7 +220,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * first.lmn ¤ò³«¤¯
+	 * first.lmn ã‚’é–‹ã
 	 */
 	public void firstFileOpen()
 	{
@@ -242,7 +242,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * Á°²ó³«¤¤¤Æ¤¤¤¿¥Õ¥¡¥¤¥ë¤ò³«¤¯
+	 * å‰å›é–‹ã„ã¦ã„ãŸãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
 	 */
 	public void openInitialFiles()
 	{
@@ -259,7 +259,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * ¿·µ¬ºîÀ®
+	 * æ–°è¦ä½œæˆ
 	 */
 	public void newFileOpen()
 	{
@@ -269,9 +269,9 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * ³«¤¯¥Õ¥¡¥¤¥ë¤òÁªÂò¤¹¤ë¡£
+	 * é–‹ããƒ•ã‚¡ã‚¤ãƒ«ã‚’é¸æŠã™ã‚‹ã€‚
 	 */
-	 //TODO: ¤³¤Î¥Ñ¥Í¥ë¤Î»Å»ö¤Ç¤Ï¤Ê¤¤¡£
+	 //TODO: ã“ã®ãƒ‘ãƒãƒ«ã®ä»•äº‹ã§ã¯ãªã„ã€‚
 	public void fileOpen()
 	{
 		File file = chooseOpenFile();
@@ -282,7 +282,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * ¥Õ¥¡¥¤¥ë¤ò³«¤¯¡£
+	 * ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ãã€‚
 	 */
 	public void openFile(File file)
 	{
@@ -299,7 +299,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			EditorPage page = createPage(buf.toString());
 			page.setFile(file);
 
-			// ¥¿¥ÖÊÑ¹¹¥¤¥Ù¥ó¥È¤È¤Î´Ø·¸¾å¡¢¥¿¥Ö¤ÎÀßÄê½ªÎ»¸å¤ËÄÉ²Ã¤¹¤ë
+			// ã‚¿ãƒ–å¤‰æ›´ã‚¤ãƒ™ãƒ³ãƒˆã¨ã®é–¢ä¿‚ä¸Šã€ã‚¿ãƒ–ã®è¨­å®šçµ‚äº†å¾Œã«è¿½åŠ ã™ã‚‹
 			tabView.addPage(page, file.getName(), file.getAbsolutePath());
 
 			FrontEnd.println("(EDITOR) file open. [ " + file.getName() + " ]");
@@ -313,7 +313,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * ¾å½ñ¤­ÊİÂ¸
+	 * ä¸Šæ›¸ãä¿å­˜
 	 */
 	public boolean fileSave()
 	{
@@ -338,7 +338,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * Ì¾Á°¤òÉÕ¤±¤ÆÊİÂ¸
+	 * åå‰ã‚’ä»˜ã‘ã¦ä¿å­˜
 	 */
 	public boolean fileSaveAs()
 	{
@@ -403,9 +403,9 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * ÊÑ¹¹¤Î¤¢¤ë¤¹¤Ù¤Æ¤Î¥Ú¡¼¥¸¤Ë¤Ä¤¤¤ÆÊİÂ¸¤Ë¤Ä¤¤¤ÆÊ¹¤¯¡£
-	 * ¥­¥ã¥ó¥»¥ë¤¬ÁªÂò¤µ¤ì¤¿¾ì¹ç¤Ï¥Ú¡¼¥¸¤Ï1¤Ä¤âÊÄ¤¸¤é¤ì¤Ê¤¤¡£
-	 * @return ¤¹¤Ù¤Æ¤Î³ÎÇ§¤Ç¡Ö¤Ï¤¤¡×¤«¡Ö¤¤¤¤¤¨¡×¤¬ÁªÂò¤µ¤ì¤¿¾ì¹ç¤Ï {@code true}¡¢¤¢¤ë³ÎÇ§¤Ë¤Ä¤¤¤Æ¡Ö¥­¥ã¥ó¥»¥ë¡×¤¬ÁªÂò¤µ¤ì¤¿¾ì¹ç¤Ï {@code false}
+	 * å¤‰æ›´ã®ã‚ã‚‹ã™ã¹ã¦ã®ãƒšãƒ¼ã‚¸ã«ã¤ã„ã¦ä¿å­˜ã«ã¤ã„ã¦èãã€‚
+	 * ã‚­ãƒ£ãƒ³ã‚»ãƒ«ãŒé¸æŠã•ã‚ŒãŸå ´åˆã¯ãƒšãƒ¼ã‚¸ã¯1ã¤ã‚‚é–‰ã˜ã‚‰ã‚Œãªã„ã€‚
+	 * @return ã™ã¹ã¦ã®ç¢ºèªã§ã€Œã¯ã„ã€ã‹ã€Œã„ã„ãˆã€ãŒé¸æŠã•ã‚ŒãŸå ´åˆã¯ {@code true}ã€ã‚ã‚‹ç¢ºèªã«ã¤ã„ã¦ã€Œã‚­ãƒ£ãƒ³ã‚»ãƒ«ã€ãŒé¸æŠã•ã‚ŒãŸå ´åˆã¯ {@code false}
 	 */
 	public boolean askSaveAllChangedFiles()
 	{
@@ -431,7 +431,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * ¤¹¤Ù¤ÆÊÄ¤¸¤ë
+	 * ã™ã¹ã¦é–‰ã˜ã‚‹
 	 */
 	public void closeAllPages()
 	{
@@ -446,7 +446,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * ÁªÂò¤·¤Æ¤¤¤ë¥Ú¡¼¥¸¤òÊÄ¤¸¤ë
+	 * é¸æŠã—ã¦ã„ã‚‹ãƒšãƒ¼ã‚¸ã‚’é–‰ã˜ã‚‹
 	 */
 	public boolean closeSelectedPage()
 	{
@@ -475,8 +475,8 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * ÁªÂò¤·¤Æ¤¤¤ë¥Ú¡¼¥¸¤òÊÄ¤¸¤ë¡£
-	 * ¤³¤Î¥á¥½¥Ã¥É¤òÄ¾ÀÜ¸Æ¤ó¤À¾ì¹ç¡¢ÊÄ¤¸¤é¤ì¤ë¥Ú¡¼¥¸¤ÎÊÑ¹¹ÆâÍÆ¤ÏÇË´ş¤µ¤ì¤ë¡£
+	 * é¸æŠã—ã¦ã„ã‚‹ãƒšãƒ¼ã‚¸ã‚’é–‰ã˜ã‚‹ã€‚
+	 * ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ã‚’ç›´æ¥å‘¼ã‚“ã å ´åˆã€é–‰ã˜ã‚‰ã‚Œã‚‹ãƒšãƒ¼ã‚¸ã®å¤‰æ›´å†…å®¹ã¯ç ´æ£„ã•ã‚Œã‚‹ã€‚
 	 */
 	public void closeSelectedPageDiscardChanges()
 	{
@@ -552,7 +552,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 				}
 				else
 				{
-					/* ¤â¤¦°ìÅÙÁªÂò */
+					/* ã‚‚ã†ä¸€åº¦é¸æŠ */
 				}
 			}
 			else
@@ -564,7 +564,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * ÊÑ¹¹¤òÊİÂ¸¤¹¤ë¤«Ê¹¤¯¡£
+	 * å¤‰æ›´ã‚’ä¿å­˜ã™ã‚‹ã‹èãã€‚
 	 */
 	private int askSaveChangedFile()
 	{
@@ -660,7 +660,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	}
 
 	/**
-	 * ¥«¡¼¥½¥ë¤Î°ÜÆ°¤ò´Æ»ë¤¹¤ë¥¯¥é¥¹
+	 * ã‚«ãƒ¼ã‚½ãƒ«ã®ç§»å‹•ã‚’ç›£è¦–ã™ã‚‹ã‚¯ãƒ©ã‚¹
 	 */
 	private class RowColumnListener implements CaretListener
 	{

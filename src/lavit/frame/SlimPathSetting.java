@@ -262,20 +262,20 @@ class SlimPathPanel extends JPanel
 	}
 
 	/**
-	 * ½é´ü¤ÎÆşÎÏ¾õÂÖ¤ò¹½À®¤·¤Ş¤¹¡£
+	 * åˆæœŸã®å…¥åŠ›çŠ¶æ…‹ã‚’æ§‹æˆã—ã¾ã™ã€‚
 	 */
 	private void initializeFields()
 	{
 		String installedSlimPath = Env.get("SLIM_EXE_PATH");
 		if (!StringUtils.nullOrEmpty(installedSlimPath) && FileUtils.exists(installedSlimPath))
 		{
-			// ¥¤¥ó¥¹¥È¡¼¥ëºÑ¤ß¤ÎSLIM¤òÁªÂò
+			// ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ¸ˆã¿ã®SLIMã‚’é¸æŠ
 			useInstalled.setSelected(true);
 			pathSlim.setPathText(installedSlimPath);
 		}
 		else
 		{
-			// SLIM¤Î¥¤¥ó¥¹¥È¡¼¥ë¤òÁªÂò
+			// SLIMã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã‚’é¸æŠ
 			useInstalled.setEnabled(false);
 			install.setSelected(true);
 		}
@@ -283,7 +283,7 @@ class SlimPathPanel extends JPanel
 	}
 
 	/**
-	 * SLIM¥½¡¼¥¹¥³¡¼¥É¥Ç¥£¥ì¥¯¥È¥ê¤Î¥Ñ¥¹Ì¾¤ò¼èÆÀ¤·¤Ş¤¹¡£
+	 * SLIMã‚½ãƒ¼ã‚¹ã‚³ãƒ¼ãƒ‰ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®ãƒ‘ã‚¹åã‚’å–å¾—ã—ã¾ã™ã€‚
 	 */
 	public String getSourceDirectory()
 	{
@@ -291,7 +291,7 @@ class SlimPathPanel extends JPanel
 	}
 
 	/**
-	 * SLIM¤Î¥¤¥ó¥¹¥È¡¼¥ëÀè¥Ç¥£¥ì¥¯¥È¥ê¤Î¥Ñ¥¹Ì¾¤ò¼èÆÀ¤·¤Ş¤¹¡£
+	 * SLIMã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«å…ˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®ãƒ‘ã‚¹åã‚’å–å¾—ã—ã¾ã™ã€‚
 	 */
 	public String getInstallDirectory()
 	{
@@ -299,7 +299,7 @@ class SlimPathPanel extends JPanel
 	}
 
 	/**
-	 * SLIM¥Ğ¥¤¥Ê¥ê¤Î¥Ñ¥¹Ì¾¤ò¼èÆÀ¤·¤Ş¤¹¡£
+	 * SLIMãƒã‚¤ãƒŠãƒªã®ãƒ‘ã‚¹åã‚’å–å¾—ã—ã¾ã™ã€‚
 	 */
 	public String getSlimBinaryPath()
 	{
@@ -327,7 +327,7 @@ class SlimPathPanel extends JPanel
 	}
 
 	/**
-	 * ÀßÄê¹àÌÜ¤¬Å¬ÀÚ¤Ç¤¢¤ë¤«¸¡ºº¤·¤Ş¤¹¡£
+	 * è¨­å®šé …ç›®ãŒé©åˆ‡ã§ã‚ã‚‹ã‹æ¤œæŸ»ã—ã¾ã™ã€‚
 	 */
 	public boolean verifyConfiguration()
 	{
@@ -393,7 +393,7 @@ class SlimPathPanel extends JPanel
 	}
 
 	/**
-	 * »ØÄê¤µ¤ì¤¿¥¤¥ó¥¹¥È¡¼¥ëÀè¥Ñ¥¹Ì¾¤«¤éSLIM¥Ğ¥¤¥Ê¥ê¤Î¥Ñ¥¹Ì¾¤òºîÀ®¤¹¤ë¡£
+	 * æŒ‡å®šã•ã‚ŒãŸã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«å…ˆãƒ‘ã‚¹åã‹ã‚‰SLIMãƒã‚¤ãƒŠãƒªã®ãƒ‘ã‚¹åã‚’ä½œæˆã™ã‚‹ã€‚
 	 */
 	private String createSlimPath()
 	{

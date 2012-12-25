@@ -89,7 +89,7 @@ public class State3DTransition{
 		double dy = to.getGraphPoint().y-from.getGraphPoint().y;
 		double dz = to.getGraphPoint().z-from.getGraphPoint().z;
 
-		// ¿§¤ÎÀßÄê
+		// è‰²ã®è¨­å®š
 		Appearance ap = new Appearance();
 		Material ma = new Material();
 		Color color = Color.WHITE;
@@ -101,14 +101,14 @@ public class State3DTransition{
 			color = Color.RED;
 		}
 		ma.setDiffuseColor(new Color3f(color));
-		ma.setEmissiveColor(new Color3f(color)); //È¯¸÷
+		ma.setEmissiveColor(new Color3f(color)); //ç™ºå…‰
 		ap.setMaterial(ma);
 
-		// ±ß¿í¤òÄÉ²Ã
+		// å††éŒã‚’è¿½åŠ 
 		Cone cone = new Cone( 0.05f, 0.3f, Cone.GENERATE_NORMALS, 20, 1, ap);
 		tg.addChild(cone);
 
-		//¥é¥¤¥ó¤òÄÉ²Ã
+		//ãƒ©ã‚¤ãƒ³ã‚’è¿½åŠ 
 		Point3d[] vertex = new Point3d[2];
 		vertex[0] = new Point3d(0.0, 0.1, 0.0);
 		vertex[1] = new Point3d(0.0, -length, 0.0);
@@ -120,11 +120,11 @@ public class State3DTransition{
 		tg.addChild(shape);
 
 
-		//Ê¿¹Ô°ÜÆ°¤òÄêµÁ
+		//å¹³è¡Œç§»å‹•ã‚’å®šç¾©
 		Transform3D transform = new Transform3D();
 		transform.set(new Vector3d(to.getGraphPoint().x - 0.3*dx/dis, to.getGraphPoint().y - 0.3*dy/dis, to.getGraphPoint().z - 0.3*dz/dis));
 
-		//²óÅ¾¤òÄêµÁ
+		//å›žè»¢ã‚’å®šç¾©
 		Transform3D rotate = new Transform3D();
 		if(dx>=0){
 			rotate.rotZ(-Math.PI / 2);
@@ -171,7 +171,7 @@ public class State3DTransition{
 		double dy = to.p.y-from.p.y;
 		double dz = to.p.z-from.p.z;
 
-		//¥é¥¤¥ó¤òÄÉ²Ã
+		//ãƒ©ã‚¤ãƒ³ã‚’è¿½åŠ 
 		Point3d[] vertex;
 		LineArray geometry;
 

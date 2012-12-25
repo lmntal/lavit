@@ -63,7 +63,7 @@ public class VisualToolBar extends JToolBar implements ActionListener {
 
 		buttons = new ArrayList<JToggleButton>();
 
-		selectButton = new JToggleButton("¡™¬Ú");
+		selectButton = new JToggleButton("ÈÅ∏Êäû");
 		selectButton.addActionListener(this);
 		selectButton.setFocusable(false);
 		selectButton.setMargin(new Insets(10, 10, 10, 10));
@@ -72,28 +72,28 @@ public class VisualToolBar extends JToolBar implements ActionListener {
 
 		addSeparator();
 
-		atomButton = new JToggleButton("•¢•»•‡");
+		atomButton = new JToggleButton("„Ç¢„Éà„É†");
 		atomButton.addActionListener(this);
 		atomButton.setFocusable(false);
 		atomButton.setMargin(new Insets(10, 10, 10, 10));
 		buttons.add(atomButton);
 		add(atomButton);
 
-		linkButton = new JToggleButton("•Í•Û•Ø");
+		linkButton = new JToggleButton("„É™„É≥„ÇØ");
 		linkButton.addActionListener(this);
 		linkButton.setFocusable(false);
 		linkButton.setMargin(new Insets(10, 10, 10, 10));
 		buttons.add(linkButton);
 		add(linkButton);
 
-		memButton = new JToggleButton("ÀÏ");
+		memButton = new JToggleButton("ËÜú");
 		memButton.addActionListener(this);
 		memButton.setFocusable(false);
 		memButton.setMargin(new Insets(10, 10, 10, 10));
 		buttons.add(memButton);
 		add(memButton);
 
-		ruleButton = new JToggleButton("•Î°º•Î");
+		ruleButton = new JToggleButton("„É´„Éº„É´");
 		ruleButton.addActionListener(this);
 		ruleButton.setFocusable(false);
 		ruleButton.setMargin(new Insets(10, 10, 10, 10));

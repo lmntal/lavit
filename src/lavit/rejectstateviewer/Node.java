@@ -49,13 +49,13 @@ public class Node {
 	private boolean marked;
 	private boolean inFrame;
 
-	//ÉÁ²è´ØÏ¢
+	//æç”»é–¢é€£
 	private Shape shape;
 	private double radius;
 	private Color fillColor;
 	private Color drawColor;
 
-	//ÊªÍı¥â¥Ç¥ëÍÑÊÑ¿ô
+	//ç‰©ç†ãƒ¢ãƒ‡ãƒ«ç”¨å¤‰æ•°
 	public double dy;
 	public double ddy;
 

@@ -85,7 +85,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 
-		//¥Ü¥¿¥óÎó
+		//ãƒœã‚¿ãƒ³åˆ—
 		buttonPanel = new JPanel(new GridLayout(2,4));
 
 		lmntalButton = new JButton(Lang.m[11]);
@@ -132,7 +132,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		setAllEnable(true);
 		add(buttonPanel);
 
-		//¥é¥Ù¥ëÎó
+		//ãƒ©ãƒ™ãƒ«åˆ—
 		labelPanel = new JPanel(new GridLayout(1,2));
 
 		fileStatus = new JLabel();

@@ -141,7 +141,7 @@ public class AutoStyledDocument extends DefaultStyledDocument{
 
 	}
 
-	// -- ¥¿¥Ö¤Ë´Ø¤¹¤ë¼ÂÁõ --
+	// -- ã‚¿ãƒ–ã«é–¢ã™ã‚‹å®Ÿè£… --
 	
 	private static final class CustomTabSet extends TabSet
 	{

@@ -102,7 +102,7 @@ public class State3DDynamicMover extends Thread {
 						springLength = panel.getDepthNode().get(1).get(0).getX() - panel.getDepthNode().get(0).get(0).getX();
 					}
 
-					//§–§Õ
+					//„Å∞„Å≠
 					for(State3DNode node : panel.getAllNode()){
 						for(State3DNode to : node.getToNodes()){
 							double l = node.distance(to);
@@ -124,7 +124,7 @@ public class State3DDynamicMover extends Thread {
 						}
 					}
 
-					//¿ÕŒœ
+					//Êñ•Âäõ
 					/*
 					int d = 10;
 					for(ArrayList<State3DNode> nodes : panel.getDepthNode()){
@@ -195,13 +195,13 @@ public class State3DDynamicMover extends Thread {
 						}
 					}
 
-					//À‡ª§Œœ
+					//Êë©Êì¶Âäõ
 					for(State3DNode node : panel.getAllNode()){
 						node.addDDY(-0.7 * (node.getDY()+node.getDDY()));
 						node.addDDZ(-0.7 * (node.getDZ()+node.getDDZ()));
 					}
 
-					//∞‹∆∞
+					//ÁßªÂãï
 					for(State3DNode node : panel.getAllNode()){
 						node.move(maxSpeed);
 					}

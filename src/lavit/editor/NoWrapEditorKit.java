@@ -48,7 +48,7 @@ import javax.swing.text.StyledEditorKit;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 
-//ÀŞ¤êÊÖ¤·¤ò¤·¤Ê¤¤¤¿¤á¤Î¥¯¥é¥¹
+//æŠ˜ã‚Šè¿”ã—ã‚’ã—ãªã„ãŸã‚ã®ã‚¯ãƒ©ã‚¹
 
 public class NoWrapEditorKit extends StyledEditorKit{
 

@@ -85,7 +85,7 @@ public class MCProfilePanel extends JPanel implements RunnerOutputGetter{
 		State state = new State(id,hash,successor,null);
 		allState.add(state);
 
-		//¥Ï¥Ã¥·¥å
+		//ãƒãƒƒã‚·ãƒ¥
 		if(hashes.containsKey(hash)){
 			hashConflict++;
 			hashes.get(hash).add(state);
@@ -95,7 +95,7 @@ public class MCProfilePanel extends JPanel implements RunnerOutputGetter{
 			hashes.put(hash,l);
 		}
 
-		//Á«°ÜÀè¿ô
+		//é·ç§»å…ˆæ•°
 		if(suces.containsKey(successor)){
 			suces.get(successor).add(state);
 		}else{

@@ -122,7 +122,7 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 		if(xInterval>30){ xInterval=30; }else if(xInterval<10){ xInterval=10; }
 		if(yInterval>30){ yInterval=30; }else if(yInterval<10){ yInterval=10; }
 
-		//Åù´Ö³ÖxÇÛÃÖ
+		//ç­‰é–“éš”xé…ç½®
 		for(StateNode node : drawNodes.getAllNode()){
 			node.setX((node.depth+1)*xInterval);
 		}
@@ -249,7 +249,7 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 			public void paintComponent(Graphics g){
 				Graphics2D g2 = (Graphics2D)g;
 
-				//¥Õ¥ì¡¼¥à¤Î½é´ü²½
+				//ãƒ•ãƒ¬ãƒ¼ãƒ ã®åˆæœŸåŒ–
 				g2.setColor(Color.white);
 				g2.fillRect(0, 0, getWidth(), getHeight());
 

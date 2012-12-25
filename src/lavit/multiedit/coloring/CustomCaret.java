@@ -46,7 +46,7 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
 /**
- * <p>¹ÔÁ´ÂÎ¤¬ÁªÂò¤µ¤ì¤¿¤È¤­¤Ë¥³¥ó¥İ¡¼¥Í¥ó¥È¤ÎÃ¼¤Ş¤Ç¥Ï¥¤¥é¥¤¥È¤µ¤ì¤ë¤è¤¦¤Ë³ÈÄ¥¤·¤¿¥­¥ã¥ì¥Ã¥È¤Ç¤¹¡£</p>
+ * <p>è¡Œå…¨ä½“ãŒé¸æŠã•ã‚ŒãŸã¨ãã«ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®ç«¯ã¾ã§ãƒã‚¤ãƒ©ã‚¤ãƒˆã•ã‚Œã‚‹ã‚ˆã†ã«æ‹¡å¼µã—ãŸã‚­ãƒ£ãƒ¬ãƒƒãƒˆã§ã™ã€‚</p>
  * @author Yuuki SHINOBU
  */
 @SuppressWarnings("serial")
@@ -65,25 +65,25 @@ public class CustomCaret extends DefaultCaret
 
 				g.setColor(c.getSelectionColor());
 
-				if (p0.y == p1.y) // Ã±°ì¤Î¹Ô
+				if (p0.y == p1.y) // å˜ä¸€ã®è¡Œ
 				{
 					Rectangle r = p0.union(p1);
 					g.fillRect(r.x, r.y, r.width, r.height);
 				}
-				else // Ê£¿ô¹Ô
+				else // è¤‡æ•°è¡Œ
 				{
-					// ³«»Ï¹Ô¡§ÁªÂòÈÏ°Ï¤Î»ÏÅÀ¤«¤é¹ÔËö¤Ş¤Ç
+					// é–‹å§‹è¡Œï¼šé¸æŠç¯„å›²ã®å§‹ç‚¹ã‹ã‚‰è¡Œæœ«ã¾ã§
 					int p0ToRight = alloc.x + alloc.width - p0.x;
 					g.fillRect(p0.x, p0.y, p0ToRight, p0.height);
 
-					// Á´ÂÎ¤¬ÁªÂò¤µ¤ì¤Æ¤¤¤ë¹Ô
+					// å…¨ä½“ãŒé¸æŠã•ã‚Œã¦ã„ã‚‹è¡Œ
 					if ((p0.y + p0.height) != p1.y)
 					{
 						g.fillRect(alloc.x, p0.y + p0.height, alloc.width, p1.y
 								- (p0.y + p0.height));
 					}
 
-					// ºÇ½ª¹Ô¡§¹ÔÆ¬¤«¤éÁªÂòÈÏ°Ï¤Î½ªÅÀ¤Ş¤Ç
+					// æœ€çµ‚è¡Œï¼šè¡Œé ­ã‹ã‚‰é¸æŠç¯„å›²ã®çµ‚ç‚¹ã¾ã§
 					g.fillRect(alloc.x, p1.y, (p1.x - alloc.x), p1.height);
 				}
 			}

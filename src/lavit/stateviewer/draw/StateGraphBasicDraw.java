@@ -75,11 +75,11 @@ public class StateGraphBasicDraw extends StateDraw {
 		this.drawNodes = panel.getDrawNodes();
 		this.zoom = panel.getZoom();
 
-		//ÇØ·Ê¿§
+		//èƒŒæ™¯è‰²
 		g2.setColor(Color.white);
 		g2.fillRect(0, 0, (int)(panel.getWidth()/zoom)+1, (int)(panel.getHeight()/zoom)+1);
 
-		//ÉÁ¼ÌÂĞ¾İ¤Î·èÄê
+		//æå†™å¯¾è±¡ã®æ±ºå®š
 		double minX=-10/zoom,maxX=(panel.getWidth()+10)/zoom;
 		double minY=-10/zoom,maxY=(panel.getHeight()+10)/zoom;
 		for(StateNode node : drawNodes.getAllNode()){
@@ -89,34 +89,34 @@ public class StateGraphBasicDraw extends StateDraw {
 			}
 		}
 
-		//½é´ü¾õÂÖ¤ÎÌğ°õ¤ÎÉÁ¼Ì
+		//åˆæœŸçŠ¶æ…‹ã®çŸ¢å°ã®æå†™
 		if(!Env.is("SV_SHOWOUTTRANS")||drawNodes.getAllOutTransition().size()==0){
 			drawStartArrow();
 		}
 
-		//OUTTRANS¤ÎÉÁ²è
+		//OUTTRANSã®æç”»
 		if(Env.is("SV_SHOWOUTTRANS")){
 			drawOutTransition();
 		}
 
-		//Àş¤ÎÉÁ¼Ì
+		//ç·šã®æå†™
 		boolean nocurve = Env.is("SV_NOCURVE");
 		if(simpleMode){
-			//¤¹¤Ù¤ÆÄ¾Àş¤ÇÉÁ²è
+			//ã™ã¹ã¦ç›´ç·šã§æç”»
 			for(StateTransition t : drawNodes.getAllTransition()){
 				//if(Math.random()<0.5){ continue; }
 				drawTransition(t, null);
 			}
 		}else{
 			/*
-			//¥À¥ß¡¼°Ê³°¤òÉÁ²è
+			//ãƒ€ãƒŸãƒ¼ä»¥å¤–ã‚’æç”»
 			for(StateTransition t : drawNodes.getAllTransition()){
 				if(t.from.dummy||t.to.dummy){ continue; }
 				drawTransition(t, null);
 				System.out.println(t);
 			}
 			System.out.println();
-			//¥À¥ß¡¼¥«¡¼¥Ö
+			//ãƒ€ãƒŸãƒ¼ã‚«ãƒ¼ãƒ–
 			ArrayList<ArrayList<StateNode>> dummyGroups = getDummyGroups(drawNodes.getDepthNode());
 			drawDummyCurve(dummyGroups, null);
 			*/
@@ -134,13 +134,13 @@ public class StateGraphBasicDraw extends StateDraw {
 			}
 		}
 
-		//¥Î¡¼¥É¤ÎÉÁ¼Ì
+		//ãƒãƒ¼ãƒ‰ã®æå†™
 		for(StateNode node : drawNodes.getAllNode()){
 			//if(Math.random()<0.5){ continue; }
 			drawNode(node, null, null);
 		}
 
-		//¥µ¥¤¥¯¥ë¤ÎÍ¥ÀèÉÁ²è
+		//ã‚µã‚¤ã‚¯ãƒ«ã®å„ªå…ˆæç”»
 		drawNodes.allNodeUnMark();
 		ArrayList<StateNode> cycleNode = drawNodes.getCycleNode();
 		for(StateNode node : cycleNode){
@@ -161,19 +161,19 @@ public class StateGraphBasicDraw extends StateDraw {
 			drawNode(node, null, null);
 		}
 
-		//ÁªÂò¤·¤Æ¤¤¤ë¥Î¡¼¥É¤ÎÉÁ¼Ì
+		//é¸æŠã—ã¦ã„ã‚‹ãƒãƒ¼ãƒ‰ã®æå†™
 		for(StateNode node : panel.getSelectNodes()){
 			drawSelectNode(node);
 		}
 		panel.updateNodeLabel();
 		panel.validate();
 
-		//ÁªÂò¥È¥é¥ó¥¸¥·¥ç¥ó¤ÎÉÁ²è
+		//é¸æŠãƒˆãƒ©ãƒ³ã‚¸ã‚·ãƒ§ãƒ³ã®æç”»
 		if(panel.getSelectTransition()!=null){
 			drawSelectTransition(panel.getSelectTransition());
 		}
 
-		//debug:¥È¥é¥ó¥¸¥·¥ç¥óÁªÂòÈÏ°Ï¤ÎÉÁ²è
+		//debug:ãƒˆãƒ©ãƒ³ã‚¸ã‚·ãƒ§ãƒ³é¸æŠç¯„å›²ã®æç”»
 		/*
 		g2.setColor(Color.LIGHT_GRAY);
 		for(StateTransition t : drawNodes.getAllTransition()){
@@ -204,7 +204,7 @@ public class StateGraphBasicDraw extends StateDraw {
 	/*
 	private void drawArrow(Graphics2D g2,StateNode node){
 
-		//Á«°ÜÀè¤Ø¤ÎÌğ°õ¤òÉ½¼¨
+		//é·ç§»å…ˆã¸ã®çŸ¢å°ã‚’è¡¨ç¤º
 		for(StateNode to : node.getToNodes()){
 			if(hideBackEdgeMode&&to.depth<node.depth){ continue; }
 			if(!node.isInFrame()&&!to.isInFrame()){ continue; }
@@ -267,7 +267,7 @@ public class StateGraphBasicDraw extends StateDraw {
 		g2.setColor(color);
 
 		if(!simpleMode){
-			//Ìğ°õ¤ÎÉ½¼¨
+			//çŸ¢å°ã®è¡¨ç¤º
 			if(to!=from){
 				if(to.dummy){
 					if(to.dummy&&from.dummy){
@@ -281,7 +281,7 @@ public class StateGraphBasicDraw extends StateDraw {
 			}else{
 				drawSelfArrow(from);
 			}
-			//¥ë¡¼¥ëÌ¾¤ÎÉ½¼¨
+			//ãƒ«ãƒ¼ãƒ«åã®è¡¨ç¤º
 			if((showRuleMode||showNoNameRuleMode)&&!from.dummy){
 				String str = from.getToRuleName(to);
 				if(str.length()>0){
@@ -390,9 +390,9 @@ public class StateGraphBasicDraw extends StateDraw {
 		}
 	}
 
-	//¥À¥ß¡¼¥«¡¼¥Ö¤ÎÉÁ²è
+	//ãƒ€ãƒŸãƒ¼ã‚«ãƒ¼ãƒ–ã®æç”»
 	private void drawDummyCurve(StateNode dummy, Color color){
-		//mark¤µ¤ì¤Æ¤ë¾ì¹ç¤ÏÉÁ²è¤·¤Ê¤¤
+		//markã•ã‚Œã¦ã‚‹å ´åˆã¯æç”»ã—ãªã„
 		if(dummy.isMarked()){ return; }
 
 		if(color==null){
@@ -404,7 +404,7 @@ public class StateGraphBasicDraw extends StateDraw {
 		}
 		g2.setColor(color);
 
-		//¥À¥ß¡¼¤Î¥ê¥¹¥È¤ÎºîÀ®
+		//ãƒ€ãƒŸãƒ¼ã®ãƒªã‚¹ãƒˆã®ä½œæˆ
 		ArrayList<StateNode> dummyGroup = new ArrayList<StateNode>();
 		StateNode n = dummy;
 		while(n.getFromNode().dummy){
@@ -416,7 +416,7 @@ public class StateGraphBasicDraw extends StateDraw {
 			n = n.getToNode();
 		}
 
-		//¥À¥ß¡¼¤ÎÃæ´ÖÅÀ¤òºîÀ®
+		//ãƒ€ãƒŸãƒ¼ã®ä¸­é–“ç‚¹ã‚’ä½œæˆ
 		ArrayList<Point2D> points = new ArrayList<Point2D>();
 		StateNode n0 = dummyGroup.get(0).getFromNode();
 		boolean inFrame = n0.isInFrame();
@@ -434,7 +434,7 @@ public class StateGraphBasicDraw extends StateDraw {
 		if(hideBackEdgeMode&&nN.depth<n0.depth){ return; }
 		if(!inFrame){ return; }
 
-		//¥Ñ¥¹¤ÎºîÀ®¡¢Ä¾Àş¡¢¶ÊÀşÉÁ²è
+		//ãƒ‘ã‚¹ã®ä½œæˆã€ç›´ç·šã€æ›²ç·šæç”»
 		GeneralPath p = new GeneralPath();
 		Point2D fP = points.get(0);
 		drawNodeLine(n0.getX(), n0.getY(), n0.getRadius(), fP.getX(), fP.getY(), 0);
@@ -445,12 +445,12 @@ public class StateGraphBasicDraw extends StateDraw {
 		}
 		g2.draw(p);
 
-		//Ìğ°õ¤ÎÉÁ²è
+		//çŸ¢å°ã®æç”»
 		Point2D lP = points.get(points.size()-1);
 		drawNodeArrow(lP.getX(), lP.getY(), 0, nN.getX(), nN.getY(), nN.getRadius(), 5);
 
 
-		//¥ë¡¼¥ëÌ¾¤ÎÉ½¼¨
+		//ãƒ«ãƒ¼ãƒ«åã®è¡¨ç¤º
 		if(showRuleMode||showNoNameRuleMode){
 			String str = n0.getToRuleName(dummyGroup.get(0));
 			if(str.length()>0){
@@ -538,7 +538,7 @@ public class StateGraphBasicDraw extends StateDraw {
 
 	private void drawSelectNode(StateNode node){
 
-		// Á«°Ü¸µ¤ÎÉÁ²è
+		// é·ç§»å…ƒã®æç”»
 		drawNodes.allNodeUnMark();
 		for(StateTransition f : node.getFromTransitions()){
 			if(!f.from.dummy){
@@ -558,7 +558,7 @@ public class StateGraphBasicDraw extends StateDraw {
 			}
 		}
 
-		// Á«°ÜÀè¤ÎÉÁ²è
+		// é·ç§»å…ˆã®æç”»
 		drawNodes.allNodeUnMark();
 		for(StateTransition t : node.getToTransitions()){
 			StateTransition f = t.to.getToTransition(node);
@@ -582,11 +582,11 @@ public class StateGraphBasicDraw extends StateDraw {
 			}
 		}
 
-		// ¾õÂÖ¤ÎÉÁ²è
+		// çŠ¶æ…‹ã®æç”»
 		drawNode(node, node.getColor(), Color.RED);
 
 		/*
-		// Á«°Ü¸µ¤ÎÉ½¼¨
+		// é·ç§»å…ƒã®è¡¨ç¤º
 		g2.setColor(Color.BLUE);
 		//for(StateNode from : node.getFromNodes()){
 		//	drawTransition(g2,from.getTransition(node),Color.BLUE);
@@ -614,7 +614,7 @@ public class StateGraphBasicDraw extends StateDraw {
 		}
 
 
-		// Á«°ÜÀè¤ÎÉ½¼¨
+		// é·ç§»å…ˆã®è¡¨ç¤º
 		g2.setColor(Color.RED);
 		//for(StateTransition t : node.getTransition()){
 		//	drawTransition(g2,t,Color.RED);
@@ -637,7 +637,7 @@ public class StateGraphBasicDraw extends StateDraw {
 				}else{
 					drawLine(g2,from.getX(),from.getY(),to.getX(),to.getY());
 				}
-				//Ìá¤êÌğ°õ¤¬¤¢¤ë¤«¥Á¥§¥Ã¥¯
+				//æˆ»ã‚ŠçŸ¢å°ãŒã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
 				for(StateNode t : to.getToNodes()){
 					if(t==from){
 						if(!simpleMode){
@@ -663,7 +663,7 @@ public class StateGraphBasicDraw extends StateDraw {
 
 		drawTransition(trans, Color.RED);
 
-		// ¾õÂÖ¤ÎÉÁ²è
+		// çŠ¶æ…‹ã®æç”»
 		drawNode(trans.from, trans.from.getColor(), Color.BLUE);
 		drawNode(trans.to, trans.to.getColor(), Color.RED);
 	}
@@ -709,20 +709,20 @@ public class StateGraphBasicDraw extends StateDraw {
 
 	private void drawLine(double x1,double y1,double x2,double y2){
 		if(zoom>2.0){
-			//double¥é¥¤¥ó
+			//doubleãƒ©ã‚¤ãƒ³
 			g2.draw(new Line2D.Double(x1,y1,x2,y2));
 		}else{
-			//int¥é¥¤¥ó
+			//intãƒ©ã‚¤ãƒ³
 			g2.drawLine((int)x1, (int)y1, (int)x2, (int)y2);
 		}
 	}
 
 	private void drawArc(double x,double y,double w,double h,double start,double extent){
 		if(zoom>2.0){
-			//double¥¢¡¼¥¯
+			//doubleã‚¢ãƒ¼ã‚¯
 			g2.draw(new Arc2D.Double(x,y,w,h,start,extent,Arc2D.OPEN));
 		}else{
-			//int¥¢¡¼¥¯
+			//intã‚¢ãƒ¼ã‚¯
 			g2.drawArc((int)x,(int)y,(int)w,(int)h,(int)start,(int)extent);
 		}
 	}
@@ -732,7 +732,7 @@ public class StateGraphBasicDraw extends StateDraw {
 		double radius;
 		Color color;
 
-		//¿§¤Î·èÄê
+		//è‰²ã®æ±ºå®š
 		double to = node.getToTransitions().size();
 		double from = node.getFromTransitions().size();
 		double r = 0;
@@ -773,14 +773,14 @@ public class StateGraphBasicDraw extends StateDraw {
 			}
 		}
 
-		//¿§¤ÎÀßÄê
+		//è‰²ã®è¨­å®š
 		if(node.dummy){
 			color = Color.gray;
 		}else{
 			color = new Color((int)r,(int)g,(int)b);
 		}
 
-		//Âç¤­¤µ¤ÎÀßÄê
+		//å¤§ãã•ã®è¨­å®š
 		if(node.dummy){
 			if(Env.is("SV_SHOW_DUMMY")){
 				radius = 2.0;
@@ -793,7 +793,7 @@ public class StateGraphBasicDraw extends StateDraw {
 			radius = 5.0;
 		}
 
-		//·Á¤ÎÀßÄê
+		//å½¢ã®è¨­å®š
 		if(node.getChildSet()==null){
 			shape = new RoundRectangle2D.Double(node.getX()-radius,node.getY()-radius,radius*2,radius*2,radius*2,radius*2);
 		}else{

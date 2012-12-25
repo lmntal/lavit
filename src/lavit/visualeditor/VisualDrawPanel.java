@@ -192,7 +192,7 @@ public class VisualDrawPanel extends JPanel implements MouseInputListener,MouseW
 	public void paintComponent(Graphics g){
 		Graphics2D g2 = (Graphics2D)g;
 
-		//¥Õ¥ì¡¼¥à¤Î½é´ü²½
+		//ãƒ•ãƒ¬ãƒ¼ãƒ ã®åˆæœŸåŒ–
 		g2.setColor(Color.white);
 		g2.fillRect(0, 0, getWidth(), getHeight());
 
@@ -516,20 +516,20 @@ public class VisualDrawPanel extends JPanel implements MouseInputListener,MouseW
 
 	private void drawLine(Graphics2D g2,double x1,double y1,double x2,double y2){
 		if(zoom>2.0){
-			//double¥é¥¤¥ó
+			//doubleãƒ©ã‚¤ãƒ³
 			g2.draw(new Line2D.Double(x1,y1,x2,y2));
 		}else{
-			//int¥é¥¤¥ó
+			//intãƒ©ã‚¤ãƒ³
 			g2.drawLine((int)x1, (int)y1, (int)x2, (int)y2);
 		}
 	}
 
 	private void drawArc(Graphics2D g2,double x,double y,double w,double h,double start,double extent){
 		if(zoom>2.0){
-			//double¥¢¡¼¥¯
+			//doubleã‚¢ãƒ¼ã‚¯
 			g2.draw(new Arc2D.Double(x,y,w,h,start,extent,Arc2D.OPEN));
 		}else{
-			//int¥¢¡¼¥¯
+			//intã‚¢ãƒ¼ã‚¯
 			g2.drawArc((int)x,(int)y,(int)w,(int)h,(int)start,(int)extent);
 		}
 	}
@@ -619,19 +619,19 @@ public class VisualDrawPanel extends JPanel implements MouseInputListener,MouseW
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO ¼«Æ°À¸À®¤µ¤ì¤¿¥á¥½¥Ã¥É¡¦¥¹¥¿¥Ö
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸãƒ¡ã‚½ãƒƒãƒ‰ãƒ»ã‚¹ã‚¿ãƒ–
 
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		// TODO ¼«Æ°À¸À®¤µ¤ì¤¿¥á¥½¥Ã¥É¡¦¥¹¥¿¥Ö
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸãƒ¡ã‚½ãƒƒãƒ‰ãƒ»ã‚¹ã‚¿ãƒ–
 
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO ¼«Æ°À¸À®¤µ¤ì¤¿¥á¥½¥Ã¥É¡¦¥¹¥¿¥Ö
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸãƒ¡ã‚½ãƒƒãƒ‰ãƒ»ã‚¹ã‚¿ãƒ–
 
 	}
 
@@ -848,7 +848,7 @@ public class VisualDrawPanel extends JPanel implements MouseInputListener,MouseW
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		// TODO ¼«Æ°À¸À®¤µ¤ì¤¿¥á¥½¥Ã¥É¡¦¥¹¥¿¥Ö
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸãƒ¡ã‚½ãƒƒãƒ‰ãƒ»ã‚¹ã‚¿ãƒ–
 		double z = Math.sqrt(zoom*100);
 		double dz = (double)e.getWheelRotation()/2.0;
 		if(e.isControlDown()){
@@ -869,13 +869,13 @@ public class VisualDrawPanel extends JPanel implements MouseInputListener,MouseW
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// TODO ¼«Æ°À¸À®¤µ¤ì¤¿¥á¥½¥Ã¥É¡¦¥¹¥¿¥Ö
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸãƒ¡ã‚½ãƒƒãƒ‰ãƒ»ã‚¹ã‚¿ãƒ–
 
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		// TODO ¼«Æ°À¸À®¤µ¤ì¤¿¥á¥½¥Ã¥É¡¦¥¹¥¿¥Ö
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸãƒ¡ã‚½ãƒƒãƒ‰ãƒ»ã‚¹ã‚¿ãƒ–
 
 	}
 }

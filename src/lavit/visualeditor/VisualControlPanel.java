@@ -85,7 +85,7 @@ public class VisualControlPanel extends JPanel implements ChangeListener,ActionL
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO ¼«Æ°À¸À®¤µ¤ì¤¿¥á¥½¥Ã¥É¡¦¥¹¥¿¥Ö
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸãƒ¡ã‚½ãƒƒãƒ‰ãƒ»ã‚¹ã‚¿ãƒ–
 
 	}
 

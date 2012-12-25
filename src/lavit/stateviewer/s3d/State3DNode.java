@@ -85,7 +85,7 @@ public class State3DNode {
 
 		//removeAllChildren();
 
-		// ¿§¤ÎÀßÄê
+		// è‰²ã®è¨­å®š
 		Appearance ap = new Appearance();
 		Material ma = new Material();
 		boolean searchMode = panel.stateGraphPanel.getDraw().isSearchMode();
@@ -95,15 +95,15 @@ public class State3DNode {
 		}else{
 			Color color = node.getColor();
 			ma.setDiffuseColor(new Color3f(color));
-			ma.setEmissiveColor(new Color3f(color)); //È¯¸÷
+			ma.setEmissiveColor(new Color3f(color)); //ç™ºå…‰
 		}
 		ap.setMaterial(ma);
 
-		// ÊªÂÎ¤òÄÉ²Ã
+		// ç‰©ä½“ã‚’è¿½åŠ 
 		sphere = new Sphere(0.2f, Sphere.GENERATE_NORMALS, 50, ap);
 		tg.addChild(sphere);
 
-		// Ê¿¹Ô°ÜÆ°¤òÄêµÁ
+		// å¹³è¡Œç§»å‹•ã‚’å®šç¾©
 		Transform3D transform = new Transform3D();
 		transform.set(new Vector3d(getGraphPoint()));
 		tg.setTransform(transform);

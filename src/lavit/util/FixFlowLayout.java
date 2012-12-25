@@ -40,7 +40,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
-//http://d.hatena.ne.jp/ruby-U/20080618/1213757977�򻲹�
+//http://d.hatena.ne.jp/ruby-U/20080618/1213757977を参考
 
 public class FixFlowLayout extends FlowLayout {
 	public Dimension preferredLayoutSize(Container target) {

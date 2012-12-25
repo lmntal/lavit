@@ -42,9 +42,9 @@ public final class FileUtils
 	private FileUtils() { }
 
 	/**
-	 * ¥Ñ¥¹Ì¾Ê¸»úÎó {@code path} ¤¬É½¤¹¥Õ¥¡¥¤¥ë¤ÎÂ¸ºß¤ò³ÎÇ§¤·¤Ş¤¹¡£
-	 * @param path ¥Ñ¥¹Ì¾Ê¸»úÎó
-	 * @return ¥Ñ¥¹Ì¾Ê¸»úÎó {@code path} ¤¬É½¤¹¥Õ¥¡¥¤¥ë¤¬Â¸ºß¤¹¤ë¾ì¹ç¤Ï {@code true}¡¢¤½¤¦¤Ç¤Ê¤¤¾ì¹ç¤Ï {@code false}¡£
+	 * ãƒ‘ã‚¹åæ–‡å­—åˆ— {@code path} ãŒè¡¨ã™ãƒ•ã‚¡ã‚¤ãƒ«ã®å­˜åœ¨ã‚’ç¢ºèªã—ã¾ã™ã€‚
+	 * @param path ãƒ‘ã‚¹åæ–‡å­—åˆ—
+	 * @return ãƒ‘ã‚¹åæ–‡å­—åˆ— {@code path} ãŒè¡¨ã™ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹å ´åˆã¯ {@code true}ã€ãã†ã§ãªã„å ´åˆã¯ {@code false}ã€‚
 	 */
 	public static boolean exists(String path)
 	{

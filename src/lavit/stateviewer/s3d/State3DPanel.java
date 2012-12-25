@@ -144,13 +144,13 @@ public class State3DPanel extends JPanel {
 			deleteGraph();
 		}
 
-		//¥À¥ß¡¼¤òÈ´¤¯
+		//ãƒ€ãƒŸãƒ¼ã‚’æŠœã
 		statePanel.stateGraphPanel.getDrawNodes().removeDummy();
 		statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
 		statePanel.stateGraphPanel.selectClear();
 		statePanel.stateGraphPanel.update();
 
-		//3D¥Î¡¼¥É¤È¥È¥é¥ó¥¸¥·¥ç¥ó¤ÎÀ¸À®
+		//3Dãƒãƒ¼ãƒ‰ã¨ãƒˆãƒ©ãƒ³ã‚¸ã‚·ãƒ§ãƒ³ã®ç”Ÿæˆ
 		for(StateTransition trans : statePanel.stateGraphPanel.getDrawNodes().getAllTransition()){
 			State3DNode from = all3DNode.get(trans.from);
 			if(from==null){ from = new State3DNode(trans.from, statePanel); all3DNode.put(trans.from, from); }
@@ -164,13 +164,13 @@ public class State3DPanel extends JPanel {
 			all3DTransition.add(s3dtrans);
 		}
 
-		//¥¹¥¿¡¼¥È¥Î¡¼¥É
+		//ã‚¹ã‚¿ãƒ¼ãƒˆãƒãƒ¼ãƒ‰
 		startNode = all3DNode.get(statePanel.stateGraphPanel.getDrawNodes().getStartNodeOne());
 		for(State3DNode node : getAllNode()){
 			node.setStartNode(startNode);
 		}
 
-		//¿¼¤µ¤Î·èÄê
+		//æ·±ã•ã®æ±ºå®š
 		for(ArrayList<StateNode> nodes : statePanel.stateGraphPanel.getDrawNodes().getDepthNode()){
 			ArrayList<State3DNode> ns = new ArrayList<State3DNode>();
 			for(StateNode node : nodes){
@@ -206,7 +206,7 @@ public class State3DPanel extends JPanel {
 			rootBranchGroup.addChild(trans.getTransformGroup());
 		}
 
-		// ¸÷¸»¤òÀßÃÖ
+		// å…‰æºã‚’è¨­ç½®
 		rootBranchGroup.addChild(createDirectionalLight());
 		rootBranchGroup.addChild(createAmbientLight());
 		rootBranchGroup.compile();
@@ -230,7 +230,7 @@ public class State3DPanel extends JPanel {
 		int d = 0;
 		for(ArrayList<State3DNode> nodes : depthNode){
 			for(State3DNode node : nodes){
-				//from¤¬2¤Ä°Ê¾å¤¢¤ë¾ì¹ç¤ÏÊ¿¶ÑºÂÉ¸¤ËÇÛÃÖ
+				//fromãŒ2ã¤ä»¥ä¸Šã‚ã‚‹å ´åˆã¯å¹³å‡åº§æ¨™ã«é…ç½®
 				int fromSize=node.getFromBackNodes().size();
 				if(fromSize>=2){
 					double y=0,z=0;
@@ -242,7 +242,7 @@ public class State3DPanel extends JPanel {
 					node.setZ(z/fromSize);
 				}
 
-				//to¤¬¤¢¤ë¾ì¹ç¤Ï±ß·Á¤ËÇÛÃÖ
+				//toãŒã‚ã‚‹å ´åˆã¯å††å½¢ã«é…ç½®
 				int toSize=node.getToNextNodes().size();
 				if(toSize>=1){
 					double r = 10*Math.sqrt(toSize-1);
@@ -272,7 +272,7 @@ public class State3DPanel extends JPanel {
 
 		TransformGroup tg = new TransformGroup();
 
-		//¥é¥¤¥ó¤òÄÉ²Ã
+		//ãƒ©ã‚¤ãƒ³ã‚’è¿½åŠ 
 		Point3d[] vertex;
 		LineArray geometry;
 
@@ -310,10 +310,10 @@ public class State3DPanel extends JPanel {
 
 	public void setCamera(){
 
-		//»ëÅÀ¤Ë¤Ä¤¤¤Æ¤Î¥Ï¡¼¥É¥¦¥§¥¢¾ğÊó¤ò¼èÆÀ¡£
+		//è¦–ç‚¹ã«ã¤ã„ã¦ã®ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢æƒ…å ±ã‚’å–å¾—ã€‚
 		ViewingPlatform vp = universe.getViewingPlatform();
 
-		//»ëÅÀ¤Î¤¿¤á¤ÎºÂÉ¸ÊÑ´¹¥¯¥é¥¹¤òÍÑ°Õ
+		//è¦–ç‚¹ã®ãŸã‚ã®åº§æ¨™å¤‰æ›ã‚¯ãƒ©ã‚¹ã‚’ç”¨æ„
 		TransformGroup camera = vp.getViewPlatformTransform();
 
 		//vp.setNominalViewingTransform();
@@ -324,7 +324,7 @@ public class State3DPanel extends JPanel {
 		transform3d.set(new Vector3d(0.0D, 0.0D, d1));
 		camera.setTransform(transform3d);
 
-		//¥­¡¼¥Ü¡¼¥É¥¸¥§¥¹¥Á¥ã
+		//ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã‚¸ã‚§ã‚¹ãƒãƒ£
 		BoundingSphere bounds = new BoundingSphere( new Point3d(), 100.0 );
 		KeyNavigatorBehavior keybehavior = new KeyNavigatorBehavior(camera);
 		keybehavior.setSchedulingBounds(bounds);
@@ -333,28 +333,28 @@ public class State3DPanel extends JPanel {
 		universe.getViewingPlatform().setPlatformGeometry(vg);
 
 		/*
-		//¥«¥á¥é¤Î°ÌÃÖ¥Ù¥¯¥È¥ë
+		//ã‚«ãƒ¡ãƒ©ã®ä½ç½®ãƒ™ã‚¯ãƒˆãƒ«
 		Transform3D view_pos = new Transform3D();
 
-		//¥«¥á¥é¤Î°ÌÃÖ¤ò·è¤á¤ë
+		//ã‚«ãƒ¡ãƒ©ã®ä½ç½®ã‚’æ±ºã‚ã‚‹
 		Vector3f pos_vec = new Vector3f(10f,10f,10f);
 
-		//¥«¥á¥é¤Î°ÌÃÖ¤Ë¤Ä¤¤¤Æ¡¢ºÂÉ¸ÊÑ´¹¼Â¹Ô
+		//ã‚«ãƒ¡ãƒ©ã®ä½ç½®ã«ã¤ã„ã¦ã€åº§æ¨™å¤‰æ›å®Ÿè¡Œ
 		view_pos.setTranslation(pos_vec);
 
-		//¥«¥á¥é¤Î¸ş¤­¤ò¼¨¤¹¥Ù¥¯¥È¥ë
+		//ã‚«ãƒ¡ãƒ©ã®å‘ãã‚’ç¤ºã™ãƒ™ã‚¯ãƒˆãƒ«
 		Transform3D view_dir = new Transform3D();
 		Transform3D view_dir2 = new Transform3D();
 
-		//¥«¥á¥é¤Î¸ş¤­¤ò·è¤á¤ë
+		//ã‚«ãƒ¡ãƒ©ã®å‘ãã‚’æ±ºã‚ã‚‹
 		view_dir.rotY(Math.PI/4);
 		view_dir2.rotX(-Math.PI/4);
 		view_dir.mul(view_dir2);
 
-		//¥«¥á¥é¤Î°ÌÃÖ¤ª¤è¤Ó¥«¥á¥é¤Î¸ş¤­¤òÅı¹ç
+		//ã‚«ãƒ¡ãƒ©ã®ä½ç½®ãŠã‚ˆã³ã‚«ãƒ¡ãƒ©ã®å‘ãã‚’çµ±åˆ
 		view_pos.mul(view_dir);
 
-		//¥«¥á¥é¤Î°ÌÃÖ¾ğÊó¤òÅĞÏ¿
+		//ã‚«ãƒ¡ãƒ©ã®ä½ç½®æƒ…å ±ã‚’ç™»éŒ²
 		camera.setTransform(view_pos);
 		 */
 	}
@@ -391,14 +391,14 @@ public class State3DPanel extends JPanel {
 	public BranchGroup createSceneGraph3() {
 		BranchGroup objRoot = new BranchGroup();
 
-		// ¸÷¸»¤òÀßÃÖ¤¹¤ë
+		// å…‰æºã‚’è¨­ç½®ã™ã‚‹
 		objRoot.addChild(createDirectionalLight());
 		objRoot.addChild(createAmbientLight());
 
 		Appearance ap = new Appearance();
 		Material ma = new Material();
 		ma.setDiffuseColor(1.0f, 1.0f, 1.0f);
-		ma.setEmissiveColor(new Color3f(1.0f, 1.0f, 1.0f)); //È¯¸÷
+		ma.setEmissiveColor(new Color3f(1.0f, 1.0f, 1.0f)); //ç™ºå…‰
 		ap.setMaterial(ma);
 
 		Cone cone = new Cone( 0.05f, 0.3f, Cone.GENERATE_NORMALS, 20, 1, ap);
@@ -429,15 +429,15 @@ public class State3DPanel extends JPanel {
 
 		BranchGroup root = new BranchGroup();
 
-		// Ê¿¹Ô°ÜÆ°¤òÄêµÁ
+		// å¹³è¡Œç§»å‹•ã‚’å®šç¾©
 		TransformGroup transRoot = new TransformGroup();
 		Transform3D transform = new Transform3D();
 
-		// xÊı¸ş¤Ë1.0m°ÜÆ°
+		// xæ–¹å‘ã«1.0mç§»å‹•
 		transform.set(new Vector3d(1.0, 0, 0));
 		transRoot.setTransform(transform);
 
-		// ¿§¤Ä¤­Î©ÊıÂÎ¤ÎºîÀ®
+		// è‰²ã¤ãç«‹æ–¹ä½“ã®ä½œæˆ
 		transRoot.addChild(new ColorCube(0.4));
 		root.addChild(transRoot);
 		root.compile();

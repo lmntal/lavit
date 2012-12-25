@@ -103,7 +103,7 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 		StatePositionSet best = new StatePositionSet(drawNodes);
 		sets.add(best);
 
-		//½é´ü°äÅÁ»Ò¤Ï¼¡¡¹¤ÈÆÍÁ³ÊÑ°Û¤µ¤»¤Æ½àÈ÷
+		//åˆæœŸéºä¼å­ã¯æ¬¡ã€…ã¨çªç„¶å¤‰ç•°ã•ã›ã¦æº–å‚™
 		for(int i=1;i<size;++i){
 			best = new StatePositionSet(best);
 			best.mutation2();
@@ -114,7 +114,7 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 
 		while(!isCancelled()){
 
-			//¸òºµ
+			//äº¤å‰
 			ArrayList<StatePositionSet> children = new ArrayList<StatePositionSet>();
 			for(int i=0;i<size/2;++i){
 				int index1 = 0;
@@ -129,7 +129,7 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 				}
 			}
 
-			//ÆÍÁ³ÊÑ°Û
+			//çªç„¶å¤‰ç•°
 			double mutation1 = 0.1;
 			double mutation2 = 0.1;
 			for(StatePositionSet s : sets){
@@ -145,12 +145,12 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 				}
 			}
 
-			//»Ò¶¡¤ÎÄÉ²Ã
+			//å­ä¾›ã®è¿½åŠ 
 			for(StatePositionSet c : children){
 				sets.add(c);
 			}
 
-			//½ÅÊ£¤òµö¤µ¤Ê¤¤
+			//é‡è¤‡ã‚’è¨±ã•ãªã„
 			HashSet<String> strset = new HashSet<String>();
 			for(int i=0;i<sets.size();){
 				String s = sets.get(i).toString();
@@ -162,13 +162,13 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 				}
 			}
 
-			//¥½¡¼¥È
+			//ã‚½ãƒ¼ãƒˆ
 			best = sortSets(sets);
 
-			//ÅñÂÁ³«»Ï
+			//æ·˜æ±°é–‹å§‹
 			ArrayList<StatePositionSet> selection = new ArrayList<StatePositionSet>();
 
-			//¥¨¥ê¡¼¥ÈÁªÂò
+			//ã‚¨ãƒªãƒ¼ãƒˆé¸æŠ
 			for(int i=0;i<size/2;++i){
 				if(sets.size()>0){
 					selection.add(sets.get(0));
@@ -178,7 +178,7 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 				}
 			}
 
-			//¥ë¡¼¥ì¥Ã¥ÈÁªÂò
+			//ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠ
 			double sum = 0;
 			for(StatePositionSet s : sets){
 				sum += 100/getParam(s);
@@ -203,7 +203,7 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 				}
 			}
 
-			//¼¡À¤Âå¤ÎºîÀ®
+			//æ¬¡ä¸–ä»£ã®ä½œæˆ
 			sets.clear();
 			for(StatePositionSet s : selection){
 				sets.add(s);
@@ -242,7 +242,7 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 		children.add(c1);
 		children.add(c2);
 
-		//¥é¥ó¥À¥à¤Ç¿¼¤µ¤ò·èÄê
+		//ãƒ©ãƒ³ãƒ€ãƒ ã§æ·±ã•ã‚’æ±ºå®š
 		//int depth = c1.getRamdomDepth();
 		//if(depth==-1) return children;
 
@@ -251,16 +251,16 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 			ArrayList<StatePosition> nodes1 = c1.getDepthNode().get(depth);
 			ArrayList<StatePosition> nodes2 = c2.getDepthNode().get(depth);
 
-			//Æ±¤¸¿¼¤µ¤Î¥Î¡¼¥É¿ô¤¬°ã¤¦¤È¥¨¥é¡¼¤Ç¶¯À©½ªÎ»
+			//åŒã˜æ·±ã•ã®ãƒãƒ¼ãƒ‰æ•°ãŒé•ã†ã¨ã‚¨ãƒ©ãƒ¼ã§å¼·åˆ¶çµ‚äº†
 			if(nodes1.size()!=nodes2.size()) return children;
 
-			//ID¥ê¥¹¥È¤ò½àÈ÷
+			//IDãƒªã‚¹ãƒˆã‚’æº–å‚™
 			ArrayList<Long> ids1 = new ArrayList<Long>();
 			for(StatePosition s : nodes1){ ids1.add(s.id); }
 			ArrayList<Long> ids2 = new ArrayList<Long>();
 			for(StatePosition s : nodes2){ ids2.add(s.id); }
 
-			//½Û´Ä¸òºµ
+			//å¾ªç’°äº¤å‰
 			int initialIndex = (int)(Math.random()*ids1.size());
 			int nextIndex = initialIndex;
 			while(true){
@@ -278,7 +278,7 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 				if(initialIndex==nextIndex){ break; }
 			}
 
-			//ID¥ê¥¹¥È¤ò¼Â¥Î¡¼¥É¤ËÈ¿±Ç
+			//IDãƒªã‚¹ãƒˆã‚’å®Ÿãƒãƒ¼ãƒ‰ã«åæ˜ 
 			for(int i=0;i<ids1.size();++i){
 				if(nodes1.get(i).id!=ids1.get(i)){
 					for(int j=i+1;j<ids1.size();++j){
@@ -426,7 +426,7 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 			public void paintComponent(Graphics g){
 				Graphics2D g2 = (Graphics2D)g;
 
-				//¥Õ¥ì¡¼¥à¤Î½é´ü²½
+				//ãƒ•ãƒ¬ãƒ¼ãƒ ã®åˆæœŸåŒ–
 				g2.setColor(Color.white);
 				g2.fillRect(0, 0, getWidth(), getHeight());
 

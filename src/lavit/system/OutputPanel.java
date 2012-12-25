@@ -153,7 +153,7 @@ public class OutputPanel extends JPanel implements MouseInputListener,RunnerOutp
 		println(str,attribute);
 	}
 
-	//¥¹¥ì¥Ã¥É¥»¡¼¥Õ
+	//ã‚¹ãƒ¬ãƒƒãƒ‰ã‚»ãƒ¼ãƒ•
 	public void println(final String str,final SimpleAttributeSet attribute){
 		line++;
 		if(line<=maxLine){
@@ -323,12 +323,12 @@ public class OutputPanel extends JPanel implements MouseInputListener,RunnerOutp
 	}
 
 	public void keyReleased(KeyEvent e) {
-		// TODO ¼«Æ°À¸À®¤µ¤ì¤¿¥á¥½¥Ã¥É¡¦¥¹¥¿¥Ö
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸãƒ¡ã‚½ãƒƒãƒ‰ãƒ»ã‚¹ã‚¿ãƒ–
 
 	}
 
 	public void keyTyped(KeyEvent e) {
-		// TODO ¼«Æ°À¸À®¤µ¤ì¤¿¥á¥½¥Ã¥É¡¦¥¹¥¿¥Ö
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸãƒ¡ã‚½ãƒƒãƒ‰ãƒ»ã‚¹ã‚¿ãƒ–
 
 	}
 }

@@ -209,7 +209,7 @@ public class StateProfilePanel extends JPanel implements RunnerOutputGetter
 			int nowCount = allState.size();
 			timeLine.add(nowCount);
 
-			//Æ±¤¸ÃÍ¤¬Â³¤¤¤¿¤È¤­¤ÎÊäÀµ
+			//åŒã˜å€¤ãŒç¶šã„ãŸã¨ãã®è£œæ­£
 			int size = timeLine.size();
 			if (size >= 2)
 			{

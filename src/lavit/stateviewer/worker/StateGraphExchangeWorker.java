@@ -136,22 +136,22 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 		boolean res;
 		ArrayList<ArrayList<StateNode>> depthNode = drawNodes.getDepthNode();
 
-		//Á°¤«¤é¸å¤í¤Ø
+		//å‰ã‹ã‚‰å¾Œã‚ã¸
 		res = reduction(1, depthNode.size(), -1, 0, depthNode.get(0).size());
 		if(!res){ end(); return null; }
 		int rightNum = getAllCross();
 		StatePositionSet right = new StatePositionSet(drawNodes);
 
-		//¸å¤í¤«¤éÁ°¤Ø
+		//å¾Œã‚ã‹ã‚‰å‰ã¸
 		res = reduction(depthNode.size()-2, -1, 1, 50, depthNode.get(depthNode.size()-1).size());
 		if(!res){ end(); return null; }
 		int leftNum = getAllCross();
 
 		if(originalNum<Math.min(rightNum, leftNum)){
-			//ºÇ½é¤ÎÊı¤¬ÎÉ¤¤¾ì¹ç¤ÏÌá¤¹
+			//æœ€åˆã®æ–¹ãŒè‰¯ã„å ´åˆã¯æˆ»ã™
 			drawNodes.updatePosition(original);
 		}else if(rightNum<leftNum){
-			//Á°¤«¤é¸å¤í¤Ø¤ÎÊı¤¬ÎÉ¤¤¾ì¹ç¤ÏÌá¤¹
+			//å‰ã‹ã‚‰å¾Œã‚ã¸ã®æ–¹ãŒè‰¯ã„å ´åˆã¯æˆ»ã™
 			drawNodes.updatePosition(right);
 		}
 		clearAllLayerYs();
@@ -209,7 +209,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 				if(isCancelled()){ return false; }
 			}
 
-			//progress¹¹¿·
+			//progressæ›´æ–°
 			endNodeNum += nodes.size();
 			setProgress(startProgress+50*endNodeNum/drawNodes.size());
 			if(isCancelled()){ return false; }
@@ -252,7 +252,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 				if(isCancelled()){ return false; }
 			}
 
-			//progress¹¹¿·
+			//progressæ›´æ–°
 			endNodeNum += nodes.size();
 			setProgress(startProgress+50*endNodeNum/drawNodes.size());
 			if(isCancelled()){ return false; }
@@ -295,7 +295,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 		return cross;
 	}
 
-	// TODO ¹âÂ®²½
+	// TODO é«˜é€ŸåŒ–
 	private int getLayerCross(int layer1,int layer2){
 		ArrayList<StateNode> nodes = drawNodes.getDepthNode().get(layer1);
 		int cross = 0;
@@ -340,11 +340,11 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 	private int getNextLayerCross(int layer){
 		int cross = 0;
 
-		//¿¼¤µ¤òÄ´¤Ù¤ë
+		//æ·±ã•ã‚’èª¿ã¹ã‚‹
 		ArrayList<ArrayList<StateNode>> depthNode = drawNodes.getDepthNode();
 		if(layer>=depthNode.size()){ return 0; }
 
-		//¿·¤·¤¯ÇÛÎó¤òºîÀ®¤·¤Æ¥½¡¼¥È
+		//æ–°ã—ãé…åˆ—ã‚’ä½œæˆã—ã¦ã‚½ãƒ¼ãƒˆ
 		ArrayList<StateNode> nodes = new ArrayList<StateNode>(depthNode.get(layer));
 		Collections.sort(nodes, new Comparator<StateNode>() {
 			public int compare(StateNode n1, StateNode n2) {
@@ -383,11 +383,11 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 	private int getBackLayerCross(int layer){
 		int cross = 0;
 
-		//¿¼¤µ¤òÄ´¤Ù¤ë
+		//æ·±ã•ã‚’èª¿ã¹ã‚‹
 		ArrayList<ArrayList<StateNode>> depthNode = drawNodes.getDepthNode();
 		if(layer>=depthNode.size()){ return 0; }
 
-		//¿·¤·¤¯ÇÛÎó¤òºîÀ®¤·¤Æ¥½¡¼¥È
+		//æ–°ã—ãé…åˆ—ã‚’ä½œæˆã—ã¦ã‚½ãƒ¼ãƒˆ
 		ArrayList<StateNode> nodes = new ArrayList<StateNode>(depthNode.get(layer));
 		Collections.sort(nodes, new Comparator<StateNode>() {
 			public int compare(StateNode n1, StateNode n2) {

@@ -197,7 +197,7 @@ public class LmnTextPane extends JTextPane
 		doc.setShowEols(b);
 	}
 
-	// ±¦Ã¼¤ÇÀŞ¤êÊÖ¤µ¤Ê¤¤¤è¤¦¤Ë¤¹¤ë
+	// å³ç«¯ã§æŠ˜ã‚Šè¿”ã•ãªã„ã‚ˆã†ã«ã™ã‚‹
 	public boolean getScrollableTracksViewportWidth()
 	{
 		Container container = getParent();

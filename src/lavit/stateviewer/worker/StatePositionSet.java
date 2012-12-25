@@ -52,13 +52,13 @@ public class StatePositionSet {
 
 	public StatePositionSet(StateNodeSet stateNodeSet){
 
-		//°ÌÃÖ¾ğÊó¤ÎºîÀ®
+		//ä½ç½®æƒ…å ±ã®ä½œæˆ
 		for(StateNode node : stateNodeSet.getAllNode()){
 			StatePosition n = new StatePosition(node);
 			allNode.put(node.id, n);
 		}
 
-		//¿¼¤µ¾ğÊó¤ÎºîÀ®
+		//æ·±ã•æƒ…å ±ã®ä½œæˆ
 		for(int depth=0; depth<stateNodeSet.getDepth();++depth){
 			ArrayList<StatePosition> dn = new ArrayList<StatePosition>();
 			for(StateNode node : stateNodeSet.getDepthNode().get(depth)){
@@ -67,7 +67,7 @@ public class StatePositionSet {
 			depthNode.add(depth, dn);
 		}
 
-		//Á«°ÜÀè¾ğÊó¤ÎÄÉ²Ã
+		//é·ç§»å…ˆæƒ…å ±ã®è¿½åŠ 
 		for(StateNode node : stateNodeSet.getAllNode()){
 			StatePosition n = allNode.get(node.id);
 			for(StateNode to : node.getToNodes()){
@@ -82,13 +82,13 @@ public class StatePositionSet {
 
 	public StatePositionSet(StatePositionSet statePositionSet){
 
-		//°ÌÃÖ¾ğÊó¤ÎºîÀ®
+		//ä½ç½®æƒ…å ±ã®ä½œæˆ
 		for(StatePosition node : statePositionSet.getAllNode()){
 			StatePosition n = new StatePosition(node);
 			allNode.put(node.id, n);
 		}
 
-		//¿¼¤µ¾ğÊó¤ÎºîÀ®
+		//æ·±ã•æƒ…å ±ã®ä½œæˆ
 		for(int depth=0; depth<statePositionSet.getDepth(); ++depth){
 			ArrayList<StatePosition> dn = new ArrayList<StatePosition>();
 			for(StatePosition node : statePositionSet.getDepthNode().get(depth)){
@@ -97,7 +97,7 @@ public class StatePositionSet {
 			depthNode.add(depth, dn);
 		}
 
-		//Á«°ÜÀè¾ğÊó¤ÎÄÉ²Ã
+		//é·ç§»å…ˆæƒ…å ±ã®è¿½åŠ 
 		for(StatePosition node : statePositionSet.getAllNode()){
 			StatePosition n = allNode.get(node.id);
 			for(StatePosition to : node.toNodes){
@@ -127,7 +127,7 @@ public class StatePositionSet {
 	}
 
 	public int getRamdomDepth(){
-		//¥é¥ó¥À¥à¤Ë¿¼¤µ¤ò·èÄê
+		//ãƒ©ãƒ³ãƒ€ãƒ ã«æ·±ã•ã‚’æ±ºå®š
 		ArrayList<Integer> depths = new ArrayList<Integer>();
 		for(int i=0;i<depthNode.size();++i){
 			depths.add(i);
@@ -143,11 +143,11 @@ public class StatePositionSet {
 
 	public void mutation1(){
 
-		//£²¸Ä°Ê¾å¥Î¡¼¥É¤¬¤¢¤ë¿¼¤µ¤ò¥é¥ó¥À¥à¤Ë·èÄê
+		//ï¼’å€‹ä»¥ä¸Šãƒãƒ¼ãƒ‰ãŒã‚ã‚‹æ·±ã•ã‚’ãƒ©ãƒ³ãƒ€ãƒ ã«æ±ºå®š
 		int depth = getRamdomDepth();
 		if(depth==-1){ return; }
 
-		//¥é¥ó¥À¥à¤Ë¥Î¡¼¥É¤òÁªÂò
+		//ãƒ©ãƒ³ãƒ€ãƒ ã«ãƒãƒ¼ãƒ‰ã‚’é¸æŠ
 		int index1=0;
 		int index2=0;
 		int size = depthNode.get(depth).size();
@@ -156,12 +156,12 @@ public class StatePositionSet {
 			index2 = (int)(Math.random()*size);
 		}
 
-		//¾ì½ê¤òÆş¤ìÂØ¤¨¤ë
+		//å ´æ‰€ã‚’å…¥ã‚Œæ›¿ãˆã‚‹
 		swap(depth, index1, index2);
 	}
 
 	public void mutation2(){
-		//Á´¿¼¤µ¤ò¸«¤Æ¡¢³ÎÎ¨¤Ç¥é¥ó¥À¥à¥·¥ã¥Ã¥Õ¥ë
+		//å…¨æ·±ã•ã‚’è¦‹ã¦ã€ç¢ºç‡ã§ãƒ©ãƒ³ãƒ€ãƒ ã‚·ãƒ£ãƒƒãƒ•ãƒ«
 		for(int depth=1;depth<getDepth();++depth){
 			if(Math.random()>0.5){ continue; }
 
@@ -177,7 +177,7 @@ public class StatePositionSet {
 	public void swap(int depth, int index1, int index2){
 		if(index1==index2){ return; }
 
-		//¾ì½ê¤òÆş¤ìÂØ¤¨¤ë
+		//å ´æ‰€ã‚’å…¥ã‚Œæ›¿ãˆã‚‹
 		ArrayList<StatePosition> nodes = depthNode.get(depth);
 
 		StatePosition n1 = nodes.get(index1);

@@ -112,7 +112,7 @@ public class LogPanel extends JPanel implements MouseInputListener,CommonFontUse
 		println(str,attribute);
 	}
 
-	//¥¹¥ì¥Ã¥É¥»¡¼¥Õ
+	//ã‚¹ãƒ¬ãƒƒãƒ‰ã‚»ãƒ¼ãƒ•
 	private void println(final String str,final SimpleAttributeSet attribute){
 		javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
 			String date = dateFormat.format(new Date());

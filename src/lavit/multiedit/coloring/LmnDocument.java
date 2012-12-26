@@ -45,6 +45,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.undo.UndoManager;
 
+import lavit.multiedit.coloring.event.DirtyFlagChangeListener;
 import lavit.multiedit.coloring.lexer.ColorLabel;
 import lavit.multiedit.coloring.lexer.Lexer;
 import lavit.multiedit.coloring.lexer.TokenLabel;
@@ -57,7 +58,7 @@ public class LmnDocument extends DefaultStyledDocument
 	private int[] parenPair = null;
 	private int tabWidth = 8;
 
-	private boolean modified;
+	private boolean dirty;
 	private int hlFlags;
 	private boolean showTabs;
 	private boolean showEols;
@@ -68,25 +69,7 @@ public class LmnDocument extends DefaultStyledDocument
 	{
 		undo.setLimit(1000);
 		addUndoableEditListener(undo);
-
-		addDocumentListener(new DocumentListener()
-		{
-			public void removeUpdate(DocumentEvent e)
-			{
-				setModified(true);
-				reparse();
-			}
-
-			public void insertUpdate(DocumentEvent e)
-			{
-				setModified(true);
-				reparse();
-			}
-
-			public void changedUpdate(DocumentEvent e)
-			{
-			}
-		});
+		addDocumentListener(new DocumentUpdateObserver());
 	}
 
 	public boolean canUndo()
@@ -119,15 +102,20 @@ public class LmnDocument extends DefaultStyledDocument
 	{
 		undo.discardAllEdits();
 	}
-	
-	public boolean isModified()
+
+	public boolean isDirty()
 	{
-		return modified;
+		return dirty;
 	}
 
-	public void setModified(boolean b)
+	public void setDirty(boolean b)
 	{
-		modified = b;
+		boolean changed = dirty != b;
+		dirty = b;
+		if (changed)
+		{
+			dispatchDirtyFlagChangeListener(dirty);
+		}
 	}
 
 	public TreeSet<ColorLabel> getLabels()
@@ -192,9 +180,9 @@ public class LmnDocument extends DefaultStyledDocument
 		{
 			String text = getText(0, getLength()).replace("\r\n", "\n");
 			Lexer lexer = new Lexer(text, hlFlags);
-			
+
 			labels = lexer.lex();
-			
+
 			tabs.clear();
 			tabs.addAll(lexer.getTabs());
 		}
@@ -212,5 +200,37 @@ public class LmnDocument extends DefaultStyledDocument
 	public int getTabWidth()
 	{
 		return tabWidth;
+	}
+
+	public void addDirtyFlagChangeListener(DirtyFlagChangeListener l)
+	{
+		listenerList.add(DirtyFlagChangeListener.class, l);
+	}
+
+	private void dispatchDirtyFlagChangeListener(boolean dirty)
+	{
+		for (DirtyFlagChangeListener l : listenerList.getListeners(DirtyFlagChangeListener.class))
+		{
+			l.dirtyFlagChanged(dirty);
+		}
+	}
+
+	private class DocumentUpdateObserver implements DocumentListener
+	{
+		public void removeUpdate(DocumentEvent e)
+		{
+			setDirty(true);
+			reparse();
+		}
+
+		public void insertUpdate(DocumentEvent e)
+		{
+			setDirty(true);
+			reparse();
+		}
+
+		public void changedUpdate(DocumentEvent e)
+		{
+		}
 	}
 }

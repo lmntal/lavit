@@ -54,6 +54,8 @@ import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 
+import lavit.multiedit.coloring.event.DirtyFlagChangeListener;
+
 @SuppressWarnings("serial")
 public class LmnTextPane extends JTextPane
 {
@@ -163,12 +165,12 @@ public class LmnTextPane extends JTextPane
 
 	public boolean isModified()
 	{
-		return doc.isModified();
+		return doc.isDirty();
 	}
 
 	public void setModified(boolean b)
 	{
-		doc.setModified(b);
+		doc.setDirty(b);
 	}
 
 	public void updateHighlight()
@@ -195,6 +197,11 @@ public class LmnTextPane extends JTextPane
 	public void setShowEols(boolean b)
 	{
 		doc.setShowEols(b);
+	}
+
+	public void addDirtyFlagChangeListener(DirtyFlagChangeListener l)
+	{
+		doc.addDirtyFlagChangeListener(l);
 	}
 
 	// 右端で折り返さないようにする

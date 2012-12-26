@@ -37,13 +37,16 @@ package lavit.runner;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import lavit.Env;
+import lavit.util.StringUtils;
 
 /**
- * TODO: 起動プロセスの標準入力への書き込みに対応する。
+ * @author Yuuki.S
  */
 public class ProcessTask
 {
@@ -52,6 +55,7 @@ public class ProcessTask
 	private int id;
 	private ProcessBuilder pb;
 	private Process p;
+	private String stdinData;
 	private StreamReaderThread stdoutReader;
 	private StreamReaderThread stderrReader;
 	private PrintLineListener stdoutListener;
@@ -61,6 +65,11 @@ public class ProcessTask
 	private boolean aborted;
 	private List<ProcessFinishListener> finishListeners = new ArrayList<ProcessFinishListener>();
 
+	public ProcessTask(String ... commands)
+	{
+		this(Arrays.asList(commands));
+	}
+
 	public ProcessTask(List<String> commands)
 	{
 		pb = new ProcessBuilder(commands);
@@ -68,9 +77,19 @@ public class ProcessTask
 		id = createID();
 	}
 
+	public int getTaskID()
+	{
+		return id;
+	}
+
 	public void setDirectory(String dirPath)
 	{
 		pb.directory(new File(dirPath).getAbsoluteFile());
+	}
+
+	public void setStandardInputData(String data)
+	{
+		stdinData = data;
 	}
 
 	public void setStandardOutputListener(PrintLineListener l)
@@ -85,25 +104,39 @@ public class ProcessTask
 
 	public void addProcessFinishListener(ProcessFinishListener l)
 	{
-		finishListeners.add(l);
+		synchronized (finishListeners)
+		{
+			finishListeners.add(l);
+		}
 	}
 
 	public void removeProcessFinishListener(ProcessFinishListener l)
 	{
-		finishListeners.remove(l);
-	}
-
-	private void deliverProcessFinishEvent(int exitCode)
-	{
-		for (ProcessFinishListener l : finishListeners)
+		synchronized (finishListeners)
 		{
-			l.processFinished(id, exitCode, aborted);
+			finishListeners.remove(l);
 		}
 	}
 
-	public boolean isTerminated()
+	private void dispatchProcessFinishEvent(int exitCode)
+	{
+		synchronized (finishListeners)
+		{
+			for (ProcessFinishListener l : finishListeners)
+			{
+				l.processFinished(id, exitCode, aborted);
+			}
+		}
+	}
+
+	public synchronized boolean isTerminated()
 	{
 		return terminated;
+	}
+
+	private synchronized void setTerminated(boolean b)
+	{
+		terminated = b;
 	}
 
 	public boolean execute()
@@ -111,11 +144,10 @@ public class ProcessTask
 		try
 		{
 			p = pb.start();
-			monitorThread = new MonitorThread();
-			monitorThread.setDaemon(true);
-			monitorThread.start();
 
-			p.getOutputStream().close();
+			OutputStream os = p.getOutputStream();
+			writeInputData(os);
+			os.close();
 
 			stdoutReader = new StreamReaderThread(p.getInputStream());
 			stderrReader = new StreamReaderThread(p.getErrorStream());
@@ -125,6 +157,10 @@ public class ProcessTask
 
 			stdoutReader.start();
 			stderrReader.start();
+
+			monitorThread = new MonitorThread();
+			monitorThread.setDaemon(true);
+			monitorThread.start();
 
 			return true;
 		}
@@ -155,6 +191,15 @@ public class ProcessTask
 		}
 	}
 
+	private void writeInputData(OutputStream os) throws IOException
+	{
+		if (!StringUtils.nullOrEmpty(stdinData))
+		{
+			os.write(stdinData.getBytes());
+			os.flush();
+		}
+	}
+
 	private void closeStreams()
 	{
 		try
@@ -182,6 +227,14 @@ public class ProcessTask
 		}
 	}
 
+	public static ProcessTask createProcessTask(String path, List<String> args)
+	{
+		List<String> commands = new ArrayList<String>();
+		commands.add(path);
+		commands.addAll(args);
+		return new ProcessTask(commands);
+	}
+
 	public static ProcessTask createJarProcessTask(String jarName, List<String> args)
 	{
 		List<String> commands = new ArrayList<String>();
@@ -192,13 +245,18 @@ public class ProcessTask
 		return new ProcessTask(commands);
 	}
 
-	private static int createID()
+	private static synchronized int createID()
 	{
 		return taskid++;
 	}
 
 	private class MonitorThread extends Thread
 	{
+		public MonitorThread()
+		{
+			setName("MonitorThread");
+		}
+
 		public void run()
 		{
 			try
@@ -210,10 +268,10 @@ public class ProcessTask
 			}
 			finally
 			{
-				closeStreams();
 				waitReaderThreads();
-				terminated = true;
-				deliverProcessFinishEvent(p.exitValue());
+				closeStreams();
+				setTerminated(true);
+				dispatchProcessFinishEvent(p.exitValue());
 			}
 		}
 	}

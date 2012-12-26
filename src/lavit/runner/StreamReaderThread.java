@@ -40,6 +40,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+/**
+ * @author Yuuki.S
+ */
 public class StreamReaderThread extends Thread
 {
 	private BufferedReader reader;
@@ -62,13 +65,21 @@ public class StreamReaderThread extends Thread
 			String line;
 			while ((line = reader.readLine()) != null)
 			{
-				if (l != null) l.println(line);
+				dispatchLine(line);
 			}
 			reader.close();
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
+		}
+	}
+
+	private void dispatchLine(String line)
+	{
+		if (l != null)
+		{
+			l.println(line);
 		}
 	}
 }

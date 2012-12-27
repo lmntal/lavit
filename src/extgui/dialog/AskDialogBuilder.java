@@ -41,6 +41,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
@@ -105,6 +107,33 @@ public class AskDialogBuilder
 	}
 
 	/**
+	 * 初期状態で Yes ボタンがフォーカスを持つように設定します。
+	 */
+	public AskDialogBuilder setYesFocused()
+	{
+		dialog.setInitialFocus(0);
+		return this;
+	}
+
+	/**
+	 * 初期状態で No ボタンがフォーカスを持つように設定します。
+	 */
+	public AskDialogBuilder setNoFocused()
+	{
+		dialog.setInitialFocus(1);
+		return this;
+	}
+
+	/**
+	 * 初期状態で Cancel ボタンがフォーカスを持つように設定します。
+	 */
+	public AskDialogBuilder setCancelFocused()
+	{
+		dialog.setInitialFocus(2);
+		return this;
+	}
+
+	/**
 	 * ダイアログを表示します。
 	 * @return Yesボタンが押された場合は {@code JOptionPane.YES_OPTION}、
 	 * Noボタンが押された場合は {@code JOptionPane.NO_OPTION}、
@@ -128,6 +157,7 @@ public class AskDialogBuilder
 		{
 			builder = new AskDialogBuilder();
 		}
+		builder.setCancelFocused();
 		return builder;
 	}
 
@@ -135,6 +165,7 @@ public class AskDialogBuilder
 	{
 		for (JButton b : buttons)
 		{
+			b.setPreferredSize(null); // to calculate default preferred size
 			Dimension size = b.getPreferredSize();
 			w = Math.max(size.width, w);
 			h = Math.max(size.height, h);
@@ -176,6 +207,7 @@ public class AskDialogBuilder
 		private JButton buttonYes;
 		private JButton buttonNo;
 		private JButton buttonCancel;
+		private JButton initialFocusedButton;
 		private DialogResult result;
 
 		public AskDialog()
@@ -219,6 +251,18 @@ public class AskDialogBuilder
 
 			add(contentPanel, BorderLayout.CENTER);
 			add(buttonPanel, BorderLayout.SOUTH);
+
+			initialFocusedButton = buttonCancel;
+			addComponentListener(new ComponentAdapter()
+			{
+				public void componentShown(ComponentEvent e)
+				{
+					if (initialFocusedButton != null)
+					{
+						initialFocusedButton.requestFocusInWindow();
+					}
+				}
+			});
 		}
 
 		private void setMessageIcon(MessageType type)
@@ -246,6 +290,22 @@ public class AskDialogBuilder
 			buttonNo.setText(no);
 			buttonCancel.setText(cancel);
 			fixButtonSize(80, 22, buttonYes, buttonNo, buttonCancel);
+		}
+
+		private void setInitialFocus(int buttonIndex)
+		{
+			switch (buttonIndex)
+			{
+			case 0:
+				initialFocusedButton = buttonYes;
+				break;
+			case 1:
+				initialFocusedButton = buttonNo;
+				break;
+			case 2:
+				initialFocusedButton = buttonCancel;
+				break;
+			}
 		}
 
 		private DialogResult getDialogResult()

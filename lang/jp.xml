@@ -6,7 +6,7 @@
 <entry key="m1">新規作成(N)</entry>
 <entry key="m2">開く(O)</entry>
 <entry key="m3">上書き保存(S)</entry>
-<entry key="m4">名前を付けて保存(A)</entry>
+<entry key="m4">名前を付けて保存(A)...</entry>
 <entry key="m5">終了(X)</entry>
 <entry key="m6">編集(E)</entry>
 <entry key="m7">コピー(C)</entry>
@@ -44,9 +44,11 @@
 <entry key="m36">表示(V)</entry>
 <entry key="m37">ファイルシステム</entry>
 
-<entry key="d0">はい</entry>
-<entry key="d1">いいえ</entry>
-<entry key="d2">キャンセル</entry>
+<entry key="m38">中間命令列をSLIMで実行(M)</entry>
+
+<entry key="d0">はい(Y)</entry>
+<entry key="d1">いいえ(N)</entry>
+<entry key="d2">キャンセル(C)</entry>
 <entry key="d3">変更</entry>
 <entry key="d4">変更しました</entry>
 <entry key="d5">ファイル</entry>

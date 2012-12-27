@@ -6,7 +6,7 @@
 <entry key="m1">New</entry>
 <entry key="m2">Open</entry>
 <entry key="m3">Save</entry>
-<entry key="m4">Save as</entry>
+<entry key="m4">Save As...</entry>
 <entry key="m5">Exit</entry>
 <entry key="m6">Edit</entry>
 <entry key="m7">Copy</entry>
@@ -37,12 +37,14 @@
 
 <entry key="m31">Close</entry>
 <entry key="m32">Close All</entry>
-<entry key="m33">LMNtal IL (Java)</entry>
+<entry key="m33">Run LMNtal IL (Java)</entry>
 <entry key="m34">Recent Files</entry>
 <entry key="m35">Clear</entry>
 
 <entry key="m36">View</entry>
 <entry key="m37">File System</entry>
+
+<entry key="m38">Run LMNtal IL (SLIM)</entry>
 
 <entry key="d0">Yes</entry>
 <entry key="d1">No</entry>

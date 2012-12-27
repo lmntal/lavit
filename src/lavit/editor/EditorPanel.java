@@ -59,7 +59,6 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
@@ -77,6 +76,9 @@ import lavit.multiedit.coloring.lexer.TokenLabel;
 import lavit.multiedit.event.TabButtonListener;
 import lavit.system.FileHistory;
 import lavit.util.CommonFontUser;
+import extgui.dialog.AskDialogBuilder;
+import extgui.dialog.DialogResult;
+import extgui.dialog.MessageType;
 import extgui.filedrop.event.FileDropListener;
 import extgui.fileview.FileViewPane;
 import extgui.fileview.event.FileSelectedListener;
@@ -279,7 +281,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	/**
 	 * 開くファイルを選択する。
 	 */
-	 //TODO: このパネルの仕事ではない。
+	//TODO: このパネルの仕事ではない。
 	public void fileOpen()
 	{
 		File file = chooseOpenFile();
@@ -424,13 +426,13 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			if (isChanged(i))
 			{
 				tabView.setSelectedPage(i);
-				int ret = askSaveChangedFile();
-				if (ret == JOptionPane.CANCEL_OPTION)
+				DialogResult ret = askSaveChangedFile();
+				if (ret == DialogResult.CANCEL)
 				{
 					approved = false;
 					break;
 				}
-				else if (ret == JOptionPane.YES_OPTION)
+				else if (ret == DialogResult.YES)
 				{
 					fileSave();
 				}
@@ -463,15 +465,21 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		boolean ret = true;
 		if (page.isModified())
 		{
-			String option[] = { Lang.d[0], Lang.d[1], Lang.d[2] };
 			String title = page.hasFile() ? page.getFile().getName() : "untitled";
 			String message = title + Lang.f[2];
-			int r = JOptionPane.showOptionDialog(FrontEnd.mainFrame, message, title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, option, option[0]);
-			if (r == JOptionPane.YES_OPTION)
+
+			AskDialogBuilder builder = AskDialogBuilder.getInstance();
+			builder
+				.setButtonCaptions(Lang.d[0], Lang.d[1], Lang.d[2])
+				.setDialogTitle(title)
+				.setText(message)
+				.setMessageType(MessageType.QUESTION);
+			DialogResult res = builder.showDialog();
+			if (res == DialogResult.YES)
 			{
 				ret = fileSave();
 			}
-			else if (r == JOptionPane.CANCEL_OPTION || r == JOptionPane.CLOSED_OPTION)
+			else if (res == DialogResult.CANCEL)
 			{
 				ret = false;
 			}
@@ -548,20 +556,25 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 			if (file.exists())
 			{
-				String option[] = { Lang.d[0], Lang.d[1], Lang.d[2] };
-				r = JOptionPane.showOptionDialog(FrontEnd.mainFrame,file.getName()+Lang.f[0],Lang.f[1],JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE,null,option,option[0]);
-				if (r == JOptionPane.YES_OPTION)
+				AskDialogBuilder builder = AskDialogBuilder.getInstance();
+				builder
+					.setButtonCaptions(Lang.d[0], Lang.d[1], Lang.d[2])
+					.setDialogTitle(Lang.f[1])
+					.setText(file.getName() + Lang.f[0])
+					.setMessageType(MessageType.QUESTION);
+				DialogResult res = builder.showDialog();
+				if (res == DialogResult.YES)
 				{
 					Env.set("EDITER_FILE_LAST_CHOOSER_DIR", file.getParent());
 					return file;
 				}
-				else if (r == JOptionPane.CANCEL_OPTION || r == JOptionPane.CLOSED_OPTION)
+				else if (res == DialogResult.CANCEL)
 				{
 					return null;
 				}
 				else
 				{
-					/* もう一度選択 */
+					// もう一度選択
 				}
 			}
 			else
@@ -575,16 +588,19 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	/**
 	 * 変更を保存するか聞く。
 	 */
-	private int askSaveChangedFile()
+	private DialogResult askSaveChangedFile()
 	{
 		EditorPage page = tabView.getSelectedPage();
-		String option[] = { Lang.d[0], Lang.d[1], Lang.d[2] };
 		String title = page.hasFile() ? page.getFile().getName() : "untitled";
 		String message = title + Lang.f[2];
-		return JOptionPane.showOptionDialog(FrontEnd.mainFrame,
-			message, title,
-			JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
-			null, option, option[0]);
+
+		AskDialogBuilder builder = AskDialogBuilder.getInstance();
+		builder
+			.setButtonCaptions(Lang.d[0], Lang.d[1], Lang.d[2])
+			.setDialogTitle(title)
+			.setText(message)
+			.setMessageType(MessageType.QUESTION);
+		return builder.showDialog();
 	}
 
 	public void loadFont()
@@ -670,8 +686,8 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 	/**
 	 * カーソルの移動を監視するクラス
-	 * TODO: タブエディタと連携してカーソル情報の監視を復活させる
 	 */
+	// TODO: タブエディタと連携してカーソル情報の監視を復活させる
 	@SuppressWarnings("unused")
 	private class RowColumnListener implements CaretListener
 	{

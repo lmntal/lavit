@@ -74,6 +74,7 @@ import lavit.event.TabChangeListener;
 import lavit.multiedit.EditorPage;
 import lavit.multiedit.TabView;
 import lavit.multiedit.coloring.lexer.TokenLabel;
+import lavit.multiedit.event.TabButtonListener;
 import lavit.system.FileHistory;
 import lavit.util.CommonFontUser;
 import extgui.filedrop.event.FileDropListener;
@@ -95,6 +96,14 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		setLayout(new BorderLayout());
 
 		tabView = new TabView();
+		tabView.addTabButtonListener(new TabButtonListener()
+		{
+			public void closeButtonClicked(int tabIndex)
+			{
+				tabView.setSelectedPage(tabIndex);
+				closeSelectedPage();
+			}
+		});
 
 		loadFont();
 		FrontEnd.addFontUser(this);
@@ -238,7 +247,6 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			}
 		}
 		openFile(first);
-		//FrontEnd.mainFrame.toolTab.ltlPanel.loadFile("0");
 	}
 
 	/**
@@ -264,7 +272,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	public void newFileOpen()
 	{
 		EditorPage page = createEmptyPage();
-		tabView.addPage(page, "untitled", "untitled");
+		tabView.setSelectedPage(page);
 		FrontEnd.println("(EDITOR) new file.");
 	}
 
@@ -286,21 +294,23 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	 */
 	public void openFile(File file)
 	{
+		String encoding = Env.get("EDITER_FILE_READ_ENCODING");
 		try
 		{
-			String encoding = Env.get("EDITER_FILE_READ_ENCODING");
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
+			BufferedReader reader = new BufferedReader(
+				new InputStreamReader(new FileInputStream(file), encoding));
 
 			StringBuilder buf = new StringBuilder();
 			int c;
-			while ((c = reader.read()) != -1) buf.append(Character.toChars(c));
+			while ((c = reader.read()) != -1)
+			{
+				buf.append(Character.toChars(c));
+			}
 			reader.close();
 
 			EditorPage page = createPage(buf.toString());
 			page.setFile(file);
-
-			// タブ変更イベントとの関係上、タブの設定終了後に追加する
-			tabView.addPage(page, file.getName(), file.getAbsolutePath());
+			tabView.setSelectedPage(page);
 
 			FrontEnd.println("(EDITOR) file open. [ " + file.getName() + " ]");
 		}
@@ -381,7 +391,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 	private EditorPage createEmptyPage()
 	{
-		EditorPage page = new EditorPage();
+		EditorPage page = tabView.createEmptyPage();
 		page.addFileDropListener(fileDropListener);
 		page.addHighlight(hlFlags);
 		page.setShowTabs(Env.is("SHOW_TABS"));
@@ -398,7 +408,6 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		writer.close();
 		page.setFile(file);
 		page.setModified(false);
-		tabView.setTitle(page, file.getName(), file.getAbsolutePath());
 		FrontEnd.println("(EDITOR) file save. [ " + file.getName() + " ]");
 	}
 
@@ -661,66 +670,83 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 	/**
 	 * カーソルの移動を監視するクラス
+	 * TODO: タブエディタと連携してカーソル情報の監視を復活させる
 	 */
+	@SuppressWarnings("unused")
 	private class RowColumnListener implements CaretListener
 	{
 		public void caretUpdate(CaretEvent e)
 		{
 			/*
-			try {
+			try
+			{
 				int pos = editor.getCaretPosition();
 				int line = getLineOfOffset(pos);
-				buttonPanel.setRowColumn(line+1, pos-getLineStartOffset(line)+1);
-			} catch (BadLocationException ex) {
+				buttonPanel.setRowColumn(line + 1, pos - getLineStartOffset(line) + 1);
+			}
+			catch (BadLocationException ex)
+			{
 				FrontEnd.printException(ex);
 			}
 			*/
 		}
 	}
 
-	private void scaleUp()
+	private static void scaleUp()
 	{
-		for (int i = 0; i < Env.FONT_SIZE_LIST.length; i++)
+		int n = getCurrentFontSizeIndex();
+		if (n + 1 < Env.FONT_SIZE_LIST.length)
 		{
-			if (Env.FONT_SIZE_LIST[i].equals(Env.get("EDITER_FONT_SIZE")))
-			{
-				i++;
-				if (i >= Env.FONT_SIZE_LIST.length)
-				{
-					i = Env.FONT_SIZE_LIST.length - 1;
-				}
-				Env.set("EDITER_FONT_SIZE",Env.FONT_SIZE_LIST[i]);
-				FrontEnd.loadAllFont();
-				break;
-			}
+			Env.set("EDITER_FONT_SIZE", Env.FONT_SIZE_LIST[n + 1]);
+			FrontEnd.loadAllFont();
 		}
 	}
 
-	private void scaleDown()
+	private static void scaleDown()
 	{
-		for (int i = 0; i < Env.FONT_SIZE_LIST.length; i++)
+		int n = getCurrentFontSizeIndex();
+		if (0 < n)
 		{
-			if (Env.FONT_SIZE_LIST[i].equals(Env.get("EDITER_FONT_SIZE")))
-			{
-				i--;
-				if (i < 0)
-				{
-					i = 0;
-				}
-				Env.set("EDITER_FONT_SIZE",Env.FONT_SIZE_LIST[i]);
-				FrontEnd.loadAllFont();
-				break;
-			}
+			Env.set("EDITER_FONT_SIZE", Env.FONT_SIZE_LIST[n - 1]);
+			FrontEnd.loadAllFont();
 		}
 	}
 
-	private void scaleDefault()
+	private static int getCurrentFontSizeIndex()
 	{
-		Env.set("EDITER_FONT_SIZE","14");
+		int currentFontSize = parseIntDefault(Env.get("EDITER_FONT_SIZE"), 14);
+
+		for (int i = 0; i < Env.FONT_SIZE_LIST.length; i++)
+		{
+			int size = parseIntDefault(Env.FONT_SIZE_LIST[i], 1);
+			if (currentFontSize <= size)
+			{
+				return i;
+			}
+		}
+		return Env.FONT_SIZE_LIST.length - 1;
+	}
+
+	// TODO: 適切な utility クラスへ移動
+	private static int parseIntDefault(String s, int defval)
+	{
+		try
+		{
+			return Integer.parseInt(s);
+		}
+		catch (NumberFormatException e)
+		{
+		}
+		return defval;
+	}
+
+	private static void scaleDefault()
+	{
+		Env.set("EDITER_FONT_SIZE", "14");
 		FrontEnd.loadAllFont();
 	}
 
-	private Action getScaleUpAction()
+	private static Action getScaleUpAction()
 	{
 		return new AbstractAction()
 		{
@@ -731,7 +757,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		};
 	}
 
-	private Action getScaleDownAction()
+	private static Action getScaleDownAction()
 	{
 		return new AbstractAction()
 		{
@@ -742,7 +768,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		};
 	}
 
-	private Action getScaleDefaultAction()
+	private static Action getScaleDefaultAction()
 	{
 		return new AbstractAction()
 		{

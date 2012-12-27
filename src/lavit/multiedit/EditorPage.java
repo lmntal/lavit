@@ -35,31 +35,56 @@
 
 package lavit.multiedit;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
+import lavit.Env;
+import lavit.multiedit.coloring.LmnTextPane;
+import lavit.multiedit.coloring.event.DirtyFlagChangeListener;
+import lavit.multiedit.coloring.lexer.TokenLabel;
+import lavit.ui.FlatButton;
 import extgui.filedrop.FileDropTransferHandler;
 import extgui.filedrop.event.FileDropListener;
-
-import lavit.multiedit.coloring.LmnTextPane;
-import lavit.multiedit.coloring.lexer.TokenLabel;
 
 @SuppressWarnings("serial")
 public class EditorPage extends JScrollPane
 {
+	private static Icon ICON_TAB_LMN;
+	private static Icon ICON_TAB_IL;
+	private static Icon ICON_TAB_OTHERS;
+	private static Icon ICON_TAB_CLOSE_COOL;
+	private static Icon ICON_TAB_CLOSE_HOT;
+
+	private TabView host;
+	private HeaderComponent header;
+
 	private LmnTextPane text;
 	private File file;
 	private FileDropTransferHandler fileDropHandler;
 
-	public EditorPage()
+	EditorPage(TabView hostTabView)
 	{
+		host = hostTabView;
+
+		header = new HeaderComponent();
+
 		text = new LmnTextPane();
 		fileDropHandler = new FileDropTransferHandler(text.getTransferHandler());
 		text.setTransferHandler(fileDropHandler);
@@ -74,6 +99,14 @@ public class EditorPage extends JScrollPane
 			public void focusGained(FocusEvent e)
 			{
 				text.requestFocus();
+			}
+		});
+
+		text.addDirtyFlagChangeListener(new DirtyFlagChangeListener()
+		{
+			public void dirtyFlagChanged(boolean dirty)
+			{
+				updateTitle();
 			}
 		});
 	}
@@ -91,6 +124,12 @@ public class EditorPage extends JScrollPane
 	public void setFile(File file)
 	{
 		this.file = file;
+		updateTitle();
+	}
+
+	public String getTitle()
+	{
+		return hasFile() ? getFile().getName() : "untitled";
 	}
 
 	public String getText()
@@ -117,22 +156,22 @@ public class EditorPage extends JScrollPane
 	{
 		return text.canUndo();
 	}
-	
+
 	public boolean canRedo()
 	{
 		return text.canRedo();
 	}
-	
+
 	public void undo()
 	{
 		text.undo();
 	}
-	
+
 	public void redo()
 	{
 		text.redo();
 	}
-	
+
 	public void clearUndo()
 	{
 		text.clearUndo();
@@ -180,7 +219,7 @@ public class EditorPage extends JScrollPane
 	{
 		text.addHighlight(kind);
 	}
-	
+
 	/**
 	 * <p>タブ文字の可視性を設定します。</p>
 	 * @param b 可視にする場合は {@code true}
@@ -189,7 +228,7 @@ public class EditorPage extends JScrollPane
 	{
 		text.setShowTabs(b);
 	}
-	
+
 	/**
 	 * <p>改行文字の可視性を設定します。</p>
 	 * @param b 可視にする場合は {@code true}
@@ -227,5 +266,122 @@ public class EditorPage extends JScrollPane
 	public void removeFileDropListener(FileDropListener listener)
 	{
 		fileDropHandler.removeFileDropListener(listener);
+	}
+
+	JComponent getHeaderComponent()
+	{
+		return header;
+	}
+
+	private void updateTitle()
+	{
+		String s = getTitle();
+		if (text.isModified())
+		{
+			s = "*" + s;
+		}
+		header.setTitleText(s);
+		host.setToolTipTextAt(host.indexOfComponent(this), getDescription());
+	}
+
+	private String getDescription()
+	{
+		return hasFile() ? getFile().getAbsolutePath() : "untitled";
+	}
+
+	private void onTabCloseButtonClicked()
+	{
+		host.onTabCloseButtonClicked(this);
+	}
+
+	private static Icon getFileIcon(String title)
+	{
+		if (title.endsWith(".lmn"))
+		{
+			if (ICON_TAB_LMN == null)
+			{
+				ICON_TAB_LMN = new ImageIcon(Env.getImageOfFile("img/tab_icon_lmn.png"));
+			}
+			return ICON_TAB_LMN;
+		}
+		else if (title.endsWith(".il") || title.endsWith(".tal"))
+		{
+			if (ICON_TAB_IL == null)
+			{
+				ICON_TAB_IL = new ImageIcon(Env.getImageOfFile("img/tab_icon_il.png"));
+			}
+			return ICON_TAB_IL;
+		}
+		return getDefaultFileIcon();
+	}
+
+	private static Icon getDefaultFileIcon()
+	{
+		if (ICON_TAB_OTHERS == null)
+		{
+			ICON_TAB_OTHERS = new ImageIcon(Env.getImageOfFile("img/tab_icon.png"));
+		}
+		return ICON_TAB_OTHERS;
+	}
+
+	private static Icon getTabCloseCoolIcon()
+	{
+		if (ICON_TAB_CLOSE_COOL == null)
+		{
+			ICON_TAB_CLOSE_COOL = new ImageIcon(Env.getImageOfFile("img/tab_close_cold.png"));
+		}
+		return ICON_TAB_CLOSE_COOL;
+	}
+
+	private static Icon getTabCloseHotIcon()
+	{
+		if (ICON_TAB_CLOSE_HOT == null)
+		{
+			ICON_TAB_CLOSE_HOT = new ImageIcon(Env.getImageOfFile("img/tab_close_hot.png"));
+		}
+		return ICON_TAB_CLOSE_HOT;
+	}
+
+	private class HeaderComponent extends JPanel
+	{
+		private JLabel titleLabel;
+		private JLabel iconLabel;
+
+		public HeaderComponent()
+		{
+			setLayout(new BorderLayout());
+			setOpaque(false);
+
+			// fix header width
+			titleLabel = new JLabel(getTitle());
+			Dimension dim = titleLabel.getPreferredSize();
+			dim.width = Math.max(dim.width, 100);
+			titleLabel.setPreferredSize(dim);
+			add(titleLabel, BorderLayout.CENTER);
+
+			Icon icon = getFileIcon(getTitle());
+			iconLabel = new JLabel(icon);
+			iconLabel.setPreferredSize(new Dimension(16, 16));
+			add(iconLabel, BorderLayout.WEST);
+
+			JButton closeButton = new FlatButton();
+			closeButton.setIcon(getTabCloseCoolIcon());
+			closeButton.setRolloverIcon(getTabCloseHotIcon());
+			closeButton.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent event)
+				{
+					onTabCloseButtonClicked();
+				}
+			});
+			closeButton.setPreferredSize(new Dimension(16, 16));
+			add(closeButton, BorderLayout.EAST);
+		}
+
+		public void setTitleText(String s)
+		{
+			titleLabel.setText(s);
+			iconLabel.setIcon(getFileIcon(s));
+		}
 	}
 }

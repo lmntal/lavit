@@ -33,11 +33,11 @@
  *
  */
 
-package lavit.multiedit.coloring.event;
+package lavit.multiedit.event;
 
 import java.util.EventListener;
 
-public interface DirtyFlagChangeListener extends EventListener
+public interface TabButtonListener extends EventListener
 {
-	public void dirtyFlagChanged(boolean dirty);
+	public void closeButtonClicked(int tabIndex);
 }

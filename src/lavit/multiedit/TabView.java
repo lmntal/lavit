@@ -35,37 +35,20 @@
 
 package lavit.multiedit;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import lavit.Env;
-import lavit.FrontEnd;
 import lavit.event.TabChangeListener;
-import lavit.ui.FlatButton;
+import lavit.multiedit.event.TabButtonListener;
 
 @SuppressWarnings("serial")
 public class TabView extends JTabbedPane
 {
-	private static Icon ICON_TAB_LMN;
-	private static Icon ICON_TAB_IL;
-	private static Icon ICON_TAB_OTHERS;
-	private static Icon ICON_TAB_CLOSE_COOL;
-	private static Icon ICON_TAB_CLOSE_HOT;
-
 	private List<TabChangeListener> tabChangeListeners = new ArrayList<TabChangeListener>();
 
 	public TabView()
@@ -88,61 +71,31 @@ public class TabView extends JTabbedPane
 		}
 	}
 
-	public void addPage(EditorPage page, String title, String toolTip)
+	public EditorPage createEmptyPage()
 	{
+		EditorPage page = new EditorPage(this);
 		page.setFont(getFont());
 		page.setTabWidth(4);
-
-		addTab(title, null, page, toolTip);
-		setTitle(page, title, toolTip);
-
-		setSelectedPage(getTabCount() - 1);
-	}
-
-	public void setTitle(final EditorPage page, String title, String toolTip)
-	{
-		JPanel hp = new JPanel(new BorderLayout());
-		hp.setOpaque(false);
-
-		// fix header width
-		JLabel header = new JLabel(title);
-		Dimension dim = header.getPreferredSize();
-		dim.width = Math.max(dim.width, 100);
-		header.setPreferredSize(dim);
-		hp.add(header, BorderLayout.CENTER);
-
-		Icon icon = getFileIcon(title);
-		JLabel iconLabel = new JLabel(icon);
-		iconLabel.setPreferredSize(new Dimension(16, 16));
-		hp.add(iconLabel, BorderLayout.WEST);
-
-		JButton closeButton = new FlatButton();
-		closeButton.setIcon(getTabCloseCoolIcon());
-		closeButton.setRolloverIcon(getTabCloseHotIcon());
-		closeButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent event)
-			{
-				setSelectedComponent(page);
-				FrontEnd.mainFrame.editorPanel.closeSelectedPage();
-			}
-		});
-		closeButton.setPreferredSize(new Dimension(16, 16));
-		hp.add(closeButton, BorderLayout.EAST);
-
-		setTabComponentAt(indexOfComponent(page), hp);
+		addTab(null, page);
+		setTabComponentAt(indexOfComponent(page), page.getHeaderComponent());
+		return page;
 	}
 
 	public EditorPage getSelectedPage()
 	{
-		int index = getSelectedIndex();
-		return (EditorPage)getComponentAt(index);
+		return (EditorPage)getSelectedComponent();
 	}
 
 	public void setSelectedPage(int index)
 	{
 		setSelectedIndex(index);
 		getSelectedPage().requestFocus();
+	}
+
+	public void setSelectedPage(EditorPage page)
+	{
+		setSelectedComponent(page);
+		page.requestFocus();
 	}
 
 	public void closePage(int index)
@@ -165,6 +118,11 @@ public class TabView extends JTabbedPane
 		return pages;
 	}
 
+	public void addTabButtonListener(TabButtonListener l)
+	{
+		listenerList.add(TabButtonListener.class, l);
+	}
+
 	public void addTabChangeListener(TabChangeListener l)
 	{
 		tabChangeListeners.add(l);
@@ -175,57 +133,23 @@ public class TabView extends JTabbedPane
 		tabChangeListeners.remove(l);
 	}
 
+	void onTabCloseButtonClicked(EditorPage page)
+	{
+		int index = indexOfComponent(page);
+		if (index != -1)
+		{
+			for (TabButtonListener l : listenerList.getListeners(TabButtonListener.class))
+			{
+				l.closeButtonClicked(index);
+			}
+		}
+	}
+
 	private void dispatchTabChangeEvent()
 	{
 		for (TabChangeListener l : tabChangeListeners)
 		{
 			l.tabChanged();
 		}
-	}
-
-	private static Icon getFileIcon(String title)
-	{
-		if (title.endsWith(".lmn"))
-		{
-			if (ICON_TAB_LMN == null)
-			{
-				ICON_TAB_LMN = new ImageIcon(Env.getImageOfFile("img/tab_icon_lmn.png"));
-			}
-			return ICON_TAB_LMN;
-		}
-		else if (title.endsWith(".il") || title.endsWith(".tal"))
-		{
-			if (ICON_TAB_IL == null)
-			{
-				ICON_TAB_IL = new ImageIcon(Env.getImageOfFile("img/tab_icon_il.png"));
-			}
-			return ICON_TAB_IL;
-		}
-		else
-		{
-			if (ICON_TAB_OTHERS == null)
-			{
-				ICON_TAB_OTHERS = new ImageIcon(Env.getImageOfFile("img/tab_icon.png"));
-			}
-			return ICON_TAB_OTHERS;
-		}
-	}
-
-	private static Icon getTabCloseCoolIcon()
-	{
-		if (ICON_TAB_CLOSE_COOL == null)
-		{
-			ICON_TAB_CLOSE_COOL = new ImageIcon(Env.getImageOfFile("img/tab_close_cold.png"));
-		}
-		return ICON_TAB_CLOSE_COOL;
-	}
-
-	private static Icon getTabCloseHotIcon()
-	{
-		if (ICON_TAB_CLOSE_HOT == null)
-		{
-			ICON_TAB_CLOSE_HOT = new ImageIcon(Env.getImageOfFile("img/tab_close_hot.png"));
-		}
-		return ICON_TAB_CLOSE_HOT;
 	}
 }

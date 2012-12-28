@@ -151,7 +151,7 @@ public class FrontEnd
 		args.addAll(Arrays.asList(Env.get("SLIM_OPTION").split("\\s+")));
 		args.add("-");
 
-		ProcessTask slimTask = ProcessTask.createProcessTask(Env.get("SLIM_EXE_PATH"), args);
+		final ProcessTask slimTask = ProcessTask.createProcessTask(Env.get("SLIM_EXE_PATH"), args);
 		slimTask.setDirectory(".");
 		slimTask.setStandardInputData(code);
 
@@ -175,13 +175,14 @@ public class FrontEnd
 		{
 			public void processFinished(int id, int exitCode, boolean isAborted)
 			{
+				double seconds = slimTask.getElapsedSeconds();
 				if (isAborted)
 				{
-					errPrintln(String.format("(SLIM) aborted. (Task[%d])", id));
+					errPrintln(String.format("(SLIM) aborted. (Task[%d], %.02f [s])", id, seconds));
 				}
 				else
 				{
-					println(String.format("(SLIM) terminated. (Task[%d])", id));
+					println(String.format("(SLIM) terminated. (Task[%d], %.02f [s])", id, seconds));
 				}
 				mainFrame.toolTab.systemPanel.outputPanel.outputEnd();
 			}

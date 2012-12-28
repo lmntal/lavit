@@ -61,6 +61,8 @@ public class ProcessTask
 	private PrintLineListener stdoutListener;
 	private PrintLineListener stderrListener;
 	private MonitorThread monitorThread;
+	private long startTime;
+	private long elapsedTime;
 	private boolean terminated;
 	private boolean aborted;
 	private List<ProcessFinishListener> finishListeners = new ArrayList<ProcessFinishListener>();
@@ -80,6 +82,11 @@ public class ProcessTask
 	public int getTaskID()
 	{
 		return id;
+	}
+
+	public double getElapsedSeconds()
+	{
+		return elapsedTime / 1000.0;
 	}
 
 	public void setDirectory(String dirPath)
@@ -141,6 +148,8 @@ public class ProcessTask
 
 	public boolean execute()
 	{
+		startTime = System.currentTimeMillis();
+
 		try
 		{
 			p = pb.start();
@@ -271,6 +280,7 @@ public class ProcessTask
 				waitReaderThreads();
 				closeStreams();
 				setTerminated(true);
+				elapsedTime = System.currentTimeMillis() - startTime;
 				dispatchProcessFinishEvent(p.exitValue());
 			}
 		}

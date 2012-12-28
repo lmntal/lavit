@@ -36,54 +36,53 @@
 package lavit.stateviewer;
 
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.stateviewer.*;
 import lavit.stateviewer.worker.StatePositionSet;
 import lavit.util.NodeYComparator;
 
-public class StateNodeSet {
+public class StateNodeSet
+{
+	private static final String cycleMarkString = "cycle(or error) found:";
+	private static final String cycleEndMarkString = "no cycles found";
+	private static final String stateMarkString = "States";
+	private static final String graphMarkString = "Transitions";
+	private static final String initStartMarkString = "init:";
+	private static final String labelMarkString = "Labels";
+	private static final String pathsMarkString = "CounterExamplePaths";
+
 	public StateGraphPanel panel;
 
 	public StateNode parentNode;
 	public int generation;
 
 	public long maxNodeId;
-	private LinkedHashMap<Long,Long> mem2id = new LinkedHashMap<Long,Long>();
+	private Map<Long, Long> mem2id = new LinkedHashMap<Long, Long>();
 
-	private LinkedHashMap<Long,StateNode> allNode = new LinkedHashMap<Long,StateNode>();
-	private LinkedHashSet<StateTransition> allTransition = new LinkedHashSet<StateTransition>();
-	private LinkedHashSet<StateTransition> outTransition = new LinkedHashSet<StateTransition>();
-	private LinkedHashSet<StateRule> allRule = new LinkedHashSet<StateRule>();
+	private Map<Long, StateNode> allNode = new LinkedHashMap<Long,StateNode>();
+	private Set<StateTransition> allTransition = new LinkedHashSet<StateTransition>();
+	private Set<StateTransition> outTransition = new LinkedHashSet<StateTransition>();
+	private Set<StateRule> allRule = new LinkedHashSet<StateRule>();
 
-	private ArrayList<StateNode> cycleNode =  new ArrayList<StateNode>();
+	private List<StateNode> cycleNode =  new ArrayList<StateNode>();
 
-	private LinkedHashSet<StateNode> startNode =  new LinkedHashSet<StateNode>();
-	private LinkedHashSet<StateNode> endNode =  new LinkedHashSet<StateNode>();
+	private Set<StateNode> startNode =  new LinkedHashSet<StateNode>();
+	private Set<StateNode> endNode =  new LinkedHashSet<StateNode>();
 
-	private ArrayList<ArrayList<StateNode>> depthNode = new ArrayList<ArrayList<StateNode>>();
-
-	final String cycleMarkString = "cycle(or error) found:";
-	final String cycleEndMarkString = "no cycles found";
-	final String stateMarkString = "States";
-	final String graphMarkString = "Transitions";
-	final String initStartMarkString = "init:";
-	final String labelMarkString = "Labels";
-	final String pathsMarkString = "CounterExamplePaths";
+	private List<List<StateNode>> depthNode = new ArrayList<List<StateNode>>();
 
 	public StateNodeSet(StateGraphPanel panel){
 		this.panel = panel;
@@ -123,12 +122,12 @@ public class StateNodeSet {
 		return getRootStateNodeSet().maxNodeId;
 	}
 
-	public LinkedHashSet<StateRule> getRules(){
+	public Set<StateRule> getRules(){
 		return allRule;
 	}
 
 	public StateRule getRule(String name){
-		LinkedHashSet<StateRule> allRule = getRootStateNodeSet().getRules();
+		Set<StateRule> allRule = getRootStateNodeSet().getRules();
 		if(name.length()==0){ return null; }
 		for(StateRule r : allRule){
 			if(r.equals(name)){
@@ -685,8 +684,8 @@ public class StateNodeSet {
 	}
 
 	public void dummyCentering(){
-		ArrayList<ArrayList<StateNode>> depthNode = getDepthNode();
-		for(ArrayList<StateNode> nodes : depthNode){
+		List<List<StateNode>> depthNode = getDepthNode();
+		for(List<StateNode> nodes : depthNode){
 			ArrayList<StateNode> ns = new ArrayList<StateNode>();
 			StateNode startNode = null;
 
@@ -732,7 +731,7 @@ public class StateNodeSet {
 	public String getDotString(){
 		StringBuffer str = new StringBuffer();
 		int no=0;
-		for(ArrayList<StateNode> sameDepth : depthNode){
+		for(List<StateNode> sameDepth : depthNode){
 			for(StateNode node : sameDepth){
 				str.append(node.getStringTo(++no));
 			}
@@ -742,7 +741,7 @@ public class StateNodeSet {
 
 	public String getRankString(){
 		StringBuffer str = new StringBuffer();
-		for(ArrayList<StateNode> sameDepth : depthNode){
+		for(List<StateNode> sameDepth : depthNode){
 			str.append("{rank = same");
 			for(StateNode node : sameDepth){
 				str.append(";"+node.id);
@@ -818,7 +817,7 @@ public class StateNodeSet {
 		cycleNode.add(pos+1, node);
 	}
 
-	public ArrayList<StateNode> getCycleNode(){
+	public List<StateNode> getCycleNode(){
 		return cycleNode;
 	}
 
@@ -850,7 +849,7 @@ public class StateNodeSet {
 		endNode.add(en);
 	}
 
-	public ArrayList<ArrayList<StateNode>> getDepthNode(){
+	public List<List<StateNode>> getDepthNode(){
 		return depthNode;
 	}
 
@@ -1157,7 +1156,7 @@ public class StateNodeSet {
 		while(depthNode.size()<=depth){
 			depthNode.add(depthNode.size(),new ArrayList<StateNode>());
 		}
-		ArrayList<StateNode> dnodes= depthNode.get(depth);
+		List<StateNode> dnodes= depthNode.get(depth);
 
 		node.depth = depth;
 		node.nth = dnodes.size();
@@ -1345,8 +1344,8 @@ public class StateNodeSet {
 				y2 = trans.from.getY();
 			}
 
-			ArrayList<StateNode> nodes = depthNode.get(trans.from.depth);
-			ArrayList<StateNode> inNodes = new ArrayList<StateNode>();
+			List<StateNode> nodes = depthNode.get(trans.from.depth);
+			List<StateNode> inNodes = new ArrayList<StateNode>();
 
 			for(StateNode n : nodes){
 				if(y1<n.getY()&&n.getY()<y2){
@@ -1460,7 +1459,7 @@ public class StateNodeSet {
 
 	public void updateDefaultYOrder(){
 		int no=0;
-		for(ArrayList<StateNode> dn : depthNode){
+		for(List<StateNode> dn : depthNode){
 			Collections.sort(dn, new Comparator<StateNode>() {
 				public int compare(StateNode n1, StateNode n2) {
 					double y1 = n1.getY();

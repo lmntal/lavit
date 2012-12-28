@@ -39,25 +39,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import lavit.Env;
-import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
 import lavit.stateviewer.StateGraphPanel;
@@ -134,7 +128,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 		StatePositionSet original = new StatePositionSet(drawNodes);
 
 		boolean res;
-		ArrayList<ArrayList<StateNode>> depthNode = drawNodes.getDepthNode();
+		List<List<StateNode>> depthNode = drawNodes.getDepthNode();
 
 		//前から後ろへ
 		res = reduction(1, depthNode.size(), -1, 0, depthNode.get(0).size());
@@ -166,11 +160,11 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 
 	private boolean reduction(int start, int end, int cmp, int startProgress, int endNodeNum){
 
-		ArrayList<ArrayList<StateNode>> depthNode = drawNodes.getDepthNode();
+		List<List<StateNode>> depthNode = drawNodes.getDepthNode();
 		boolean crossReductionDummyOnly = Env.is("SV_CROSSREDUCTION_DUMMYONLY");
 
 		for(int i=start;i!=end;i-=cmp){
-			ArrayList<StateNode> nodes = depthNode.get(i);
+			List<StateNode> nodes = depthNode.get(i);
 			int backCross = Integer.MAX_VALUE;
 			while(true){
 				for(StateNode node : nodes){
@@ -297,7 +291,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 
 	// TODO 高速化
 	private int getLayerCross(int layer1,int layer2){
-		ArrayList<StateNode> nodes = drawNodes.getDepthNode().get(layer1);
+		List<StateNode> nodes = drawNodes.getDepthNode().get(layer1);
 		int cross = 0;
 		for(StateNode n1 : nodes){
 			for(StateNode n1f : n1.getLayerFlowNodes(layer2)){
@@ -341,11 +335,11 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 		int cross = 0;
 
 		//深さを調べる
-		ArrayList<ArrayList<StateNode>> depthNode = drawNodes.getDepthNode();
+		List<List<StateNode>> depthNode = drawNodes.getDepthNode();
 		if(layer>=depthNode.size()){ return 0; }
 
 		//新しく配列を作成してソート
-		ArrayList<StateNode> nodes = new ArrayList<StateNode>(depthNode.get(layer));
+		List<StateNode> nodes = new ArrayList<StateNode>(depthNode.get(layer));
 		Collections.sort(nodes, new Comparator<StateNode>() {
 			public int compare(StateNode n1, StateNode n2) {
 				if(n1.getY()<n2.getY()){
@@ -384,11 +378,11 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 		int cross = 0;
 
 		//深さを調べる
-		ArrayList<ArrayList<StateNode>> depthNode = drawNodes.getDepthNode();
+		List<List<StateNode>> depthNode = drawNodes.getDepthNode();
 		if(layer>=depthNode.size()){ return 0; }
 
 		//新しく配列を作成してソート
-		ArrayList<StateNode> nodes = new ArrayList<StateNode>(depthNode.get(layer));
+		List<StateNode> nodes = new ArrayList<StateNode>(depthNode.get(layer));
 		Collections.sort(nodes, new Comparator<StateNode>() {
 			public int compare(StateNode n1, StateNode n2) {
 				if(n1.getY()<n2.getY()){
@@ -425,7 +419,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 
 
 	private int getOneLayerCross(int layer){
-		ArrayList<StateNode> nodes = drawNodes.getDepthNode().get(layer);
+		List<StateNode> nodes = drawNodes.getDepthNode().get(layer);
 		int cross = 0;
 		for(StateNode n : nodes){
 			for(StateNode to : n.getToNodes()){

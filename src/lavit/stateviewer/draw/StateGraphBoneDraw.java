@@ -49,13 +49,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import lavit.Env;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
 import lavit.stateviewer.StateTransition;
-import lavit.util.ColorMaker;
 
 public class StateGraphBoneDraw extends StateDraw {
 	StateGraphPanel panel;
@@ -127,7 +127,7 @@ public class StateGraphBoneDraw extends StateDraw {
 
 		//サイクルの優先描画
 		drawNodes.allNodeUnMark();
-		ArrayList<StateNode> cycleNode = drawNodes.getCycleNode();
+		List<StateNode> cycleNode = drawNodes.getCycleNode();
 		for(StateNode node : cycleNode){
 			StateTransition t = node.getToCycleTransition();
 			if(t!=null){

@@ -38,17 +38,13 @@ package lavit.stateviewer.controller;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -73,13 +69,11 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
-import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
 import lavit.stateviewer.StatePanel;
 import lavit.stateviewer.StateRule;
 import lavit.stateviewer.StateTransition;
-import lavit.util.StateTransitionCatcher;
 
 public class StateSimulationPanel extends JPanel {
 	private StatePanel statePanel;
@@ -534,7 +528,7 @@ public class StateSimulationPanel extends JPanel {
 
 			SelectPanel(){
 				ruleLines = new ArrayList<RuleLine>();
-				LinkedHashSet<StateRule> rules = statePanel.stateGraphPanel.getDrawNodes().getRules();
+				Set<StateRule> rules = statePanel.stateGraphPanel.getDrawNodes().getRules();
 				setLayout(new GridLayout(rules.size(),1));
 				for(StateRule r : rules){
 					RuleLine rl = new RuleLine(r,rules.size());

@@ -37,25 +37,16 @@ package lavit.stateviewer.worker;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import lavit.Env;
-import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
 import lavit.stateviewer.StateGraphPanel;
@@ -126,8 +117,8 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 		boolean move = true;
 		while(move){
 			move = false;
-			ArrayList<ArrayList<StateNode>> depthNode = drawNodes.getDepthNode();
-			for(ArrayList<StateNode> nodes : depthNode){
+			List<List<StateNode>> depthNode = drawNodes.getDepthNode();
+			for(List<StateNode> nodes : depthNode){
 				for(StateNode node : nodes){
 					if(node.dummy){
 						double y = node.getY();
@@ -157,7 +148,7 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 		return null;
 	}
 
-	boolean rideOtherNode(ArrayList<StateNode> nodes,StateNode node){
+	boolean rideOtherNode(List<StateNode> nodes,StateNode node){
 		for(StateNode n : nodes){
 			if(n==node) continue;
 			double dy = node.getY()-n.getY();

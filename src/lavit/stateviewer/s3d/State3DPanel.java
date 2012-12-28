@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import javax.media.j3d.AmbientLight;
 import javax.media.j3d.BoundingSphere;
@@ -85,7 +86,7 @@ public class State3DPanel extends JPanel {
 	private LinkedHashSet<State3DTransition> all3DTransition = new LinkedHashSet<State3DTransition>();
 	private State3DNode startNode;
 	private State3DNode selectNode;
-	private ArrayList<ArrayList<State3DNode>> depthNode = new ArrayList<ArrayList<State3DNode>>();
+	private List<List<State3DNode>> depthNode = new ArrayList<List<State3DNode>>();
 	public StatePanel statePanel;
 
 	public Canvas3D canvas;
@@ -130,7 +131,7 @@ public class State3DPanel extends JPanel {
 		return all3DNode.values();
 	}
 
-	public ArrayList<ArrayList<State3DNode>> getDepthNode(){
+	public List<List<State3DNode>> getDepthNode(){
 		return depthNode;
 	}
 
@@ -171,8 +172,8 @@ public class State3DPanel extends JPanel {
 		}
 
 		//深さの決定
-		for(ArrayList<StateNode> nodes : statePanel.stateGraphPanel.getDrawNodes().getDepthNode()){
-			ArrayList<State3DNode> ns = new ArrayList<State3DNode>();
+		for(List<StateNode> nodes : statePanel.stateGraphPanel.getDrawNodes().getDepthNode()){
+			List<State3DNode> ns = new ArrayList<State3DNode>();
 			for(StateNode node : nodes){
 				ns.add(all3DNode.get(node));
 			}
@@ -228,7 +229,7 @@ public class State3DPanel extends JPanel {
 
 	public void reset3dPosition(){
 		int d = 0;
-		for(ArrayList<State3DNode> nodes : depthNode){
+		for(List<State3DNode> nodes : depthNode){
 			for(State3DNode node : nodes){
 				//fromが2つ以上ある場合は平均座標に配置
 				int fromSize=node.getFromBackNodes().size();

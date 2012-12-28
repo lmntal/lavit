@@ -39,24 +39,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import lavit.Env;
-import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
 import lavit.stateviewer.StateGraphPanel;
@@ -157,8 +153,8 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		}
 
 		//初期状態からの遷移元平均値配置
-		ArrayList<ArrayList<StateNode>> depthNode = drawNodes.getDepthNode();
-		for(ArrayList<StateNode> nodes : depthNode){
+		List<List<StateNode>> depthNode = drawNodes.getDepthNode();
+		for(List<StateNode> nodes : depthNode){
 
 			//平均場所決定
 			for(StateNode node : nodes){
@@ -240,7 +236,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		//最深ノードからの遷移先平均値配置
 		for(int i=depthNode.size()-1;i>=0;--i){
 
-			ArrayList<StateNode> nodes = depthNode.get(i);
+			List<StateNode> nodes = depthNode.get(i);
 
 			//平均場所決定
 			for(StateNode node : nodes){
@@ -270,7 +266,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		//初期ノードからの遷移先・遷移元平均値配置
 		for(int i=0;i<depthNode.size();++i){
 
-			ArrayList<StateNode> nodes = depthNode.get(i);
+			List<StateNode> nodes = depthNode.get(i);
 
 			//平均場所決定
 			for(StateNode node : nodes){
@@ -308,13 +304,13 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 	}
 
 //	ほぐす
-	private void detanglingNodes(ArrayList<StateNode> nodes,double yInterval){
+	private void detanglingNodes(List<StateNode> nodes,double yInterval){
 
 		//ソートする
-		ArrayList<StateNode> sortNodes = new ArrayList<StateNode>(nodes);
+		List<StateNode> sortNodes = new ArrayList<StateNode>(nodes);
 		Collections.sort(sortNodes, new NodeYComparator());
 
-		ArrayList<StateNode> revsortNodes = new ArrayList<StateNode>(sortNodes);
+		List<StateNode> revsortNodes = new ArrayList<StateNode>(sortNodes);
 		Collections.reverse(revsortNodes);
 
 		//距離が0のノードをほぐす
@@ -344,7 +340,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		}
 	}
 
-	private boolean zeroDetanlingNodes(ArrayList<StateNode> sortNodes,ArrayList<StateNode> revsortNodes,double yInterval){
+	private boolean zeroDetanlingNodes(List<StateNode> sortNodes,List<StateNode> revsortNodes,double yInterval){
 
 		//距離が0のノードを見つける
 		double zoreY = 0;
@@ -430,7 +426,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object,Object>{
 		return true;
 	}
 
-	private boolean nonzeroDetanlingNodes(ArrayList<StateNode> sortNodes,ArrayList<StateNode> revsortNodes,double yInterval){
+	private boolean nonzeroDetanlingNodes(List<StateNode> sortNodes,List<StateNode> revsortNodes,double yInterval){
 
 		//最小距離の２つのノードを見つける
 		StateNode move1=null,move2=null;

@@ -35,9 +35,8 @@
 
 package lavit.stateviewer.worker;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import lavit.*;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
@@ -114,7 +113,7 @@ public class StateDynamicMover extends Thread {
 
 					//斥力
 					int d = 10;
-					for(ArrayList<StateNode> nodes : drawNodes.getDepthNode()){
+					for(List<StateNode> nodes : drawNodes.getDepthNode()){
 						for(StateNode node : nodes){
 							for(StateNode n : nodes){
 								if(node.id==n.id) continue;

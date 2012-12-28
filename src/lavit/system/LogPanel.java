@@ -38,9 +38,9 @@ package lavit.system;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -53,107 +53,123 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
-import javax.swing.event.MouseInputListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
-import lavit.*;
+import lavit.Env;
+import lavit.FrontEnd;
 import lavit.util.CommonFontUser;
 
-public class LogPanel extends JPanel implements MouseInputListener,CommonFontUser {
+@SuppressWarnings("serial")
+public class LogPanel extends JPanel implements CommonFontUser
+{
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
-	private DefaultStyledDocument doc;
-	private JScrollPane jsp;
+	private StyledDocument doc;
 	private JTextPane log;
-
 	private RightMenu rightMenu = new RightMenu();
 
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+	public LogPanel()
+	{
+		setLayout(new BorderLayout());
 
-	LogPanel(){
 		doc = new DefaultStyledDocument();
 		log = new JTextPane(doc);
 		log.setEditable(false);
-		log.addMouseListener(this);
-		jsp = new JScrollPane(log);
-		jsp.getVerticalScrollBar().setUnitIncrement(15);
+		log.addMouseListener(new MenuTrigger());
 
-		setLayout(new BorderLayout());
-		add(jsp,BorderLayout.CENTER);
+		JScrollPane jsp = new JScrollPane(log);
+		jsp.getVerticalScrollBar().setUnitIncrement(15);
+		add(jsp, BorderLayout.CENTER);
 
 		loadFont();
 		FrontEnd.addFontUser(this);
-
 	}
 
-
-	public void loadFont(){
+	public void loadFont()
+	{
 		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
 		log.setFont(font);
 	}
 
-	public void printException(Exception e){
+	public void printException(Exception e)
+	{
 		StringWriter sw = new StringWriter();
 	    e.printStackTrace(new PrintWriter(sw));
 	    errPrintln(sw.toString());
 	}
 
-	public void println(String str){
-		SimpleAttributeSet attribute = new SimpleAttributeSet();
-		attribute.addAttribute(StyleConstants.Foreground, Color.BLACK);
-		println(str,attribute);
+	public void println(String str)
+	{
+		println(str, Color.BLACK, Color.WHITE);
 	}
 
-	public void errPrintln(String str){
-		SimpleAttributeSet attribute = new SimpleAttributeSet();
-		attribute.addAttribute(StyleConstants.Foreground, Color.RED);
-		println(str,attribute);
+	public void errPrintln(String str)
+	{
+		println(str, Color.RED, Color.WHITE);
 	}
 
-	//スレッドセーフ
-	private void println(final String str,final SimpleAttributeSet attribute){
-		javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-			String date = dateFormat.format(new Date());
-			try {
-				doc.insertString(doc.getLength(),"[" + date + "] "+str+"\n", attribute);
+	private synchronized void println(final String str, Color fg, Color bg)
+	{
+		final SimpleAttributeSet attr = new SimpleAttributeSet();
+		StyleConstants.setForeground(attr, fg);
+		StyleConstants.setBackground(attr, bg);
+
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				String date = DATE_FORMAT.format(new Date());
+				try
+				{
+					doc.insertString(doc.getLength(), "[" + date + "] " + str + "\n", attr);
+				}
+				catch (BadLocationException e)
+				{
+					e.printStackTrace();
+				}
 				log.setCaretPosition(doc.getLength());
-			} catch (BadLocationException e) {
-				e.printStackTrace();
 			}
-		}});
+		});
 	}
 
-	public void mousePressed(MouseEvent e) {
-		if(SwingUtilities.isRightMouseButton(e)){
-			rightMenu.show(e.getComponent(), e.getX(), e.getY());
+	private class MenuTrigger extends MouseAdapter
+	{
+		public void mousePressed(MouseEvent e)
+		{
+			checkPopupTrigger(e);
+		}
+
+		public void mouseReleased(MouseEvent e)
+		{
+			checkPopupTrigger(e);
+		}
+
+		private void checkPopupTrigger(MouseEvent e)
+		{
+			if (e.isPopupTrigger())
+			{
+				rightMenu.show(e.getComponent(), e.getX(), e.getY());
+			}
 		}
 	}
-	public void mouseClicked(MouseEvent e) {}
-	public void mouseEntered(MouseEvent e) {}
-	public void mouseExited(MouseEvent e) {}
-	public void mouseReleased(MouseEvent e) {}
-	public void mouseDragged(MouseEvent e) {}
-	public void mouseMoved(MouseEvent e) {}
 
-	private class RightMenu extends JPopupMenu implements ActionListener{
-		private JMenuItem clear = new JMenuItem("Clear");
-
-
-		RightMenu(){
-			clear.addActionListener(this);
+	private class RightMenu extends JPopupMenu
+	{
+		public RightMenu()
+		{
+			JMenuItem clear = new JMenuItem("Clear");
+			clear.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					log.setText("");
+				}
+			});
 			add(clear);
 		}
-
-		public void actionPerformed(ActionEvent e) {
-			JMenuItem src = (JMenuItem)e.getSource();
-			if(src==clear){
-				log.setText("");
-			}
-		}
-
-
 	}
-
 }

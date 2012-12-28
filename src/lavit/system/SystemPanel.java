@@ -48,7 +48,8 @@ public class SystemPanel extends JPanel
 	public OutputPanel outputPanel;
 	public LogPanel logPanel;
 
-	public SystemPanel(){
+	public SystemPanel()
+	{
 		setLayout(new BorderLayout());
 
 		outputPanel = new OutputPanel();

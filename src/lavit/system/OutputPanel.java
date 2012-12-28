@@ -42,8 +42,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,44 +54,37 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.runner.RunnerOutputGetter;
+import lavit.ui.ColoredLinePrinter;
 import lavit.util.CommonFontUser;
 
 @SuppressWarnings("serial")
 public class OutputPanel extends JPanel implements RunnerOutputGetter, CommonFontUser
 {
-	private DefaultStyledDocument doc;
-	private JTextPane log;
+	private StyledDocument doc;
+	private ColoredLinePrinter log;
 
 	private JPanel findPanel = new JPanel();
 	private JLabel findLabel = new JLabel();
 	private JTextField findField = new JTextField();
 
-	private int line = 0;
-	private int maxLine = 0;
-
 	private int findLength = 0;
 	private int findCursorPos = 0;
 	private List<Integer> findResults = new ArrayList<Integer>();
 
-	private RightMenu rightMenu = new RightMenu();
-
 	public OutputPanel()
 	{
-		doc = new DefaultStyledDocument();
-		log = new JTextPane(doc);
+		log = new ColoredLinePrinter();
 		log.setEditable(false);
-		log.addMouseListener(new MenuTrigger());
+		log.addMouseListener(new PopupMenuTrigger(new RightMenu()));
+		doc = log.getStyledDocument();
 
 		JScrollPane jsp = new JScrollPane(log);
 		jsp.getVerticalScrollBar().setUnitIncrement(15);
@@ -116,8 +107,7 @@ public class OutputPanel extends JPanel implements RunnerOutputGetter, CommonFon
 		findPanel.add(findButton, BorderLayout.EAST);
 		add(findPanel, BorderLayout.SOUTH);
 
-		line = 0;
-		maxLine = Env.getInt("SYSTEM_OUTPUT_MAXLINE");
+		log.setMaximumNumberOfLines(Env.getInt("SYSTEM_OUTPUT_MAXLINE"));
 
 		loadFont();
 		FrontEnd.addFontUser(this);
@@ -135,63 +125,17 @@ public class OutputPanel extends JPanel implements RunnerOutputGetter, CommonFon
 
 	public void println(String str)
 	{
-		println(str, Color.BLACK, Color.WHITE);
+		log.appendLine(str, Color.BLACK, Color.WHITE);
 	}
 
 	public void errPrintln(String str)
 	{
-		println(str, Color.RED, Color.WHITE);
+		log.appendLine(str, Color.RED, Color.WHITE);
 	}
 
 	public void printTitle(String str)
 	{
-		println(str, Color.WHITE, Color.BLUE);
-	}
-
-	private synchronized void println(final String str, final Color foreground, final Color background)
-	{
-		line++;
-		if (line <= maxLine)
-		{
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					appendString(doc, str + "\n", foreground, background);
-					log.setCaretPosition(doc.getLength());
-				}
-			});
-			if (line == maxLine)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						appendString(doc, "Output is full.\n", Color.RED, Color.WHITE);
-						log.setCaretPosition(doc.getLength());
-					}
-				});
-			}
-		}
-		else
-		{
-			System.out.println(str);
-		}
-	}
-
-	private static void appendString(Document doc, String s, Color fg, Color bg)
-	{
-		SimpleAttributeSet attr = new SimpleAttributeSet();
-		StyleConstants.setForeground(attr, fg);
-		StyleConstants.setBackground(attr, bg);
-		try
-		{
-			doc.insertString(doc.getLength(), s, attr);
-		}
-		catch (BadLocationException e)
-		{
-			e.printStackTrace();
-		}
+		log.appendLine(str, Color.WHITE, Color.BLUE);
 	}
 
 	private void toggleFindVisible()
@@ -316,27 +260,6 @@ public class OutputPanel extends JPanel implements RunnerOutputGetter, CommonFon
 		}
 	}
 
-	private class MenuTrigger extends MouseAdapter
-	{
-		public void mousePressed(MouseEvent e)
-		{
-			checkPopupTrigger(e);
-		}
-
-		public void mouseReleased(MouseEvent e)
-		{
-			checkPopupTrigger(e);
-		}
-
-		private void checkPopupTrigger(MouseEvent e)
-		{
-			if (e.isPopupTrigger())
-			{
-				rightMenu.show(e.getComponent(), e.getX(), e.getY());
-			}
-		}
-	}
-
 	private class RightMenu extends JPopupMenu
 	{
 		public RightMenu()
@@ -346,8 +269,7 @@ public class OutputPanel extends JPanel implements RunnerOutputGetter, CommonFon
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					log.setText("");
-					line = 0;
+					log.clear();
 					findLength = 0;
 					findCursorPos = 0;
 					findResults.clear();

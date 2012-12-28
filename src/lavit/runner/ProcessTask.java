@@ -155,8 +155,15 @@ public class ProcessTask
 			p = pb.start();
 
 			OutputStream os = p.getOutputStream();
-			writeInputData(os);
-			os.close();
+			try
+			{
+				writeInputData(os);
+				os.close();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 
 			stdoutReader = new StreamReaderThread(p.getInputStream());
 			stderrReader = new StreamReaderThread(p.getErrorStream());

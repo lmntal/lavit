@@ -40,8 +40,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -51,16 +49,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.ui.ColoredLinePrinter;
 import lavit.util.CommonFontUser;
 
 @SuppressWarnings("serial")
@@ -68,18 +60,15 @@ public class LogPanel extends JPanel implements CommonFontUser
 {
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
-	private StyledDocument doc;
-	private JTextPane log;
-	private RightMenu rightMenu = new RightMenu();
+	private ColoredLinePrinter log;
 
 	public LogPanel()
 	{
 		setLayout(new BorderLayout());
 
-		doc = new DefaultStyledDocument();
-		log = new JTextPane(doc);
+		log = new ColoredLinePrinter();
 		log.setEditable(false);
-		log.addMouseListener(new MenuTrigger());
+		log.addMouseListener(new PopupMenuTrigger(new RightMenu()));
 
 		JScrollPane jsp = new JScrollPane(log);
 		jsp.getVerticalScrollBar().setUnitIncrement(15);
@@ -112,49 +101,9 @@ public class LogPanel extends JPanel implements CommonFontUser
 		println(str, Color.RED, Color.WHITE);
 	}
 
-	private synchronized void println(final String str, Color fg, Color bg)
+	private void println(String str, Color fg, Color bg)
 	{
-		final SimpleAttributeSet attr = new SimpleAttributeSet();
-		StyleConstants.setForeground(attr, fg);
-		StyleConstants.setBackground(attr, bg);
-
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				String date = DATE_FORMAT.format(new Date());
-				try
-				{
-					doc.insertString(doc.getLength(), "[" + date + "] " + str + "\n", attr);
-				}
-				catch (BadLocationException e)
-				{
-					e.printStackTrace();
-				}
-				log.setCaretPosition(doc.getLength());
-			}
-		});
-	}
-
-	private class MenuTrigger extends MouseAdapter
-	{
-		public void mousePressed(MouseEvent e)
-		{
-			checkPopupTrigger(e);
-		}
-
-		public void mouseReleased(MouseEvent e)
-		{
-			checkPopupTrigger(e);
-		}
-
-		private void checkPopupTrigger(MouseEvent e)
-		{
-			if (e.isPopupTrigger())
-			{
-				rightMenu.show(e.getComponent(), e.getX(), e.getY());
-			}
-		}
+		log.appendLine("[" + DATE_FORMAT.format(new Date()) + "] " + str, fg, bg);
 	}
 
 	private class RightMenu extends JPopupMenu
@@ -166,7 +115,7 @@ public class LogPanel extends JPanel implements CommonFontUser
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					log.setText("");
+					log.clear();
 				}
 			});
 			add(clear);

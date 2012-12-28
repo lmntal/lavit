@@ -38,12 +38,17 @@ package lavit.ui;
 import java.awt.Color;
 
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+/**
+ * @author Yuuki.S
+ */
 public class ColoredLinePrinter extends JTextPane
 {
 	private static final long serialVersionUID = 1L;
@@ -56,9 +61,20 @@ public class ColoredLinePrinter extends JTextPane
 		doc = getDocument();
 	}
 
-	public void setLimitLines(int n)
+	public void setMaximumNumberOfLines(int n)
 	{
 		limitLines = n;
+	}
+
+	public synchronized void clear()
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				setText("");
+			}
+		});
 	}
 
 	public void appendLine(String line)
@@ -73,9 +89,23 @@ public class ColoredLinePrinter extends JTextPane
 
 	public void appendLine(String line, Color fg, Color bg)
 	{
-		appendText(line, fg, bg);
-		lineFeed();
-		moveCaret();
+		SimpleAttributeSet a = new SimpleAttributeSet();
+		StyleConstants.setForeground(a, fg);
+		StyleConstants.setBackground(a, bg);
+		appendLine(line, a);
+	}
+
+	public synchronized void appendLine(final String line, final AttributeSet attr)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				appendString(line, attr);
+				appendLineFeed();
+				moveCaretToEnd();
+			}
+		});
 	}
 
 	public void append(String s)
@@ -90,49 +120,61 @@ public class ColoredLinePrinter extends JTextPane
 
 	public void append(String s, Color fg, Color bg)
 	{
-		appendText(s, fg, bg);
-		moveCaret();
-	}
-
-	public void lineFeed()
-	{
-		try
-		{
-			doc.insertString(doc.getLength(), "\n", null);
-		}
-		catch (BadLocationException e)
-		{
-			e.printStackTrace();
-		}
-
-		Element elem = doc.getDefaultRootElement();
-
-		if (limitLines > 0)
-		{
-			int lines = elem.getElementCount();
-			if (lines > limitLines)
-			{
-				try
-				{
-					doc.remove(0, getText().indexOf('\n'));
-				}
-				catch (BadLocationException e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-		moveCaret();
-	}
-
-	private void appendText(String s, Color fg, Color bg)
-	{
 		SimpleAttributeSet a = new SimpleAttributeSet();
 		StyleConstants.setForeground(a, fg);
 		StyleConstants.setBackground(a, bg);
+		append(s, a);
+	}
+
+	public synchronized void append(final String s, final AttributeSet attr)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				appendString(s, attr);
+				moveCaretToEnd();
+			}
+		});
+	}
+
+	public synchronized void lineFeed()
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				appendLineFeed();
+				moveCaretToEnd();
+			}
+		});
+	}
+
+	//
+	// INTERNAL METHODS
+	//
+
+	/** [NOTE] This method must be called in EDT. */
+	private void appendLineFeed()
+	{
+		appendString("\n", null);
+		if (limitLines > 0)
+		{
+			Element root = doc.getDefaultRootElement();
+			int lines = root.getElementCount();
+			if (lines > limitLines)
+			{
+				deleteFirstLine();
+			}
+		}
+	}
+
+	/** [NOTE] This method must be called in EDT. */
+	private void appendString(String s, AttributeSet attr)
+	{
 		try
 		{
-			doc.insertString(doc.getLength(), s, a);
+			doc.insertString(doc.getLength(), s, attr);
 		}
 		catch (BadLocationException e)
 		{
@@ -140,10 +182,31 @@ public class ColoredLinePrinter extends JTextPane
 		}
 	}
 
-	private void moveCaret()
+	/** [NOTE] This method must be called in EDT. */
+	private void deleteFirstLine()
 	{
-		Element elem = doc.getDefaultRootElement();
-		int offset = elem.getElement(elem.getElementCount() - 1).getStartOffset();
-		setCaretPosition(offset - 1);
+		try
+		{
+			doc.remove(0, getText().indexOf('\n'));
+		}
+		catch (BadLocationException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/** [NOTE] This method must be called in EDT. */
+	private void moveCaretToEnd()
+	{
+		Element root = doc.getDefaultRootElement();
+		int offset = root.getElement(root.getElementCount() - 1).getStartOffset();
+		try
+		{
+			setCaretPosition(offset);
+		}
+		catch (IllegalArgumentException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

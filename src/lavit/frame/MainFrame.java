@@ -218,7 +218,7 @@ public class MainFrame extends JFrame
 		}
 	}
 
-	public void runAsILCode()
+	public void runILCodeOnLMNtalJava()
 	{
 		if (ilRunner != null) return;
 
@@ -226,7 +226,7 @@ public class MainFrame extends JFrame
 		{
 			editorPanel.fileSave();
 		}
-		FrontEnd.mainFrame.toolTab.systemPanel.outputPanel.outputStart("lmntal --stdin-tal", Env.get("LMNTAL_OPTION"), editorPanel.getFile());
+		toolTab.systemPanel.outputPanel.outputStart("lmntal --stdin-tal", Env.get("LMNTAL_OPTION"), editorPanel.getFile());
 		String s = editorPanel.getSelectedEditor().getText();
 		ILRunner runner = new ILRunner(Env.get("LMNTAL_OPTION"));
 		runner.setStdoutListener(new PrintLineListener()
@@ -234,7 +234,7 @@ public class MainFrame extends JFrame
 			@Override
 			public void println(String line)
 			{
-				FrontEnd.mainFrame.toolTab.systemPanel.outputPanel.println(line);
+				toolTab.systemPanel.outputPanel.println(line);
 			}
 		});
 		runner.setStderrListener(new PrintLineListener()
@@ -242,10 +242,20 @@ public class MainFrame extends JFrame
 			@Override
 			public void println(String line)
 			{
-				FrontEnd.mainFrame.toolTab.systemPanel.outputPanel.errPrintln(line);
+				toolTab.systemPanel.outputPanel.errPrintln(line);
 			}
 		});
 		runner.exec(s);
+	}
+
+	public void runILCodeOnSLIM()
+	{
+		if (editorPanel.isChanged())
+		{
+			editorPanel.fileSave();
+		}
+		toolTab.setTab("System");
+		FrontEnd.executeILCodeInSLIM();
 	}
 
 	public void killILRunner()

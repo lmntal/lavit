@@ -284,23 +284,21 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				FrontEnd.mainFrame.runAsILCode();
+				FrontEnd.mainFrame.runILCodeOnLMNtalJava();
 			}
 		});
 		iILJavaRun.setMnemonic(KeyEvent.VK_I);
 
-		/*
-		iILSlimRun = new JMenuItem("中間命令列をSLIMで実行(M)");
+		iILSlimRun = new JMenuItem(Lang.m[38]);
 		run.add(iILSlimRun);
 		iILSlimRun.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				FrontEnd.mainFrame.runAsILCode();
+				FrontEnd.mainFrame.runILCodeOnSLIM();
 			}
 		});
-		iILSlimRun.setMnemonic(KeyEvent.VK_I);
-		*/
+		iILSlimRun.setMnemonic(KeyEvent.VK_M);
 
 		run.addSeparator();
 

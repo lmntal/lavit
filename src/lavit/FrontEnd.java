@@ -53,6 +53,7 @@ import lavit.frame.LookAndFeelEntry;
 import lavit.frame.MainFrame;
 import lavit.frame.SlimPathSetting;
 import lavit.frame.StartupFrame;
+import lavit.runner.PrintLineListener;
 import lavit.runner.ProcessFinishListener;
 import lavit.runner.ProcessTask;
 import lavit.runner.RebootRunner;
@@ -69,14 +70,14 @@ public class FrontEnd
 
 	public FrontEnd(String[] args)
 	{
-		mainFrame   = new MainFrame();
-        mainFrame.editorPanel.openInitialFiles();
+		mainFrame = new MainFrame();
+		mainFrame.editorPanel.openInitialFiles();
 
-        sleep(500);
+		sleep(500);
 
-        loadArgs(args); //起動オプションの読み込み
+		loadArgs(args); //起動オプションの読み込み
 
-        println("(SYSTEM) Ready.");
+		println("(SYSTEM) Ready.");
 	}
 
 	private static void loadArgs(String[] args)
@@ -114,6 +115,7 @@ public class FrontEnd
 		List<String> args = new ArrayList<String>();
 		args.addAll(Arrays.asList(Env.get("UNYO_OPTION").split("\\s+")));
 		args.add(file.getAbsolutePath());
+
 		ProcessTask unyoTask = ProcessTask.createJarProcessTask("unyo.jar", args);
 		unyoTask.setDirectory(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfUnyo());
 		unyoTask.addProcessFinishListener(new ProcessFinishListener()
@@ -130,24 +132,70 @@ public class FrontEnd
 				}
 			}
 		});
+
 		if (unyoTask.execute())
 		{
 			FrontEnd.addProcessTask(unyoTask);
 		}
 	}
 
-	public static void addProcessTask(final ProcessTask task)
+	public static void executeILCodeInSLIM()
 	{
-		task.addProcessFinishListener(new ProcessFinishListener()
+		File file = mainFrame.editorPanel.getFile();
+		String code = mainFrame.editorPanel.getSelectedEditor().getText();
+
+		println("(SLIM) executing...");
+		mainFrame.toolTab.systemPanel.outputPanel.outputStart("slim", Env.get("SLIM_OPTION"), file);
+
+		List<String> args = new ArrayList<String>();
+		args.addAll(Arrays.asList(Env.get("SLIM_OPTION").split("\\s+")));
+		args.add("-");
+
+		ProcessTask slimTask = ProcessTask.createProcessTask(Env.get("SLIM_EXE_PATH"), args);
+		slimTask.setDirectory(".");
+		slimTask.setStandardInputData(code);
+
+		slimTask.setStandardOutputListener(new PrintLineListener()
+		{
+			public void println(String line)
+			{
+				mainFrame.toolTab.systemPanel.outputPanel.println(line);
+			}
+		});
+
+		slimTask.setStandardErrorListener(new PrintLineListener()
+		{
+			public void println(String line)
+			{
+				mainFrame.toolTab.systemPanel.outputPanel.errPrintln(line);
+			}
+		});
+
+		slimTask.addProcessFinishListener(new ProcessFinishListener()
 		{
 			public void processFinished(int id, int exitCode, boolean isAborted)
 			{
-				if (!isAborted)
+				if (isAborted)
 				{
-					cleanProcessTasks();
+					errPrintln(String.format("(SLIM) aborted. (Task[%d])", id));
 				}
+				else
+				{
+					println(String.format("(SLIM) terminated. (Task[%d])", id));
+				}
+				mainFrame.toolTab.systemPanel.outputPanel.outputEnd();
 			}
 		});
+
+		if (slimTask.execute())
+		{
+			addProcessTask(slimTask);
+		}
+	}
+
+	public static void addProcessTask(ProcessTask task)
+	{
+		cleanProcessTasks();
 		synchronized (processTasks)
 		{
 			processTasks.add(task);
@@ -210,7 +258,7 @@ public class FrontEnd
 		rebootRunner.run();
 		while (rebootRunner.isRunning())
 		{
-			FrontEnd.sleep(200);
+			sleep(200);
 		}
 		System.exit(0);
 	}

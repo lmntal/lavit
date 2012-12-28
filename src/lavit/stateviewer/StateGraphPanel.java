@@ -38,66 +38,42 @@ package lavit.stateviewer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.Arc2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 
-import javax.imageio.ImageIO;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
-import lavit.*;
+import lavit.Env;
+import lavit.FrontEnd;
 import lavit.runner.LmntalRunner;
 import lavit.stateviewer.controller.SelectStateTransitionRuleFrame;
 import lavit.stateviewer.controller.StateGenerationControlPanel;
 import lavit.stateviewer.controller.StateNodeLabel;
 import lavit.stateviewer.controller.StateRightMenu;
-import lavit.stateviewer.draw.*;
+import lavit.stateviewer.draw.StateGraphAtomcolorDraw;
+import lavit.stateviewer.draw.StateGraphBasicDraw;
+import lavit.stateviewer.draw.StateGraphBoneDraw;
+import lavit.stateviewer.draw.StateGraphFlownodeDraw;
 import lavit.stateviewer.worker.StateDynamicMover;
 import lavit.stateviewer.worker.StateGraphAdjust2Worker;
 import lavit.stateviewer.worker.StateGraphAdjust3Worker;
@@ -111,11 +87,11 @@ import lavit.stateviewer.worker.StateGraphSimpleMixAdjustWorker;
 import lavit.stateviewer.worker.StateGraphStretchMoveWorker;
 import lavit.stateviewer.worker.StatePainter;
 import lavit.util.CommonFontUser;
-import lavit.util.NodeYComparator;
 import lavit.util.StateDraw;
 
-public class StateGraphPanel extends JPanel implements MouseInputListener,MouseWheelListener,KeyListener,CommonFontUser{
-
+@SuppressWarnings("serial")
+public class StateGraphPanel extends JPanel implements MouseInputListener, MouseWheelListener, KeyListener, CommonFontUser
+{
 	public StatePanel statePanel;
 
 	private StateGenerationControlPanel generalControlPanel;
@@ -141,7 +117,8 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 	private Font font;
 
-	public StateGraphPanel(StatePanel statePanel){
+	public StateGraphPanel(StatePanel statePanel)
+	{
 		this.statePanel = statePanel;
 
 		setFocusable(true);
@@ -169,12 +146,13 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		FrontEnd.addFontUser(this);
 	}
 
-	public void init(StateNodeSet nodes){
-
+	public void init(StateNodeSet nodes)
+	{
 		setActive(false);
 
 		this.drawNodes = nodes;
-		if(nodes.generation==0){
+		if (nodes.generation == 0)
+		{
 			this.rootDrawNodes = nodes;
 		}
 
@@ -189,9 +167,12 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		this.startPoint = null;
 		this.selectSquare = false;
 
-		if(nodes.parentNode==null){
+		if (nodes.parentNode == null)
+		{
 			generalControlPanel.setVisible(false);
-		}else{
+		}
+		else
+		{
 			generalControlPanel.setVisible(true);
 			generalControlPanel.updateLabel(nodes);
 		}
@@ -200,113 +181,159 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		statePanel.stateControlPanel.stateControllerTab.simulationPanel.init();
 
-		if(Env.is("SV_STARTUP_ABSTRACTION")){
+		if (Env.is("SV_STARTUP_ABSTRACTION"))
+		{
 			new SelectStateTransitionRuleFrame(this, new StateTransitionAbstraction(this));
-		}else{
+		}
+		else
+		{
 			startupReset();
 			autoCentering();
 			setActive(true);
 		}
-
 	}
 
-	public void init(StateNodeSet nodes, StateNode selectNode){
+	public void init(StateNodeSet nodes, StateNode selectNode)
+	{
 		init(nodes);
-		if(nodes.getAllNode().contains(selectNode)){
+		if (nodes.getAllNode().contains(selectNode))
+		{
 			selectNodes.add(selectNode);
 		}
 	}
 
-	public void startupReset(){
-		if(!Env.get("SV_STARTUP_RESET_TYPE").equals("none")){
-			if(drawNodes.size()<=Env.getInt("SV_STARTUP_RESET_LIMIT")){
-				FrontEnd.println("(StateViewer) Startup Reset : "+Env.get("SV_STARTUP_RESET_TYPE"));
-				if(Env.get("SV_STARTUP_RESET_TYPE").equals("PositionReset")){
+	public void startupReset()
+	{
+		String resetType = Env.get("SV_STARTUP_RESET_TYPE");
+		if (!"none".equals(resetType))
+		{
+			if (drawNodes.size() <= Env.getInt("SV_STARTUP_RESET_LIMIT"))
+			{
+				FrontEnd.println("(StateViewer) Startup Reset : " + resetType);
+				if ("PositionReset".equals(resetType))
+				{
 					positionReset();
-				}else if(Env.get("SV_STARTUP_RESET_TYPE").equals("AdjustReset")){
+				}
+				else if ("AdjustReset".equals(resetType))
+				{
 					adjustReset();
-				}else if(Env.get("SV_STARTUP_RESET_TYPE").equals("AdjustBackReset")){
+				}
+				else if ("AdjustBackReset".equals(resetType))
+				{
 					adjust2Reset();
-				}else if(Env.get("SV_STARTUP_RESET_TYPE").equals("AdjustFindReset")){
+				}
+				else if ("AdjustFindReset".equals(resetType))
+				{
 					adjust3Reset();
-				}else if(Env.get("SV_STARTUP_RESET_TYPE").equals("SimpleMixAdjust")){
+				}
+				else if ("SimpleMixAdjust".equals(resetType))
+				{
 					simpleMixAdjust();
-				}else if(Env.get("SV_STARTUP_RESET_TYPE").equals("DummyMixAdjust")){
+				}
+				else if ("DummyMixAdjust".equals(resetType))
+				{
 					dummyMixAdjust();
 				}
-			}else{
-				FrontEnd.println("(StateViewer) "+drawNodes.size()+" state > Startup Reset Limit ("+Env.getInt("SV_STARTUP_RESET_LIMIT")+" state)");
+			}
+			else
+			{
+				FrontEnd.println("(StateViewer) " + drawNodes.size() + " state > Startup Reset Limit ("+Env.getInt("SV_STARTUP_RESET_LIMIT") + " state)");
 				FrontEnd.sleep(300);
 			}
 		}
 	}
 
-	public void generationReset(){
+	public void generationReset()
+	{
 		init(rootDrawNodes);
 	}
 
-	public void generationUp(){
-		if(drawNodes.parentNode!=null){
+	public void generationUp()
+	{
+		if (drawNodes.parentNode != null)
+		{
 			init(drawNodes.parentNode.parentSet, drawNodes.parentNode);
 		}
 	}
 
-	public void update(){
+	public void update()
+	{
 		painter.update();
 	}
 
-	public void setActive(boolean active){
-		if(painter.isActive()==active){ return; }
-		if(active){
+	public void setActive(boolean active)
+	{
+		if (painter.isActive() == active) { return; }
+		if (active)
+		{
 			addMouseListener(this);
 			addMouseMotionListener(this);
 			addMouseWheelListener(this);
 			addKeyListener(this);
-		}else{
+		}
+		else
+		{
 			removeMouseListener(this);
 			removeMouseMotionListener(this);
 			removeMouseWheelListener(this);
 			removeKeyListener(this);
 		}
 		painter.setActive(active);
-		mover.setActive(active&& Env.is("SV_DYNAMIC_MOVER"));
+		mover.setActive(active && Env.is("SV_DYNAMIC_MOVER"));
 
 		statePanel.stateControlPanel.setEnabled(active);
-		if(active){
+		if (active)
+		{
 			update();
-		}else{
+		}
+		else
+		{
 			repaint();
 		}
 	}
 
-	public boolean isActive(){
+	public boolean isActive()
+	{
 		return painter.isActive();
 	}
 
-	public void setDynamicMoverActive(boolean active){
+	public void setDynamicMoverActive(boolean active)
+	{
 		mover.setActive(active);
 	}
 
-	public StateDynamicMover getDynamicMover(){
+	public StateDynamicMover getDynamicMover()
+	{
 		return mover;
 	}
 
-	public boolean isDynamicMoverActive(){
+	public boolean isDynamicMoverActive()
+	{
 		return mover.isActive();
 	}
 
-	public void loadFont(){
-		font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")-4);
+	public void loadFont()
+	{
+		font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE") - 4);
 		update();
 		revalidate();
 	}
 
-	public StateDraw getDraw(){
+	public StateDraw getDraw()
+	{
 		return draw;
 	}
 
-	public void setInnerZoom(double zoom){
-		if(zoom<0.0001){ zoom=0.0001; }else if(zoom>4.0){ zoom=4.0; }
+	public void setInnerZoom(double zoom)
+	{
+		if (zoom < 0.0001)
+		{
+			zoom = 0.0001;
+		}
+		else if (zoom > 4.0)
+		{
+			zoom=4.0;
+		}
 
 		double w = (double)getWidth() / 2;
 		double h = (double)getHeight() / 2;
@@ -315,110 +342,140 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		double oldW = w / this.zoom;
 		double oldH = h / this.zoom;
 
-		drawNodes.allMove(newW-oldW,newH-oldH);
+		drawNodes.allMove(newW - oldW, newH - oldH);
 
 		this.zoom = zoom;
 		updateSimpleMode();
 	}
 
-	public void updateSimpleMode(){
-		if(Env.get("SV_SIMPLE_MODE").equals("auto")){
-			draw.setSimpleMode(zoom<=0.7);
-		}else{
+	public void updateSimpleMode()
+	{
+		if (Env.get("SV_SIMPLE_MODE").equals("auto"))
+		{
+			draw.setSimpleMode(zoom <= 0.7);
+		}
+		else
+		{
 			draw.setSimpleMode(Env.is("SV_SIMPLE_MODE"));
 		}
 	}
 
-	public void updateDraw(){
-		if(Env.get("SV_GRAPH_DRAW").equals("FLOWNODE")){
+	public void updateDraw()
+	{
+		String graphDraw = Env.get("SV_GRAPH_DRAW");
+		if ("FLOWNODE".equals(graphDraw))
+		{
 			draw = new StateGraphFlownodeDraw(this);
-		}else if(Env.get("SV_GRAPH_DRAW").equals("ATOMCOLOR")){
+		}
+		else if("ATOMCOLOR".equals(graphDraw))
+		{
 			draw = new StateGraphAtomcolorDraw(this);
-		}else if(Env.get("SV_GRAPH_DRAW").equals("BONE")){
+		}
+		else if("BONE".equals(graphDraw))
+		{
 			draw = new StateGraphBoneDraw(this);
-		}else{
+		}
+		else
+		{
 			draw = new StateGraphBasicDraw(this);
 		}
-		if(drawNodes!=null) drawNodes.updateNodeLooks();
+		if (drawNodes != null) drawNodes.updateNodeLooks();
 	}
 
-	public void changeZoom(double dz){
-		double z = Math.sqrt(zoom*10000);
+	public void changeZoom(double dz)
+	{
+		double z = Math.sqrt(zoom * 10000);
 		z -= dz;
-		if(z<0){ z=0; }
-		setZoom(z*z/10000.0);
+		if (z < 0) z = 0;
+		setZoom(z * z / 10000.0);
 		update();
 	}
 
-	public void setZoom(double zoom){
+	public void setZoom(double zoom)
+	{
 		setInnerZoom(zoom);
 		statePanel.stateControlPanel.setSliderPos(zoom);
 	}
 
-	public double getZoom(){
+	public double getZoom()
+	{
 		return this.zoom;
 	}
 
-	public void setDrawTime(double drawTime){
+	public void setDrawTime(double drawTime)
+	{
 		this.drawTime = drawTime;
 		statePanel.stateControlPanel.updateInfo();
 	}
 
-	public double getDrawTime(){
+	public double getDrawTime()
+	{
 		return this.drawTime;
 	}
 
-	public int getDepth(){
-		if(drawNodes==null) return 0;
+	public int getDepth()
+	{
+		if (drawNodes == null) return 0;
 		return drawNodes.getDepth();
 	}
 
-	public int getAllNum(){
-		if(drawNodes==null) return 0;
-		return drawNodes.size()-drawNodes.getDummySize();
+	public int getAllNum()
+	{
+		if (drawNodes == null) return 0;
+		return drawNodes.size() - drawNodes.getDummySize();
 	}
 
-	public int getEndNum(){
-		if(drawNodes==null) return 0;
+	public int getEndNum()
+	{
+		if (drawNodes == null) return 0;
 		return drawNodes.getEndNode().size();
 	}
 
-	public ArrayList<StateNode> getSelectNodes(){
+	public ArrayList<StateNode> getSelectNodes()
+	{
 		return selectNodes;
 	}
 
-	public void setSelectNode(StateNode selectNode){
+	public void setSelectNode(StateNode selectNode)
+	{
 		selectClear();
 		selectNodes.add(selectNode);
 	}
 
-	public void selectClear(){
+	public void selectClear()
+	{
 		selectNodes.clear();
 		nodeSelected = false;
 		selectTransition = null;
 	}
 
-	public StateTransition getSelectTransition(){
+	public StateTransition getSelectTransition()
+	{
 		return this.selectTransition;
 	}
 
-	public boolean isSelectSquare(){
+	public boolean isSelectSquare()
+	{
 		return this.selectSquare;
 	}
 
-	public Point getLastPoint(){
+	public Point getLastPoint()
+	{
 		return this.lastPoint;
 	}
 
-	public Point getStartPoint(){
+	public Point getStartPoint()
+	{
 		return this.startPoint;
 	}
 
-	public StateNodeSet getDrawNodes(){
+	public StateNodeSet getDrawNodes()
+	{
 		return drawNodes;
 	}
 
-	public void updateNodeLabel(){
+	public void updateNodeLabel()
+	{
 		nodeLabel.setNode(selectNodes);
 	}
 
@@ -466,113 +523,131 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 	*/
 
-	public void dummyMixAdjust(){
-		(new StateGraphDummyMixAdjustWorker(this)).start();
+	public void dummyMixAdjust()
+	{
+		new StateGraphDummyMixAdjustWorker(this).start();
 	}
 
-	public void simpleMixAdjust(){
-		(new StateGraphSimpleMixAdjustWorker(this)).start();
+	public void simpleMixAdjust()
+	{
+		new StateGraphSimpleMixAdjustWorker(this).start();
 	}
 
-	public void positionReset(){
+	public void positionReset()
+	{
 		drawNodes.positionReset();
 	}
 
-	public void adjustReset(){
-		(new StateGraphAdjustWorker(this)).selectExecute();
+	public void adjustReset()
+	{
+		new StateGraphAdjustWorker(this).selectExecute();
 	}
 
-	public void adjust2Reset(){
-		(new StateGraphAdjust2Worker(this)).selectExecute();
+	public void adjust2Reset()
+	{
+		new StateGraphAdjust2Worker(this).selectExecute();
 	}
 
-	public void adjust3Reset(){
-		(new StateGraphAdjust3Worker(this)).selectExecute();
+	public void adjust3Reset()
+	{
+		new StateGraphAdjust3Worker(this).selectExecute();
 	}
 
-	public void dummySmoothing(){
-		(new StateGraphDummySmoothingWorker(this)).selectExecute();
+	public void dummySmoothing()
+	{
+		new StateGraphDummySmoothingWorker(this).selectExecute();
 	}
 
-	public void exchangeReset(){
-		(new StateGraphExchangeWorker(this)).selectExecute();
+	public void exchangeReset()
+	{
+		new StateGraphExchangeWorker(this).selectExecute();
 	}
 
-	public void geneticAlgorithmLength(){
+	public void geneticAlgorithmLength()
+	{
 		StateGraphGeneticAlgorithmWorker worker = new StateGraphGeneticAlgorithmWorker(this);
 		worker.ready();
 		worker.execute();
 	}
 
-	public void stretchMove(){
+	public void stretchMove()
+	{
 		StateGraphStretchMoveWorker worker = new StateGraphStretchMoveWorker(this);
 		worker.ready();
 		worker.execute();
 	}
 
-	public void randomMove(){
+	public void randomMove()
+	{
 		StateGraphRandomMoveWorker worker = new StateGraphRandomMoveWorker(this);
 		worker.ready();
 		worker.execute();
 	}
 
-	void groupMove(){
-		for(int i=0;i<5;++i){
-			for(StateNode node : drawNodes.getAllNode()){
-				double y=0;
-				int count=0;
-				for(StateNode to : node.getToNodes()){
-					y+=to.getY();
+	void groupMove()
+	{
+		for (int i = 0; i < 5; ++i)
+		{
+			for (StateNode node : drawNodes.getAllNode())
+			{
+				double y = 0;
+				int count = 0;
+				for (StateNode to : node.getToNodes())
+				{
+					y += to.getY();
 					++count;
 				}
-				for(StateNode from : node.getFromNodes()){
-					y+=from.getY();
+				for (StateNode from : node.getFromNodes())
+				{
+					y += from.getY();
 					++count;
 				}
-				node.setPosition(node.getX(),y/count);
+				node.setPosition(node.getX(), y / count);
 			}
 		}
 		update();
 	}
 
-	public void startMover(){
+	public void startMover()
+	{
 		mover.setActive(!mover.isActive());
 	}
 
-	public void autoCentering(){
+	public void autoCentering()
+	{
 		zoomCentering();
 		moveCentering();
 		update();
 	}
 
-	private void zoomCentering(){
+	private void zoomCentering()
+	{
 		Rectangle2D.Double d = drawNodes.getNodesDimension();
 
-		double zoomX = getWidth()/d.width;
-		double zoomY = getHeight()/d.height;
+		double zoomX = getWidth() / d.width;
+		double zoomY = getHeight() / d.height;
 
-		if(zoomX<zoomY){
-			setZoom(zoomX);
-		}else{
-			setZoom(zoomY);
-		}
+		setZoom(Math.min(zoomX, zoomY));
 	}
 
-	private void moveCentering(){
+	private void moveCentering()
+	{
 		drawNodes.resetMovePosition();
 		Rectangle2D.Double d = getNodesWindowDimension();
 		drawNodes.allMove(((getWidth()-d.width)/2.0)/zoom,((getHeight()-d.height)/2.0)/zoom);
 	}
 
-	public void fitCentering(){
+	public void fitCentering()
+	{
 		Rectangle2D.Double d = drawNodes.getNodesDimension();
-		drawNodes.allMove(-1.0*d.getX(), -1.0*d.getY());
+		drawNodes.allMove(-1.0 * d.getX(), -1.0 * d.getY());
 		d = getNodesWindowDimension();
-		drawNodes.allScaleMove(getWidth()/d.getWidth(), getHeight()/d.getHeight(), 0, 0);
+		drawNodes.allScaleMove(getWidth() / d.getWidth(), getHeight() / d.getHeight(), 0, 0);
 		update();
 	}
 
-	public Rectangle2D.Double getNodesWindowDimension(){
+	public Rectangle2D.Double getNodesWindowDimension()
+	{
 		Rectangle2D.Double d = drawNodes.getNodesDimension();
 		d.x *= zoom;
 		d.y *= zoom;
@@ -630,30 +705,37 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 	*/
 
-	public int stateFind(String str){
+	public int stateFind(String str)
+	{
 		selectClear();
 		drawNodes.setAllWeak(true);
 
-		if(str.equals("")){
+		if (str.equals(""))
+		{
 			searchReset();
 			return 0;
 		}
 
-		HashSet<StateNode> hits = new HashSet<StateNode>();
+		Set<StateNode> hits = new HashSet<StateNode>();
 
 		//検索
-		for(StateNode node : new LinkedList<StateNode>(drawNodes.getAllNode())){
-			if(node.isMatch(str)){
+		for (StateNode node : new LinkedList<StateNode>(drawNodes.getAllNode()))
+		{
+			if (node.isMatch(str))
+			{
 				hits.add(node);
 			}
 		}
 
 		//処理
-		for(StateNode node : hits){
+		for (StateNode node : hits)
+		{
 			drawNodes.setLastOrder(node);
 			node.weak = false;
-			for(StateTransition t : node.getToTransitions()){
-				if(hits.contains(t.to)){
+			for (StateTransition t : node.getToTransitions())
+			{
+				if (hits.contains(t.to))
+				{
 					drawNodes.setLastOrder(t);
 					t.weak = false;
 				}
@@ -666,63 +748,80 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		return hits.size();
 	}
 
-	public int stateMatch(String head,String guard){
+	public int stateMatch(String head, String guard)
+	{
 		selectClear();
 		drawNodes.setAllWeak(true);
 
-		if(head.equals("")){
+		if (head.equals(""))
+		{
 			searchReset();
 			return 0;
 		}
 
-		HashSet<StateNode> hits = new HashSet<StateNode>();
+		Set<StateNode> hits = new HashSet<StateNode>();
 
 		File f = new File("temp.lmn");
-		try {
+		try
+		{
 			FileWriter fp = new FileWriter(f);
-			fp.write(drawNodes.getMatchFileString(head,guard));
-            fp.close();
-		} catch (IOException e) {
+			fp.write(drawNodes.getMatchFileString(head, guard));
+			fp.close();
+		}
+		catch (IOException e)
+		{
 			FrontEnd.printException(e);
 		}
 
-		final LmntalRunner lr = new LmntalRunner("",f);
+		final LmntalRunner lr = new LmntalRunner("", f);
 		lr.setBuffering(true);
 		lr.run();
 
-		while(lr.isRunning()){
+		while (lr.isRunning())
+		{
 			FrontEnd.sleep(200);
 		}
-		if(lr.isSucceeded()){
+		if (lr.isSucceeded())
+		{
 			String str = lr.getBufferString();
 			int sp=str.indexOf("sVr_matches{");
-			if(sp==-1){ return -1; }
+			if (sp == -1) { return -1; }
 			int ep=str.indexOf("}",sp+12);
 			String ids = str.substring(sp+12,ep);
-			if(ids.length()>0){
+			if (ids.length() > 0)
+			{
 				String[] strs = ids.split(",");
-				for(String s: strs){
-					try{
+				for (String s : strs)
+				{
+					try
+					{
 						long id = Long.parseLong(s.substring(s.indexOf("(")+1,s.indexOf(")")));
 						StateNode node = drawNodes.get(id);
 						hits.add(node);
-					}catch(Exception e){
+					}
+					catch (Exception e)
+					{
 						searchReset();
 						return -1;
 					}
 				}
 			}
-		}else{
+		}
+		else
+		{
 			searchReset();
 			return -1;
 		}
 
 		//処理
-		for(StateNode node : hits){
+		for (StateNode node : hits)
+		{
 			drawNodes.setLastOrder(node);
 			node.weak = false;
-			for(StateTransition t : node.getToTransitions()){
-				if(hits.contains(t.to)){
+			for (StateTransition t : node.getToTransitions())
+			{
+				if (hits.contains(t.to))
+				{
 					drawNodes.setLastOrder(t);
 					t.weak = false;
 				}
@@ -735,7 +834,8 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		return hits.size();
 	}
 
-	public void searchShortCycle(){
+	public void searchShortCycle()
+	{
 		drawNodes.updateShortCycle();
 		update();
 	}
@@ -866,146 +966,184 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 	*/
 
-	public void searchReset(){
+	public void searchReset()
+	{
 		drawNodes.setAllWeak(false);
 		drawNodes.updateNodeLooks();
 		draw.setSearchMode(false);
 		update();
 	}
 
-	public void emBackNodes(ArrayList<StateNode> nodes){
+	public void emBackNodes(ArrayList<StateNode> nodes)
+	{
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 		drawNodes.allNodeUnMark();
 
-		LinkedList<StateNode> queue = new LinkedList<StateNode>();
+		Queue<StateNode> queue = new LinkedList<StateNode>();
 
-		for(StateNode n : nodes){
+		for(StateNode n : nodes)
+		{
 			n.mark();
 			queue.add(n);
 			weaks.remove(n);
 		}
 
-		while(!queue.isEmpty()){
+		while (!queue.isEmpty())
+		{
 			StateNode node = queue.remove();
-			for(StateNode n : node.getFromNodes()){
-				if(n.isMarked()||n.depth!=node.depth-1){continue;}
+			for (StateNode n : node.getFromNodes())
+			{
+				if (n.isMarked() || n.depth != node.depth - 1) continue;
 				n.mark();
 				queue.add(n);
 				weaks.remove(n);
 			}
 		}
-		for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
+		for (StateNode node : weaks)
+		{
+			node.weak = true;
+			node.updateLooks();
+		}
 		update();
 	}
 
-	public void emFromNodes(ArrayList<StateNode> nodes){
+	public void emFromNodes(ArrayList<StateNode> nodes)
+	{
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 		drawNodes.allNodeUnMark();
 
-		LinkedList<StateNode> queue = new LinkedList<StateNode>();
+		Queue<StateNode> queue = new LinkedList<StateNode>();
 
-		for(StateNode n : nodes){
+		for (StateNode n : nodes)
+		{
 			n.mark();
 			queue.add(n);
 			weaks.remove(n);
 		}
 
-		while(!queue.isEmpty()){
+		while (!queue.isEmpty())
+		{
 			StateNode node = queue.remove();
-			for(StateNode n : node.getFromNodes()){
-				if(n.isMarked()){continue;}
+			for (StateNode n : node.getFromNodes())
+			{
+				if (n.isMarked()) continue;
 				n.mark();
 				queue.add(n);
 				weaks.remove(n);
 			}
 		}
-		for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
+		for (StateNode node : weaks)
+		{
+			node.weak = true;
+			node.updateLooks();
+		}
 		update();
 	}
 
-	public void emNextNodes(ArrayList<StateNode> nodes){
+	public void emNextNodes(ArrayList<StateNode> nodes)
+	{
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 		drawNodes.allNodeUnMark();
 
-		LinkedList<StateNode> queue = new LinkedList<StateNode>();
+		Queue<StateNode> queue = new LinkedList<StateNode>();
 
-		for(StateNode n : nodes){
+		for (StateNode n : nodes)
+		{
 			n.mark();
 			queue.add(n);
 			weaks.remove(n);
 		}
 
-		while(!queue.isEmpty()){
+		while (!queue.isEmpty())
+		{
 			StateNode node = queue.remove();
-			for(StateNode n : node.getToNodes()){
-				if(n.isMarked()||node.depth+1!=n.depth){continue;}
+			for (StateNode n : node.getToNodes())
+			{
+				if (n.isMarked() || node.depth + 1 != n.depth) continue;
 				n.mark();
 				queue.add(n);
 				weaks.remove(n);
 			}
 		}
-		for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
+		for (StateNode node : weaks)
+		{
+			node.weak = true;
+			node.updateLooks();
+		}
 		update();
 	}
 
-	public void emToNodes(ArrayList<StateNode> nodes){
+	public void emToNodes(ArrayList<StateNode> nodes)
+	{
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 		drawNodes.allNodeUnMark();
 
-		LinkedList<StateNode> queue = new LinkedList<StateNode>();
+		Queue<StateNode> queue = new LinkedList<StateNode>();
 
-		for(StateNode n : nodes){
+		for (StateNode n : nodes)
+		{
 			n.mark();
 			queue.add(n);
 			weaks.remove(n);
 		}
 
-		while(!queue.isEmpty()){
+		while (!queue.isEmpty())
+		{
 			StateNode node = queue.remove();
-			for(StateNode n : node.getToNodes()){
-				if(n.isMarked()){continue;}
+			for (StateNode n : node.getToNodes())
+			{
+				if (n.isMarked()) continue;
 				n.mark();
 				queue.add(n);
 				weaks.remove(n);
 			}
 		}
-		for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
+		for (StateNode node : weaks)
+		{
+			node.weak = true;
+			node.updateLooks();
+		}
 		update();
 	}
 
-	public void allDelete(){
+	public void allDelete()
+	{
 		setActive(false);
 		statePanel.stateControlPanel.updateInfo();
 		repaint();
 	}
 
-	public void paintComponent(Graphics g){
+	public void paintComponent(Graphics g)
+	{
 		Graphics2D g2 = (Graphics2D)g;
 
-		if(Env.is("SV_ANTIALIAS")){
+		if (Env.is("SV_ANTIALIAS"))
+		{
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		}else{
+		}
+		else
+		{
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 		}
 
 		g2.setFont(font);
 
 		//フレームの初期化
-		g2.setColor(Color.white);
+		g2.setColor(Color.WHITE);
 		g2.fillRect(0, 0, getWidth(), getHeight());
 
-		if(!isActive()){ return; }
+		if (!isActive()) return;
 		//グラフ描画
 
 		double startTime = System.currentTimeMillis();
 
-
-		g2.scale(zoom,zoom);
+		g2.scale(zoom, zoom);
 
 		draw.drawGraph(g2);
 
 		//選択時の四角の表示
-		if(selectSquare&&lastPoint!=null&&startPoint!=null){
+		if (selectSquare && lastPoint != null && startPoint != null)
+		{
 			Point p1 = new Point((int)((double)lastPoint.getX()/zoom), (int)((double)lastPoint.getY()/zoom));
 			Point p2 = new Point((int)((double)startPoint.getX()/zoom), (int)((double)startPoint.getY()/zoom));
 
@@ -1013,10 +1151,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 			g2.drawRect(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.max(p1.x, p2.x)-Math.min(p1.x, p2.x), Math.max(p1.y, p2.y)-Math.min(p1.y, p2.y));
 		}
 
-		g2.scale(1.0/zoom, 1.0/zoom);
+		g2.scale(1.0 / zoom, 1.0 / zoom);
 
-		setDrawTime(System.currentTimeMillis()-startTime);
-
+		setDrawTime(System.currentTimeMillis() - startTime);
 	}
 
 	/*
@@ -1026,19 +1163,26 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 	}
 	*/
 
-	public void shakeMove(){
-		for(int i=0;i<50;++i){
-			for(StateNode node : drawNodes.getAllNode()){
+	public void shakeMove()
+	{
+		for (int i = 0; i < 50; ++i)
+		{
+			for (StateNode node : drawNodes.getAllNode())
+			{
 				double newX = (Math.random()-0.5)*20.0 + node.getX();
 				double newY = (Math.random()-0.5)*20.0 + node.getY();
 				double nowMinLength = drawNodes.getMinLength(node.id,node.getX(),node.getY());
 				double newMinLength = drawNodes.getMinLength(node.id,newX,newY);
-				if(nowMinLength<24&&nowMinLength<newMinLength){
+				if (nowMinLength < 24 && nowMinLength < newMinLength)
+				{
 					node.setPosition(newX, newY);
-				}else if(newMinLength>=24){
+				}
+				else if (newMinLength >= 24)
+				{
 					double nowLinkLength = drawNodes.getLinkLength(node,node.getX(),node.getY());
 					double newLinkLength = drawNodes.getLinkLength(node,newX,newY);
-					if(newLinkLength<nowLinkLength){
+					if (newLinkLength < nowLinkLength)
+					{
 						node.setPosition(newX, newY);
 					}
 				}
@@ -1047,11 +1191,16 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		autoCentering();
 	}
 
-	public void selectNodeAbstraction(){
-		if(selectNodes.size()<=1){ return; }
-		ArrayList<StateNode> groupNodes = new ArrayList<StateNode>();
-		for(StateNode node : selectNodes){
-			if(!node.dummy){ groupNodes.add(node); }
+	public void selectNodeAbstraction()
+	{
+		if (selectNodes.size() <= 1) return;
+		List<StateNode> groupNodes = new ArrayList<StateNode>();
+		for (StateNode node : selectNodes)
+		{
+			if (!node.dummy)
+			{
+				groupNodes.add(node);
+			}
 		}
 
 		StateAbstractionMaker maker = new StateAbstractionMaker(this);
@@ -1059,27 +1208,32 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		maker.end();
 	}
 
-	public boolean isDragg(){
-		if(lastPoint==null){
+	public boolean isDragg()
+	{
+		if (lastPoint == null)
+		{
 			return false;
-		}else{
+		}
+		else
+		{
 			return true;
 		}
 	}
 
-	public void mouseClicked(MouseEvent e) {
-
+	public void mouseClicked(MouseEvent e)
+	{
 	}
 
-	public void mouseEntered(MouseEvent e) {
-
+	public void mouseEntered(MouseEvent e)
+	{
 	}
 
-	public void mouseExited(MouseEvent e) {
-
+	public void mouseExited(MouseEvent e)
+	{
 	}
 
-	public void mousePressed(MouseEvent e) {
+	public void mousePressed(MouseEvent e)
+	{
 		requestFocus();
 
 		lastPoint = e.getPoint();
@@ -1092,64 +1246,91 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 
 		//ある程度拡大していないと選択できない
 		StateNode selectNode = null;
-		if(zoom>0.3){
+		if (zoom > 0.3)
+		{
 			selectNode = drawNodes.pickANode(p);
 		}
 
-		if(e.isControlDown()){
-			if(selectNode!=null){
-				if(!selectNodes.contains(selectNode)){
+		if (e.isControlDown())
+		{
+			if (selectNode != null)
+			{
+				if (!selectNodes.contains(selectNode))
+				{
 					selectNodes.add(selectNode);
 					nodeSelected = true;
-				}else{
+				}
+				else
+				{
 					selectNodes.remove(selectNode);
 					nodeSelected = false;
 				}
-			}else{
+			}
+			else
+			{
 				nodeSelected = false;
 			}
-		}else{
-			if(selectNode!=null){
-				if(!selectNodes.contains(selectNode)){
+		}
+		else
+		{
+			if (selectNode != null)
+			{
+				if (!selectNodes.contains(selectNode))
+				{
 					selectNodes.clear();
 					selectNodes.add(selectNode);
-				}else if(e.getClickCount()==2){
-					if(e.isShiftDown()){
+				}
+				else if (e.getClickCount() == 2)
+				{
+					if (e.isShiftDown())
+					{
 						selectNode.debugFrame(this);
-					}else{
+					}
+					else
+					{
 						selectNode.doubleClick(this);
 					}
 				}
 				nodeSelected = true;
-			}else{
+			}
+			else
+			{
 				selectNodes.clear();
 				nodeSelected = false;
 			}
 		}
 
-
 		//トランジションの選択
-		if(selectNode==null&&selectNodes.size()==0){
-			if(zoom>0.3){
+		if (selectNode == null && selectNodes.size() == 0)
+		{
+			if (zoom > 0.3)
+			{
 				selectTransition = drawNodes.pickATransition(p);
-				if(selectTransition!=null&&e.getClickCount()==2){
+				if (selectTransition != null && e.getClickCount() == 2)
+				{
 					selectTransition.doubleClick(this);
 				}
-			}else{
+			}
+			else
+			{
 				selectTransition = null;
 			}
-		}else{
+		}
+		else
+		{
 			selectTransition = null;
 		}
 
 		//右クリック制御
-		if(SwingUtilities.isRightMouseButton(e)){
-			(new StateRightMenu(this)).show(e.getComponent(), e.getX(), e.getY());
+		if (SwingUtilities.isRightMouseButton(e))
+		{
+			new StateRightMenu(this).show(e.getComponent(), e.getX(), e.getY());
 		}
 		update();
 	}
 
-	public void mouseReleased(MouseEvent e) {
+	public void mouseReleased(MouseEvent e)
+	{
 		lastPoint = null;
 		startPoint = null;
 		selectSquare = false;
@@ -1157,12 +1338,15 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		update();
 	}
 
-	public void mouseDragged(MouseEvent e) {
-		if(lastPoint == null){
+	public void mouseDragged(MouseEvent e)
+	{
+		if (lastPoint == null)
+		{
 			lastPoint = e.getPoint();
 			return;
 		}
-		if(startPoint == null){
+		if (startPoint == null)
+		{
 			startPoint = e.getPoint();
 			selectSquare = false;
 			return;
@@ -1170,41 +1354,61 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		double dx = (double)(e.getX() - lastPoint.x) / zoom;
 		double dy = (double)(e.getY() - lastPoint.y) / zoom;
 
-		if(nodeSelected){
-			if(!e.isAltDown()){ dx = 0; }
-			if(e.isAltDown()&&e.isControlDown()&&selectNodes.size()==1){
-				for(StateNode node : selectNodes){
+		if (nodeSelected)
+		{
+			if (!e.isAltDown()) { dx = 0; }
+			if (e.isAltDown() && e.isControlDown() && selectNodes.size() == 1)
+			{
+				for (StateNode node : selectNodes)
+				{
 					accompany_move(node,dx,dy);
 				}
-			}else{
-				for(StateNode node : selectNodes){
+			}
+			else
+			{
+				for (StateNode node : selectNodes)
+				{
 					node.move(dx, dy);
 				}
 			}
-		}else if(selectTransition!=null){
-			if(!e.isAltDown()){ dx = 0; }
+		}
+		else if (selectTransition != null)
+		{
+			if (!e.isAltDown()) { dx = 0; }
 			selectTransition.from.move(dx, dy);
-			if(selectTransition.from!=selectTransition.to){
+			if (selectTransition.from != selectTransition.to)
+			{
 				selectTransition.to.move(dx, dy);
 			}
-		}else{
-
-			if(e.isControlDown()){
+		}
+		else
+		{
+			if (e.isControlDown())
+			{
 				Rectangle2D.Double d = getNodesWindowDimension();
-				double posX,posY;
-				if(startPoint.x<d.getCenterX()){
-					if(startPoint.y<d.getCenterY()){
+				double posX, posY;
+				if (startPoint.x < d.getCenterX())
+				{
+					if (startPoint.y < d.getCenterY())
+					{
 						posX = d.getMaxX();
 						posY = d.getMaxY();
-					}else{
+					}
+					else
+					{
 						posX = d.getMaxX();
 						posY = d.getMinY();
 					}
-				}else{
-					if(startPoint.y<d.getCenterY()){
+				}
+				else
+				{
+					if (startPoint.y < d.getCenterY())
+					{
 						posX = d.getMinX();
 						posY = d.getMaxY();
-					}else{
+					}
+					else
+					{
 						posX = d.getMinX();
 						posY = d.getMinY();
 					}
@@ -1268,7 +1472,9 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				scaleY = Math.abs(scaleY);
 				*/
 
-			}else if(e.isShiftDown()){
+			}
+			else if (e.isShiftDown())
+			{
 				selectSquare = true;
 				Point p1 = new Point((int)((double)lastPoint.getX()/zoom), (int)((double)lastPoint.getY()/zoom));
 				Point p2 = new Point((int)((double)startPoint.getX()/zoom), (int)((double)startPoint.getY()/zoom));
@@ -1278,14 +1484,17 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 				double maxX = Math.max(p1.x, p2.x);
 				double maxY = Math.max(p1.y, p2.y);
 				selectNodes.clear();
-				for(StateNode node : drawNodes.getAllNode()){
-					if(!draw.isShowDummyMode()&&node.dummy){ continue; }
-					if(minX<node.getX()&&node.getX()<maxX&&minY<node.getY()&&node.getY()<maxY){
+				for (StateNode node : drawNodes.getAllNode())
+				{
+					if (!draw.isShowDummyMode() && node.dummy) { continue; }
+					if (minX < node.getX() && node.getX() < maxX && minY < node.getY() && node.getY() < maxY)
+					{
 						selectNodes.add(node);
 					}
 				}
-
-			}else{
+			}
+			else
+			{
 				setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 				drawNodes.allMove(dx, dy);
 			}
@@ -1294,64 +1503,78 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		update();
 	}
 
-	private void accompany_move(StateNode node,double dx,double dy){
+	private void accompany_move(StateNode node, double dx, double dy)
+	{
 		drawNodes.allNodeUnMark();
 
-		LinkedList<StateNode> now_queue = new LinkedList<StateNode>();
-		LinkedList<StateNode> next_queue = new LinkedList<StateNode>();
+		Queue<StateNode> now_queue = new LinkedList<StateNode>();
+		Queue<StateNode> next_queue = new LinkedList<StateNode>();
 
 		next_queue.add(node);
 
 		int count=0;
-		while(!next_queue.isEmpty()){
+		while (!next_queue.isEmpty())
+		{
 			now_queue.clear();
-			for(StateNode n : next_queue){
+			for (StateNode n : next_queue)
+			{
 				now_queue.add(n);
 			}
 			next_queue.clear();
 
-			for(StateNode n : now_queue){
-				if(n.isMarked()){ continue; }
+			for (StateNode n : now_queue)
+			{
+				if (n.isMarked()) { continue; }
 				n.mark();
 				n.move(dx, dy);
 
-				for(StateNode to : n.getToNodes()){
+				for (StateNode to : n.getToNodes())
+				{
 					next_queue.add(to);
 				}
-				for(StateNode from : n.getFromNodes()){
+				for (StateNode from : n.getFromNodes())
+				{
 					next_queue.add(from);
 				}
 			}
 			dx /= 2;
 			dy /= 2;
 			count++;
-			if(count>10){ break; }
+			if (count > 10) break;
 		}
 	}
 
-	public void mouseMoved(MouseEvent e) {
-
+	public void mouseMoved(MouseEvent e)
+	{
 	}
 
-	public void mouseWheelMoved(MouseWheelEvent e) {
+	public void mouseWheelMoved(MouseWheelEvent e)
+	{
 		//double oldZoom = zoom;
 		double dz = (double)e.getWheelRotation()*5;
 		double s = 1.1;
-		if(e.isAltDown()){
+		if (e.isAltDown())
+		{
 			dz /= 5;
 			s -= 1.0;
 			s /= 5;
 			s += 1.0;
 		}
-		if(e.isControlDown()){
-			if(dz>0){
+		if (e.isControlDown())
+		{
+			if (dz > 0)
+			{
 				drawNodes.allScaleCenterMove(s, 1);
 				drawNodes.allScaleCenterMove(1, s);
-			}else if(dz<0){
+			}
+			else if (dz < 0)
+			{
 				drawNodes.allScaleCenterMove(1.0/s, 1);
 				drawNodes.allScaleCenterMove(1, 1.0/s);
 			}
-		}else{
+		}
+		else
+		{
 			changeZoom(dz);
 		}
 		update();
@@ -1361,70 +1584,100 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		//drawNodes.allMove((oldZoom-zoom)*dx/2, (oldZoom-zoom)*dy/2);
 	}
 
-
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(KeyEvent e)
+	{
 		boolean isUpdate = false;
 		double d = 5;
 		double s = 1.1;
-		if(e.isAltDown()){
+		if (e.isAltDown())
+		{
 			d /= 5;
 			s -= 1.0;
 			s /= 5;
 			s += 1.0;
 		}
 
-		switch(e.getKeyCode()){
+		switch (e.getKeyCode())
+		{
 		case KeyEvent.VK_LEFT:
-			if(selectNodes.size()==0){
-				if(e.isControlDown()){
+			if (selectNodes.size() == 0)
+			{
+				if (e.isControlDown())
+				{
 					drawNodes.allScaleCenterMove(1.0/s, 1);
-				}else{
+				}
+				else
+				{
 					drawNodes.allMove(-d/zoom, 0);
 				}
-			}else{
-				for(StateNode node : selectNodes){
+			}
+			else
+			{
+				for (StateNode node : selectNodes)
+				{
 					node.move(-d/zoom, 0);
 				}
 			}
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_RIGHT:
-			if(selectNodes.size()==0){
-				if(e.isControlDown()){
+			if (selectNodes.size() == 0)
+			{
+				if (e.isControlDown())
+				{
 					drawNodes.allScaleCenterMove(s, 1);
-				}else{
+				}
+				else
+				{
 					drawNodes.allMove(d/zoom, 0);
 				}
-			}else{
-				for(StateNode node : selectNodes){
+			}
+			else
+			{
+				for (StateNode node : selectNodes)
+				{
 					node.move(d/zoom, 0);
 				}
 			}
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_DOWN:
-			if(selectNodes.size()==0){
-				if(e.isControlDown()){
+			if (selectNodes.size() == 0)
+			{
+				if (e.isControlDown())
+				{
 					drawNodes.allScaleCenterMove(1, s);
-				}else{
+				}
+				else
+				{
 					drawNodes.allMove(0, d/zoom);
 				}
-			}else{
-				for(StateNode node : selectNodes){
+			}
+			else
+			{
+				for (StateNode node : selectNodes)
+				{
 					node.move(0, d/zoom);
 				}
 			}
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_UP:
-			if(selectNodes.size()==0){
-				if(e.isControlDown()){
+			if (selectNodes.size() == 0)
+			{
+				if (e.isControlDown())
+				{
 					drawNodes.allScaleCenterMove(1, 1/s);
-				}else{
+				}
+				else
+				{
 					drawNodes.allMove(0, -d/zoom);
 				}
-			}else{
-				for(StateNode node : selectNodes){
+			}
+			else
+			{
+				for (StateNode node : selectNodes)
+				{
 					node.move(0, -d/zoom);
 				}
 			}
@@ -1439,40 +1692,42 @@ public class StateGraphPanel extends JPanel implements MouseInputListener,MouseW
 		case KeyEvent.VK_SEMICOLON:
 		case KeyEvent.VK_ADD:
 		case KeyEvent.VK_PLUS:
-			if(e.isControlDown()){
+			if (e.isControlDown())
+			{
 				changeZoom(-1);
 			}
 			break;
 		case KeyEvent.VK_MINUS:
 		case KeyEvent.VK_SUBTRACT:
-			if(e.isControlDown()){
+			if (e.isControlDown())
+			{
 				changeZoom(1);
 			}
 			break;
 		case KeyEvent.VK_0:
-			if(e.isControlDown()){
+			if (e.isControlDown())
+			{
 				setZoom(1);
 				update();
 			}
 			break;
 		case KeyEvent.VK_SPACE:
-			if(selectTransition!=null){
+			if (selectTransition != null)
+			{
 				selectTransition.separateTransition(drawNodes);
 				selectTransition = null;
 				update();
 			}
 			break;
 		}
-		if(isUpdate) update();
+		if (isUpdate) update();
 	}
 
-	public void keyReleased(KeyEvent e) {
-
+	public void keyReleased(KeyEvent e)
+	{
 	}
 
-	public void keyTyped(KeyEvent e) {
-
+	public void keyTyped(KeyEvent e)
+	{
 	}
-
-
 }

@@ -56,7 +56,6 @@ import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
 import lavit.stateviewer.StateTransition;
-import lavit.util.StateDraw;
 
 public class StateGraphFlownodeDraw extends StateDraw {
 	StateGraphPanel panel;

@@ -56,7 +56,7 @@ import java.util.TreeSet;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.runner.LmntalRunner;
-import lavit.util.StateDraw;
+import lavit.stateviewer.draw.StateDraw;
 import lavit.util.UtilTextFrame;
 
 public class StateNode implements Shape {

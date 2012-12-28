@@ -56,7 +56,6 @@ import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
 import lavit.stateviewer.StateTransition;
 import lavit.util.ColorMaker;
-import lavit.util.StateDraw;
 
 public class StateGraphAtomcolorDraw extends StateDraw {
 	StateGraphPanel panel;

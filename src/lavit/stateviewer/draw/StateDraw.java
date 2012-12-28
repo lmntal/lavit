@@ -33,17 +33,15 @@
  *
  */
 
-package lavit.util;
+package lavit.stateviewer.draw;
 
-import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.ConcurrentModificationException;
 
 import lavit.Env;
 import lavit.stateviewer.StateNode;
 
-public abstract class StateDraw {
+public abstract class StateDraw
+{
 	protected boolean simpleMode;
 	protected boolean hideBackEdgeMode;
 	protected boolean showIdMode;
@@ -53,10 +51,14 @@ public abstract class StateDraw {
 	protected boolean cycleMode;
 	protected boolean searchMode;
 
-	public StateDraw(){
-		if(Env.get("SV_SIMPLE_MODE").equals("auto")){
+	public StateDraw()
+	{
+		if (Env.get("SV_SIMPLE_MODE").equals("auto"))
+		{
 			this.simpleMode = false;
-		}else{
+		}
+		else
+		{
 			this.simpleMode = Env.is("SV_SIMPLE_MODE");
 		}
 		this.hideBackEdgeMode = Env.is("SV_HIDEBACKEDGE");
@@ -69,55 +71,68 @@ public abstract class StateDraw {
 		this.searchMode = false;
 	}
 
-	public void setCycleMode(boolean cycleMode){
+	public void setCycleMode(boolean cycleMode)
+	{
 		this.cycleMode = cycleMode;
 	}
 
-	public boolean isCycleMode(){
+	public boolean isCycleMode()
+	{
 		return this.cycleMode;
 	}
 
-	public void setSearchMode(boolean searchMode){
+	public void setSearchMode(boolean searchMode)
+	{
 		this.searchMode = searchMode;
 	}
 
-	public boolean isSearchMode(){
+	public boolean isSearchMode()
+	{
 		return this.searchMode;
 	}
 
-	public void setSimpleMode(boolean simpleMode){
+	public void setSimpleMode(boolean simpleMode)
+	{
 		this.simpleMode = simpleMode;
 	}
 
-	public boolean isSimpleMode(){
+	public boolean isSimpleMode()
+	{
 		return this.simpleMode;
 	}
 
-	public void setHideBackEdgeMode(boolean hideBackEdgeMode){
+	public void setHideBackEdgeMode(boolean hideBackEdgeMode)
+	{
 		this.hideBackEdgeMode = hideBackEdgeMode;
 	}
 
-	public boolean isHideBackEdgeMode(){
+	public boolean isHideBackEdgeMode()
+	{
 		return this.hideBackEdgeMode;
 	}
 
-	public void setShowIdMode(boolean showIdMode){
+	public void setShowIdMode(boolean showIdMode)
+	{
 		this.showIdMode = showIdMode;
 	}
 
-	public void setShowRuleMode(boolean showRuleMode){
+	public void setShowRuleMode(boolean showRuleMode)
+	{
 		this.showRuleMode = showRuleMode;
 	}
 
-	public void setShowNoNameRuleMode(boolean showNoNameRuleMode){
+	public void setShowNoNameRuleMode(boolean showNoNameRuleMode)
+	{
 		this.showNoNameRuleMode = showNoNameRuleMode;
 	}
 
-	public void setShowDummyMode(boolean showDummyMode){
+	public void setShowDummyMode(boolean showDummyMode)
+	{
 		this.showDummyMode = showDummyMode;
 	}
 
-	public boolean isShowDummyMode(){
+	public boolean isShowDummyMode()
+	{
 		return this.showDummyMode;
 	}
 

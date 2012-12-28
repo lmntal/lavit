@@ -70,6 +70,7 @@ import lavit.stateviewer.controller.SelectStateTransitionRuleFrame;
 import lavit.stateviewer.controller.StateGenerationControlPanel;
 import lavit.stateviewer.controller.StateNodeLabel;
 import lavit.stateviewer.controller.StateRightMenu;
+import lavit.stateviewer.draw.StateDraw;
 import lavit.stateviewer.draw.StateGraphAtomcolorDraw;
 import lavit.stateviewer.draw.StateGraphBasicDraw;
 import lavit.stateviewer.draw.StateGraphBoneDraw;
@@ -87,7 +88,6 @@ import lavit.stateviewer.worker.StateGraphSimpleMixAdjustWorker;
 import lavit.stateviewer.worker.StateGraphStretchMoveWorker;
 import lavit.stateviewer.worker.StatePainter;
 import lavit.util.CommonFontUser;
-import lavit.util.StateDraw;
 
 @SuppressWarnings("serial")
 public class StateGraphPanel extends JPanel implements MouseInputListener, MouseWheelListener, KeyListener, CommonFontUser

@@ -42,7 +42,6 @@ import java.util.LinkedList;
 import lavit.Env;
 import lavit.stateviewer.worker.StateGraphStretchMoveWorker;
 import lavit.stateviewer.worker.StateTransitionAbstractionWorker;
-import lavit.util.StateTransitionCatcher;
 
 public class StateTransitionAbstraction implements StateTransitionCatcher {
 

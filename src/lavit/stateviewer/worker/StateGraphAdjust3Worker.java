@@ -55,10 +55,10 @@ import javax.swing.SwingWorker;
 import lavit.Env;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.stateviewer.NodeYComparator;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
-import lavit.util.NodeYComparator;
 
 public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 	private StateGraphPanel panel;
@@ -452,7 +452,7 @@ public class StateGraphAdjust3Worker extends SwingWorker<Object,Object>{
 
 		//ソートする
 		List<StateNode> sortNodes = new ArrayList<StateNode>(nodes);
-		Collections.sort(sortNodes, new NodeYComparator());
+		Collections.sort(sortNodes, NodeYComparator.getInstance());
 
 		List<StateNode> revsortNodes = new ArrayList<StateNode>(sortNodes);
 		Collections.reverse(revsortNodes);

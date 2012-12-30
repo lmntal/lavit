@@ -33,14 +33,35 @@
  *
  */
 
-package lavit.util;
+package lavit.stateviewer;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Comparator;
 
-import lavit.stateviewer.StateRule;
-import lavit.stateviewer.StateTransition;
+public class NodeYComparator implements Comparator<StateNode>
+{
+	private static NodeYComparator instance;
 
-public interface StateTransitionCatcher {
-	public void transitionCatch(Collection<StateRule> rules, Collection<StateTransition> trans);
+	private NodeYComparator() { }
+
+	public int compare(StateNode n1, StateNode n2)
+	{
+		int c = Double.compare(n1.getY(), n2.getY());
+		if (c != 0)
+		{
+			return c;
+		}
+		else
+		{
+			return n1.id == n2.id ? 0 : (n1.id < n2.id ? -1 : 1);
+		}
+	}
+
+	public synchronized static NodeYComparator getInstance()
+	{
+		if (instance == null)
+		{
+			instance = new NodeYComparator();
+		}
+		return instance;
+	}
 }

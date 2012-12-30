@@ -52,7 +52,6 @@ import java.util.Set;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.stateviewer.worker.StatePositionSet;
-import lavit.util.NodeYComparator;
 
 public class StateNodeSet
 {
@@ -690,7 +689,7 @@ public class StateNodeSet
 			StateNode startNode = null;
 
 			nodes = new ArrayList<StateNode>(nodes);
-			Collections.sort(nodes, new NodeYComparator());
+			Collections.sort(nodes, NodeYComparator.getInstance());
 
 			for(StateNode node : nodes){
 				if(node.dummy){

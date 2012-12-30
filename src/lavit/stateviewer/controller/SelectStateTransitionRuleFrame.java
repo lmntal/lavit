@@ -66,7 +66,6 @@ import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.frame.ChildWindowListener;
 import lavit.stateviewer.*;
-import lavit.util.StateTransitionCatcher;
 
 public class SelectStateTransitionRuleFrame extends JFrame implements ActionListener {
 	private StateGraphPanel graphPanel;

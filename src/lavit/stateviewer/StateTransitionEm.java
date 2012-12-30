@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import lavit.util.StateTransitionCatcher;
 
 public class StateTransitionEm implements StateTransitionCatcher {
 	private StateGraphPanel graphPanel;

@@ -243,31 +243,39 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 			FrontEnd.mainFrame.toolTab.setTab("System");
 			FrontEnd.executeUnyo(FrontEnd.mainFrame.editorPanel.getFile());
 		}
-		else if (src == slimButton) {
-
-			if(editorPanel.isChanged()){
+		else if (src == slimButton)
+		{
+			if (editorPanel.isChanged())
+			{
 				editorPanel.fileSave();
 			}
 
-			setButtonEnable(false);
+			if (editorPanel.getFile().getName().endsWith(".il"))
+			{
+				FrontEnd.mainFrame.runILCodeOnSLIM();
+			}
+			else
+			{
+				setButtonEnable(false);
 
-			FrontEnd.mainFrame.toolTab.setTab("System");
+				FrontEnd.mainFrame.toolTab.setTab("System");
 
-			FrontEnd.println("(SLIM) Doing...");
-			slimRunner = new SlimRunner(Env.get("SLIM_OPTION"));
-			slimRunner.run();
-			(new Thread(new Runnable() { public void run() {
-				while(slimRunner.isRunning()){
-					FrontEnd.sleep(200);
-				}
-				FrontEnd.println("(SLIM) Done! ["+(slimRunner.getTime()/1000.0)+"s]");
-				slimRunner = null;
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-					setButtonEnable(true);
-				}});
-			}})).start();
-
-		}else if (src == sviewerButton) {
+				FrontEnd.println("(SLIM) Doing...");
+				slimRunner = new SlimRunner(Env.get("SLIM_OPTION"));
+				slimRunner.run();
+				(new Thread(new Runnable() { public void run() {
+					while(slimRunner.isRunning()){
+						FrontEnd.sleep(200);
+					}
+					FrontEnd.println("(SLIM) Done! ["+(slimRunner.getTime()/1000.0)+"s]");
+					slimRunner = null;
+					javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
+						setButtonEnable(true);
+					}});
+				}})).start();
+			}
+		}
+		else if (src == sviewerButton) {
 
 			if(editorPanel.isChanged()){
 				editorPanel.fileSave();

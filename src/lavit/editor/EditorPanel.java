@@ -38,9 +38,11 @@ package lavit.editor;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -70,6 +72,7 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.event.TabChangeListener;
+import lavit.frame.FindReplaceDialog;
 import lavit.multiedit.EditorPage;
 import lavit.multiedit.TabView;
 import lavit.multiedit.coloring.lexer.TokenLabel;
@@ -106,6 +109,13 @@ public class EditorPanel extends JPanel implements CommonFontUser
 				closeSelectedPage();
 			}
 		});
+		tabView.addTabChangeListener(new TabChangeListener()
+		{
+			public void tabChanged()
+			{
+				FindReplaceDialog.getDialog().setTargetTextComponent(getSelectedEditor());
+			}
+		});
 
 		loadFont();
 		FrontEnd.addFontUser(this);
@@ -127,15 +137,16 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 		updateHighlight();
 
+		int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		InputMap im = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_DOWN_MASK), "mag_font");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, InputEvent.CTRL_DOWN_MASK), "mag_font");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SEMICOLON, InputEvent.CTRL_DOWN_MASK), "mag_font");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, mask), "mag_font");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, mask), "mag_font");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SEMICOLON, mask), "mag_font");
 
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK), "min_font");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK), "min_font");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, mask), "min_font");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, mask), "min_font");
 
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK), "def_font");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_0, mask), "def_font");
 
 		ActionMap am = getActionMap();
 		am.put("mag_font", getScaleUpAction());

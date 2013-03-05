@@ -210,6 +210,18 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 			}
 		});
 
+		edit.addSeparator();
+
+		JMenuItem itemFind = new JMenuItem("Find/Replace...");
+		itemFind.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				FindReplaceDialog.getDialog().showDialog();
+			}
+		});
+		edit.add(itemFind);
+
 		/*
 		edit.addSeparator();
 
@@ -364,6 +376,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		setAccelerator(iCopy, KeyEvent.VK_C, mask);
 		setAccelerator(iCut, KeyEvent.VK_X, mask);
 		setAccelerator(iPaste, KeyEvent.VK_V, mask);
+		setAccelerator(itemFind, KeyEvent.VK_F, mask);
 		setAccelerator(iLMNtal, KeyEvent.VK_F1, 0);
 		setAccelerator(iLMNtalg, KeyEvent.VK_F2, 0);
 		setAccelerator(iUNYO, KeyEvent.VK_F3, 0);

@@ -41,6 +41,9 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -49,38 +52,85 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
+
+import lavit.util.Option;
 
 @SuppressWarnings("serial")
 public class FindReplaceDialog extends JDialog
 {
+	private static FindReplaceDialog instance;
+
+	private JTextComponent targetTextComponent;
+
 	private JTextField findText;
 	private JTextField replaceText;
 	private JButton findForward;
 	private JButton findBackward;
 	private JButton replace;
 	private JButton replaceAll;
-	private JCheckBox useRegex;
+	private JCheckBox checkRegex;
+	private JCheckBox checkWrap;
+	private JLabel labelMessage;
 	private JButton buttonClose;
-	
-	public FindReplaceDialog()
+
+	private boolean isQueryDirty = true;
+	private Pattern queryPattern;
+
+	private FindReplaceDialog()
 	{
 		setTitle("Find/Replace");
-		
+
 		JPanel contents = new JPanel();
-		
+
 		JLabel labelFind = new JLabel("Find:");
 		JLabel labelReplace = new JLabel("Replace:");
 		findText = new JTextField();
 		findText.setColumns(20);
+		findText.getDocument().addDocumentListener(new QueryDocumentListener());
 		replaceText = new JTextField();
 		replaceText.setColumns(20);
 		findForward = new JButton("Find forward");
+		findForward.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				doFind(true, false);
+			}
+		});
 		findBackward = new JButton("Find backward");
+		findBackward.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				doFind(false, false);
+			}
+		});
 		replace = new JButton("Replace");
+		replace.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				doFind(true, true);
+			}
+		});
 		replaceAll = new JButton("Replace all");
-		useRegex = new JCheckBox("Regex");
+		replaceAll.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				doReplaceAll();
+			}
+		});
+		checkRegex = new JCheckBox("Regex");
+		checkWrap = new JCheckBox("Wrap search");
+		labelMessage = new JLabel("message");
 
 		Dimension dim = findForward.getPreferredSize();
 		dim.width += 20;
@@ -98,6 +148,11 @@ public class FindReplaceDialog extends JDialog
 		replaceAll.setMinimumSize(dim);
 		replaceAll.setMaximumSize(dim);
 
+		JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		checkBoxPanel.setBorder(BorderFactory.createTitledBorder("Options"));
+		checkBoxPanel.add(checkRegex);
+		checkBoxPanel.add(checkWrap);
+
 		contents.add(labelFind);
 		contents.add(labelReplace);
 		contents.add(findText);
@@ -106,41 +161,52 @@ public class FindReplaceDialog extends JDialog
 		contents.add(findBackward);
 		contents.add(replace);
 		contents.add(replaceAll);
-		contents.add(useRegex);
+		contents.add(checkBoxPanel);
+		contents.add(labelMessage);
 
-		GroupLayout layout = new GroupLayout(contents);
-		contents.setLayout(layout);
-		layout.setAutoCreateGaps(true);
-		layout.setAutoCreateContainerGaps(true);
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addGroup(layout.createParallelGroup()
-				.addComponent(labelFind)
-				.addComponent(labelReplace))
-			.addGroup(layout.createParallelGroup()
-				.addComponent(findText)
-				.addComponent(replaceText)
-				.addComponent(useRegex))
-			.addGroup(layout.createParallelGroup()
-				.addComponent(findForward)
-				.addComponent(findBackward)
-				.addComponent(replace)
-				.addComponent(replaceAll))
+		GroupLayout gl = new GroupLayout(contents);
+		contents.setLayout(gl);
+		gl.setAutoCreateGaps(true);
+		gl.setAutoCreateContainerGaps(true);
+		gl.setHorizontalGroup(gl.createParallelGroup(Alignment.LEADING)
+			.addGroup(gl.createSequentialGroup()
+				.addGroup(gl.createParallelGroup()
+					.addComponent(labelFind)
+					.addComponent(labelReplace)
+				)
+				.addGroup(gl.createParallelGroup()
+					.addComponent(findText)
+					.addComponent(replaceText)
+					.addComponent(checkBoxPanel)
+				)
+				.addGroup(gl.createParallelGroup()
+					.addComponent(findForward)
+					.addComponent(findBackward)
+					.addComponent(replace)
+					.addComponent(replaceAll)
+				)
+			)
+			.addComponent(labelMessage)
 		);
-		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+		gl.setVerticalGroup(gl.createSequentialGroup()
+			.addGroup(gl.createParallelGroup(Alignment.BASELINE)
 				.addComponent(labelFind)
 				.addComponent(findText)
-				.addComponent(findForward))
+				.addComponent(findForward)
+			)
 			.addComponent(findBackward)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+			.addGroup(gl.createParallelGroup(Alignment.BASELINE)
 				.addComponent(labelReplace)
 				.addComponent(replaceText)
-				.addComponent(replace))
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+				.addComponent(replace)
+			)
+			.addGroup(gl.createParallelGroup(Alignment.BASELINE)
 				.addComponent(replaceAll)
-				.addComponent(useRegex))
+				.addComponent(checkBoxPanel)
+			)
+			.addComponent(labelMessage)
 		);
-		
+
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		buttonPanel.setBorder(
 			BorderFactory.createCompoundBorder(
@@ -154,16 +220,334 @@ public class FindReplaceDialog extends JDialog
 		buttonClose = new JButton("Close");
 		buttonClose.addActionListener(new ActionListener()
 		{
-			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				dispose();
+				closeDialog();
 			}
 		});
 		buttonPanel.add(buttonClose);
-		
+
 		add(contents, BorderLayout.CENTER);
 		add(buttonPanel, BorderLayout.SOUTH);
 		pack();
+
+		setAlwaysOnTop(true);
+		setModalityType(ModalityType.MODELESS);
+		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+		setLocationRelativeTo(null);
+	}
+
+	public void setTargetTextComponent(JTextComponent targetTextComponent)
+	{
+		this.targetTextComponent = targetTextComponent;
+	}
+
+	public void showDialog()
+	{
+		setVisible(true);
+	}
+
+	private void closeDialog()
+	{
+		setVisible(false);
+	}
+
+	private boolean isRegex()
+	{
+		return checkRegex.isSelected();
+	}
+
+	private boolean isWrapSearch()
+	{
+		return checkWrap.isSelected();
+	}
+
+	private void doFind(boolean forward, final boolean replace)
+	{
+		setMessage("");
+		if (isRegex())
+		{
+			progressFindRegex(forward, isWrapSearch()).accept(new Option.IVisitor<Boolean, Object>()
+			{
+				public Object visitSome(Boolean found)
+				{
+					if (found)
+					{
+						if (replace)
+						{
+							askReplace();
+						}
+					}
+					else
+					{
+						setErrorMessage("text not found.");
+					}
+					return null;
+				}
+
+				public Object visitNone()
+				{
+					return null;
+				}
+			});
+		}
+		else
+		{
+			if (progressFind(forward, isWrapSearch()))
+			{
+				if (replace)
+				{
+					askReplace();
+				}
+			}
+			else
+			{
+				setErrorMessage("text not found.");
+			}
+		}
+	}
+
+	private void doReplaceAll()
+	{
+		executeReplaceAll(true, isWrapSearch());
+	}
+
+	private Option<Pattern> getQueryPattern(String patternText)
+	{
+		if (isQueryDirty)
+		{
+			try
+			{
+				queryPattern = Pattern.compile(patternText);
+				isQueryDirty = false;
+			}
+			catch (PatternSyntaxException e)
+			{
+				return Option.none();
+			}
+		}
+		return Option.some(queryPattern);
+	}
+
+	private String getText()
+	{
+		return targetTextComponent.getText().replace("\r\n", "\n");
+	}
+
+	private boolean progressFind(boolean forward, boolean wrap)
+	{
+		return progressFind(new TextFinder(findText.getText()), forward, wrap);
+	}
+
+	private Option<Boolean> progressFindRegex(final boolean forward, final boolean wrap)
+	{
+		return getQueryPattern(findText.getText()).accept(new Option.IVisitor<Pattern, Option<Boolean>>()
+		{
+			public Option<Boolean> visitNone()
+			{
+				setErrorMessage("regular expression syntax error.");
+				return Option.none();
+			}
+
+			public Option<Boolean> visitSome(Pattern pattern)
+			{
+				return Option.some(progressFind(new RegexTextFinder(pattern), forward, wrap));
+			}
+		});
+	}
+
+	private boolean progressFind(ITextFinder finder, boolean forward, boolean wrap)
+	{
+		String text = getText();
+		if (forward)
+		{
+			if (!finder.selectNextMatch(text, targetTextComponent.getSelectionEnd()))
+			{
+				if (!wrap || !finder.selectNextMatch(text, 0))
+				{
+					return false;
+				}
+			}
+		}
+		else
+		{
+			if (!finder.selectPreviousMatch(text, targetTextComponent.getSelectionStart()))
+			{
+				if (!wrap || !finder.selectPreviousMatch(text, text.length()))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private void askReplace()
+	{
+		String from = targetTextComponent.getSelectedText();
+		String to = replaceText.getText();
+		int ret = JOptionPane.showConfirmDialog(this, "Replace \"" + from + "\" to \"" + to + "\"?", "Replace", JOptionPane.YES_NO_OPTION);
+		if (ret == JOptionPane.YES_OPTION)
+		{
+			targetTextComponent.replaceSelection(replaceText.getText());
+		}
+	}
+
+	private void executeReplaceAll(boolean forward, boolean wrap)
+	{
+		int count = stepReplaceAll(forward, wrap);
+		setMessage("replaced " + count + " tokens.");
+	}
+
+	private int stepReplaceAll(boolean forward, boolean wrap)
+	{
+		return progressFindRegex(forward, wrap).accept(new Option.IVisitor<Boolean, Integer>()
+		{
+			public Integer visitSome(Boolean b)
+			{
+				targetTextComponent.replaceSelection(replaceText.getText());
+				return 1;
+			}
+
+			public Integer visitNone()
+			{
+				return 0;
+			}
+		}) + stepReplaceAll(forward, wrap);
+	}
+
+	private void setSelection(int start, int end)
+	{
+		targetTextComponent.setSelectionStart(start);
+		targetTextComponent.setSelectionEnd(end);
+		targetTextComponent.requestFocusInWindow();
+	}
+
+	private void setMessage(String message)
+	{
+		labelMessage.setForeground(Color.BLACK);
+		labelMessage.setText(message);
+	}
+
+	private void setErrorMessage(String message)
+	{
+		labelMessage.setForeground(Color.RED);
+		labelMessage.setText(message);
+	}
+
+	public static FindReplaceDialog getDialog()
+	{
+		if (instance == null)
+		{
+			instance = new FindReplaceDialog();
+		}
+		return instance;
+	}
+
+	private class QueryDocumentListener implements DocumentListener
+	{
+		public void insertUpdate(DocumentEvent e)
+		{
+			isQueryDirty = true;
+		}
+
+		public void removeUpdate(DocumentEvent e)
+		{
+			isQueryDirty = true;
+		}
+
+		public void changedUpdate(DocumentEvent e)
+		{
+		}
+	}
+
+	private interface ITextFinder
+	{
+		public boolean selectNextMatch(String text, int startIndex);
+		public boolean selectPreviousMatch(String text, int endIndex);
+	}
+
+	private class TextFinder implements ITextFinder
+	{
+		private String query;
+
+		public TextFinder(String query)
+		{
+			this.query = query;
+		}
+
+		public boolean selectNextMatch(String text, int startIndex)
+		{
+			int i = text.indexOf(query, startIndex);
+			if (i != -1)
+			{
+				setSelection(i, i + query.length());
+				return true;
+			}
+			return false;
+		}
+
+		public boolean selectPreviousMatch(String text, int endIndex)
+		{
+			int i = 0, j = -1;
+			while (i < text.length())
+			{
+				i = text.indexOf(query, i);
+				if (i == -1 || endIndex <= i)
+				{
+					break;
+				}
+				j = i;
+				i += query.length();
+			}
+			if (j != -1)
+			{
+				setSelection(j, j + query.length());
+				return true;
+			}
+			return false;
+		}
+	}
+
+	private class RegexTextFinder implements ITextFinder
+	{
+		private Pattern pattern;
+
+		public RegexTextFinder(Pattern pattern)
+		{
+			this.pattern = pattern;
+		}
+
+		public boolean selectNextMatch(String text, int startIndex)
+		{
+			Matcher m = pattern.matcher(text);
+			if (m.find(startIndex))
+			{
+				setSelection(m.start(), m.end());
+				return true;
+			}
+			return false;
+		}
+
+		public boolean selectPreviousMatch(String text, int endIndex)
+		{
+			Matcher m = pattern.matcher(text);
+			int start = -1, end = -1;
+			while (m.find())
+			{
+				if (endIndex <= m.start())
+				{
+					break;
+				}
+				start = m.start();
+				end = m.end();
+			}
+			if (start != -1)
+			{
+				setSelection(start, end);
+				return true;
+			}
+			return false;
+		}
 	}
 }

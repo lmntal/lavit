@@ -135,9 +135,9 @@ public class AskDialogBuilder
 
 	/**
 	 * ダイアログを表示します。
-	 * @return Yesボタンが押された場合は {@code JOptionPane.YES_OPTION}、
-	 * Noボタンが押された場合は {@code JOptionPane.NO_OPTION}、
-	 * Cancelボタンが押された場合は {@code JOptionPane.CANCEL_OPTION}。
+	 * @return Yesボタンが押された場合は {@code DialogResult.YES}、
+	 * Noボタンが押された場合は {@code DialogResult.NO}、
+	 * Cancelボタンが押された場合は {@code DialogResult.CANCEL}。
 	 */
 	public DialogResult showDialog()
 	{
@@ -324,7 +324,7 @@ public class AskDialogBuilder
 
 			public void actionPerformed(ActionEvent e)
 			{
-				result  = value;
+				result = value;
 				dispose();
 			}
 		}

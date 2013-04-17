@@ -36,6 +36,11 @@
 package lavit.util;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public final class FileUtils
 {
@@ -60,5 +65,53 @@ public final class FileUtils
 			fileName = fileName.substring(0, i);
 		}
 		return fileName;
+	}
+
+	public static List<File> enumFiles(File dir, FileFilter filter)
+	{
+		List<File> files = new ArrayList<File>();
+		enumFiles(files, dir, filter);
+		return files;
+	}
+
+	private static void enumFiles(List<File> list, File dir, FileFilter filter)
+	{
+		List<File> files = new ArrayList<File>();
+		if (dir.exists() && dir.isDirectory())
+		{
+			for (File child : dir.listFiles(filter))
+			{
+				if (child.isFile())
+				{
+					files.add(child);
+				}
+				else if (child.isDirectory())
+				{
+					list.add(child);
+				}
+			}
+		}
+		Collections.sort(list, FileNameComparator.getInstance());
+		Collections.sort(files, FileNameComparator.getInstance());
+		list.addAll(files);
+	}
+
+	private static class FileNameComparator implements Comparator<File>
+	{
+		private static FileNameComparator instance;
+
+		public int compare(File a, File b)
+		{
+			return a.getName().compareTo(b.getName());
+		}
+
+		public static synchronized FileNameComparator getInstance()
+		{
+			if (instance == null)
+			{
+				instance = new FileNameComparator();
+			}
+			return instance;
+		}
 	}
 }

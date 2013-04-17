@@ -47,8 +47,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -66,6 +64,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import lavit.util.FileUtils;
 import extgui.fileview.event.DirectoryChangeListener;
 import extgui.fileview.event.FileSelectedListener;
 
@@ -75,13 +74,13 @@ import extgui.fileview.event.FileSelectedListener;
 @SuppressWarnings("serial")
 public class FileTree extends JComponent
 {
-	private static final String PENDING = "<Loading...>";
-	private static final String EMPTY = "<Empty>";
+	private static final TreeItem PENDING = TreeItem.label("<Loading...>");
+	private static final TreeItem EMPTY = TreeItem.label("<Empty>");
 	private static final Icon ICON_LEAF = new ImageIcon(FileTree.class.getResource("leaf.png"));
 
 	private DefaultTreeModel model;
 	private JTree tree;
-	private File baseDir = new File("");
+	private File baseDir = new File(".");
 	private FileFilter fileFilter = new DefaultFileFilter();
 
 	public FileTree()
@@ -115,7 +114,7 @@ public class FileTree extends JComponent
 
 		add(new NullBorderJScrollPane(tree));
 
-		setBaseDirectory(new File(""));
+		setBaseDirectory(new File("."));
 		refresh();
 	}
 
@@ -149,9 +148,13 @@ public class FileTree extends JComponent
 		if (path != null)
 		{
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode)path.getLastPathComponent();
-			if (!node.isRoot() && node.getUserObject() instanceof File)
+			if (!node.isRoot())
 			{
-				return (File)node.getUserObject();
+				TreeItem item = (TreeItem)node.getUserObject();
+				if (item.hasFile())
+				{
+					return item.getFile();
+				}
 			}
 		}
 		return null;
@@ -159,7 +162,7 @@ public class FileTree extends JComponent
 
 	public void refresh()
 	{
-		DefaultMutableTreeNode tempRoot = new DefaultMutableTreeNode(baseDir, true);
+		DefaultMutableTreeNode tempRoot = new DefaultMutableTreeNode(TreeItem.file(baseDir), true);
 		tempRoot.add(new DefaultMutableTreeNode(PENDING, false));
 		setRootNode(tempRoot);
 		doInBackground(new Runnable()
@@ -269,10 +272,13 @@ public class FileTree extends JComponent
 			if (path != null)
 			{
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode)path.getLastPathComponent();
-				if (node.isLeaf() && node.getUserObject() instanceof File)
+				if (node.isLeaf())
 				{
-					File file = (File)node.getUserObject();
-					dispatchFileSelectedListener(file);
+					TreeItem item = (TreeItem)node.getUserObject();
+					if (item.hasFile())
+					{
+						dispatchFileSelectedListener(item.getFile());
+					}
 				}
 			}
 		}
@@ -291,13 +297,14 @@ public class FileTree extends JComponent
 
 	private void addChildren(DefaultMutableTreeNode root)
 	{
-		File dir = (File)root.getUserObject();
+		TreeItem item = (TreeItem)root.getUserObject();
+		File dir = item.getFile();
 		if (dir.exists() && dir.isDirectory())
 		{
 			root.removeAllChildren();
-			for (File file : getFileList(dir))
+			for (File file : FileUtils.enumFiles(dir, fileFilter))
 			{
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(file, false);
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(TreeItem.file(file), false);
 				if (file.isDirectory())
 				{
 					node.setAllowsChildren(true);
@@ -314,31 +321,9 @@ public class FileTree extends JComponent
 
 	private TreeNode createDirectoryNode(File dir)
 	{
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode(dir, true);
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode(TreeItem.file(dir), true);
 		addChildren(root);
 		return root;
-	}
-
-	private List<File> getFileList(File rootDir)
-	{
-		List<File> dirs = new ArrayList<File>();
-		List<File> files = new ArrayList<File>();
-		if (rootDir.exists() && rootDir.isDirectory())
-		{
-			for (File child : rootDir.listFiles(fileFilter))
-			{
-				if (child.isFile())
-				{
-					files.add(child);
-				}
-				else if (child.isDirectory())
-				{
-					dirs.add(child);
-				}
-			}
-		}
-		dirs.addAll(files);
-		return dirs;
 	}
 
 	private static void doInBackground(Runnable task)
@@ -358,12 +343,11 @@ public class FileTree extends JComponent
 		{
 			if (value instanceof DefaultMutableTreeNode)
 			{
-				Object o = ((DefaultMutableTreeNode)value).getUserObject();
-				if (o instanceof File)
+				TreeItem item = (TreeItem)((DefaultMutableTreeNode)value).getUserObject();
+				if (item.hasFile())
 				{
 					textSelectionColor = Color.BLACK;
 					textNonSelectionColor = Color.BLACK;
-					value = ((File)o).getName();
 				}
 				else
 				{
@@ -421,5 +405,50 @@ public class FileTree extends JComponent
 		{
 			return true;
 		}
+	}
+}
+
+abstract class TreeItem
+{
+	public boolean hasFile()
+	{
+		return false;
+	}
+
+	public File getFile()
+	{
+		return null;
+	}
+
+	public static TreeItem file(final File file)
+	{
+		return new TreeItem()
+		{
+			public boolean hasFile()
+			{
+				return true;
+			}
+
+			public File getFile()
+			{
+				return file;
+			}
+
+			public String toString()
+			{
+				return file.getName();
+			}
+		};
+	}
+
+	public static TreeItem label(final String label)
+	{
+		return new TreeItem()
+		{
+			public String toString()
+			{
+				return label;
+			}
+		};
 	}
 }

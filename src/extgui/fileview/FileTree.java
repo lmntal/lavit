@@ -76,6 +76,8 @@ public class FileTree extends JComponent
 {
 	private static final TreeItem PENDING = TreeItem.label("<Loading...>");
 	private static final TreeItem EMPTY = TreeItem.label("<Empty>");
+	private static final Icon ICON_CLOSED = new ImageIcon(FileTree.class.getResource("closed.png"));
+	private static final Icon ICON_OPEN = new ImageIcon(FileTree.class.getResource("open.png"));
 	private static final Icon ICON_LEAF = new ImageIcon(FileTree.class.getResource("leaf.png"));
 
 	private DefaultTreeModel model;
@@ -184,6 +186,8 @@ public class FileTree extends JComponent
 	private void setTreeCellRenderer()
 	{
 		FileTreeCellRenderer renderer = new FileTreeCellRenderer();
+		renderer.setClosedIcon(ICON_CLOSED);
+		renderer.setOpenIcon(ICON_OPEN);
 		renderer.setLeafIcon(ICON_LEAF);
 		tree.setCellRenderer(renderer);
 	}

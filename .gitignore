@@ -1,5 +1,8 @@
 
-bin
+bin/
 *.class
 *.classpath
+
+properties/
+lmntal/
 

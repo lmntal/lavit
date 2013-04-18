@@ -93,8 +93,6 @@ public class FileViewPane extends FlatSplitPane
 		setRightComponent(contentComponent);
 		setContinuousLayout(true);
 
-		fileTree.setBaseDirectory(new File(""));
-
 		setDividerSize(3);
 		setResizeWeight(0);
 	}

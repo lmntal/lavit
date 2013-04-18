@@ -39,19 +39,25 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
@@ -82,6 +88,7 @@ public class FileTree extends JComponent
 
 	private DefaultTreeModel model;
 	private JTree tree;
+	private JTextField textExtensionFilter;
 	private File baseDir = new File(".");
 	private FileFilter fileFilter = new DefaultFileFilter();
 
@@ -114,7 +121,42 @@ public class FileTree extends JComponent
 		});
 		setTreeCellRenderer();
 
-		add(new NullBorderJScrollPane(tree));
+		add(new NullBorderJScrollPane(tree), BorderLayout.CENTER);
+
+		textExtensionFilter = new JTextField();
+		int fontSize = textExtensionFilter.getFont().getSize();
+		textExtensionFilter.setFont(new Font(Font.DIALOG_INPUT, Font.PLAIN, fontSize));
+		textExtensionFilter.setToolTipText("Extension filter");
+		textExtensionFilter.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String s = textExtensionFilter.getText();
+				final Set<String> exts = new HashSet<String>();
+				for (String ext : s.split(","))
+				{
+					exts.add(ext.trim());
+				}
+				fileFilter = new FileFilter()
+				{
+					public boolean accept(File file)
+					{
+						if (file.isDirectory())
+						{
+							return true;
+						}
+						String ext = FileUtils.getExtension(file.getName());
+						if (!ext.isEmpty())
+						{
+							return exts.contains(ext);
+						}
+						return false;
+					}
+				};
+				refresh();
+			}
+		});
+		add(textExtensionFilter, BorderLayout.SOUTH);
 
 		setBaseDirectory(new File("."));
 		refresh();

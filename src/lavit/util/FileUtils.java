@@ -67,6 +67,16 @@ public final class FileUtils
 		return fileName;
 	}
 
+	public static String getExtension(String fileName)
+	{
+		int i = fileName.lastIndexOf('.');
+		if (i != -1)
+		{
+			return fileName.substring(i + 1);
+		}
+		return "";
+	}
+
 	public static List<File> enumFiles(File dir, FileFilter filter)
 	{
 		List<File> files = new ArrayList<File>();

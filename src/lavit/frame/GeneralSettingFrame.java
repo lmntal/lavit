@@ -36,10 +36,12 @@
 package lavit.frame;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
-import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,7 +51,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.DefaultListModel;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.GroupLayout.Group;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -61,6 +67,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.ListSelectionModel;
+import javax.swing.LookAndFeel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -78,43 +85,111 @@ import lavit.util.FixFlowLayout;
 @SuppressWarnings("serial")
 public class GeneralSettingFrame extends JDialog
 {
-	public GeneralSettingFrame()
+	private static LookAndFeel laf;
+	private static GeneralSettingFrame instance;
+
+	private GeneralSettingFrame()
 	{
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		setTitle("Preferences");
 		setIconImages(Env.getApplicationIcons());
 		setAlwaysOnTop(true);
-		setPreferredSize(new Dimension(500, 400));
 
-		JPanel panel = new JPanel(new GridLayout(0, 1));
-		panel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+		JPanel panel = new JPanel();
 
 		//panel.add(new SlimLibSettingPanel());
-		panel.add(new EditorColorPanel());
-		panel.add(new FontSettingPanel());
-		panel.add(new EncodingSettingPanel());
-		panel.add(new ViewSettingPanel());
-		panel.add(new UIFontSizeSettingPanel());
+		JPanel panelEditor = new EditorColorPanel();
+		JPanel panelFont = new FontSettingPanel();
+		JPanel panelEncoding = new EncodingSettingPanel();
+		JPanel panelView = new ViewSettingPanel();
+		JPanel panelUIFont = new UIFontSizeSettingPanel();
+
+		GroupLayout gl = new GroupLayout(panel);
+		panel.setLayout(gl);
+		gl.setAutoCreateGaps(true);
+		gl.setAutoCreateContainerGaps(true);
+		gl.setHorizontalGroup(gl.createParallelGroup(Alignment.CENTER)
+			.addComponent(panelEditor)
+			.addComponent(panelFont)
+			.addGroup(gl.createSequentialGroup()
+				.addComponent(panelEncoding)
+				.addComponent(panelView)
+			)
+			.addComponent(panelUIFont)
+		);
+		gl.setVerticalGroup(gl.createSequentialGroup()
+			.addComponent(panelEditor)
+			.addComponent(panelFont)
+			.addGroup(gl.createParallelGroup(Alignment.LEADING)
+				.addComponent(panelEncoding)
+				.addComponent(panelView)
+			)
+			.addComponent(panelUIFont)
+		);
 
 		add(panel, BorderLayout.CENTER);
+
+		JButton buttonClose = new JButton("Close");
+		buttonClose.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				close();
+			}
+		});
+		Dimension dim = buttonClose.getPreferredSize();
+		dim.width = Math.max(dim.width, 100);
+		buttonClose.setPreferredSize(dim);
+
+		JPanel panelButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		panelButtons.setBorder(BorderFactory.createCompoundBorder(
+			BorderFactory.createEmptyBorder(5, 5, 5, 5),
+			BorderFactory.createCompoundBorder(
+				BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY),
+				BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE)
+			)
+		));
+		panelButtons.add(buttonClose);
+		add(panelButtons, BorderLayout.SOUTH);
 
 		addWindowListener(new ChildWindowListener(this));
 
 		pack();
-		setLocationRelativeTo(FrontEnd.mainFrame);
-		setVisible(true);
 	}
 
-	private static class EditorColorPanel extends JPanel implements ActionListener
+	public static synchronized void showDialog()
 	{
-		private final String majorOption[] = { "comment", "symbol", "reserved" };
-		private JCheckBox optionCheckBox[] = new JCheckBox[majorOption.length];
+		LookAndFeel currentLaf = UIManager.getLookAndFeel();
+		if (instance == null || !currentLaf.equals(laf))
+		{
+			laf = currentLaf;
+			instance = new GeneralSettingFrame();
+			instance.setLocationRelativeTo(null);
+		}
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				instance.pack();
+				instance.setVisible(true);
+			}
+		});
+	}
+
+	private void close()
+	{
+		setVisible(false);
+	}
+
+	private static class EditorColorPanel extends JPanel
+	{
+		private final String[] majorOption = { "comment", "symbol", "reserved" };
+		private JCheckBox[] optionCheckBox = new JCheckBox[majorOption.length];
 		private JCheckBox optShowEols;
 		private JCheckBox optShowTabs;
 
 		public EditorColorPanel()
 		{
-			setLayout(new FixFlowLayout());
 			setBorder(new TitledBorder("Color"));
 
 			for (int i = 0; i < majorOption.length; ++i)
@@ -124,9 +199,16 @@ public class GeneralSettingFrame extends JDialog
 			}
 			settingInit();
 
+			ActionListener l = new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					updateColorSettings();
+				}
+			};
 			for (int i = 0; i < majorOption.length; ++i)
 			{
-				optionCheckBox[i].addActionListener(this);
+				optionCheckBox[i].addActionListener(l);
 			}
 
 			optShowEols = new JCheckBox("Show Line Delimiters");
@@ -134,7 +216,6 @@ public class GeneralSettingFrame extends JDialog
 			add(optShowEols);
 			optShowEols.addActionListener(new ActionListener()
 			{
-				@Override
 				public void actionPerformed(ActionEvent e)
 				{
 					Env.set("SHOW_LINE_DELIMITERS", optShowEols.isSelected());
@@ -147,13 +228,41 @@ public class GeneralSettingFrame extends JDialog
 			add(optShowTabs);
 			optShowTabs.addActionListener(new ActionListener()
 			{
-				@Override
 				public void actionPerformed(ActionEvent e)
 				{
 					Env.set("SHOW_TABS", optShowTabs.isSelected());
 					FrontEnd.mainFrame.editorPanel.updateHighlight();
 				}
 			});
+
+			Component pad1 = Box.createHorizontalGlue();
+			Component pad2 = Box.createHorizontalGlue();
+
+			GroupLayout gl = new GroupLayout(this);
+			setLayout(gl);
+			gl.setAutoCreateGaps(true);
+			gl.setAutoCreateContainerGaps(true);
+
+			Group hg1 = gl.createSequentialGroup();
+			Group vg1 = gl.createParallelGroup(Alignment.BASELINE);
+
+			hg1.addComponent(pad1);
+			for (JCheckBox check : optionCheckBox)
+			{
+				hg1.addComponent(check);
+				vg1.addComponent(check);
+			}
+			hg1.addComponent(optShowEols);
+			hg1.addComponent(optShowTabs);
+			hg1.addComponent(pad2);
+
+			vg1.addComponent(pad1);
+			vg1.addComponent(optShowEols);
+			vg1.addComponent(optShowTabs);
+			vg1.addComponent(pad2);
+
+			gl.setHorizontalGroup(hg1);
+			gl.setVerticalGroup(vg1);
 		}
 
 		private void settingInit()
@@ -175,7 +284,7 @@ public class GeneralSettingFrame extends JDialog
 			}
 		}
 
-		public void actionPerformed(ActionEvent e)
+		private void updateColorSettings()
 		{
 			String newOptions = "";
 			for (int i = 0; i < majorOption.length; ++i)
@@ -197,37 +306,80 @@ public class GeneralSettingFrame extends JDialog
 		}
 	}
 
-	private class FontSettingPanel extends JPanel implements ActionListener
+	private static class FontSettingPanel extends JPanel
 	{
-		private String tabSizeList[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
-
 		private JComboBox fontFamilyComboBox;
 		private JComboBox fontSizeComboBox;
 		private JComboBox tabSizeComboBox;
 
 		public FontSettingPanel()
 		{
-			setLayout(new FixFlowLayout());
 			setBorder(new TitledBorder("Editor Font"));
 
-			add(new JLabel("FontFamily"));
+			JLabel labelFamily = new JLabel("Family:");
+			add(labelFamily);
 			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 			fontFamilyComboBox = new JComboBox(ge.getAvailableFontFamilyNames());
-			add(fontFamilyComboBox);
 
-			add(new JLabel("FontSize"));
+			JLabel labelSize = new JLabel("Size:");
+			add(labelSize);
 			fontSizeComboBox = new JComboBox(Env.FONT_SIZE_LIST);
-			add(fontSizeComboBox);
 
-			add(new JLabel("TabSize"));
-			tabSizeComboBox = new JComboBox(tabSizeList);
-			add(tabSizeComboBox);
+			JLabel labelTabWidth = new JLabel("Tab width:");
+			add(labelTabWidth);
+			tabSizeComboBox = new JComboBox();
+			for (int tabWidth = 1; tabWidth <= 10; tabWidth++)
+			{
+				tabSizeComboBox.addItem(String.valueOf(tabWidth));
+			}
 
 			settingInit();
 
-			fontFamilyComboBox.addActionListener(this);
-			fontSizeComboBox.addActionListener(this);
-			tabSizeComboBox.addActionListener(this);
+			GroupLayout gl = new GroupLayout(this);
+			setLayout(gl);
+			gl.setAutoCreateGaps(true);
+			gl.setAutoCreateContainerGaps(true);
+			gl.setHorizontalGroup(gl.createSequentialGroup()
+				.addComponent(labelFamily)
+				.addComponent(fontFamilyComboBox)
+				.addComponent(labelSize)
+				.addComponent(fontSizeComboBox)
+				.addComponent(labelTabWidth)
+				.addComponent(tabSizeComboBox)
+			);
+			gl.setVerticalGroup(gl.createParallelGroup(Alignment.BASELINE)
+				.addComponent(labelFamily)
+				.addComponent(fontFamilyComboBox)
+				.addComponent(labelSize)
+				.addComponent(fontSizeComboBox)
+				.addComponent(labelTabWidth)
+				.addComponent(tabSizeComboBox)
+			);
+
+			fontFamilyComboBox.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					Env.set("EDITER_FONT_FAMILY", (String)fontFamilyComboBox.getSelectedItem());
+					FrontEnd.loadAllFont();
+				}
+			});
+			fontSizeComboBox.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					Env.set("EDITER_FONT_SIZE", (String)fontSizeComboBox.getSelectedItem());
+					FrontEnd.loadAllFont();
+				}
+			});
+			tabSizeComboBox.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					Env.set("EDITER_TAB_SIZE", (String)tabSizeComboBox.getSelectedItem());
+					FrontEnd.loadAllFont();
+				}
+			});
 		}
 
 		private void settingInit()
@@ -236,63 +388,81 @@ public class GeneralSettingFrame extends JDialog
 			fontSizeComboBox.setSelectedItem(Env.get("EDITER_FONT_SIZE"));
 			tabSizeComboBox.setSelectedItem(Env.get("EDITER_TAB_SIZE"));
 		}
-
-		public void actionPerformed(ActionEvent e)
-		{
-			Env.set("EDITER_FONT_FAMILY", (String)fontFamilyComboBox.getSelectedItem());
-			Env.set("EDITER_FONT_SIZE", (String)fontSizeComboBox.getSelectedItem());
-			Env.set("EDITER_TAB_SIZE", (String)tabSizeComboBox.getSelectedItem());
-			/*
-			FrontEnd.mainFrame.editorPanel.loadFont();
-			FrontEnd.mainFrame.toolTab.systemPanel.logPanel.loadFont();
-			FrontEnd.mainFrame.toolTab.systemPanel.outputPanel.loadFont();
-			FrontEnd.mainFrame.toolTab.statePanel.stateGraphPanel.loadFont();
-			*/
-			FrontEnd.loadAllFont();
-
-		}
-
 	}
 
-	private class EncodingSettingPanel extends JPanel implements ActionListener
+	private static class EncodingSettingPanel extends JPanel
 	{
-		private String encodingList[] = { "SJIS", "EUC_JP", "ISO2022JP", "UTF8" };
+		private String[] encodingList = { "SJIS", "EUC_JP", "ISO2022JP", "UTF8" };
 
 		private JComboBox readComboBox;
 		private JComboBox writeComboBox;
 
 		public EncodingSettingPanel()
 		{
-			setLayout(new FixFlowLayout());
 			setBorder(new TitledBorder("File Encoding"));
 
-			add(new JLabel("READ"));
+			JLabel labelRead = new JLabel("Read as:");
 			readComboBox = new JComboBox(encodingList);
-			add(readComboBox);
-
-			add(new JLabel("WRITE"));
-			writeComboBox = new JComboBox(encodingList);
-			add(writeComboBox);
-
-			settingInit();
-
-			readComboBox.addActionListener(this);
-			writeComboBox.addActionListener(this);
-		}
-
-		private void settingInit()
-		{
 			readComboBox.setSelectedItem(Env.get("EDITER_FILE_READ_ENCODING"));
+			readComboBox.setMaximumSize(readComboBox.getPreferredSize());
+			readComboBox.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					setSelectedReadEncoding();
+				}
+			});
+
+			JLabel labelWrite = new JLabel("Write as:");
+			writeComboBox = new JComboBox(encodingList);
 			writeComboBox.setSelectedItem(Env.get("EDITER_FILE_WRITE_ENCODING"));
+			writeComboBox.setMaximumSize(writeComboBox.getPreferredSize());
+			writeComboBox.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					setSelectedWriteEncoding();
+				}
+			});
+
+			GroupLayout gl = new GroupLayout(this);
+			setLayout(gl);
+			gl.setAutoCreateGaps(true);
+			gl.setAutoCreateContainerGaps(true);
+			gl.setHorizontalGroup(gl.createSequentialGroup()
+				.addGroup(gl.createParallelGroup(Alignment.TRAILING)
+					.addComponent(labelRead)
+					.addComponent(labelWrite)
+				)
+				.addGroup(gl.createParallelGroup()
+					.addComponent(readComboBox)
+					.addComponent(writeComboBox)
+				)
+			);
+			gl.setVerticalGroup(gl.createSequentialGroup()
+				.addGroup(gl.createParallelGroup(Alignment.BASELINE)
+					.addComponent(labelRead)
+					.addComponent(readComboBox)
+				)
+				.addGroup(gl.createParallelGroup(Alignment.BASELINE)
+					.addComponent(labelWrite)
+					.addComponent(writeComboBox)
+				)
+			);
 		}
 
-		public void actionPerformed(ActionEvent e)
+		private void setSelectedReadEncoding()
 		{
 			Env.set("EDITER_FILE_READ_ENCODING", (String)readComboBox.getSelectedItem());
+		}
+
+		private void setSelectedWriteEncoding()
+		{
 			Env.set("EDITER_FILE_WRITE_ENCODING", (String)writeComboBox.getSelectedItem());
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private class SlimLibSettingPanel extends JPanel implements ActionListener
 	{
 		private JCheckBox useCheckBox;
@@ -314,41 +484,46 @@ public class GeneralSettingFrame extends JDialog
 		}
 	}
 
-	private class ViewSettingPanel extends JPanel
+	private static class ViewSettingPanel extends JPanel
 	{
-		private String langList[] = { "jp", "en" };
+		private static class Item
+		{
+			public final String id;
+			public final String desc;
+
+			public Item(String id, String desc)
+			{
+				this.id = id;
+				this.desc = desc;
+			}
+
+			public String toString()
+			{
+				return desc;
+			}
+		}
 
 		private JComboBox langComboBox;
 		private JComboBox lookAndFeelComboBox;
 
 		public ViewSettingPanel()
 		{
-			setLayout(new FixFlowLayout());
 			setBorder(new TitledBorder("View"));
 
-			add(new JLabel("Lang"));
-			langComboBox = new JComboBox(langList);
+			JLabel labelLanguage = new JLabel("Language:");
+			langComboBox = new JComboBox();
+			langComboBox.addItem(new Item("jp", "Japanese"));
+			langComboBox.addItem(new Item("en", "English"));
 			langComboBox.setSelectedItem(Env.get("LANG"));
 			langComboBox.addActionListener(new ActionListener()
 			{
-				@Override
 				public void actionPerformed(ActionEvent e)
 				{
-					Env.set("LANG", (String)langComboBox.getSelectedItem());
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							JOptionPane.showMessageDialog(
-								GeneralSettingFrame.this, Lang.f[4],
-								"Change Language", JOptionPane.PLAIN_MESSAGE);
-						}
-					});
+					changeLanguage();
 				}
 			});
-			add(langComboBox);
 
-			add(new JLabel("LookAndFeel"));
+			JLabel labelLaf = new JLabel("LookAndFeel:");
 			String lafName = Env.get("LookAndFeel");
 			lookAndFeelComboBox = new JComboBox();
 			for (LookAndFeelEntry ent : LookAndFeelEntry.getSupportedLookAndFeelEntries())
@@ -361,48 +536,104 @@ public class GeneralSettingFrame extends JDialog
 			}
 			lookAndFeelComboBox.addActionListener(new ActionListener()
 			{
-				@Override
 				public void actionPerformed(ActionEvent e)
 				{
-					LookAndFeelEntry lafEntry = (LookAndFeelEntry)lookAndFeelComboBox.getSelectedItem();
-					FrontEnd.setLookAndFeel(lafEntry);
+					changeLAF();
 				}
 			});
-			add(lookAndFeelComboBox);
+
+			GroupLayout gl = new GroupLayout(this);
+			setLayout(gl);
+			gl.setAutoCreateGaps(true);
+			gl.setAutoCreateContainerGaps(true);
+			gl.setHorizontalGroup(gl.createSequentialGroup()
+				.addGroup(gl.createParallelGroup(Alignment.TRAILING)
+					.addComponent(labelLanguage)
+					.addComponent(labelLaf)
+				)
+				.addGroup(gl.createParallelGroup(Alignment.LEADING)
+					.addComponent(langComboBox)
+					.addComponent(lookAndFeelComboBox)
+				)
+			);
+			gl.setVerticalGroup(gl.createSequentialGroup()
+				.addGroup(gl.createParallelGroup(Alignment.BASELINE)
+					.addComponent(labelLanguage)
+					.addComponent(langComboBox)
+				)
+				.addGroup(gl.createParallelGroup(Alignment.BASELINE)
+					.addComponent(labelLaf)
+					.addComponent(lookAndFeelComboBox)
+				)
+			);
+		}
+
+		private void changeLanguage()
+		{
+			Item item = (Item)langComboBox.getSelectedItem();
+			Env.set("LANG", item.id);
+			JOptionPane.showMessageDialog(this, Lang.f[4], "Change Language", JOptionPane.INFORMATION_MESSAGE);
+		}
+
+		private void changeLAF()
+		{
+			LookAndFeelEntry lafEntry = (LookAndFeelEntry)lookAndFeelComboBox.getSelectedItem();
+			FrontEnd.setLookAndFeel(lafEntry);
 		}
 	}
 
-	private class UIFontSizeSettingPanel extends JPanel
+	private static class UIFontSizeSettingPanel extends JPanel
 	{
-		private JButton buttonInc;
-		private JButton buttonDec;
-
 		public UIFontSizeSettingPanel()
 		{
 			setBorder(BorderFactory.createTitledBorder("UI Font Size"));
 
-			buttonInc = new JButton("+");
+			JButton buttonInc = new JButton("+");
 			buttonInc.addActionListener(new ActionListener()
 			{
-				@Override
 				public void actionPerformed(ActionEvent e)
 				{
 					addToFontSizeAll(1);
 				}
 			});
 
-			buttonDec = new JButton("-");
+			JButton buttonDec = new JButton("-");
 			buttonDec.addActionListener(new ActionListener()
 			{
-				@Override
 				public void actionPerformed(ActionEvent e)
 				{
 					addToFontSizeAll(-1);
 				}
 			});
 
-			add(buttonInc);
-			add(buttonDec);
+			Dimension dim1 = buttonInc.getPreferredSize();
+			Dimension dim2 = buttonDec.getPreferredSize();
+			dim1.width = Math.max(Math.max(dim1.width, dim2.width), 30);
+			buttonInc.setPreferredSize(dim1);
+			buttonInc.setMaximumSize(dim1);
+			buttonInc.setMinimumSize(dim1);
+			buttonDec.setPreferredSize(dim1);
+			buttonDec.setMaximumSize(dim1);
+			buttonDec.setMinimumSize(dim1);
+
+			Component padLeft = Box.createHorizontalGlue();
+			Component padRight = Box.createHorizontalGlue();
+
+			GroupLayout gl = new GroupLayout(this);
+			setLayout(gl);
+			gl.setAutoCreateContainerGaps(true);
+			gl.setHorizontalGroup(gl.createSequentialGroup()
+				.addComponent(padLeft)
+				.addComponent(buttonInc)
+				.addComponent(buttonDec)
+				.addComponent(padRight)
+			);
+			gl.setVerticalGroup(gl.createParallelGroup(Alignment.BASELINE)
+				.addComponent(padLeft)
+				.addComponent(buttonInc)
+				.addComponent(buttonDec)
+				.addComponent(padRight)
+			);
 		}
 
 		private void addToFontSizeAll(int a)
@@ -417,8 +648,7 @@ public class GeneralSettingFrame extends JDialog
 					float size = font.getSize() + a;
 					if (size > 0)
 					{
-						UIManager.put(key,
-							new FontUIResource(font.deriveFont(size)));
+						UIManager.put(key, new FontUIResource(font.deriveFont(size)));
 					}
 				}
 			}
@@ -426,7 +656,6 @@ public class GeneralSettingFrame extends JDialog
 			// fire updates
 			SwingUtilities.invokeLater(new Runnable()
 			{
-				@Override
 				public void run()
 				{
 					try
@@ -446,6 +675,7 @@ public class GeneralSettingFrame extends JDialog
 	}
 
 	// under developed
+	@SuppressWarnings("unused")
 	private class UISettingPanel extends JPanel
 	{
 		private JList uiFontList;

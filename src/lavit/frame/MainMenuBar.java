@@ -486,7 +486,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		}
 		else if (src == iGeneral)
 		{
-			GeneralSettingFrame.showDialog();
+			GeneralSettingDialog.showDialog();
 		}
 		else if (src == iVersion)
 		{

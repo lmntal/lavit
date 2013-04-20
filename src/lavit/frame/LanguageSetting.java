@@ -39,7 +39,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 
 import javax.swing.ButtonGroup;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 

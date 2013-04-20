@@ -83,12 +83,12 @@ import lavit.Lang;
 import lavit.util.FixFlowLayout;
 
 @SuppressWarnings("serial")
-public class GeneralSettingFrame extends JDialog
+public class GeneralSettingDialog extends JDialog
 {
 	private static LookAndFeel laf;
-	private static GeneralSettingFrame instance;
+	private static GeneralSettingDialog instance;
 
-	private GeneralSettingFrame()
+	private GeneralSettingDialog()
 	{
 		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		setTitle("Preferences");
@@ -163,7 +163,7 @@ public class GeneralSettingFrame extends JDialog
 		if (instance == null || !currentLaf.equals(laf))
 		{
 			laf = currentLaf;
-			instance = new GeneralSettingFrame();
+			instance = new GeneralSettingDialog();
 			instance.setLocationRelativeTo(null);
 		}
 		SwingUtilities.invokeLater(new Runnable()

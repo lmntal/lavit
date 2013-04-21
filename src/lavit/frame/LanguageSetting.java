@@ -35,10 +35,10 @@
 
 package lavit.frame;
 
-import java.awt.GridLayout;
-import java.awt.Insets;
-
 import javax.swing.ButtonGroup;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.GroupLayout.Group;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -70,23 +70,34 @@ public final class LanguageSetting
 @SuppressWarnings("serial")
 class LanguageSelectPanel extends JPanel
 {
-	private String[] labels = { "English", "日本語" };
+	private String[] labels = { "English", "Japanese" };
 	private String[] langs = { "en", "jp" };
 	private JRadioButton[] radios = new JRadioButton[labels.length];
 
 	public LanguageSelectPanel()
 	{
-		setLayout(new GridLayout(0, 1));
-
 		ButtonGroup group = new ButtonGroup();
 		for (int i = 0; i < labels.length; i++)
 		{
 			radios[i] = new JRadioButton(labels[i]);
-			radios[i].setMargin(new Insets(2,10,2,10));
 			group.add(radios[i]);
 			add(radios[i]);
 		}
 		radios[0].setSelected(true);
+
+		GroupLayout gl = new GroupLayout(this);
+		setLayout(gl);
+		gl.setAutoCreateContainerGaps(true);
+		gl.setAutoCreateGaps(true);
+		Group hg = gl.createParallelGroup(Alignment.LEADING);
+		Group vg = gl.createSequentialGroup();
+		for (JRadioButton radio : radios)
+		{
+			hg.addComponent(radio);
+			vg.addComponent(radio);
+		}
+		gl.setHorizontalGroup(hg);
+		gl.setVerticalGroup(vg);
 	}
 
 	public String getSelectedLang()

@@ -52,7 +52,7 @@ import lavit.frame.LanguageSetting;
 import lavit.frame.LookAndFeelEntry;
 import lavit.frame.MainFrame;
 import lavit.frame.SlimPathSetting;
-import lavit.frame.StartupFrame;
+import lavit.frame.LaViTSplashWindow;
 import lavit.runner.PrintLineListener;
 import lavit.runner.ProcessFinishListener;
 import lavit.runner.ProcessTask;
@@ -63,22 +63,9 @@ import lavit.util.StringUtils;
 public class FrontEnd
 {
 	public static MainFrame mainFrame;
-
 	public static Set<CommonFontUser> fontUsers = new HashSet<CommonFontUser>();
 
 	private static List<ProcessTask> processTasks = new ArrayList<ProcessTask>();
-
-	public FrontEnd(String[] args)
-	{
-		mainFrame = new MainFrame();
-		mainFrame.editorPanel.openInitialFiles();
-
-		sleep(500);
-
-		loadArgs(args); //起動オプションの読み込み
-
-		println("(SYSTEM) Ready.");
-	}
 
 	private static void loadArgs(String[] args)
 	{
@@ -110,32 +97,25 @@ public class FrontEnd
 
 	public static void executeUnyo(File file)
 	{
-		FrontEnd.println("(UNYO) executing...");
+		println("(UNYO) executing...");
 
 		List<String> args = new ArrayList<String>();
 		args.addAll(Arrays.asList(Env.get("UNYO_OPTION").split("\\s+")));
 		args.add(file.getAbsolutePath());
 
-		ProcessTask unyoTask = ProcessTask.createJarProcessTask("unyo.jar", args);
+		final ProcessTask unyoTask = ProcessTask.createJarProcessTask("unyo.jar", args);
 		unyoTask.setDirectory(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfUnyo());
 		unyoTask.addProcessFinishListener(new ProcessFinishListener()
 		{
 			public void processFinished(int id, int exitCode, boolean isAborted)
 			{
-				if (isAborted)
-				{
-					FrontEnd.errPrintln(String.format("(UNYO) aborted. (Task[%d])", id));
-				}
-				else
-				{
-					FrontEnd.println(String.format("(UNYO) terminated. (Task[%d])", id));
-				}
+				printTerminationMessage("UNYO", id, unyoTask.getElapsedSeconds(), exitCode, isAborted);
 			}
 		});
 
 		if (unyoTask.execute())
 		{
-			FrontEnd.addProcessTask(unyoTask);
+			addProcessTask(unyoTask);
 		}
 	}
 
@@ -175,15 +155,7 @@ public class FrontEnd
 		{
 			public void processFinished(int id, int exitCode, boolean isAborted)
 			{
-				double seconds = slimTask.getElapsedSeconds();
-				if (isAborted)
-				{
-					errPrintln(String.format("(SLIM) aborted. (Task[%d], %.02f [s])", id, seconds));
-				}
-				else
-				{
-					println(String.format("(SLIM) terminated. (Task[%d], %.02f [s])", id, seconds));
-				}
+				printTerminationMessage("SLIM", id, slimTask.getElapsedSeconds(), exitCode, isAborted);
 				mainFrame.toolTab.systemPanel.outputPanel.outputEnd();
 			}
 		});
@@ -369,6 +341,28 @@ public class FrontEnd
 		}
 	}
 
+	private static void printTerminationMessage(String label, int taskId, double seconds, int exitCode, boolean aborted)
+	{
+		String s = "($label) $text (Task[$id] $time [s])";
+		s = s.replace("$label", label);
+		s = s.replace("$id", String.valueOf(taskId));
+		s = s.replace("$text", aborted ? "aborted" : "terminated");
+		s = s.replace("$time", String.format("%.02f", seconds));
+
+		if (aborted)
+		{
+			errPrintln(s);
+		}
+		else
+		{
+			println(s);
+		}
+		if (exitCode != 0)
+		{
+			errPrintln("ExitCode = " + exitCode);
+		}
+	}
+
 	private static void initialSetup()
 	{
 		if (!Env.isSet("LANG"))
@@ -403,7 +397,8 @@ public class FrontEnd
 	}
 
 	/**
-	 * @param args
+	 * The entry point of LaViT.
+	 * @param args Command line arguments.
 	 */
 	public static void main(final String[] args)
 	{
@@ -411,16 +406,7 @@ public class FrontEnd
 
 		setLookAndFeel(LookAndFeelEntry.getLookAndFeelEntry(Env.get("LookAndFeel")));
 
-		final StartupFrame sf = new StartupFrame();
-		sf.setLocationRelativeTo(null);
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				sf.setVisible(true);
-			}
-		});
+		LaViTSplashWindow.showSplash(2000);
 
 		initialSetup();
 
@@ -430,8 +416,12 @@ public class FrontEnd
 			{
 				try
 				{
-					new FrontEnd(args);
-					sf.setVisible(false);
+					mainFrame = new MainFrame();
+					mainFrame.editorPanel.openInitialFiles();
+
+					loadArgs(args); //起動オプションの読み込み
+
+					println("(SYSTEM) Ready.");
 				}
 				catch (Exception e)
 				{

@@ -37,41 +37,78 @@ package lavit.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Window;
 
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JWindow;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import lavit.Env;
 
-public class StartupFrame extends JWindow
+public class LaViTSplashWindow extends Window
 {
 	private static final long serialVersionUID = 1L;
 
-	public StartupFrame()
-	{
-		Icon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
+	private static LaViTSplashWindow instance;
 
+	private LaViTSplashWindow()
+	{
+		super(null);
+
+		setAlwaysOnTop(true);
 		setIconImages(Env.getApplicationIcons());
 
-		JPanel panel = new JPanel();
+		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		panel.setBackground(Color.WHITE);
-		panel.setLayout(new BorderLayout());
 		add(panel);
 
-		JLabel icon = new JLabel(image);
+		JLabel icon = new JLabel(new ImageIcon(Env.getImageOfFile("img/logo.png")));
 		panel.add(icon, BorderLayout.CENTER);
 
-		JLabel text = new JLabel("Version " + Env.APP_VERSION);
-		text.setHorizontalAlignment(SwingConstants.CENTER);
-		text.setBackground(Color.WHITE);
-		panel.add(text, BorderLayout.SOUTH);
+		JLabel label = new JLabel("Version " + Env.APP_VERSION);
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+		label.setBackground(Color.WHITE);
+		panel.add(label, BorderLayout.SOUTH);
 
 		pack();
+	}
+
+	public static void showSplash(final long millis)
+	{
+		if (instance == null)
+		{
+			instance = new LaViTSplashWindow();
+		}
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				instance.setLocationRelativeTo(null);
+				instance.setVisible(true);
+			}
+		});
+		Thread thread = new Thread()
+		{
+			public void run()
+			{
+				try
+				{
+					sleep(millis);
+				}
+				catch (InterruptedException e)
+				{
+				}
+				finally
+				{
+					instance.dispose();
+				}
+			}
+		};
+		thread.setDaemon(true);
+		thread.start();
 	}
 }

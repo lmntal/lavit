@@ -2,6 +2,7 @@
 bin/
 *.class
 *.classpath
+*.jar
 
 properties/
 lmntal/

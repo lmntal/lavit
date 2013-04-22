@@ -130,39 +130,12 @@ public class FindReplaceDialog extends JDialog
 		});
 		checkRegex = new JCheckBox("Regex");
 		checkWrap = new JCheckBox("Wrap search");
-		labelMessage = new JLabel("message");
-
-		Dimension dim = findForward.getPreferredSize();
-		dim.width += 20;
-		dim.height = 22;
-		findForward.setPreferredSize(dim);
-		findForward.setMinimumSize(dim);
-		findForward.setMaximumSize(dim);
-		findBackward.setPreferredSize(dim);
-		findBackward.setMinimumSize(dim);
-		findBackward.setMaximumSize(dim);
-		replace.setPreferredSize(dim);
-		replace.setMinimumSize(dim);
-		replace.setMaximumSize(dim);
-		replaceAll.setPreferredSize(dim);
-		replaceAll.setMinimumSize(dim);
-		replaceAll.setMaximumSize(dim);
+		labelMessage = new JLabel("Ready.");
 
 		JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		checkBoxPanel.setBorder(BorderFactory.createTitledBorder("Options"));
 		checkBoxPanel.add(checkRegex);
 		checkBoxPanel.add(checkWrap);
-
-		contents.add(labelFind);
-		contents.add(labelReplace);
-		contents.add(findText);
-		contents.add(replaceText);
-		contents.add(findForward);
-		contents.add(findBackward);
-		contents.add(replace);
-		contents.add(replaceAll);
-		contents.add(checkBoxPanel);
-		contents.add(labelMessage);
 
 		GroupLayout gl = new GroupLayout(contents);
 		contents.setLayout(gl);
@@ -226,6 +199,8 @@ public class FindReplaceDialog extends JDialog
 			}
 		});
 		buttonPanel.add(buttonClose);
+
+		fixButtonWidth(120, findForward, findBackward, replace, replaceAll, buttonClose);
 
 		add(contents, BorderLayout.CENTER);
 		add(buttonPanel, BorderLayout.SOUTH);
@@ -442,6 +417,25 @@ public class FindReplaceDialog extends JDialog
 			instance = new FindReplaceDialog();
 		}
 		return instance;
+	}
+
+	private static void fixButtonWidth(int minWidth, JButton ... buttons)
+	{
+		int w = minWidth;
+		int h = 0;
+		for (JButton b : buttons)
+		{
+			Dimension dim = b.getPreferredSize();
+			w = Math.max(dim.width, w);
+			h = Math.max(dim.height, h);
+		}
+		Dimension size = new Dimension(w, h);
+		for (JButton b : buttons)
+		{
+			b.setPreferredSize(size);
+			b.setMaximumSize(size);
+			b.setMinimumSize(size);
+		}
 	}
 
 	private class QueryDocumentListener implements DocumentListener

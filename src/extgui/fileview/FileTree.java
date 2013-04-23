@@ -50,6 +50,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -90,7 +91,7 @@ public class FileTree extends JComponent
 	private JTree tree;
 	private JTextField textExtensionFilter;
 	private File baseDir = new File(".");
-	private FileFilter fileFilter = new DefaultFileFilter();
+	private FileFilter fileFilter = DefaultFileFilter.getInstance();
 
 	public FileTree()
 	{
@@ -131,29 +132,7 @@ public class FileTree extends JComponent
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				String s = textExtensionFilter.getText();
-				final Set<String> exts = new HashSet<String>();
-				for (String ext : s.split(","))
-				{
-					exts.add(ext.trim());
-				}
-				fileFilter = new FileFilter()
-				{
-					public boolean accept(File file)
-					{
-						if (file.isDirectory())
-						{
-							return true;
-						}
-						String ext = FileUtils.getExtension(file.getName());
-						if (!ext.isEmpty())
-						{
-							return exts.contains(ext);
-						}
-						return false;
-					}
-				};
-				refresh();
+				updateExtensionFilter();
 			}
 		});
 		add(textExtensionFilter, BorderLayout.SOUTH);
@@ -223,6 +202,25 @@ public class FileTree extends JComponent
 	{
 		super.updateUI();
 		setTreeCellRenderer();
+	}
+
+	private void updateExtensionFilter()
+	{
+		String s = textExtensionFilter.getText().trim();
+		if (s.isEmpty())
+		{
+			fileFilter = DefaultFileFilter.getInstance();
+		}
+		else
+		{
+			Set<String> exts = new HashSet<String>();
+			for (String ext : s.split(","))
+			{
+				exts.add(ext.trim());
+			}
+			fileFilter = new ExtensionSetFileFilter(exts);
+		}
+		refresh();
 	}
 
 	private void setTreeCellRenderer()
@@ -444,13 +442,46 @@ public class FileTree extends JComponent
 			setBorder(null);
 		}
 	}
+}
 
-	private static class DefaultFileFilter implements FileFilter
+class DefaultFileFilter implements FileFilter
+{
+	private static DefaultFileFilter instance;
+
+	private DefaultFileFilter() { }
+
+	public boolean accept(File file)
 	{
-		public boolean accept(File file)
+		return true;
+	}
+
+	public static synchronized DefaultFileFilter getInstance()
+	{
+		if (instance == null)
+		{
+			instance = new DefaultFileFilter();
+		}
+		return instance;
+	}
+}
+
+class ExtensionSetFileFilter implements FileFilter
+{
+	private Set<String> exts;
+
+	public ExtensionSetFileFilter(Set<String> exts)
+	{
+		this.exts = Collections.unmodifiableSet(exts);
+	}
+
+	public boolean accept(File file)
+	{
+		if (file.isDirectory())
 		{
 			return true;
 		}
+		String ext = FileUtils.getExtension(file.getName());
+		return exts.contains(ext);
 	}
 }
 

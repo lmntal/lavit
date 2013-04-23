@@ -355,7 +355,7 @@ public class EditorPage extends JScrollPane
 			// fix header width
 			titleLabel = new JLabel(getTitle());
 			Dimension dim = titleLabel.getPreferredSize();
-			dim.width = Math.max(dim.width, 100);
+			dim.width = 100;
 			titleLabel.setPreferredSize(dim);
 			add(titleLabel, BorderLayout.CENTER);
 

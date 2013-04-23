@@ -292,7 +292,7 @@ public class FrontEnd
 		}
 		catch (InterruptedException e)
 		{
-			FrontEnd.printException(e);
+			printException(e);
 		}
 	}
 
@@ -317,7 +317,7 @@ public class FrontEnd
 				}
 				catch (Exception e)
 				{
-					FrontEnd.printException(e);
+					printException(e);
 				}
 			}
 		});
@@ -407,6 +407,14 @@ public class FrontEnd
 		setLookAndFeel(LookAndFeelEntry.getLookAndFeelEntry(Env.get("LookAndFeel")));
 
 		LaViTSplashWindow.showSplash(2000);
+		try
+		{
+			Thread.sleep(500);
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
 
 		initialSetup();
 
@@ -425,7 +433,7 @@ public class FrontEnd
 				}
 				catch (Exception e)
 				{
-					FrontEnd.printException(e);
+					printException(e);
 					e.printStackTrace();
 				}
 			}

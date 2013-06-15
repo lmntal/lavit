@@ -40,9 +40,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -79,6 +77,7 @@ import lavit.multiedit.coloring.lexer.TokenLabel;
 import lavit.multiedit.event.TabButtonListener;
 import lavit.system.FileHistory;
 import lavit.util.CommonFontUser;
+import lavit.util.FileUtils;
 import extgui.dialog.AskDialogBuilder;
 import extgui.dialog.DialogResult;
 import extgui.dialog.MessageType;
@@ -243,6 +242,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 	/**
 	 * first.lmn を開く
+	 * first.lmn が存在しなければ作成する。
 	 */
 	public void firstFileOpen()
 	{
@@ -271,7 +271,10 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		if (!files.isEmpty())
 		{
 			openFiles(files);
-			tabView.setSelectedIndex(0);
+			if (tabView.getTabCount() > 0)
+			{
+				tabView.setSelectedIndex(0);
+			}
 		}
 		else
 		{
@@ -513,17 +516,14 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 	private File chooseOpenFile()
 	{
-		String chooser_dir = Env.get("EDITER_FILE_LAST_CHOOSER_DIR");
-		if (chooser_dir == null)
+		String chooserDir = Env.get("EDITER_FILE_LAST_CHOOSER_DIR");
+		if (chooserDir == null || !FileUtils.exists(chooserDir))
 		{
-			chooser_dir=new File("demo").getAbsolutePath();
-		}
-		else if (!new File(chooser_dir).exists() && new File("demo").exists())
-		{
-			chooser_dir=new File("demo").getAbsolutePath();
+			File dirDemo = new File("demo");
+			chooserDir = dirDemo.exists() ? dirDemo.getAbsolutePath() : ".";
 		}
 
-		JFileChooser jfc = new JFileChooser(chooser_dir);
+		JFileChooser jfc = new JFileChooser(chooserDir);
 		jfc.addChoosableFileFilter(LMNtalFileFilter.getInstance());
 		jfc.addChoosableFileFilter(ILCodeFileFilter.getInstance());
 		jfc.setFileFilter(LMNtalFileFilter.getInstance());
@@ -533,7 +533,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			return null;
 		}
 		File file = jfc.getSelectedFile();
-		Env.set("EDITER_FILE_LAST_CHOOSER_DIR",file.getParent());
+		Env.set("EDITER_FILE_LAST_CHOOSER_DIR", jfc.getCurrentDirectory().getAbsolutePath());
 		return file;
 	}
 

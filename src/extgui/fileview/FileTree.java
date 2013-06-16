@@ -58,7 +58,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
@@ -74,6 +73,7 @@ import javax.swing.tree.TreeSelectionModel;
 import lavit.util.FileUtils;
 import extgui.fileview.event.DirectoryChangeListener;
 import extgui.fileview.event.FileSelectedListener;
+import extgui.text.HintTextField;
 
 /**
  * @author Yuuki.S
@@ -89,7 +89,7 @@ public class FileTree extends JComponent
 
 	private DefaultTreeModel model;
 	private JTree tree;
-	private JTextField textExtensionFilter;
+	private HintTextField textExtensionFilter;
 	private File baseDir = new File(".");
 	private FileFilter fileFilter = DefaultFileFilter.getInstance();
 
@@ -124,7 +124,8 @@ public class FileTree extends JComponent
 
 		add(new NullBorderJScrollPane(tree), BorderLayout.CENTER);
 
-		textExtensionFilter = new JTextField();
+		textExtensionFilter = new HintTextField();
+		textExtensionFilter.setHintText("input extensions (e.g. txt,lmn,il)");
 		int fontSize = textExtensionFilter.getFont().getSize();
 		textExtensionFilter.setFont(new Font(Font.DIALOG_INPUT, Font.PLAIN, fontSize));
 		textExtensionFilter.setToolTipText("Extension filter");

@@ -31,7 +31,9 @@
  *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  *   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- */package lavit.stateprofiler;
+ */
+
+package lavit.stateprofiler;
 
 import java.awt.GridLayout;
 
@@ -48,18 +50,15 @@ class StateProfileLabelPanel extends JPanel
 
 	public StateProfileLabelPanel()
 	{
-		setLayout(new GridLayout(1, 2));
+		setLayout(new GridLayout(1, 0));
 
-		all = new JLabel();
-		all.setHorizontalAlignment(JLabel.RIGHT);
+		all = new JLabel("", JLabel.RIGHT);
 		add(all);
 
-		clock = new JLabel();
-		clock.setHorizontalAlignment(JLabel.RIGHT);
+		clock = new JLabel("", JLabel.RIGHT);
 		add(clock);
 
-		speed = new JLabel();
-		speed.setHorizontalAlignment(JLabel.RIGHT);
+		speed = new JLabel("", JLabel.RIGHT);
 		add(speed);
 
 		setStatus(0, 0, 0);
@@ -71,9 +70,9 @@ class StateProfileLabelPanel extends JPanel
 		{
 			public void run()
 			{
-				all.setText("State : " + states + " state");
-				clock.setText("Clock : " + time + " sec");
-				speed.setText("Speed : " + rate + " state/sec");
+				all.setText("State : " + states + " [state]");
+				clock.setText("Clock : " + time + " [sec]");
+				speed.setText("Speed : " + rate + " [state/sec]");
 			}
 		});
 	}

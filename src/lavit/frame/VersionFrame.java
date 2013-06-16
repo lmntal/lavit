@@ -37,6 +37,8 @@ package lavit.frame;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -89,17 +91,25 @@ public class VersionFrame extends JDialog
 		infoText.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
 		panel.add(new JScrollPane(infoText));
 
-		JButton button = new JButton("OK");
-		button.setAlignmentX(Component.CENTER_ALIGNMENT);
-		button.addActionListener(new ActionListener()
+		JButton buttonOK = new JButton("OK");
+		buttonOK.setAlignmentX(Component.CENTER_ALIGNMENT);
+		buttonOK.addActionListener(new ActionListener()
 		{
-			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				dispose();
 			}
 		});
-		panel.add(button);
+		Dimension size = buttonOK.getPreferredSize();
+		size.width = Math.max(size.width, 100);
+		buttonOK.setPreferredSize(size);
+
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		buttonPanel.setOpaque(false);
+		buttonPanel.add(buttonOK);
+		panel.add(buttonPanel);
+
+		getRootPane().setDefaultButton(buttonOK);
 
 		addWindowListener(new ChildWindowListener(this));
 	}
@@ -130,7 +140,6 @@ public class VersionFrame extends JDialog
 		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
-			@Override
 			public void run()
 			{
 				instance.updateInformationText();

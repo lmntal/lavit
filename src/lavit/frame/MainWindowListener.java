@@ -35,25 +35,18 @@
 
 package lavit.frame;
 
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
-import lavit.*;
+import lavit.FrontEnd;
 
-public class MainWindowListener implements WindowListener {
-
+class MainWindowListener extends WindowAdapter
+{
 	private MainFrame frame;
 
-	MainWindowListener(MainFrame frame){
+	MainWindowListener(MainFrame frame)
+	{
 		this.frame = frame;
-	}
-
-	public void windowActivated(WindowEvent e) {
-
-	}
-
-	public void windowClosed(WindowEvent e) {
-
 	}
 
 	public void windowClosing(WindowEvent e)
@@ -61,20 +54,13 @@ public class MainWindowListener implements WindowListener {
 		FrontEnd.exit();
 	}
 
-	public void windowDeactivated(WindowEvent e) {
-
-	}
-
-	public void windowDeiconified(WindowEvent e) {
+	public void windowDeiconified(WindowEvent e)
+	{
 		frame.setAllChildWindowVisible(true);
 	}
 
-	public void windowIconified(WindowEvent e) {
+	public void windowIconified(WindowEvent e)
+	{
 		frame.setAllChildWindowVisible(false);
 	}
-
-	public void windowOpened(WindowEvent e) {
-
-	}
-
 }

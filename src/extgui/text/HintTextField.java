@@ -78,6 +78,12 @@ public class HintTextField extends JTextField
 		super(doc, text, columns);
 	}
 
+	public HintTextField(String text, String hintText)
+	{
+		super(text);
+		setHintText(hintText);
+	}
+
 	public void setHintText(String s)
 	{
 		hintText = s;

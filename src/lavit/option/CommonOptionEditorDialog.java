@@ -77,7 +77,7 @@ class CommonOptionEditorDialog extends JDialog
 	{
 		setTitle("Displaying Options");
 
-		JLabel labelDesc = new JLabel("Edit the list of option switches to display in Option tab.");
+		JLabel labelDesc = new JLabel("Edit the list of option switches to be displayed in Option tab.");
 		labelDesc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
 		comboKeys = new JComboBox();
@@ -122,11 +122,11 @@ class CommonOptionEditorDialog extends JDialog
 		GroupLayout gl = new GroupLayout(getContentPane());
 		gl.setAutoCreateContainerGaps(true);
 		gl.setAutoCreateGaps(true);
-		gl.setHorizontalGroup(gl.createParallelGroup(Alignment.TRAILING)
+		gl.setHorizontalGroup(gl.createParallelGroup(Alignment.LEADING)
 			.addComponent(labelDesc)
 			.addComponent(comboKeys)
 			.addComponent(editJsp)
-			.addGroup(gl.createSequentialGroup()
+			.addGroup(Alignment.TRAILING, gl.createSequentialGroup()
 				.addComponent(buttonApply)
 				.addComponent(buttonClose)
 			)

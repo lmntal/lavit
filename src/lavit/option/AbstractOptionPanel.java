@@ -35,6 +35,8 @@
 
 package lavit.option;
 
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -43,12 +45,11 @@ import java.util.List;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import lavit.Env;
-import lavit.util.FixFlowLayout;
+import extgui.text.HintTextField;
 
 /**
  * コマンドラインオプション設定パネルの処理を共通化した（対症療法的）抽象コンポーネント。
@@ -79,21 +80,24 @@ abstract class AbstractOptionPanel extends JPanel
 			}
 		}
 
-		setLayout(new FixFlowLayout());
-		setBorder(new TitledBorder(title));
+		setLayout(new BorderLayout());
 
 		ChangeHandler handler = new ChangeHandler();
+		JPanel checkBoxPanel = new JPanel(new GridLayout(0, 3));
 		optionBoxes = new JCheckBox[majorOptions.size()];
 		for (int i = 0; i < majorOptions.size(); i++)
 		{
-			optionBoxes[i] = new JCheckBox(majorOptions.get(i));
+			String caption = majorOptions.get(i);
+			optionBoxes[i] = new JCheckBox(caption);
+			optionBoxes[i].setToolTipText(caption);
 			optionBoxes[i].addActionListener(handler);
-			add(optionBoxes[i]);
+			checkBoxPanel.add(optionBoxes[i]);
 		}
+		add(checkBoxPanel, BorderLayout.CENTER);
 
-		optionField = new JTextField(16);
+		optionField = new HintTextField("", "<other options>");
 		optionField.getDocument().addDocumentListener(handler);
-		add(optionField);
+		add(optionField, BorderLayout.SOUTH);
 
 		initializeFields();
 	}

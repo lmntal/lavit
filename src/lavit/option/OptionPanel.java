@@ -35,58 +35,61 @@
 
 package lavit.option;
 
-import javax.swing.BoxLayout;
+import java.awt.BorderLayout;
+import java.awt.Dialog.ModalityType;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import lavit.Env;
+import extgui.collapsiblepane.CollapsiblePane;
 
 @SuppressWarnings("serial")
 public class OptionPanel extends JPanel
 {
-	private OptionLMNtalPanel optionLMNtalPanel;
-	private OptionUnyoPanel optionUnyoPanel;
-	private OptionCompilePanel optionCompilePanel;
-	private OptionSlimPanel optionSlimPanel;
-	private OptionSVPanel optionSVPanel;
-	private OptionSVDepthPanel optionSVDepthPanel;
-	private OptionLtlPanel optionLtlPanel;
-
 	public OptionPanel()
 	{
-		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		setLayout(new BorderLayout());
 
-		optionLMNtalPanel = new OptionLMNtalPanel(readOptions("options.lmntal"));
-		add(optionLMNtalPanel);
+		CollapsiblePane cp = new CollapsiblePane()
+			.addPage("lmntal", "LMNtal Options", new OptionLMNtalPanel(readOptions("options.lmntal")))
+			.addPage("unyo", "UNYO Options", new OptionUnyoPanel(readOptions("options.unyo")))
+			.addPage("slim-compile", "SLIM Compile Options", new OptionCompilePanel(readOptions("options.lmntal_slim")))
+			.addPage("slim", "SLIM Options", new OptionSlimPanel(readOptions("options.slim")))
+			.addPage("sv", "StateViewer SLIM Options", new OptionSVPanel(readOptions("options.stateviewer")))
+			.addPage("ltl", "LTL Model Check SLIM Options", new OptionLtlPanel(readOptions("options.ltl")))
+		;
 
-		optionUnyoPanel = new OptionUnyoPanel(readOptions("options.unyo"));
-		add(optionUnyoPanel);
+		for (String key : readOptions("window.controls.switches.expanded"))
+		{
+			if (cp.containsKey(key))
+			{
+				cp.setExpanded(key, true);
+			}
+		}
 
-		optionCompilePanel = new OptionCompilePanel(readOptions("options.lmntal_slim"));
-		add(optionCompilePanel);
+		JScrollPane jsp = new JScrollPane(cp);
+		jsp.getVerticalScrollBar().setUnitIncrement(10);
+		add(jsp, BorderLayout.CENTER);
 
-		optionSlimPanel = new OptionSlimPanel(readOptions("options.slim"));
-		add(optionSlimPanel);
-
-		//optionSVDepthPanel = new OptionSVDepthPanel();
-		//add(optionSVDepthPanel);
-
-		optionSVPanel = new OptionSVPanel(readOptions("options.stateviewer"));
-		add(optionSVPanel);
-
-		optionLtlPanel = new OptionLtlPanel(readOptions("options.ltl"));
-		add(optionLtlPanel);
-
-		//fontSettingPanel = new FontSettingPanel();
-		//add(fontSettingPanel);
-
-		//encodingSettingPanel = new EncodingSettingPanel();
-		//add(encodingSettingPanel);
-
-		//editorColorPanel = new EditorColorPanel();
-		//add(editorColorPanel);
-
-		//generalSettingPanel = new GeneralSettingPanel();
-		//add(generalSettingPanel);
+		cp.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+			{
+				if (e.isControlDown() && SwingUtilities.isRightMouseButton(e))
+				{
+					JDialog dialog = new CommonOptionEditorDialog();
+					dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+					dialog.pack();
+					dialog.setLocationRelativeTo(null);
+					dialog.setVisible(true);
+				}
+			}
+		});
 	}
 
 	private static String[] readOptions(String key)

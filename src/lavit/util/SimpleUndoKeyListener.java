@@ -35,28 +35,42 @@
 
 package lavit.util;
 
+import java.awt.Toolkit;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.undo.UndoManager;
 
-public class SimpleUndoKeyListener implements KeyListener {
+public class SimpleUndoKeyListener extends KeyAdapter
+{
+	private UndoManager undoManager;
 
-	UndoManager undoManager;
-
-	public SimpleUndoKeyListener(UndoManager undoManeger){
+	public SimpleUndoKeyListener(UndoManager undoManeger)
+	{
 		this.undoManager = undoManeger;
 	}
-	public void keyPressed(KeyEvent e) {
-		if(e.isControlDown()&&e.getKeyCode()==KeyEvent.VK_Z&&undoManager.canUndo()){
-			undoManager.undo();
-			e.consume();
-		}else if(e.isControlDown()&&e.getKeyCode()==KeyEvent.VK_Y&&undoManager.canRedo()){
-			undoManager.redo();
-			e.consume();
+
+	public void keyPressed(KeyEvent e)
+	{
+		if ((e.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0)
+		{
+			switch (e.getKeyCode())
+			{
+			case KeyEvent.VK_Z:
+				if (undoManager.canUndo())
+				{
+					undoManager.undo();
+					e.consume();
+				}
+				break;
+			case KeyEvent.VK_Y:
+				if (undoManager.canRedo())
+				{
+					undoManager.redo();
+					e.consume();
+				}
+				break;
+			}
 		}
 	}
-	public void keyReleased(KeyEvent e) {}
-	public void keyTyped(KeyEvent e) {}
-
 }

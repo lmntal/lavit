@@ -39,15 +39,17 @@ import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.UndoManager;
 
-public class SimpleUndoableEditListener implements UndoableEditListener {
+public class SimpleUndoableEditListener implements UndoableEditListener
+{
+	private UndoManager undoManager;
 
-	UndoManager undoManager;
-
-	public SimpleUndoableEditListener(UndoManager undoManeger){
+	public SimpleUndoableEditListener(UndoManager undoManeger)
+	{
 		this.undoManager = undoManeger;
 	}
 
-	public void undoableEditHappened(UndoableEditEvent e) {
+	public void undoableEditHappened(UndoableEditEvent e)
+	{
 		undoManager.addEdit(e.getEdit());
 	}
 }

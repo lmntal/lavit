@@ -77,6 +77,12 @@ public final class FileUtils
 		return "";
 	}
 
+	public static boolean hasExtension(String fileName)
+	{
+		int i = fileName.lastIndexOf('.');
+		return 0 < i && i < fileName.length() - 1;
+	}
+
 	public static List<File> enumFiles(File dir, FileFilter filter)
 	{
 		List<File> files = new ArrayList<File>();

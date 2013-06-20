@@ -553,13 +553,13 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			}
 			file = jfc.getSelectedFile();
 
-			if (!file.exists())
+			if (!file.exists() && !FileUtils.hasExtension(file.getName()))
 			{
-				if (!file.getName().endsWith(".lmn") && jfc.getFileFilter() == LMNtalFileFilter.getInstance())
+				if (jfc.getFileFilter() == LMNtalFileFilter.getInstance())
 				{
 					file = new File(file.getAbsolutePath() + ".lmn");
 				}
-				else if (!file.getName().endsWith(".il") && !file.getName().endsWith(".tal") && jfc.getFileFilter() == ILCodeFileFilter.getInstance())
+				else if (jfc.getFileFilter() == ILCodeFileFilter.getInstance())
 				{
 					file = new File(file.getAbsolutePath() + ".il");
 				}

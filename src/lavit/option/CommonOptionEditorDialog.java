@@ -35,8 +35,16 @@
 
 package lavit.option;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -46,6 +54,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -72,32 +81,83 @@ class CommonOptionEditorDialog extends JDialog
 	private JTextArea edit;
 	private JButton buttonApply;
 	private JButton buttonClose;
+	private Map<String, String> optionSettings = new HashMap<String, String>();
 
 	public CommonOptionEditorDialog()
 	{
 		setTitle("Displaying Options");
+		setLayout(new BorderLayout());
 
-		JLabel labelDesc = new JLabel("Edit the list of option switches to be displayed in Option tab.");
-		labelDesc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		JLabel labelDesc = new JLabel("Edit option switches in Option tab.");
+		labelDesc.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+		labelDesc.setBackground(Color.WHITE);
+		labelDesc.setOpaque(true);
+		add(labelDesc, BorderLayout.NORTH);
+
+		initContentPanel();
+		initButtonPanel();
+		load();
+
+		pack();
+	}
+
+	private void initContentPanel()
+	{
+		JPanel p = new JPanel();
 
 		comboKeys = new JComboBox();
 		for (String key : visibleOptionKeys)
 		{
+			optionSettings.put(key, Env.get(key, ""));
 			comboKeys.addItem(key);
 		}
 		comboKeys.setEditable(false);
-		comboKeys.addActionListener(new ActionListener()
+		comboKeys.addItemListener(new ItemListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			public void itemStateChanged(ItemEvent e)
 			{
-				load();
+				switch (e.getStateChange())
+				{
+				case ItemEvent.DESELECTED:
+					update();
+					break;
+				case ItemEvent.SELECTED:
+					load();
+					break;
+				}
 			}
 		});
-		add(comboKeys);
 
 		edit = new JTextArea();
 		JScrollPane editJsp = new JScrollPane(edit);
-		add(editJsp);
+		editJsp.setPreferredSize(new Dimension(300, 150));
+
+		GroupLayout gl = new GroupLayout(p);
+		gl.setAutoCreateContainerGaps(true);
+		gl.setAutoCreateGaps(true);
+		gl.setHorizontalGroup(gl.createParallelGroup(Alignment.LEADING)
+			.addComponent(comboKeys)
+			.addComponent(editJsp)
+		);
+		gl.setVerticalGroup(gl.createSequentialGroup()
+			.addComponent(comboKeys, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			.addComponent(editJsp)
+		);
+		p.setLayout(gl);
+
+		add(p, BorderLayout.CENTER);
+	}
+
+	private void initButtonPanel()
+	{
+		JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		p.setBorder(BorderFactory.createCompoundBorder(
+			BorderFactory.createEmptyBorder(5, 5, 5, 5),
+			BorderFactory.createCompoundBorder(
+				BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY),
+				BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE)
+			)
+		));
 
 		buttonApply = new JButton("Apply");
 		buttonApply.addActionListener(new ActionListener()
@@ -107,55 +167,52 @@ class CommonOptionEditorDialog extends JDialog
 				store();
 			}
 		});
-		add(buttonApply);
+		p.add(buttonApply);
 
 		buttonClose = new JButton("Close");
 		buttonClose.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				dispose();
+				close();
 			}
 		});
-		add(buttonClose);
+		p.add(buttonClose);
 
-		GroupLayout gl = new GroupLayout(getContentPane());
-		gl.setAutoCreateContainerGaps(true);
-		gl.setAutoCreateGaps(true);
-		gl.setHorizontalGroup(gl.createParallelGroup(Alignment.LEADING)
-			.addComponent(labelDesc)
-			.addComponent(comboKeys)
-			.addComponent(editJsp)
-			.addGroup(Alignment.TRAILING, gl.createSequentialGroup()
-				.addComponent(buttonApply)
-				.addComponent(buttonClose)
-			)
-		);
-		gl.setVerticalGroup(gl.createSequentialGroup()
-			.addComponent(labelDesc)
-			.addComponent(comboKeys, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-			.addComponent(editJsp, 0, 200, Short.MAX_VALUE)
-			.addGroup(gl.createParallelGroup(Alignment.BASELINE)
-				.addComponent(buttonApply)
-				.addComponent(buttonClose)
-			)
-		);
-		getContentPane().setLayout(gl);
+		Dimension size = buttonApply.getPreferredSize();
+		size.width = Math.max(size.width, buttonClose.getPreferredSize().width);
+		size.width = Math.max(size.width, 100);
+		buttonApply.setPreferredSize(size);
+		buttonClose.setPreferredSize(size);
 
-		load();
+		add(p, BorderLayout.SOUTH);
 	}
 
 	private void load()
 	{
 		String key = (String)comboKeys.getSelectedItem();
-		edit.setText(Env.get(key, "").replaceAll("\\s+", "\n"));
+		edit.setText(optionSettings.get(key).replaceAll("\\s+", "\n"));
+		edit.setCaretPosition(0);
+	}
+
+	private void update()
+	{
+		String key = (String)comboKeys.getSelectedItem();
+		optionSettings.put(key, edit.getText().replaceAll("\\s+", " "));
 	}
 
 	private void store()
 	{
-		String key = (String)comboKeys.getSelectedItem();
-		String value = edit.getText().replaceAll("\\s+", " ");
-		Env.set(key, value);
-		JOptionPane.showMessageDialog(this, "To apply this change, please restart LaViT.", "Apply", JOptionPane.INFORMATION_MESSAGE);
+		update();
+		for (Map.Entry<String, String> entry : optionSettings.entrySet())
+		{
+			Env.set(entry.getKey(), entry.getValue());
+		}
+		JOptionPane.showMessageDialog(this, "Please restart LaViT to apply the changes.", "Apply Changes", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	private void close()
+	{
+		dispose();
 	}
 }

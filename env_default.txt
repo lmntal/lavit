@@ -16,6 +16,7 @@ EDITER_TAB_SIZE=2
 editor.highlight=int unary uniq float ground string new num hlink
 window.fileview.visible=true
 window.fileview.divider=200
+window.fileview.filter=lmn,il
 LMNTAL_OPTION=
 UNYO_OPTION=-O2
 SHOW_LINE_DELIMITERS=false

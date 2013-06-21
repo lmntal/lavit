@@ -140,7 +140,7 @@ public class MainFrame extends JFrame
 
 		toolTab = new ToolTab();
 
-		final double editerPer = IntUtils.clamp(Env.getInt("window.divider_location", 50), 0, 100) / 100.0;
+		final double editorPer = IntUtils.clamp(Env.getInt("window.divider_location", 50), 0, 100) / 100.0;
 		jsp = new FlatSplitPane();
 		jsp.setLeftComponent(editorPanel);
 		jsp.setRightComponent(toolTab);
@@ -152,7 +152,8 @@ public class MainFrame extends JFrame
 			{
 				int location = Env.getInt("window.fileview.divider", 25);
 				editorPanel.setFileViewDividerLocation(location);
-				jsp.setDividerLocation((int)Math.round(getWidth() * editerPer));
+				jsp.setDividerLocation((int)Math.round(getWidth() * editorPer));
+				editorPanel.setFileViewExtensionFilterText(Env.get("window.fileview.filter", ""));
 			}
 		});
 		setContentPane(jsp);
@@ -276,6 +277,7 @@ public class MainFrame extends JFrame
 		Env.set("window.divider_location", (int)Math.round(100.0 * jsp.getDividerLocation() / getWidth()));
 		Env.set("window.fileview.visible", editorPanel.isFileViewVisible());
 		Env.set("window.fileview.divider", editorPanel.getFileViewDividerLocation());
+		Env.set("window.fileview.filter", editorPanel.getFileViewExtensionFilterText());
 	}
 
 	private void loadLTLFile(File lmntalFile)

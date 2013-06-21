@@ -240,6 +240,16 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		return fileView.getDividerLocation();
 	}
 
+	public void setFileViewExtensionFilterText(String filterText)
+	{
+		fileView.setExtensionFilterText(filterText);
+	}
+
+	public String getFileViewExtensionFilterText()
+	{
+		return fileView.getExtensionFilterText();
+	}
+
 	/**
 	 * first.lmn を開く
 	 * first.lmn が存在しなければ作成する。

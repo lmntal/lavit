@@ -39,17 +39,21 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -59,6 +63,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import lavit.Env;
+import lavit.util.StringUtils;
 
 /**
  * タブ中に並べるオプションスイッチをとりあえず編集する用
@@ -81,6 +86,7 @@ class CommonOptionEditorDialog extends JDialog
 	private JTextArea edit;
 	private JButton buttonApply;
 	private JButton buttonClose;
+	private CheckBoxPanel checkBoxPanel;
 	private Map<String, String> optionSettings = new HashMap<String, String>();
 
 	public CommonOptionEditorDialog()
@@ -96,6 +102,8 @@ class CommonOptionEditorDialog extends JDialog
 
 		initContentPanel();
 		initButtonPanel();
+
+		loadEnvironment();
 		load();
 
 		pack();
@@ -108,7 +116,6 @@ class CommonOptionEditorDialog extends JDialog
 		comboKeys = new JComboBox();
 		for (String key : visibleOptionKeys)
 		{
-			optionSettings.put(key, Env.get(key, ""));
 			comboKeys.addItem(key);
 		}
 		comboKeys.setEditable(false);
@@ -119,7 +126,7 @@ class CommonOptionEditorDialog extends JDialog
 				switch (e.getStateChange())
 				{
 				case ItemEvent.DESELECTED:
-					update();
+					update((String)e.getItem());
 					break;
 				case ItemEvent.SELECTED:
 					load();
@@ -132,16 +139,27 @@ class CommonOptionEditorDialog extends JDialog
 		JScrollPane editJsp = new JScrollPane(edit);
 		editJsp.setPreferredSize(new Dimension(300, 150));
 
+		checkBoxPanel = new CheckBoxPanel();
+		checkBoxPanel.setBorder(BorderFactory.createTitledBorder("Open on startup"));
+		checkBoxPanel.addItem("lmntal", "LMNtal Options");
+		checkBoxPanel.addItem("unyo", "UNYO Options");
+		checkBoxPanel.addItem("slim-compile", "SLIM Compile Options");
+		checkBoxPanel.addItem("slim", "SLIM Options");
+		checkBoxPanel.addItem("sv", "StateViewer Options");
+		checkBoxPanel.addItem("ltl", "LTL Model Check Options");
+
 		GroupLayout gl = new GroupLayout(p);
 		gl.setAutoCreateContainerGaps(true);
 		gl.setAutoCreateGaps(true);
 		gl.setHorizontalGroup(gl.createParallelGroup(Alignment.LEADING)
 			.addComponent(comboKeys)
 			.addComponent(editJsp)
+			.addComponent(checkBoxPanel)
 		);
 		gl.setVerticalGroup(gl.createSequentialGroup()
 			.addComponent(comboKeys, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addComponent(editJsp)
+			.addComponent(checkBoxPanel)
 		);
 		p.setLayout(gl);
 
@@ -164,7 +182,7 @@ class CommonOptionEditorDialog extends JDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				store();
+				saveEnvironment();
 			}
 		});
 		p.add(buttonApply);
@@ -197,22 +215,92 @@ class CommonOptionEditorDialog extends JDialog
 
 	private void update()
 	{
-		String key = (String)comboKeys.getSelectedItem();
+		update((String)comboKeys.getSelectedItem());
+	}
+
+	private void update(String key)
+	{
 		optionSettings.put(key, edit.getText().replaceAll("\\s+", " "));
 	}
 
-	private void store()
+	private void loadEnvironment()
+	{
+		for (String key : visibleOptionKeys)
+		{
+			optionSettings.put(key, Env.get(key, ""));
+		}
+
+		String values = Env.get("window.controls.switches.expanded", "");
+		checkBoxPanel.setSelectedKeys(StringUtils.splitToSet(values, "\\s+"));
+	}
+
+	private void saveEnvironment()
 	{
 		update();
+
 		for (Map.Entry<String, String> entry : optionSettings.entrySet())
 		{
 			Env.set(entry.getKey(), entry.getValue());
 		}
-		JOptionPane.showMessageDialog(this, "Please restart LaViT to apply the changes.", "Apply Changes", JOptionPane.INFORMATION_MESSAGE);
+
+		Set<String> openOptions = new LinkedHashSet<String>();
+		for (String key : checkBoxPanel.getSelectedKeys())
+		{
+			openOptions.add(key);
+		}
+		Env.set("window.controls.switches.expanded", StringUtils.join(openOptions, " "));
+
+		JOptionPane.showMessageDialog(this,
+			"Please restart LaViT to apply the changes.",
+			"Apply Changes",
+			JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void close()
 	{
 		dispose();
+	}
+}
+
+@SuppressWarnings("serial")
+class CheckBoxPanel extends JPanel
+{
+	private Map<String, JCheckBox> checks = new HashMap<String, JCheckBox>();
+
+	public CheckBoxPanel()
+	{
+		setLayout(new GridLayout(0, 3));
+	}
+
+	public void addItem(String key, String text)
+	{
+		if (checks.containsKey(key))
+		{
+			throw new RuntimeException("key " + key + " already exists");
+		}
+		JCheckBox checkBox = new JCheckBox(text);
+		checks.put(key, checkBox);
+		add(checkBox);
+	}
+
+	public void setSelectedKeys(Set<String> keys)
+	{
+		for (Map.Entry<String, JCheckBox> entry : checks.entrySet())
+		{
+			entry.getValue().setSelected(keys.contains(entry.getKey()));
+		}
+	}
+
+	public Set<String> getSelectedKeys()
+	{
+		Set<String> keys = new LinkedHashSet<String>();
+		for (Map.Entry<String, JCheckBox> entry : checks.entrySet())
+		{
+			if (entry.getValue().isSelected())
+			{
+				keys.add(entry.getKey());
+			}
+		}
+		return keys;
 	}
 }

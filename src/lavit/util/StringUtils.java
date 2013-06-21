@@ -35,11 +35,54 @@
 
 package lavit.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 public final class StringUtils
 {
+	private StringUtils() { }
+
 	public static boolean nullOrEmpty(String s)
 	{
 		return s == null || s.isEmpty();
+	}
+
+	public static <T> String join(Collection<T> items, String delim)
+	{
+		StringBuilder buf = new StringBuilder();
+		boolean first = true;
+		for (T item : items)
+		{
+			if (first)
+			{
+				first = false;
+			}
+			else
+			{
+				buf.append(delim);
+			}
+			buf.append(item);
+		}
+		return buf.toString();
+	}
+
+	public static Set<String> splitToSet(String s, String regex)
+	{
+		Set<String> set = new LinkedHashSet<String>();
+		for (String item : s.split(regex))
+		{
+			set.add(item);
+		}
+		return set;
+	}
+
+	public static List<String> splitToList(String s, String regex)
+	{
+		return new ArrayList<String>(Arrays.asList(s.split(regex)));
 	}
 
 	public static String convertLineDelimiter(String text, LineDelimiter mode)

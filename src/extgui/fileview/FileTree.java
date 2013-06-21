@@ -161,6 +161,17 @@ public class FileTree extends JComponent
 		dispatchDirectoryChangeListener(baseDir);
 	}
 
+	public void setExtensionFilterText(String filterText)
+	{
+		textExtensionFilter.setText(filterText);
+		updateExtensionFilter();
+	}
+
+	public String getExtensionFilterText()
+	{
+		return textExtensionFilter.getText();
+	}
+
 	public void setFileFilter(FileFilter filter)
 	{
 		this.fileFilter = filter;

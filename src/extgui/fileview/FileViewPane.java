@@ -181,6 +181,16 @@ public class FileViewPane extends FlatSplitPane
 		fileTree.setBaseDirectory(dir);
 	}
 
+	public void setExtensionFilterText(String filterText)
+	{
+		fileTree.setExtensionFilterText(filterText);
+	}
+
+	public String getExtensionFilterText()
+	{
+		return fileTree.getExtensionFilterText();
+	}
+
 	public void setFileFilter(FileFilter fileFilter)
 	{
 		fileTree.setFileFilter(fileFilter);

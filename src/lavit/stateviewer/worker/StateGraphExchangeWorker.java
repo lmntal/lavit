@@ -53,6 +53,7 @@ import javax.swing.SwingWorker;
 
 import lavit.Env;
 import lavit.Lang;
+import lavit.StopWatch;
 import lavit.frame.ChildWindowListener;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
@@ -120,7 +121,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 	@Override
 	protected Object doInBackground(){
 
-		Env.startWatch("Exchange[1]");
+		StopWatch.startWatch("Exchange[1]");
 
 		if(Env.is("SV_CROSSREDUCTION_DUMMYONLY")&&drawNodes.getDummySize()==0){ end(); return null; }
 
@@ -153,7 +154,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object,Object>{
 		if(frame!=null) frame.end();
 		end();
 
-		Env.stopWatch("Exchange[1]");
+		StopWatch.stopWatch("Exchange[1]");
 		return null;
 	}
 

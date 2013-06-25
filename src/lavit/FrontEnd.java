@@ -244,7 +244,7 @@ public class FrontEnd
 		}
 		Env.saveOpenedFilePathes(mainFrame.editorPanel.getFiles());
 		mainFrame.exit();
-		if (Env.is("WATCH_DUMP")) Env.dumpWatch();
+		if (Env.is("WATCH_DUMP")) StopWatch.dumpWatch();
 		Env.save();
 		System.out.println("LaViT end.");
 		System.exit(0);

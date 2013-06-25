@@ -52,10 +52,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -644,59 +642,5 @@ public final class Env
 			cachedSLIMVersion = version;
 		}
 		return cachedSLIMVersion;
-	}
-
-	// TODO: expel timer logics
-
-	private static Map<String, Long> watchNowTimes = new HashMap<String, Long>();
-	private static Map<String, Long> watchSumTimes = new HashMap<String, Long>();
-	private static Map<String, Integer> watchCount = new HashMap<String, Integer>();
-
-	public static void startWatch(String key)
-	{
-		watchNowTimes.put(key, System.currentTimeMillis());
-	}
-
-	public static void stopWatch(String key)
-	{
-		long t;
-		if (watchNowTimes.containsKey(key))
-		{
-			t = System.currentTimeMillis() - watchNowTimes.get(key);
-		}
-		else
-		{
-			t = 0;
-		}
-		if (watchSumTimes.containsKey(key))
-		{
-			long sum = watchSumTimes.get(key);
-			watchSumTimes.put(key, sum + t);
-			watchCount.put(key, watchCount.get(key) + 1);
-		}
-		else
-		{
-			watchSumTimes.put(key, t);
-			watchCount.put(key, 1);
-		}
-	}
-
-	public static void dumpWatch()
-	{
-		DecimalFormat f = new DecimalFormat("####.##");
-		if (watchSumTimes.size() > 0)
-		{
-			System.out.println("---- watch = " + watchSumTimes.size() + " ----");
-		}
-		for (String key : watchSumTimes.keySet())
-		{
-			double t = watchSumTimes.get(key) / 1000.0;
-			System.out.println("watch[" + key + "] : " + f.format(t) + " (" + watchCount.get(key) + ")");
-		}
-		if (watchSumTimes.size() > 0)
-		{
-			System.out.println();
-		}
-		watchSumTimes.clear();
 	}
 }

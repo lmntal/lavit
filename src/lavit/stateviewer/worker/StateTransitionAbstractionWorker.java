@@ -39,29 +39,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import lavit.Env;
-import lavit.FrontEnd;
 import lavit.Lang;
+import lavit.StopWatch;
 import lavit.frame.ChildWindowListener;
-import lavit.stateviewer.*;
+import lavit.stateviewer.StateAbstractionMaker;
+import lavit.stateviewer.StateGraphPanel;
+import lavit.stateviewer.StateNode;
+import lavit.stateviewer.StateNodeSet;
+import lavit.stateviewer.StateRule;
+import lavit.stateviewer.StateTransition;
 
 public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>{
 	private StateGraphPanel panel;
@@ -162,7 +161,7 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 
 		while(true){
 
-			Env.startWatch("Worker[1]");
+			StopWatch.startWatch("Worker[1]");
 
 			LinkedHashSet<StateNode> transitionGroup = new LinkedHashSet<StateNode>();
 			while(nodes.size()>0){
@@ -185,9 +184,9 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 
 					StateNode node = queue.remove();
 
-					Env.startWatch("Worker[1-1]");
+					StopWatch.startWatch("Worker[1-1]");
 					Collection<StateNode> ns = node.getRuleNameGroupNodes(rules);
-					Env.stopWatch("Worker[1-1]");
+					StopWatch.stopWatch("Worker[1-1]");
 
 					for(StateNode n : ns){
 						if(n.isMarked()){continue;}
@@ -205,12 +204,12 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 
 			if(transitionGroup.size()<=1){ break; }
 
-			Env.stopWatch("Worker[1]");
-			Env.startWatch("Worker[2]");
+			StopWatch.stopWatch("Worker[1]");
+			StopWatch.startWatch("Worker[2]");
 
 			maker.makeNode(transitionGroup);
 
-			Env.stopWatch("Worker[2]");
+			StopWatch.stopWatch("Worker[2]");
 
 			setProgress((int)(100*(1-((double)nodes.size())/((double)allNum))));
 			if(isCancelled()){ end();return null; }

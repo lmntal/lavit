@@ -37,8 +37,6 @@ package lavit.multiedit.coloring;
 
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -69,8 +67,6 @@ public class LmnTextPane extends JTextPane
 
 		doc = new LmnDocument();
 		setDocument(doc);
-
-		setOpaque(false);
 
 		addCaretListener(new CaretListener()
 		{
@@ -126,6 +122,13 @@ public class LmnTextPane extends JTextPane
 				doc.redo();
 			}
 		});
+	}
+
+	public void updateUI()
+	{
+		super.updateUI();
+		setUI(new LineHighlightTextPaneUI());
+		setBackground(Color.WHITE);
 	}
 
 	public void setTabWidth(int spaces)
@@ -210,35 +213,6 @@ public class LmnTextPane extends JTextPane
 		Container container = getParent();
 		TextUI ui = getUI();
 		return ui.getPreferredSize(this).width < container.getWidth();
-	}
-
-	protected void paintComponent(Graphics g)
-	{
-		Rectangle bounds = g.getClipBounds();
-		g.setColor(Color.WHITE);
-		g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
-
-		// paint line highlight
-		try
-		{
-			Rectangle rc0 = modelToView(0);
-			Rectangle rc = modelToView(getCaretPosition());
-
-			if (rc0 == null || rc == null) return;
-
-			int x = rc0.x;
-			int y = rc.y;
-			int w = getWidth();
-			int h = rc.height;
-
-			g.setColor(new Color(240, 240, 255));
-			g.fillRect(x, y, w, h);
-		}
-		catch (BadLocationException e)
-		{
-			e.printStackTrace();
-		}
-		super.paintComponent(g);
 	}
 
 	private int[] findParenPair(int caretPos)

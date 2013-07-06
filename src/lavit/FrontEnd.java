@@ -63,8 +63,8 @@ import lavit.util.StringUtils;
 public class FrontEnd
 {
 	public static MainFrame mainFrame;
-	public static Set<CommonFontUser> fontUsers = new HashSet<CommonFontUser>();
 
+	private static Set<CommonFontUser> fontUsers = new HashSet<CommonFontUser>();
 	private static List<ProcessTask> processTasks = new ArrayList<ProcessTask>();
 
 	private static void loadArgs(String[] args)

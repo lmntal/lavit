@@ -112,7 +112,11 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		{
 			public void tabChanged()
 			{
-				FindReplaceDialog.getDialog().setTargetTextComponent(getSelectedEditor());
+				JTextPane selectedEditor = getSelectedEditor();
+				if (selectedEditor != null)
+				{
+					FindReplaceDialog.getDialog().setTargetTextComponent(selectedEditor);
+				}
 			}
 		});
 
@@ -185,7 +189,8 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 	public JTextPane getSelectedEditor()
 	{
-		return tabView.getSelectedPage().getJTextPane();
+		EditorPage page = tabView.getSelectedPage();
+		return page != null ? page.getJTextPane() : null;
 	}
 
 	public File getFile()

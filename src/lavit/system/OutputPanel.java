@@ -46,6 +46,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
@@ -72,6 +73,7 @@ public class OutputPanel extends JPanel implements RunnerOutputGetter, CommonFon
 	private ColoredLinePrinter log;
 
 	private JPanel findPanel = new JPanel();
+	private JButton buttonClearOutput;
 	private JLabel findLabel = new JLabel();
 	private JTextField findField = new JTextField();
 
@@ -95,16 +97,35 @@ public class OutputPanel extends JPanel implements RunnerOutputGetter, CommonFon
 		FindFieldAction findAction = new FindFieldAction();
 		KeyHandler keyHandler = new KeyHandler();
 
+		buttonClearOutput = new JButton("Clear Output");
+		buttonClearOutput.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				log.clear();
+			}
+		});
+
 		JButton findButton = new JButton("Find");
 		findButton.addActionListener(findAction);
 		findButton.addKeyListener(keyHandler);
 		findField.addActionListener(findAction);
 		findField.addKeyListener(keyHandler);
 
-		findPanel.setLayout(new BorderLayout());
-		findPanel.add(findLabel, BorderLayout.WEST);
-		findPanel.add(findField, BorderLayout.CENTER);
-		findPanel.add(findButton, BorderLayout.EAST);
+		GroupLayout gl = new GroupLayout(findPanel);
+		findPanel.setLayout(gl);
+		gl.setHorizontalGroup(gl.createSequentialGroup()
+			.addComponent(buttonClearOutput)
+			.addComponent(findLabel)
+			.addComponent(findField)
+			.addComponent(findButton)
+		);
+		gl.setVerticalGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			.addComponent(buttonClearOutput)
+			.addComponent(findLabel)
+			.addComponent(findField)
+			.addComponent(findButton)
+		);
 		add(findPanel, BorderLayout.SOUTH);
 
 		log.setMaximumNumberOfLines(Env.getInt("SYSTEM_OUTPUT_MAXLINE"));

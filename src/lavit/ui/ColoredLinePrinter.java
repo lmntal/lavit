@@ -49,10 +49,9 @@ import javax.swing.text.StyleConstants;
 /**
  * @author Yuuki.S
  */
+@SuppressWarnings("serial")
 public class ColoredLinePrinter extends JTextPane
 {
-	private static final long serialVersionUID = 1L;
-
 	private int limitLines;
 	private Document doc;
 

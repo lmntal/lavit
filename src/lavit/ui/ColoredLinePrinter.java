@@ -52,7 +52,12 @@ import javax.swing.text.StyleConstants;
 @SuppressWarnings("serial")
 public class ColoredLinePrinter extends JTextPane
 {
-	private int limitLines;
+	private static final int DEFALT_LIMIT_LINES = 1000;
+
+	private final Object lock = new Object();
+
+	private int limitLines = DEFALT_LIMIT_LINES;
+	private int lines;
 	private Document doc;
 
 	public ColoredLinePrinter()
@@ -62,18 +67,30 @@ public class ColoredLinePrinter extends JTextPane
 
 	public void setMaximumNumberOfLines(int n)
 	{
-		limitLines = n;
+		if (n > 0)
+		{
+			limitLines = n;
+		}
 	}
 
-	public synchronized void clear()
+	public void clear()
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
 				setText("");
+				setLinesZero();
 			}
 		});
+	}
+
+	private void setLinesZero()
+	{
+		synchronized (lock)
+		{
+			lines = 0;
+		}
 	}
 
 	public void appendLine(String line)
@@ -94,17 +111,39 @@ public class ColoredLinePrinter extends JTextPane
 		appendLine(line, a);
 	}
 
-	public synchronized void appendLine(final String line, final AttributeSet attr)
+	public void appendLine(final String line, final AttributeSet attr)
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		synchronized (lock)
 		{
-			public void run()
+			if (lines < limitLines)
 			{
-				appendString(line, attr);
-				appendLineFeed();
-				moveCaretToEnd();
+				++lines;
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						appendString(line, attr);
+						appendLineFeed();
+						moveCaretToEnd();
+					}
+				});
+				if (lines == limitLines)
+				{
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							SimpleAttributeSet a = new SimpleAttributeSet();
+							StyleConstants.setBackground(a, Color.WHITE);
+							StyleConstants.setForeground(a, Color.RED);
+							appendString("Output is full.", a);
+							appendLineFeed();
+							moveCaretToEnd();
+						}
+					});
+				}
 			}
-		});
+		}
 	}
 
 	public void append(String s)
@@ -157,15 +196,6 @@ public class ColoredLinePrinter extends JTextPane
 	private void appendLineFeed()
 	{
 		appendString("\n", null);
-		if (limitLines > 0)
-		{
-			Element root = doc.getDefaultRootElement();
-			int lines = root.getElementCount();
-			if (lines > limitLines)
-			{
-				deleteFirstLine();
-			}
-		}
 	}
 
 	/** [NOTE] This method must be called in EDT. */
@@ -174,19 +204,6 @@ public class ColoredLinePrinter extends JTextPane
 		try
 		{
 			doc.insertString(doc.getLength(), s, attr);
-		}
-		catch (BadLocationException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	/** [NOTE] This method must be called in EDT. */
-	private void deleteFirstLine()
-	{
-		try
-		{
-			doc.remove(0, getText().indexOf('\n'));
 		}
 		catch (BadLocationException e)
 		{

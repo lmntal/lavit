@@ -631,7 +631,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 	public void loadFont()
 	{
-		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
+		Font font = Env.getEditorFont();
 		tabView.setFont(font);
 		setTabWidth(Env.getInt("EDITER_TAB_SIZE"));
 	}
@@ -734,57 +734,19 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		}
 	}
 
-	private static void scaleUp()
+	private static void addFontSize(int addition)
 	{
-		int n = getCurrentFontSizeIndex();
-		if (n + 1 < Env.FONT_SIZE_LIST.length)
+		int fontSize = Env.getInt("EDITER_FONT_SIZE", 12) + addition;
+		if (0 < fontSize && fontSize < 120)
 		{
-			Env.set("EDITER_FONT_SIZE", Env.FONT_SIZE_LIST[n + 1]);
+			Env.set("EDITER_FONT_SIZE", fontSize);
 			FrontEnd.loadAllFont();
 		}
-	}
-
-	private static void scaleDown()
-	{
-		int n = getCurrentFontSizeIndex();
-		if (0 < n)
-		{
-			Env.set("EDITER_FONT_SIZE", Env.FONT_SIZE_LIST[n - 1]);
-			FrontEnd.loadAllFont();
-		}
-	}
-
-	private static int getCurrentFontSizeIndex()
-	{
-		int currentFontSize = parseIntDefault(Env.get("EDITER_FONT_SIZE"), 14);
-
-		for (int i = 0; i < Env.FONT_SIZE_LIST.length; i++)
-		{
-			int size = parseIntDefault(Env.FONT_SIZE_LIST[i], 1);
-			if (currentFontSize <= size)
-			{
-				return i;
-			}
-		}
-		return Env.FONT_SIZE_LIST.length - 1;
-	}
-
-	// TODO: 適切な utility クラスへ移動
-	private static int parseIntDefault(String s, int defval)
-	{
-		try
-		{
-			return Integer.parseInt(s);
-		}
-		catch (NumberFormatException e)
-		{
-		}
-		return defval;
 	}
 
 	private static void scaleDefault()
 	{
-		Env.set("EDITER_FONT_SIZE", "14");
+		Env.set("EDITER_FONT_SIZE", 12);
 		FrontEnd.loadAllFont();
 	}
 
@@ -794,7 +756,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				scaleUp();
+				addFontSize(1);
 			}
 		};
 	}
@@ -805,7 +767,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				scaleDown();
+				addFontSize(-1);
 			}
 		};
 	}

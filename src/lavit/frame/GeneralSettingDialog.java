@@ -73,6 +73,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.FontUIResource;
@@ -309,7 +311,7 @@ public class GeneralSettingDialog extends JDialog
 	private static class FontSettingPanel extends JPanel
 	{
 		private JComboBox fontFamilyComboBox;
-		private JComboBox fontSizeComboBox;
+		private JSpinner fontSizeController;
 		private JComboBox tabSizeComboBox;
 
 		public FontSettingPanel()
@@ -323,7 +325,9 @@ public class GeneralSettingDialog extends JDialog
 
 			JLabel labelSize = new JLabel("Size:");
 			add(labelSize);
-			fontSizeComboBox = new JComboBox(Env.FONT_SIZE_LIST);
+
+			int fontSize = Env.getInt("EDITER_FONT_SIZE", 12);
+			fontSizeController = new JSpinner(new SpinnerNumberModel(fontSize, 2, 120, 1));
 
 			JLabel labelTabWidth = new JLabel("Tab width:");
 			add(labelTabWidth);
@@ -343,7 +347,7 @@ public class GeneralSettingDialog extends JDialog
 				.addComponent(labelFamily)
 				.addComponent(fontFamilyComboBox)
 				.addComponent(labelSize)
-				.addComponent(fontSizeComboBox)
+				.addComponent(fontSizeController)
 				.addComponent(labelTabWidth)
 				.addComponent(tabSizeComboBox)
 			);
@@ -351,7 +355,7 @@ public class GeneralSettingDialog extends JDialog
 				.addComponent(labelFamily)
 				.addComponent(fontFamilyComboBox)
 				.addComponent(labelSize)
-				.addComponent(fontSizeComboBox)
+				.addComponent(fontSizeController)
 				.addComponent(labelTabWidth)
 				.addComponent(tabSizeComboBox)
 			);
@@ -364,11 +368,12 @@ public class GeneralSettingDialog extends JDialog
 					FrontEnd.loadAllFont();
 				}
 			});
-			fontSizeComboBox.addActionListener(new ActionListener()
+			fontSizeController.addChangeListener(new ChangeListener()
 			{
-				public void actionPerformed(ActionEvent e)
+				public void stateChanged(ChangeEvent e)
 				{
-					Env.set("EDITER_FONT_SIZE", (String)fontSizeComboBox.getSelectedItem());
+					int fontSize = (Integer)fontSizeController.getValue();
+					Env.set("EDITER_FONT_SIZE", fontSize);
 					FrontEnd.loadAllFont();
 				}
 			});
@@ -385,7 +390,6 @@ public class GeneralSettingDialog extends JDialog
 		private void settingInit()
 		{
 			fontFamilyComboBox.setSelectedItem(Env.get("EDITER_FONT_FAMILY"));
-			fontSizeComboBox.setSelectedItem(Env.get("EDITER_FONT_SIZE"));
 			tabSizeComboBox.setSelectedItem(Env.get("EDITER_TAB_SIZE"));
 		}
 	}

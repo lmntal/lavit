@@ -138,7 +138,7 @@ public class OutputPanel extends JPanel implements RunnerOutputGetter, CommonFon
 
 	public void loadFont()
 	{
-		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
+		Font font = Env.getEditorFont();
 		log.setFont(font);
 		findField.setFont(font);
 		revalidate();

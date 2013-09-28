@@ -35,50 +35,22 @@
 
 package lavit.util;
 
-import java.awt.Font;
+import java.awt.Toolkit;
 
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
+/**
+ * {@code java.awt.Font}はフォントサイズを72DPIとして解釈するという可能性がある。
+ * このクラスでは、システムから取得したスクリーン解像度を使用してポイントサイズから
+ * {@code Font}クラスのコンストラクタに与えるべきサイズを計算する。
+ * @author Yuuki.S
+ */
+public final class FontSizeUtils
+{
+	private static final int dpi = Toolkit.getDefaultToolkit().getScreenResolution();
 
-import lavit.Env;
-import lavit.FrontEnd;
-import lavit.editor.AutoStyledDocument;
-import lavit.frame.ChildWindowListener;
+	private FontSizeUtils() { }
 
-public class UtilTextFrame extends JFrame{
-
-	public UtilTextFrame(String title,String str){
-
-		int width = FrontEnd.mainFrame.getWidth()/2;
-		int height = FrontEnd.mainFrame.getHeight()/2;
-		int x = FrontEnd.mainFrame.getX();
-		int y = FrontEnd.mainFrame.getY();
-
-		setSize(width,height);
-		setLocation(x,y);
-		setTitle(title);
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-		/*
-		JTextArea text = new JTextArea(state);
-		text.setLineWrap(true);
-		text.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")));
-		 */
-		AutoStyledDocument doc = new AutoStyledDocument();
-		JTextPane editor = new JTextPane();
-		//editor.setEditorKit(new NoWrapEditorKit());
-		editor.setDocument(doc);
-		editor.setFont(Env.getEditorFont());
-		editor.setText(str);
-		doc.colorChange();
-		doc.end();
-
-		add(new JScrollPane(editor));
-
-		addWindowListener(new ChildWindowListener(this));
-
-		setVisible(true);
-
+	public static int getActualFontSize(int pt)
+	{
+		return (int)(pt * dpi / 72.0 + 0.5);
 	}
 }

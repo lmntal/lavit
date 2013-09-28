@@ -35,6 +35,7 @@
 
 package lavit;
 
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.BufferedReader;
@@ -61,6 +62,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lavit.util.FileUtils;
+import lavit.util.FontSizeUtils;
 import lavit.util.StringUtils;
 
 public final class Env
@@ -79,8 +81,6 @@ public final class Env
 	public static final String DIR_NAME_LTL2BA = "ltl2ba-1.1";
 
 	public static final String LMNTAL_LIBRARY_DIR = "lmntal";
-
-	public static final String[] FONT_SIZE_LIST = {"8","9","10","11","12","14","16","18","20","24","28","32","36","40","44","48","54","60","66","72","80","88","96","106"};
 
 	private static final String ENV_FILE = "env.txt";
 	private static final String ENV_DEFAULT_FILE = "env_default.txt";
@@ -215,6 +215,13 @@ public final class Env
 		{
 		}
 		return value;
+	}
+
+	public static Font getEditorFont()
+	{
+		String fontFamily = get("EDITER_FONT_FAMILY", Font.MONOSPACED);
+		int fontSize = FontSizeUtils.getActualFontSize(getInt("EDITER_FONT_SIZE", 12));
+		return new Font(fontFamily, Font.PLAIN, fontSize);
 	}
 
 	public static boolean is(String key)

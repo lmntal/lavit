@@ -72,7 +72,7 @@ class LtlSymbolPanel extends JPanel implements CommonFontUser
 
 	public void loadFont()
 	{
-		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
+		Font font = Env.getEditorFont();
 		symbolArea.setFont(font);
 	}
 

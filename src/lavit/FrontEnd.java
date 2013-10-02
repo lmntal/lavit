@@ -48,15 +48,16 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import lavit.frame.CygwinPathSetting;
+import lavit.frame.LaViTSplashWindow;
 import lavit.frame.LanguageSetting;
 import lavit.frame.LookAndFeelEntry;
 import lavit.frame.MainFrame;
 import lavit.frame.SlimPathSetting;
-import lavit.frame.LaViTSplashWindow;
 import lavit.runner.PrintLineListener;
 import lavit.runner.ProcessFinishListener;
 import lavit.runner.ProcessTask;
 import lavit.runner.RebootRunner;
+import lavit.system.versioncheck.UpdateChecker;
 import lavit.util.CommonFontUser;
 import lavit.util.StringUtils;
 
@@ -430,6 +431,12 @@ public class FrontEnd
 					loadArgs(args); //起動オプションの読み込み
 
 					println("(SYSTEM) Ready.");
+
+					if (Env.get("updatecheck.enabled", "false").equals("true") && Env.isSet("updatecheck.url"))
+					{
+						String url = Env.get("updatecheck.url");
+						UpdateChecker.checkVersion(mainFrame, Env.APP_VERSION, Env.APP_DATE, url);
+					}
 				}
 				catch (Exception e)
 				{

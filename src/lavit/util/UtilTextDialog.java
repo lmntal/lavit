@@ -35,39 +35,38 @@
 
 package lavit.util;
 
-import java.awt.Font;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
 
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.editor.AutoStyledDocument;
 import lavit.frame.ChildWindowListener;
 
-public class UtilTextFrame extends JFrame{
+@SuppressWarnings("serial")
+public class UtilTextDialog extends JDialog
+{
+	private static final Object LOCK = new Object();
+	private static final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
+	private static Point initialLocation = null;
+	private static Point location = null;
 
-	public UtilTextFrame(String title,String str){
+	public UtilTextDialog(String title, String str)
+	{
+		super(FrontEnd.mainFrame, title);
 
-		int width = FrontEnd.mainFrame.getWidth()/2;
-		int height = FrontEnd.mainFrame.getHeight()/2;
-		int x = FrontEnd.mainFrame.getX();
-		int y = FrontEnd.mainFrame.getY();
+		setSize(300, 200);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-		setSize(width,height);
-		setLocation(x,y);
-		setTitle(title);
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-		/*
-		JTextArea text = new JTextArea(state);
-		text.setLineWrap(true);
-		text.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")));
-		 */
 		AutoStyledDocument doc = new AutoStyledDocument();
 		JTextPane editor = new JTextPane();
-		//editor.setEditorKit(new NoWrapEditorKit());
 		editor.setDocument(doc);
 		editor.setFont(Env.getEditorFont());
 		editor.setText(str);
@@ -78,7 +77,43 @@ public class UtilTextFrame extends JFrame{
 
 		addWindowListener(new ChildWindowListener(this));
 
-		setVisible(true);
+		initLocation();
+	}
 
+	private void initLocation()
+	{
+		synchronized (LOCK)
+		{
+			if (location == null)
+			{
+				initialLocation = getLocation();
+				location = getLocation();
+			}
+			else
+			{
+				location.translate(20, 20);
+				if (SCREEN_SIZE.height <= location.y + getHeight())
+				{
+					location.y = initialLocation.y;
+				}
+				if (SCREEN_SIZE.width <= location.x + getWidth())
+				{
+					location.x = initialLocation.x;
+				}
+				setLocation(location);
+			}
+		}
+	}
+
+	public static void showDialog(final String title, final String text)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				UtilTextDialog dialog = new UtilTextDialog(title, text);
+				dialog.setVisible(true);
+			}
+		});
 	}
 }

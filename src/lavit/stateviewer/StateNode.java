@@ -57,7 +57,7 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.runner.LmntalRunner;
 import lavit.stateviewer.draw.StateDraw;
-import lavit.util.UtilTextFrame;
+import lavit.util.UtilTextDialog;
 
 public class StateNode implements Shape {
 	public long id;
@@ -90,7 +90,6 @@ public class StateNode implements Shape {
 	//物理モデル用変数
 	public double dy;
 	public double ddy;
-
 
 	StateNode(long id, StateNodeSet parentSet){
 		this.id = id;
@@ -731,10 +730,14 @@ public class StateNode implements Shape {
 		}
 	}
 
-	void doubleClick(StateGraphPanel graphPanel){
-		if(childSet==null){
-			new UtilTextFrame(""+id,state);
-		}else{
+	void doubleClick(StateGraphPanel graphPanel)
+	{
+		if (childSet == null)
+		{
+			UtilTextDialog.showDialog(String.valueOf(id), state);
+		}
+		else
+		{
 			graphPanel.init(childSet);
 		}
 	}
@@ -764,7 +767,7 @@ public class StateNode implements Shape {
 		for(StateNode n : getFromNodes()){ buf.append(n.id+", "); }
 		buf.append("\n");
 
-		new UtilTextFrame(""+id, buf.toString());
+		UtilTextDialog.showDialog(String.valueOf(id), buf.toString());
 	}
 
 	public String toString(){

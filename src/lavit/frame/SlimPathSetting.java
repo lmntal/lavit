@@ -55,6 +55,7 @@ import javax.swing.event.ChangeListener;
 import lavit.Env;
 import lavit.Lang;
 import lavit.frame.ModalSettingDialog.ClosingEvent;
+import lavit.frame.SlimPathSetting.Result;
 import lavit.runner.SlimInstaller;
 import lavit.ui.PathInputField;
 import lavit.util.FileUtils;
@@ -218,7 +219,10 @@ class SlimPathPanel extends JPanel
 			{
 				public void stateChanged(ChangeEvent e)
 				{
-					pathSlim.setPathText(createSlimPath());
+					if (getResult() != Result.USE_OTHER)
+					{
+						pathSlim.setPathText(createSlimPath());
+					}
 				}
 			});
 			panel.add(label2);
@@ -387,7 +391,6 @@ class SlimPathPanel extends JPanel
 		case USE_OTHER:
 			pathSource.setPathText("");
 			pathInstall.setPathText("");
-			pathSlim.setPathText("");
 			break;
 		}
 	}

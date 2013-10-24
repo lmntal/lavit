@@ -37,41 +37,40 @@ package lavit.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Window;
+import java.awt.Font;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JWindow;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import lavit.Env;
 
-public class LaViTSplashWindow extends Window
+@SuppressWarnings("serial")
+public class LaViTSplashWindow extends JWindow
 {
-	private static final long serialVersionUID = 1L;
-
-	private static LaViTSplashWindow instance;
-
 	private LaViTSplashWindow()
 	{
-		super(null);
-
 		setAlwaysOnTop(true);
 		setIconImages(Env.getApplicationIcons());
 
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+		panel.setOpaque(true);
 		panel.setBackground(Color.WHITE);
 		add(panel);
 
 		JLabel icon = new JLabel(new ImageIcon(Env.getImageOfFile("img/logo.png")));
 		panel.add(icon, BorderLayout.CENTER);
 
-		JLabel label = new JLabel("Version " + Env.APP_VERSION);
+		JLabel label = new JLabel("VERSION " + Env.APP_VERSION);
 		label.setHorizontalAlignment(SwingConstants.CENTER);
-		label.setBackground(Color.WHITE);
+		label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
+		label.setForeground(Color.GRAY);
 		panel.add(label, BorderLayout.SOUTH);
 
 		pack();
@@ -79,18 +78,31 @@ public class LaViTSplashWindow extends Window
 
 	public static void showSplash(final long millis)
 	{
-		if (instance == null)
+		try
 		{
-			instance = new LaViTSplashWindow();
-		}
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
+			SwingUtilities.invokeAndWait(new Runnable()
 			{
-				instance.setLocationRelativeTo(null);
-				instance.setVisible(true);
-			}
-		});
+				public void run()
+				{
+					buildAndShow(millis);
+				}
+			});
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+		catch (InvocationTargetException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	private static void buildAndShow(final long millis)
+	{
+		final JWindow w = new LaViTSplashWindow();
+		w.setLocationRelativeTo(null);
+		w.setVisible(true);
 		Thread thread = new Thread()
 		{
 			public void run()
@@ -104,7 +116,7 @@ public class LaViTSplashWindow extends Window
 				}
 				finally
 				{
-					instance.dispose();
+					w.dispose();
 				}
 			}
 		};

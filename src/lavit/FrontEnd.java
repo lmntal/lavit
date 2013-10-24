@@ -403,19 +403,11 @@ public class FrontEnd
 	 */
 	public static void main(final String[] args)
 	{
+		LaViTSplashWindow.showSplash(2000);
+
 		new Env();
 
 		setLookAndFeel(LookAndFeelEntry.getLookAndFeelEntry(Env.get("LookAndFeel")));
-
-		LaViTSplashWindow.showSplash(2000);
-		try
-		{
-			Thread.sleep(500);
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
 
 		initialSetup();
 

@@ -312,6 +312,11 @@ public class Lexer
 		}
 	}
 
+	private void skipws()
+	{
+		while (!end() && Character.isWhitespace(peek())) succ();
+	}
+
 	private boolean end()
 	{
 		return _column >= _cs.length;

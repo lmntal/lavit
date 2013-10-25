@@ -72,6 +72,7 @@ class LmnView extends PlainView
 {
 	private Map<Integer, Color> colors = new HashMap<Integer, Color>();
 	private int marginLeft;
+	private Color ruleNameBackground = new Color(255, 200, 200);
 
 	public LmnView(Element e)
 	{
@@ -154,7 +155,6 @@ class LmnView extends PlainView
 			}
 
 			// color part
-			g.setColor(colors.get(label.getLabel()));
 			int len = label.getLength();
 			if (label.getStart() < pos)
 			{
@@ -165,6 +165,18 @@ class LmnView extends PlainView
 				len = p1 - pos;
 			}
 			doc.getText(pos, len, lb);
+			if (label.getLabel() == TokenLabel.RULENAME)
+			{
+				FontMetrics fm = g.getFontMetrics();
+				int w = Utilities.getTabbedTextWidth(lb, fm, x, this, 0);
+				g.setColor(ruleNameBackground);
+				g.fillRect(x, y - fm.getAscent(), w, fm.getHeight());
+				g.setColor(getContainer().getForeground());
+			}
+			else
+			{
+				g.setColor(colors.get(label.getLabel()));
+			}
 			x = Utilities.drawTabbedText(lb, x, y, g, this, 0);
 			pos += len;
 		}

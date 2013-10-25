@@ -64,12 +64,45 @@ public class LmnDocument extends DefaultStyledDocument
 	private boolean showEols;
 
 	private UndoManager undo = new UndoManager();
+	private DocumentListener updateObserver;
 
 	public LmnDocument()
 	{
 		undo.setLimit(1000);
 		addUndoableEditListener(undo);
-		addDocumentListener(new DocumentUpdateObserver());
+
+		updateObserver = new DocumentUpdateObserver();
+		addDocumentListener(updateObserver);
+	}
+
+	public void initializeText(String text)
+	{
+		removeDocumentListener(updateObserver);
+		try
+		{
+			remove(0, getLength());
+			insertString(0, text, null);
+		}
+		catch (BadLocationException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			addDocumentListener(updateObserver);
+		}
+	}
+
+	public String getRowText()
+	{
+		try
+		{
+			return getText(0, getLength());
+		}
+		catch (BadLocationException e)
+		{
+		}
+		return null;
 	}
 
 	public boolean canUndo()
@@ -178,7 +211,7 @@ public class LmnDocument extends DefaultStyledDocument
 	{
 		try
 		{
-			String text = getText(0, getLength()).replace("\r\n", "\n");
+			String text = getText(0, getLength());
 			Lexer lexer = new Lexer(text, hlFlags);
 
 			labels = lexer.lex();
@@ -188,7 +221,6 @@ public class LmnDocument extends DefaultStyledDocument
 		}
 		catch (BadLocationException e)
 		{
-			e.printStackTrace();
 		}
 	}
 
@@ -215,18 +247,22 @@ public class LmnDocument extends DefaultStyledDocument
 		}
 	}
 
+	private void updateHighlight()
+	{
+		setDirty(true);
+		reparse();
+	}
+
 	private class DocumentUpdateObserver implements DocumentListener
 	{
 		public void removeUpdate(DocumentEvent e)
 		{
-			setDirty(true);
-			reparse();
+			updateHighlight();
 		}
 
 		public void insertUpdate(DocumentEvent e)
 		{
-			setDirty(true);
-			reparse();
+			updateHighlight();
 		}
 
 		public void changedUpdate(DocumentEvent e)

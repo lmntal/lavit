@@ -74,6 +74,7 @@ public class EditorPage extends JScrollPane
 
 	private TabView host;
 	private HeaderComponent header;
+	private LineNumberView lineNumberView;
 
 	private LmnTextPane text;
 	private File file;
@@ -89,7 +90,8 @@ public class EditorPage extends JScrollPane
 		fileDropHandler = new FileDropTransferHandler(text.getTransferHandler());
 		text.setTransferHandler(fileDropHandler);
 
-		setRowHeaderView(new LineNumberView(text));
+		lineNumberView = new LineNumberView(text);
+		setRowHeaderView(lineNumberView);
 		setViewportView(text);
 
 		getVerticalScrollBar().setUnitIncrement(15);
@@ -140,6 +142,7 @@ public class EditorPage extends JScrollPane
 	public void setText(String t)
 	{
 		text.setText(t);
+		lineNumberView.updateUI();
 	}
 
 	public boolean isModified()

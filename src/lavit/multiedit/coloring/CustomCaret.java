@@ -54,50 +54,54 @@ public class CustomCaret extends DefaultCaret
 {
 	private static final class SelectionPainter implements Highlighter.HighlightPainter
 	{
-		public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c)
+		public static final SelectionPainter INSTANCE = new SelectionPainter();
+
+		public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent c)
 		{
 			Rectangle alloc = bounds.getBounds();
+			TextUI mapper = c.getUI();
 			try
 			{
-				TextUI mapper = c.getUI();
-				Rectangle p0 = mapper.modelToView(c, offs0);
-				Rectangle p1 = mapper.modelToView(c, offs1);
-
+				Rectangle r0 = mapper.modelToView(c, p0);
+				Rectangle r1 = mapper.modelToView(c, p1);
 				g.setColor(c.getSelectionColor());
-
-				if (p0.y == p1.y) // 単一の行
-				{
-					Rectangle r = p0.union(p1);
-					g.fillRect(r.x, r.y, r.width, r.height);
-				}
-				else // 複数行
-				{
-					// 開始行：選択範囲の始点から行末まで
-					int p0ToRight = alloc.x + alloc.width - p0.x;
-					g.fillRect(p0.x, p0.y, p0ToRight, p0.height);
-
-					// 全体が選択されている行
-					if ((p0.y + p0.height) != p1.y)
-					{
-						g.fillRect(alloc.x, p0.y + p0.height, alloc.width, p1.y
-								- (p0.y + p0.height));
-					}
-
-					// 最終行：行頭から選択範囲の終点まで
-					g.fillRect(alloc.x, p1.y, (p1.x - alloc.x), p1.height);
-				}
+				paintSelection(g, alloc, r0, r1);
 			}
 			catch (BadLocationException e)
 			{
 			}
 		}
-	}
 
-	private static SelectionPainter painter;
+		private void paintSelection(Graphics g, Rectangle area, Rectangle r0, Rectangle r1)
+		{
+			if (r0.y == r1.y) // 単一の行
+			{
+				int right = r1.x + r1.width;
+				g.fillRect(r0.x, r0.y, right - r0.x, r0.height);
+			}
+			else // 複数行
+			{
+				// 開始行：選択範囲の始点から行末まで
+				int p0ToRight = area.x + area.width - r0.x;
+				g.fillRect(r0.x, r0.y, p0ToRight, r0.height);
+
+				// 全体が選択されている行
+				int r0Bottom = r0.y + r0.height;
+				int h = r1.y - r0Bottom;
+				if (h != 0)
+				{
+					g.fillRect(area.x, r0Bottom, area.width, h);
+				}
+
+				// 最終行：行頭から選択範囲の終点まで
+				g.fillRect(area.x, r1.y, (r1.x - area.x), r1.height);
+			}
+		}
+	}
 
 	protected Highlighter.HighlightPainter getSelectionPainter()
 	{
-		return painter != null ? painter : (painter = new SelectionPainter());
+		return SelectionPainter.INSTANCE;
 	}
 
 	protected synchronized void damage(Rectangle r)

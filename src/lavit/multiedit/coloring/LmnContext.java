@@ -43,8 +43,8 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.event.DocumentEvent;
@@ -53,7 +53,6 @@ import javax.swing.text.Element;
 import javax.swing.text.PlainView;
 import javax.swing.text.Position.Bias;
 import javax.swing.text.Segment;
-import javax.swing.text.StyleContext;
 import javax.swing.text.Utilities;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
@@ -61,8 +60,7 @@ import javax.swing.text.ViewFactory;
 import lavit.multiedit.coloring.lexer.ColorLabel;
 import lavit.multiedit.coloring.lexer.TokenLabel;
 
-@SuppressWarnings("serial")
-public class LmnContext extends StyleContext implements ViewFactory
+public class LmnContext implements ViewFactory
 {
 	public View create(Element e)
 	{
@@ -72,58 +70,29 @@ public class LmnContext extends StyleContext implements ViewFactory
 
 class LmnView extends PlainView
 {
-	private LmnDocument _doc;
-	private Map<Integer, Color> _colors = new TreeMap<Integer, Color>();
-	private int _marginLeft;
-	
+	private Map<Integer, Color> colors = new HashMap<Integer, Color>();
+	private int marginLeft;
+
 	public LmnView(Element e)
 	{
 		super(e);
-		_doc = (LmnDocument)getDocument();
+		colors.put(TokenLabel.COMMENT , new Color(  0, 128,   0));
+		colors.put(TokenLabel.STRING  , new Color(128,   0,   0));
+		colors.put(TokenLabel.OPERATOR, new Color(255,   0,   0));
+		colors.put(TokenLabel.KEYWORD , new Color(  0,   0, 255));
 	}
-	
+
 	public void paint(Graphics g, Shape alloc)
 	{
-		_colors.put(TokenLabel.COMMENT , new Color(  0, 128,   0));
-		_colors.put(TokenLabel.STRING  , new Color(128,   0,   0));
-		_colors.put(TokenLabel.OPERATOR, new Color(255,   0,   0));
-		_colors.put(TokenLabel.KEYWORD , new Color(  0,   0, 255));
-		
-		_marginLeft = alloc.getBounds().x;
-		
+		marginLeft = alloc.getBounds().x;
+
 		drawParenPair(g, alloc);
-		
-		if (_doc.getShowTabs())
+
+		if (getLMNDocument().getShowTabs())
 		{
 			drawTabs(g, alloc);
 		}
-		
-		super.paint(g, alloc);
-	}
-	
-	public float nextTabStop(float x, int tabOffset)
-	{
-		Graphics g = getGraphics();
-		if (g != null)
-		{
-			FontMetrics fm = getGraphics().getFontMetrics();
-			int width = fm.charWidth('m') * _doc.getTabWidth();
-			return _marginLeft + (int)Math.ceil(x / width) * width;
-		}
-		return 0;
-	}
-	
-	protected void updateDamage(DocumentEvent changes, Shape a, ViewFactory f)
-	{
-		super.updateDamage(changes, a, f);
-		Component comp = getContainer();
-		comp.repaint();
-	}
-	
-	protected int drawUnselectedText(Graphics g, int x, int y, int p0, int p1) throws BadLocationException
-	{
-		y += 1;
-		
+
 		Graphics2D g2 = (Graphics2D)g;
 		RenderingHints hints = g2.getRenderingHints();
 		if (g.getFont().getSize() < 24)
@@ -135,18 +104,46 @@ class LmnView extends PlainView
 			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		}
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST, 250);
-		
-		LmnDocument doc = (LmnDocument)getDocument();
+
+		super.paint(g, alloc);
+
+		g2.setRenderingHints(hints);
+	}
+
+	public float nextTabStop(float x, int tabOffset)
+	{
+		Graphics g = getGraphics();
+		if (g != null)
+		{
+			FontMetrics fm = getGraphics().getFontMetrics();
+			int width = fm.charWidth(' ') * getLMNDocument().getTabWidth();
+			return marginLeft + (int)Math.ceil(x / width) * width;
+		}
+		return 0;
+	}
+
+	protected void updateDamage(DocumentEvent changes, Shape a, ViewFactory f)
+	{
+		super.updateDamage(changes, a, f);
+		Component comp = getContainer();
+		comp.repaint();
+	}
+
+	protected int drawUnselectedText(Graphics g, int x, int y, int p0, int p1) throws BadLocationException
+	{
+		y += 1;
+
+		LmnDocument doc = getLMNDocument();
 		Segment lb = getLineBuffer();
 		int pos = p0;
-		
+
 		// draw all color parts
 		for (ColorLabel label : doc.getLabels())
 		{
 			if (label.getEnd() < p0) continue;
-			
+
 			if (p1 <= Math.max(pos, label.getStart())) break;
-			
+
 			// before
 			if (pos < label.getStart())
 			{
@@ -155,9 +152,9 @@ class LmnView extends PlainView
 				x = Utilities.drawTabbedText(lb, x, y, g, this, 0);
 				pos = label.getStart();
 			}
-			
+
 			// color part
-			g.setColor(_colors.get(label.getLabel()));
+			g.setColor(colors.get(label.getLabel()));
 			int len = label.getLength();
 			if (label.getStart() < pos)
 			{
@@ -171,16 +168,16 @@ class LmnView extends PlainView
 			x = Utilities.drawTabbedText(lb, x, y, g, this, 0);
 			pos += len;
 		}
-		
+
 		// remaining
 		if (pos < p1)
 		{
-			g.setColor(Color.BLACK);
+			g.setColor(getContainer().getForeground());
 			doc.getText(pos, p1 - pos, lb);
 			x = Utilities.drawTabbedText(lb, x, y, g, this, 0);
 		}
-		
-		if (_doc.getShowEols() && p0 < p1)
+
+		if (getLMNDocument().getShowEols() && p0 < p1)
 		{
 			String eol = doc.getText(p1 - 1, 1);
 			if (eol.charAt(0) == '\n')
@@ -188,32 +185,15 @@ class LmnView extends PlainView
 				drawCRLF(g, x, y);
 			}
 		}
-		
-		g2.setRenderingHints(hints);
 		return x;
 	}
-	
+
 	protected int drawSelectedText(Graphics g, int x, int y, int p0, int p1) throws BadLocationException
 	{
-		Graphics2D g2 = (Graphics2D)g;
-		RenderingHints hints = g2.getRenderingHints();
-		if (g.getFont().getSize() < 24)
-		{
-			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-		}
-		else
-		{
-			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		}
-		g2.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST, 250);
-		
 		g.setColor(getContainer().getForeground());
-		
 		Segment seg = getLineBuffer();
 		getDocument().getText(p0, p1 - p0, seg);
 		x = Utilities.drawTabbedText(seg, x, y + 1, g, this, 0);
-		
-		g2.setRenderingHints(hints);
 		return x;
 	}
 	
@@ -227,12 +207,10 @@ class LmnView extends PlainView
 		try
 		{
 			g.setColor(new Color(255, 200, 100));
-			
 			for (ColorLabel c : parens)
 			{
 				Shape s = modelToView(c.getStart(), alloc, Bias.Backward);
 				Rectangle rc = s.getBounds();
-				
 				g.fillRect(rc.x, rc.y, w, h);
 			}
 		}
@@ -241,13 +219,13 @@ class LmnView extends PlainView
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void drawTabs(Graphics g, Shape alloc)
 	{
 		int h = g.getFontMetrics().getHeight() - 8;
-		
+
 		if (h <= 0) return;
-		
+
 		LmnDocument doc = (LmnDocument)getDocument();
 		g.setColor(Color.LIGHT_GRAY);
 		try
@@ -264,7 +242,7 @@ class LmnView extends PlainView
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void drawTabCharacter(Graphics g, Rectangle r, int height)
 	{
 		int sy = r.y + (r.height - height) / 2;
@@ -272,20 +250,20 @@ class LmnView extends PlainView
 		g.drawLine(r.x + 3, sy        , r.x + 3 + h, sy + h);
 		g.drawLine(r.x + 3, sy + 2 * h, r.x + 3 + h, sy + h);
 	}
-	
+
 	private void drawCRLF(Graphics g, int x, int y)
 	{
 		FontMetrics fm = g.getFontMetrics();
 		int w = fm.charWidth('x');
 		int h = fm.getAscent();
-		
+
 		g.setColor(Color.LIGHT_GRAY);
 		g.drawLine(x + (w - 1), y - h + 1, x + (w - 1), y - 1    );
 		g.drawLine(x + 1      , y - 1    , x + (w - 1), y - 1    );
 		g.drawLine(x + 1      , y - 1    , x + 3      , y + 2 - 1);
 		g.drawLine(x + 1      , y - 1    , x + 3      , y - 2 - 1);
 	}
-	
+
 	/*
 	private void drawLF(Graphics g, int x, int y)
 	{
@@ -298,7 +276,7 @@ class LmnView extends PlainView
 		g.drawLine(x + w / 2, y - 1    , x + w / 2 + 2, y - 1 - 2);
 		g.drawLine(x + w / 2, y - 1    , x + w / 2 - 2, y - 1 - 2);
 	}
-	
+
 	private void drawCR(Graphics g, int x, int y)
 	{
 		FontMetrics fm = g.getFontMetrics();
@@ -311,4 +289,9 @@ class LmnView extends PlainView
 		g.drawLine(x + 1, y - h / 2, x + 1 + 2, y - h / 2 + 2);
 	}
 	*/
+
+	private LmnDocument getLMNDocument()
+	{
+		return (LmnDocument)getDocument();
+	}
 }

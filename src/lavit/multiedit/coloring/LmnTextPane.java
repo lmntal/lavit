@@ -36,7 +36,6 @@
 package lavit.multiedit.coloring;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -48,8 +47,10 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Document;
 import javax.swing.text.Element;
 
 import lavit.multiedit.coloring.event.DirtyFlagChangeListener;
@@ -57,7 +58,7 @@ import lavit.multiedit.coloring.event.DirtyFlagChangeListener;
 @SuppressWarnings("serial")
 public class LmnTextPane extends JTextPane
 {
-	private LmnDocument doc;
+	private final Document blankDocument = new DefaultStyledDocument();
 	private boolean autoIndentEnabled = true;
 	private boolean autoAlignEnabled = true;
 
@@ -65,15 +66,26 @@ public class LmnTextPane extends JTextPane
 	{
 		setEditorKit(new LmnEditorKit());
 
-		doc = new LmnDocument();
-		setDocument(doc);
-
 		addCaretListener(new CaretListener()
 		{
 			public void caretUpdate(CaretEvent e)
 			{
-				int[] pospair = findParenPair(getCaretPosition());
-				doc.setParenPair(pospair);
+				String text = getLMNDocument().getRowText();
+				int caretPos = getCaretPosition();
+				int pos = findMatchingParenIndex(text, caretPos);
+				if (pos == -1)
+				{
+					--caretPos;
+					pos = findMatchingParenIndex(text, caretPos);
+				}
+				if (pos != -1)
+				{
+					getLMNDocument().setParenPair(new int[] { caretPos, pos });
+				}
+				else
+				{
+					getLMNDocument().setParenPair(null);
+				}
 				repaint();
 			}
 		});
@@ -112,14 +124,14 @@ public class LmnTextPane extends JTextPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				doc.undo();
+				getLMNDocument().undo();
 			}
 		});
 		am.put("redo", new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				doc.redo();
+				getLMNDocument().redo();
 			}
 		});
 	}
@@ -131,132 +143,193 @@ public class LmnTextPane extends JTextPane
 		setBackground(Color.WHITE);
 	}
 
+	public void setText(String text)
+	{
+		LmnDocument doc = getLMNDocument();
+		setDocument(blankDocument);
+		text = setEOLStringPropertyAndReplace(doc, text);
+		doc.initializeText(text);
+		setDocument(doc);
+		updateHighlight();
+	}
+
+	private String setEOLStringPropertyAndReplace(Document doc, String text)
+	{
+		boolean isCR = false;
+		boolean isLF = false;
+		boolean isCRLF = false;
+		boolean prevCR = false;
+		for (int i = 0, limit = Math.min(text.length(), 4096); i < limit; i++)
+		{
+			switch (text.charAt(i))
+			{
+			case '\r':
+				if (prevCR)
+				{
+					isCR = true;
+				}
+				else
+				{
+					prevCR = true;
+				}
+				break;
+			case '\n':
+				if (prevCR)
+				{
+					isCRLF = true;
+				}
+				else
+				{
+					isLF = true;
+				}
+				break;
+			}
+			if (isCR || isLF || isCRLF)
+			{
+				break;
+			}
+		}
+		if (isCR)
+		{
+			text = text.replace('\r', '\n');
+			doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, "\r");
+		}
+		else if (isCRLF)
+		{
+			text = text.replace("\r\n", "\n");
+			doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, "\r\n");
+		}
+		else if (isLF)
+		{
+			doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
+		}
+		return text;
+	}
+
+	public LmnDocument getLMNDocument()
+	{
+		return (LmnDocument)getDocument();
+	}
+
 	public void setTabWidth(int spaces)
 	{
-		doc.setTabWidth(spaces);
+		getLMNDocument().setTabWidth(spaces);
 	}
 
 	public int getTabWidth()
 	{
-		return doc.getTabWidth();
+		return getLMNDocument().getTabWidth();
 	}
 
 	public boolean canUndo()
 	{
-		return doc.canUndo();
+		return getLMNDocument().canUndo();
 	}
 
 	public boolean canRedo()
 	{
-		return doc.canRedo();
+		return getLMNDocument().canRedo();
 	}
 
 	public void undo()
 	{
-		doc.undo();
+		getLMNDocument().undo();
 	}
 
 	public void redo()
 	{
-		doc.redo();
+		getLMNDocument().redo();
 	}
 
 	public void clearUndo()
 	{
-		doc.clearUndo();
+		getLMNDocument().clearUndo();
 	}
 
 	public boolean isModified()
 	{
-		return doc.isDirty();
+		return getLMNDocument().isDirty();
 	}
 
 	public void setModified(boolean b)
 	{
-		doc.setDirty(b);
+		getLMNDocument().setDirty(b);
 	}
 
 	public void updateHighlight()
 	{
-		doc.reparse();
+		getLMNDocument().reparse();
 		repaint();
 	}
 
 	public void addHighlight(int labelKind)
 	{
-		doc.addHighlight(labelKind);
+		getLMNDocument().addHighlight(labelKind);
 	}
 
 	public void removeHighlight(int labelKind)
 	{
-		doc.removeHighlight(labelKind);
+		getLMNDocument().removeHighlight(labelKind);
 	}
 
 	public void setShowTabs(boolean b)
 	{
-		doc.setShowTabs(b);
+		getLMNDocument().setShowTabs(b);
 	}
 
 	public void setShowEols(boolean b)
 	{
-		doc.setShowEols(b);
+		getLMNDocument().setShowEols(b);
 	}
 
 	public void addDirtyFlagChangeListener(DirtyFlagChangeListener l)
 	{
-		doc.addDirtyFlagChangeListener(l);
+		getLMNDocument().addDirtyFlagChangeListener(l);
 	}
 
 	// 右端で折り返さないようにする
 	public boolean getScrollableTracksViewportWidth()
 	{
-		Container container = getParent();
-		TextUI ui = getUI();
-		return ui.getPreferredSize(this).width < container.getWidth();
+		return getUI().getPreferredSize(this).width < getParent().getWidth();
 	}
 
-	private int[] findParenPair(int caretPos)
+	private static int findMatchingParenIndex(String s, int p0)
 	{
-		String text = getText().replace("\r\n", "\n");
-		int p0 = caretPos - 1, chpos;
-
-		if (p0 < 0 || text.length() <= p0) return null;
-
-		char c1 = text.charAt(p0);
-		if ((chpos = "({[)}]".indexOf(text.charAt(p0))) != -1)
+		if (0 <= p0 && p0 < s.length())
 		{
-			char c2 = ")}]({[".charAt(chpos);
-			int dir = chpos < 3 ? 1 : -1;
-
-			int p1 = p0 + dir;
-			int level = 0;
-
-			while (0 <= p1 && p1 < text.length())
+			char c1 = s.charAt(p0);
+			char c2 = getPairParenChar(c1);
+			if (c2 != 0)
 			{
-				char c = text.charAt(p1);
-				if (c == c2)
+				int dir = isOpenParen(c1) ? 1 : -1;
+				int level = 0;
+				for (int p1 = p0 + dir; 0 <= p1 && p1 < s.length(); p1 += dir)
 				{
-					if (level == 0)
+					char c = s.charAt(p1);
+					if (c == c2)
 					{
-						return new int[] { p1, p0 };
+						if (level == 0)
+						{
+							return p1;
+						}
+						else
+						{
+							--level;
+						}
 					}
-					else
+					else if (c == c1)
 					{
-						level--;
+						++level;
 					}
 				}
-				else if (c == c1)
-				{
-					level++;
-				}
-				p1 += dir;
 			}
 		}
-		return null;
+		return -1;
 	}
 
 	private boolean autoIndent()
 	{
+		LmnDocument doc = getLMNDocument();
 		final int pos = getCaretPosition();
 		int lineIndex = doc.getDefaultRootElement().getElementIndex(pos);
 		Element elemLine = doc.getDefaultRootElement().getElement(lineIndex);
@@ -282,6 +355,7 @@ public class LmnTextPane extends JTextPane
 
 	private boolean autoAlign()
 	{
+		LmnDocument doc = getLMNDocument();
 		int pos = getCaretPosition();
 		int index = doc.getDefaultRootElement().getElementIndex(pos);
 		if (index == 0)
@@ -367,5 +441,24 @@ public class LmnTextPane extends JTextPane
 			if (c != ' ' && c != '\t') break;
 		}
 		return i;
+	}
+
+	private static char getPairParenChar(char c)
+	{
+		switch (c)
+		{
+			case '(': return ')';
+			case '{': return '}';
+			case '[': return ']';
+			case ')': return '(';
+			case '}': return '{';
+			case ']': return '[';
+		}
+		return 0;
+	}
+
+	private static boolean isOpenParen(char c)
+	{
+		return c == '(' || c == '{' || c == '[';
 	}
 }

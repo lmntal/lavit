@@ -205,7 +205,19 @@ public class Lexer
 			}
 			else if (Character.isLetter(c) || c == '_')
 			{
+				int start = _column;
 				lex_word();
+				int length = _column - start;
+				skipws();
+				if (peek() == '@')
+				{
+					succ();
+					if (peek() == '@')
+					{
+						succ();
+						addItem(start, length, TokenLabel.RULENAME);
+					}
+				}
 			}
 			else
 			{

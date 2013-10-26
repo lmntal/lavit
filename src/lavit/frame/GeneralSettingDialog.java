@@ -46,16 +46,18 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout.Group;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -83,6 +85,7 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.util.FixFlowLayout;
+import lavit.util.StringUtils;
 
 @SuppressWarnings("serial")
 public class GeneralSettingDialog extends JDialog
@@ -92,7 +95,7 @@ public class GeneralSettingDialog extends JDialog
 
 	private GeneralSettingDialog()
 	{
-		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setTitle("Preferences");
 		setIconImages(Env.getApplicationIcons());
 		setAlwaysOnTop(true);
@@ -185,8 +188,10 @@ public class GeneralSettingDialog extends JDialog
 
 	private static class EditorColorPanel extends JPanel
 	{
-		private final String[] majorOption = { "comment", "symbol", "reserved" };
-		private JCheckBox[] optionCheckBox = new JCheckBox[majorOption.length];
+		private JCheckBox checkComment;
+		private JCheckBox checkSymbol;
+		private JCheckBox checkKeyword;
+		private JCheckBox checkRulename;
 		private JCheckBox optShowEols;
 		private JCheckBox optShowTabs;
 
@@ -194,12 +199,12 @@ public class GeneralSettingDialog extends JDialog
 		{
 			setBorder(new TitledBorder("Color"));
 
-			for (int i = 0; i < majorOption.length; ++i)
-			{
-				optionCheckBox[i] = new JCheckBox(majorOption[i]);
-				add(optionCheckBox[i]);
-			}
-			settingInit();
+			checkComment = new JCheckBox("Comment");
+			checkSymbol = new JCheckBox("Symbol");
+			checkKeyword = new JCheckBox("Keyword");
+			checkRulename = new JCheckBox("Rule Name");
+
+			initializeSelections();
 
 			ActionListener l = new ActionListener()
 			{
@@ -208,10 +213,10 @@ public class GeneralSettingDialog extends JDialog
 					updateColorSettings();
 				}
 			};
-			for (int i = 0; i < majorOption.length; ++i)
-			{
-				optionCheckBox[i].addActionListener(l);
-			}
+			checkComment.addActionListener(l);
+			checkSymbol.addActionListener(l);
+			checkKeyword.addActionListener(l);
+			checkRulename.addActionListener(l);
 
 			optShowEols = new JCheckBox("Show Line Delimiters");
 			optShowEols.setSelected(Env.is("SHOW_LINE_DELIMITERS"));
@@ -244,66 +249,67 @@ public class GeneralSettingDialog extends JDialog
 			setLayout(gl);
 			gl.setAutoCreateGaps(true);
 			gl.setAutoCreateContainerGaps(true);
-
-			Group hg1 = gl.createSequentialGroup();
-			Group vg1 = gl.createParallelGroup(Alignment.BASELINE);
-
-			hg1.addComponent(pad1);
-			for (JCheckBox check : optionCheckBox)
-			{
-				hg1.addComponent(check);
-				vg1.addComponent(check);
-			}
-			hg1.addComponent(optShowEols);
-			hg1.addComponent(optShowTabs);
-			hg1.addComponent(pad2);
-
-			vg1.addComponent(pad1);
-			vg1.addComponent(optShowEols);
-			vg1.addComponent(optShowTabs);
-			vg1.addComponent(pad2);
-
-			gl.setHorizontalGroup(hg1);
-			gl.setVerticalGroup(vg1);
+			gl.setHorizontalGroup(gl.createSequentialGroup()
+				.addComponent(pad1)
+				.addGroup(gl.createParallelGroup()
+					.addGroup(gl.createSequentialGroup()
+						.addComponent(checkComment)
+						.addComponent(checkSymbol)
+						.addComponent(checkKeyword)
+						.addComponent(checkRulename)
+					)
+					.addGroup(gl.createSequentialGroup()
+						.addComponent(optShowEols)
+						.addComponent(optShowTabs)
+					)
+				)
+				.addComponent(pad2)
+			);
+			gl.setVerticalGroup(gl.createParallelGroup(Alignment.BASELINE)
+				.addComponent(pad1)
+				.addGroup(gl.createSequentialGroup()
+					.addComponent(checkComment)
+					.addComponent(optShowEols)
+				)
+				.addGroup(gl.createSequentialGroup()
+					.addComponent(checkSymbol)
+					.addComponent(optShowTabs)
+				)
+				.addComponent(checkKeyword)
+				.addComponent(checkRulename)
+				.addComponent(pad2)
+			);
 		}
 
-		private void settingInit()
+		private void initializeSelections()
 		{
-			for (int i = 0; i < majorOption.length; ++i)
-			{
-				optionCheckBox[i].setSelected(false);
-			}
-			String[] options = Env.get("COLOR_TARGET").split(" ");
-			for (String o : options)
-			{
-				for (int i = 0; i < majorOption.length; ++i)
-				{
-					if (majorOption[i].equals(o))
-					{
-						optionCheckBox[i].setSelected(true);
-					}
-				}
-			}
+			Set<String> options = new HashSet<String>(Arrays.asList(Env.get("COLOR_TARGET").split("\\s+")));
+			checkComment.setSelected(options.contains("comment"));
+			checkSymbol.setSelected(options.contains("symbol"));
+			checkKeyword.setSelected(options.contains("reserved"));
+			checkRulename.setSelected(options.contains("rulename"));
 		}
 
 		private void updateColorSettings()
 		{
-			String newOptions = "";
-			for (int i = 0; i < majorOption.length; ++i)
+			Set<String> options = new HashSet<String>();
+			if (checkComment.isSelected())
 			{
-				if (optionCheckBox[i].isSelected())
-				{
-					if (newOptions.length() == 0)
-					{
-						newOptions += optionCheckBox[i].getText();
-					}
-					else
-					{
-						newOptions += " " + optionCheckBox[i].getText();
-					}
-				}
+				options.add("comment");
 			}
-			Env.set("COLOR_TARGET", newOptions);
+			if (checkSymbol.isSelected())
+			{
+				options.add("symbol");
+			}
+			if (checkKeyword.isSelected())
+			{
+				options.add("reserved");
+			}
+			if (checkRulename.isSelected())
+			{
+				options.add("rulename");
+			}
+			Env.set("COLOR_TARGET", StringUtils.join(options, " "));
 			FrontEnd.mainFrame.editorPanel.updateHighlight();
 		}
 	}

@@ -262,6 +262,11 @@ public class LmnTextPane extends JTextPane
 		repaint();
 	}
 
+	public void clearHighlightFlags()
+	{
+		getLMNDocument().setHighlightFlags(0);
+	}
+
 	public void addHighlight(int labelKind)
 	{
 		getLMNDocument().addHighlight(labelKind);

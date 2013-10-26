@@ -176,6 +176,10 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			{
 				hlFlags |= TokenLabel.KEYWORD;
 			}
+			else if (target.equals("rulename"))
+			{
+				hlFlags |= TokenLabel.RULENAME;
+			}
 		}
 		for (EditorPage page : tabView.getPages())
 		{

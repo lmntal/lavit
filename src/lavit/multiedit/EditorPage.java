@@ -58,7 +58,6 @@ import javax.swing.JTextPane;
 import lavit.Env;
 import lavit.multiedit.coloring.LmnTextPane;
 import lavit.multiedit.coloring.event.DirtyFlagChangeListener;
-import lavit.multiedit.coloring.lexer.TokenLabel;
 import lavit.ui.FlatButton;
 import extgui.filedrop.FileDropTransferHandler;
 import extgui.filedrop.event.FileDropListener;
@@ -211,11 +210,7 @@ public class EditorPage extends JScrollPane
 
 	public void removeAllHighlights()
 	{
-		text.removeHighlight(
-				  TokenLabel.KEYWORD
-				| TokenLabel.COMMENT
-				| TokenLabel.STRING
-				| TokenLabel.OPERATOR);
+		text.clearHighlightFlags();
 	}
 
 	public void addHighlight(int kind)

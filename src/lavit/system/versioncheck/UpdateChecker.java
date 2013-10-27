@@ -35,26 +35,29 @@
 
 package lavit.system.versioncheck;
 
-import java.awt.Component;
+import java.awt.Frame;
 import java.util.Map;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 public class UpdateChecker
 {
-	public static void checkVersion(Component parent, String versionText, String dateText, String remoteUrl)
+	public static void checkVersion(Frame owner, String versionText, String dateText, String remoteUrl)
 	{
 		Map<String, String> table = ColonSeparatedTableReader.loadFromURL(remoteUrl, 3);
 		String remoteVersionText = table.get("version");
 		String remoteDateText = table.get("release-date");
+		String downloadUrl = getDefault(table, "download-url", "");
+		String desc = getDefault(table, "description", "(no description)");
+
 		VersionInfo currentVersion = VersionInfo.create(versionText, dateText);
 		VersionInfo releaseVersion = VersionInfo.create(remoteVersionText, remoteDateText);
 		if (currentVersion != null && releaseVersion != null)
 		{
 			if (releaseVersion.isNewer(currentVersion))
 			{
-				showDialog(parent, releaseVersion);
+				showDialog(owner, releaseVersion, downloadUrl, desc);
 			}
 			else
 			{
@@ -63,15 +66,29 @@ public class UpdateChecker
 		}
 	}
 
-	private static void showDialog(final Component parent, VersionInfo v)
+	private static void showDialog(final Frame owner, final VersionInfo v, final String url, final String desc)
 	{
-		final String msg = "Newer version " + v.getVersionText() + " (" + v.getDateText() + ") is available.";
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				JOptionPane.showMessageDialog(parent, msg, "New version", JOptionPane.INFORMATION_MESSAGE);
+				UpdateNotifierFrame frame = new UpdateNotifierFrame(owner, "Update", "Newer LaViT is now available.", v.getVersionText(), v.getDateText());
+				frame.setLinkUrl(url);
+				frame.setDescriptionText(desc);
+				frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				frame.setLocationRelativeTo(null);
+				frame.setVisible(true);
 			}
 		});
+	}
+
+	private static String getDefault(Map<String, String> map, String key, String defval)
+	{
+		String value = map.get(key);
+		if (value == null)
+		{
+			value = defval;
+		}
+		return value;
 	}
 }

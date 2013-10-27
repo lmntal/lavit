@@ -121,7 +121,7 @@ public class ColonSeparatedTableReader
 				String[] kv = line.trim().split("\\s*:\\s*", 2);
 				if (kv.length == 2)
 				{
-					result.put(kv[0], kv[1]);
+					result.put(kv[0], kv[1].replace("\\n", "\n"));
 				}
 			}
 		}

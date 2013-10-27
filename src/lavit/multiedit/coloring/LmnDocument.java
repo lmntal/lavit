@@ -177,6 +177,11 @@ public class LmnDocument extends DefaultStyledDocument
 		return set;
 	}
 
+	public void setHighlightFlags(int flags)
+	{
+		hlFlags = flags;
+	}
+
 	public void addHighlight(int labelKind)
 	{
 		hlFlags |= labelKind;

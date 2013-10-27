@@ -41,4 +41,7 @@ public final class TokenLabel
 	public static final int STRING   = 2;
 	public static final int KEYWORD  = 4;
 	public static final int OPERATOR = 8;
+	public static final int RULENAME = 16;
+
+	private TokenLabel() { }
 }

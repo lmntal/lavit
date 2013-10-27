@@ -145,12 +145,14 @@ public class Lexer
 		{
 			char c = peek();
 
-			if (c == '\t')
-				_tabs.add(_column);
-
-			if (c == '/')
+			int start = _column;
+			switch (c)
 			{
-				int start = _column;
+			case '\t':
+				_tabs.add(_column);
+				succ();
+				break;
+			case '/':
 				succ();
 				c = peek();
 				if (c == '/')
@@ -163,23 +165,18 @@ public class Lexer
 					succ();
 					lex_blockcomment(start);
 				}
-			}
-			else if (c == '\'' || c == '"')
-			{
+				break;
+			case '\'':
+			case '"':
 				char q = c;
-				int start = _column;
 				succ();
 				lex_quote(q, start);
-			}
-			else if (c == '%')
-			{
-				int start = _column;
+				break;
+			case '%':
 				succ();
 				lex_linecomment(start);
-			}
-			else if (c == ':')
-			{
-				int start = _column;
+				break;
+			case ':':
 				succ();
 				c = peek();
 				if (_state == STATE_LMNTAL && c == '-')
@@ -192,9 +189,8 @@ public class Lexer
 					succ();
 					_state = STATE_LMNTAL;
 				}
-			}
-			else if (c == '[')
-			{
+				break;
+			case '[':
 				succ();
 				c = peek();
 				if (c == ':')
@@ -202,14 +198,28 @@ public class Lexer
 					succ();
 					_state = STATE_JAVA;
 				}
-			}
-			else if (Character.isLetter(c) || c == '_')
-			{
-				lex_word();
-			}
-			else
-			{
-				succ();
+				break;
+			default:
+				if (Character.isLetter(c) || c == '_')
+				{
+					lex_word();
+					int length = _column - start;
+					skipws();
+					if (peek() == '@')
+					{
+						succ();
+						if (peek() == '@')
+						{
+							succ();
+							addItem(start, length, TokenLabel.RULENAME);
+						}
+					}
+				}
+				else
+				{
+					succ();
+				}
+				break;
 			}
 		}
 		return _labels;
@@ -310,6 +320,11 @@ public class Lexer
 		{
 			_labels.add(new ColorLabel(start, length, label));
 		}
+	}
+
+	private void skipws()
+	{
+		while (!end() && Character.isWhitespace(peek())) succ();
 	}
 
 	private boolean end()

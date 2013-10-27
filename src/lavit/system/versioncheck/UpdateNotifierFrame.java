@@ -60,6 +60,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -68,6 +69,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+
+import lavit.Env;
 
 @SuppressWarnings("serial")
 public class UpdateNotifierFrame extends JDialog
@@ -151,6 +154,15 @@ public class UpdateNotifierFrame extends JDialog
 			}
 		});
 
+		final JCheckBox checkDisable = new JCheckBox("Disable update checking");
+		checkDisable.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Env.set("updatecheck.enabled", !checkDisable.isSelected());
+			}
+		});
+
 		JPanel panelCenter = new JPanel();
 		GroupLayout gl = new GroupLayout(panelCenter);
 		gl.setAutoCreateContainerGaps(true);
@@ -169,6 +181,7 @@ public class UpdateNotifierFrame extends JDialog
 			.addComponent(link, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 			.addComponent(labelShowDetail)
 			.addComponent(detailJsp)
+			.addComponent(checkDisable)
 		);
 		gl.setVerticalGroup(gl.createSequentialGroup()
 			.addGroup(gl.createParallelGroup(Alignment.BASELINE)
@@ -182,6 +195,7 @@ public class UpdateNotifierFrame extends JDialog
 			.addComponent(link)
 			.addComponent(labelShowDetail)
 			.addComponent(detailJsp)
+			.addComponent(checkDisable)
 		);
 		panelCenter.setLayout(gl);
 		add(panelCenter, BorderLayout.CENTER);
@@ -196,6 +210,8 @@ public class UpdateNotifierFrame extends JDialog
 		});
 		ButtonPanel buttonPanel = new ButtonPanel(buttonClose);
 		add(buttonPanel, BorderLayout.SOUTH);
+
+		getRootPane().setDefaultButton(buttonClose);
 
 		pack();
 	}

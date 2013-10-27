@@ -414,19 +414,22 @@ public class FrontEnd
 			e.printStackTrace();
 		}
 
-		Thread updateCheckThread = new Thread()
+		if (Env.get("updatecheck.enabled", "false").equals("true"))
 		{
-			public void run()
+			final String url = Env.get("updatecheck.url", "");
+			if (!url.isEmpty())
 			{
-				if (Env.get("updatecheck.enabled", "false").equals("true") && Env.isSet("updatecheck.url"))
+				Thread updateCheckThread = new Thread()
 				{
-					String url = Env.get("updatecheck.url");
-					UpdateChecker.checkVersion(mainFrame, Env.APP_VERSION, Env.APP_DATE, url);
-				}
+					public void run()
+					{
+						UpdateChecker.checkVersion(mainFrame, Env.APP_VERSION, Env.APP_DATE, url);
+					}
+				};
+				updateCheckThread.setDaemon(true);
+				updateCheckThread.start();
 			}
-		};
-		updateCheckThread.setDaemon(true);
-		updateCheckThread.start();
+		}
 	}
 
 	/**

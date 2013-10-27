@@ -35,9 +35,12 @@
 
 package lavit.util;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
@@ -47,8 +50,9 @@ import javax.swing.WindowConstants;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.editor.AutoStyledDocument;
 import lavit.frame.ChildWindowListener;
+import util.CharCondition;
+import util.LazyHighlighter;
 
 @SuppressWarnings("serial")
 public class UtilTextDialog extends JDialog
@@ -57,6 +61,10 @@ public class UtilTextDialog extends JDialog
 	private static final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
 	private static Point initialLocation = null;
 	private static Point location = null;
+	private static final CharCondition HEAD_TESTER = CharCondition.just('!').union(CharCondition.upperAlpha()).union(CharCondition.digit());
+	private static final CharCondition PART_TESTER = CharCondition.just('_').union(CharCondition.alphaOrDigit());
+
+	private LazyHighlighter highlighter;
 
 	public UtilTextDialog(String title, String str)
 	{
@@ -65,17 +73,33 @@ public class UtilTextDialog extends JDialog
 		setSize(300, 200);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-		AutoStyledDocument doc = new AutoStyledDocument();
 		JTextPane editor = new JTextPane();
-		editor.setDocument(doc);
 		editor.setFont(Env.getEditorFont());
 		editor.setText(str);
-		doc.colorChange();
-		doc.end();
 
 		add(new JScrollPane(editor));
 
 		addWindowListener(new ChildWindowListener(this));
+
+		highlighter = new LazyHighlighter(editor)
+			.setHeadCharCondition(HEAD_TESTER)
+			.setPartCharCondition(PART_TESTER)
+			.setHighlightBackground(Color.YELLOW)
+			.setUseCaret(true);
+		highlighter.updateMarkers();
+
+		addWindowListener(new WindowAdapter()
+		{
+			public void windowOpened(WindowEvent e)
+			{
+				highlighter.startActivator();
+			}
+
+			public void windowClosing(WindowEvent e)
+			{
+				highlighter.stopActivator();
+			}
+		});
 
 		initLocation();
 	}

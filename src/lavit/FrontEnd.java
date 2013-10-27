@@ -397,6 +397,38 @@ public class FrontEnd
 		}
 	}
 
+	private static void buildAndShowGUI(String[] args)
+	{
+		try
+		{
+			mainFrame = new MainFrame();
+			mainFrame.editorPanel.openInitialFiles();
+
+			loadArgs(args); //起動オプションの読み込み
+
+			println("(SYSTEM) Ready.");
+		}
+		catch (Exception e)
+		{
+			printException(e);
+			e.printStackTrace();
+		}
+
+		Thread updateCheckThread = new Thread()
+		{
+			public void run()
+			{
+				if (Env.get("updatecheck.enabled", "false").equals("true") && Env.isSet("updatecheck.url"))
+				{
+					String url = Env.get("updatecheck.url");
+					UpdateChecker.checkVersion(mainFrame, Env.APP_VERSION, Env.APP_DATE, url);
+				}
+			}
+		};
+		updateCheckThread.setDaemon(true);
+		updateCheckThread.start();
+	}
+
 	/**
 	 * The entry point of LaViT.
 	 * @param args Command line arguments.
@@ -415,26 +447,7 @@ public class FrontEnd
 		{
 			public void run()
 			{
-				try
-				{
-					mainFrame = new MainFrame();
-					mainFrame.editorPanel.openInitialFiles();
-
-					loadArgs(args); //起動オプションの読み込み
-
-					println("(SYSTEM) Ready.");
-
-					if (Env.get("updatecheck.enabled", "false").equals("true") && Env.isSet("updatecheck.url"))
-					{
-						String url = Env.get("updatecheck.url");
-						UpdateChecker.checkVersion(mainFrame, Env.APP_VERSION, Env.APP_DATE, url);
-					}
-				}
-				catch (Exception e)
-				{
-					printException(e);
-					e.printStackTrace();
-				}
+				buildAndShowGUI(args);
 			}
 		});
 	}

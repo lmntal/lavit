@@ -191,6 +191,42 @@ public class LazyHighlighter
 		highlightActivator.stopMonitoring();
 	}
 
+	public void updateMarkers()
+	{
+		try
+		{
+			Document doc = textPane.getDocument();
+			String s = doc.getText(0, doc.getLength());
+			StringBuilder buf = new StringBuilder();
+			marker.clear();
+			for (int i = 0; i < s.length(); )
+			{
+				char c = s.charAt(i);
+				if (headTester.test(c))
+				{
+					int start = i;
+					i++;
+					buf.setLength(0);
+					buf.append(c);
+					while (i < s.length() && partTester.test(s.charAt(i)))
+					{
+						buf.append(s.charAt(i));
+						i++;
+					}
+					marker.addMarker(start, buf.toString());
+				}
+				else
+				{
+					i++;
+				}
+			}
+		}
+		catch (BadLocationException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	private int getPosition()
 	{
 		if (useCaret)
@@ -202,48 +238,6 @@ public class LazyHighlighter
 			Point p = MouseInfo.getPointerInfo().getLocation();
 			SwingUtilities.convertPointFromScreen(p, textPane);
 			return textPane.viewToModel(p);
-		}
-	}
-
-	public void updateMarkers()
-	{
-		Document doc = textPane.getDocument();
-		try
-		{
-			String text = doc.getText(0, doc.getLength());
-			updateMarkers(text);
-			highlightActivator.activate();
-		}
-		catch (BadLocationException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	private void updateMarkers(String s)
-	{
-		StringBuilder buf = new StringBuilder();
-		marker.clear();
-		for (int i = 0; i < s.length(); )
-		{
-			char c = s.charAt(i);
-			if (headTester.test(c))
-			{
-				int start = i;
-				i++;
-				buf.setLength(0);
-				buf.append(c);
-				while (i < s.length() && partTester.test(s.charAt(i)))
-				{
-					buf.append(s.charAt(i));
-					i++;
-				}
-				marker.addMarker(start, buf.toString());
-			}
-			else
-			{
-				i++;
-			}
 		}
 	}
 
@@ -282,6 +276,7 @@ public class LazyHighlighter
 		public void run()
 		{
 			updateMarkers();
+			highlightActivator.activate();
 		}
 	}
 

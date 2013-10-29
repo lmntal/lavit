@@ -93,6 +93,9 @@ public class GeneralSettingDialog extends JDialog
 	private static LookAndFeel laf;
 	private static GeneralSettingDialog instance;
 
+	private EditorColorPanel panelEditor;
+	private FontSettingPanel panelFont;
+
 	private GeneralSettingDialog()
 	{
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -103,8 +106,8 @@ public class GeneralSettingDialog extends JDialog
 		JPanel panel = new JPanel();
 
 		//panel.add(new SlimLibSettingPanel());
-		JPanel panelEditor = new EditorColorPanel();
-		JPanel panelFont = new FontSettingPanel();
+		panelEditor = new EditorColorPanel();
+		panelFont = new FontSettingPanel();
 		JPanel panelEncoding = new EncodingSettingPanel();
 		JPanel panelView = new ViewSettingPanel();
 		JPanel panelUIFont = new UIFontSizeSettingPanel();
@@ -158,8 +161,12 @@ public class GeneralSettingDialog extends JDialog
 		add(panelButtons, BorderLayout.SOUTH);
 
 		addWindowListener(new ChildWindowListener(this));
+	}
 
-		pack();
+	public void initialize()
+	{
+		panelEditor.initialize();
+		panelFont.initialize();
 	}
 
 	public static synchronized void showDialog()
@@ -169,12 +176,14 @@ public class GeneralSettingDialog extends JDialog
 		{
 			laf = currentLaf;
 			instance = new GeneralSettingDialog();
+			instance.pack();
 			instance.setLocationRelativeTo(null);
 		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
+				instance.initialize();
 				instance.pack();
 				instance.setVisible(true);
 			}
@@ -204,8 +213,6 @@ public class GeneralSettingDialog extends JDialog
 			checkKeyword = new JCheckBox("Keyword");
 			checkRulename = new JCheckBox("Rule Name");
 
-			initializeSelections();
-
 			ActionListener l = new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -219,8 +226,6 @@ public class GeneralSettingDialog extends JDialog
 			checkRulename.addActionListener(l);
 
 			optShowEols = new JCheckBox("Show Line Delimiters");
-			optShowEols.setSelected(Env.is("SHOW_LINE_DELIMITERS"));
-			add(optShowEols);
 			optShowEols.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -231,8 +236,6 @@ public class GeneralSettingDialog extends JDialog
 			});
 
 			optShowTabs = new JCheckBox("Show Tabs");
-			optShowTabs.setSelected(Env.is("SHOW_TABS"));
-			add(optShowTabs);
 			optShowTabs.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -279,15 +282,19 @@ public class GeneralSettingDialog extends JDialog
 				.addComponent(checkRulename)
 				.addComponent(pad2)
 			);
+
+			initialize();
 		}
 
-		private void initializeSelections()
+		public void initialize()
 		{
 			Set<String> options = new HashSet<String>(Arrays.asList(Env.get("COLOR_TARGET").split("\\s+")));
 			checkComment.setSelected(options.contains("comment"));
 			checkSymbol.setSelected(options.contains("symbol"));
 			checkKeyword.setSelected(options.contains("reserved"));
 			checkRulename.setSelected(options.contains("rulename"));
+			optShowEols.setSelected(Env.is("SHOW_LINE_DELIMITERS"));
+			optShowTabs.setSelected(Env.is("SHOW_TABS"));
 		}
 
 		private void updateColorSettings()
@@ -325,25 +332,21 @@ public class GeneralSettingDialog extends JDialog
 			setBorder(new TitledBorder("Editor Font"));
 
 			JLabel labelFamily = new JLabel("Family:");
-			add(labelFamily);
+
 			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 			fontFamilyComboBox = new JComboBox(ge.getAvailableFontFamilyNames());
 
 			JLabel labelSize = new JLabel("Size:");
-			add(labelSize);
 
-			int fontSize = Env.getInt("EDITER_FONT_SIZE", 12);
-			fontSizeController = new JSpinner(new SpinnerNumberModel(fontSize, 2, 120, 1));
+			fontSizeController = new JSpinner(new SpinnerNumberModel(12, 1, 120, 1));
 
 			JLabel labelTabWidth = new JLabel("Tab width:");
-			add(labelTabWidth);
+
 			tabSizeComboBox = new JComboBox();
 			for (int tabWidth = 1; tabWidth <= 10; tabWidth++)
 			{
 				tabSizeComboBox.addItem(String.valueOf(tabWidth));
 			}
-
-			settingInit();
 
 			GroupLayout gl = new GroupLayout(this);
 			setLayout(gl);
@@ -391,11 +394,14 @@ public class GeneralSettingDialog extends JDialog
 					FrontEnd.loadAllFont();
 				}
 			});
+
+			initialize();
 		}
 
-		private void settingInit()
+		public void initialize()
 		{
 			fontFamilyComboBox.setSelectedItem(Env.get("EDITER_FONT_FAMILY"));
+			fontSizeController.setValue(Env.getInt("EDITER_FONT_SIZE", 12));
 			tabSizeComboBox.setSelectedItem(Env.get("EDITER_TAB_SIZE"));
 		}
 	}

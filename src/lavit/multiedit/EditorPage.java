@@ -54,6 +54,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.event.CaretListener;
 import javax.swing.text.Element;
 
 import lavit.Env;
@@ -275,6 +276,16 @@ public class EditorPage extends JScrollPane
 	public void removeFileDropListener(FileDropListener listener)
 	{
 		fileDropHandler.removeFileDropListener(listener);
+	}
+
+	public void addCaretListener(CaretListener listener)
+	{
+		text.addCaretListener(listener);
+	}
+
+	public void removeCaretListener(CaretListener listener)
+	{
+		text.removeCaretListener(listener);
 	}
 
 	JComponent getHeaderComponent()

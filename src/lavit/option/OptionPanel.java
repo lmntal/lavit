@@ -82,11 +82,17 @@ public class OptionPanel extends JPanel
 			{
 				if (e.isControlDown() && SwingUtilities.isRightMouseButton(e))
 				{
-					JDialog dialog = new CommonOptionEditorDialog();
-					dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-					dialog.pack();
-					dialog.setLocationRelativeTo(null);
-					dialog.setVisible(true);
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							JDialog dialog = new CommonOptionEditorDialog();
+							dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+							dialog.pack();
+							dialog.setLocationRelativeTo(null);
+							dialog.setVisible(true);
+						}
+					});
 				}
 			}
 		});

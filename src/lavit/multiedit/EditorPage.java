@@ -54,6 +54,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.text.Element;
 
 import lavit.Env;
 import lavit.multiedit.coloring.LmnTextPane;
@@ -196,6 +197,16 @@ public class EditorPage extends JScrollPane
 	public void setCaretPosition(int position)
 	{
 		text.setCaretPosition(position);
+	}
+
+	public LineColumn getLineColumn()
+	{
+		int caretpos = text.getCaretPosition();
+		Element root = text.getDocument().getDefaultRootElement();
+		int index = root.getElementIndex(caretpos);
+		int line = index + 1;
+		int column = caretpos - root.getElement(index).getStartOffset() + 1;
+		return new LineColumn(caretpos, line, column);
 	}
 
 	public JTextPane getJTextPane()

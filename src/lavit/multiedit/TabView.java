@@ -40,10 +40,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JTabbedPane;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import lavit.event.TabChangeListener;
+import lavit.multiedit.event.CaretPositionChangeListener;
 import lavit.multiedit.event.TabButtonListener;
 
 @SuppressWarnings("serial")
@@ -58,6 +61,7 @@ public class TabView extends JTabbedPane
 			public void stateChanged(ChangeEvent e)
 			{
 				dispatchTabChangeEvent();
+				dispatchCaretPositionChangeEvent();
 			}
 		});
 	}
@@ -76,6 +80,13 @@ public class TabView extends JTabbedPane
 		EditorPage page = new EditorPage(this);
 		page.setFont(getFont());
 		page.setTabWidth(4);
+		page.addCaretListener(new CaretListener()
+		{
+			public void caretUpdate(CaretEvent e)
+			{
+				dispatchCaretPositionChangeEvent();
+			}
+		});
 		addTab(null, page);
 		setTabComponentAt(indexOfComponent(page), page.getHeaderComponent());
 		return page;
@@ -128,9 +139,28 @@ public class TabView extends JTabbedPane
 		tabChangeListeners.add(l);
 	}
 
-	public void removeTabChangeListener(TabChangeListener l)
+	public void removeTabChangeListener(TabChangeListener listener)
 	{
-		tabChangeListeners.remove(l);
+		tabChangeListeners.remove(listener);
+	}
+
+	public void addCaretPositionChangeListener(CaretPositionChangeListener listener)
+	{
+		listenerList.add(CaretPositionChangeListener.class, listener);
+	}
+
+	public void removeCaretPositionChangeListener(CaretPositionChangeListener listener)
+	{
+		listenerList.remove(CaretPositionChangeListener.class, listener);
+	}
+
+	private void dispatchCaretPositionChangeEvent()
+	{
+		LineColumn lineColumn = getSelectedPage().getLineColumn();
+		for (CaretPositionChangeListener l : listenerList.getListeners(CaretPositionChangeListener.class))
+		{
+			l.caretPositionChanged(lineColumn);
+		}
 	}
 
 	void onTabCloseButtonClicked(EditorPage page)

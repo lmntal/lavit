@@ -44,7 +44,6 @@ import java.io.InputStreamReader;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -72,13 +71,6 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 	public JButton svporButton;
 	public JButton nullButton;
 	public JButton killButton;
-
-	private JPanel labelPanel;
-	private JLabel rowColumnStatus;
-	private JLabel fileStatus;
-
-	private int textRow;
-	private int textColumn;
 
 	public EditorButtonPanel(EditorPanel editorPanel){
 		this.editorPanel = editorPanel;
@@ -131,36 +123,6 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 
 		setAllEnable(true);
 		add(buttonPanel);
-
-		//ラベル列
-		labelPanel = new JPanel(new GridLayout(1,2));
-
-		fileStatus = new JLabel();
-		updateFileStatus();
-		labelPanel.add(fileStatus);
-
-		rowColumnStatus = new JLabel();
-		rowColumnStatus.setHorizontalAlignment(JLabel.RIGHT);
-		setRowColumn(1,1);
-		labelPanel.add(rowColumnStatus);
-
-		add(labelPanel);
-
-	}
-
-	public void updateFileStatus(){
-		String fileMark = "";
-		if(editorPanel.isChanged()){
-			fileMark = "["+Lang.f[5]+"]";
-		}
-		fileStatus.setText(" "+fileMark+" "+editorPanel.getFileName());
-	}
-
-	public void setRowColumn(int r, int c){
-		this.textRow=r;
-		this.textColumn=c;
-		String rowColumn = textRow + ":" + textColumn;
-		rowColumnStatus.setText(rowColumn);
 	}
 
 	public void setAllEnable(boolean enable){

@@ -36,10 +36,19 @@
 package lavit.multiedit;
 
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -60,6 +69,35 @@ public class TabView extends JTabbedPane
 			{
 				dispatchTabChangeEvent();
 				dispatchCaretPositionChangeEvent(getSelectedPage().getLineColumn());
+			}
+		});
+
+		int ctrlMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		InputMap im = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, ctrlMask), "next");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, ctrlMask | InputEvent.SHIFT_DOWN_MASK), "prev");
+
+		ActionMap am = getActionMap();
+		am.put("next", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (getTabCount() != 0)
+				{
+					int index = (getSelectedIndex() + 1) % getTabCount();
+					setSelectedPage(index);
+				}
+			}
+		});
+		am.put("prev", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (getTabCount() != 0)
+				{
+					int index = (getSelectedIndex() + getTabCount() - 1) % getTabCount();
+					setSelectedPage(index);
+				}
 			}
 		});
 	}

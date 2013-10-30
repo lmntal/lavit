@@ -35,18 +35,25 @@
 
 package lavit.multiedit;
 
+import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -56,6 +63,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
@@ -130,6 +138,10 @@ public class EditorPage extends JScrollPane
 				updateTitle();
 			}
 		});
+
+		int ctrlMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		removeFocusTraversalKey(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, ctrlMask));
+		removeFocusTraversalKey(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, ctrlMask | InputEvent.SHIFT_DOWN_MASK));
 	}
 
 	public boolean hasFile()
@@ -334,6 +346,13 @@ public class EditorPage extends JScrollPane
 		{
 			l.caretPositionChanged(lineColumn);
 		}
+	}
+
+	private void removeFocusTraversalKey(int id, KeyStroke keystroke)
+	{
+		Set<AWTKeyStroke> strokes = new HashSet<AWTKeyStroke>(text.getFocusTraversalKeys(id));
+		strokes.remove(keystroke);
+		text.setFocusTraversalKeys(id, strokes);
 	}
 
 	private static Icon getFileIcon(String title)

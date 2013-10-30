@@ -60,6 +60,7 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -68,9 +69,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.filechooser.FileFilter;
 
 import lavit.Env;
@@ -762,30 +760,6 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	public void redoundoUpdate()
 	{
 		//FrontEnd.mainFrame.mainMenuBar.updateUndoRedo(undoredoManager.canUndo(), undoredoManager.canRedo());
-	}
-
-	/**
-	 * カーソルの移動を監視するクラス
-	 */
-	// TODO: タブエディタと連携してカーソル情報の監視を復活させる
-	@SuppressWarnings("unused")
-	private class RowColumnListener implements CaretListener
-	{
-		public void caretUpdate(CaretEvent e)
-		{
-			/*
-			try
-			{
-				int pos = editor.getCaretPosition();
-				int line = getLineOfOffset(pos);
-				buttonPanel.setRowColumn(line + 1, pos - getLineStartOffset(line) + 1);
-			}
-			catch (BadLocationException ex)
-			{
-				FrontEnd.printException(ex);
-			}
-			*/
-		}
 	}
 
 	private static void addFontSize(int addition)

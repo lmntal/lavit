@@ -35,16 +35,31 @@
 
 package lavit.multiedit;
 
+import javax.swing.text.Element;
+import javax.swing.text.JTextComponent;
+
 public class LineColumn
 {
 	public final int offset;
 	public final int line;
 	public final int column;
+	public final int selectionLength;
 
-	public LineColumn(int offset, int line, int column)
+	public LineColumn(int offset, int line, int column, int selectionLength)
 	{
 		this.offset = offset;
 		this.line = line;
 		this.column = column;
+		this.selectionLength = selectionLength;
+	}
+
+	public static LineColumn create(JTextComponent comp)
+	{
+		int offset = comp.getCaretPosition();
+		Element root = comp.getDocument().getDefaultRootElement();
+		int index = root.getElementIndex(offset);
+		int column = offset - root.getElement(index).getStartOffset() + 1;
+		int selectionLength = Math.abs(offset - comp.getCaret().getMark());
+		return new LineColumn(offset, index + 1, column, selectionLength);
 	}
 }

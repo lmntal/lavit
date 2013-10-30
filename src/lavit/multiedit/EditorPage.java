@@ -42,6 +42,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -54,12 +56,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.Element;
 
 import lavit.Env;
 import lavit.multiedit.coloring.LmnTextPane;
 import lavit.multiedit.coloring.event.DirtyFlagChangeListener;
+import lavit.multiedit.event.CaretPositionChangeListener;
 import lavit.ui.FlatButton;
 import extgui.filedrop.FileDropTransferHandler;
 import extgui.filedrop.event.FileDropListener;
@@ -102,6 +106,21 @@ public class EditorPage extends JScrollPane
 			public void focusGained(FocusEvent e)
 			{
 				text.requestFocus();
+			}
+		});
+
+		text.addCaretListener(new CaretListener()
+		{
+			public void caretUpdate(CaretEvent e)
+			{
+				fireCaretPositionChangeEvent();
+			}
+		});
+		text.addMouseMotionListener(new MouseMotionAdapter()
+		{
+			public void mouseDragged(MouseEvent e)
+			{
+				fireCaretPositionChangeEvent();
 			}
 		});
 
@@ -278,14 +297,14 @@ public class EditorPage extends JScrollPane
 		fileDropHandler.removeFileDropListener(listener);
 	}
 
-	public void addCaretListener(CaretListener listener)
+	public void addCaretPositionChangeListener(CaretPositionChangeListener listener)
 	{
-		text.addCaretListener(listener);
+		listenerList.add(CaretPositionChangeListener.class, listener);
 	}
 
-	public void removeCaretListener(CaretListener listener)
+	public void removeCaretPositionChangeListener(CaretPositionChangeListener listener)
 	{
-		text.removeCaretListener(listener);
+		listenerList.remove(CaretPositionChangeListener.class, listener);
 	}
 
 	JComponent getHeaderComponent()
@@ -312,6 +331,15 @@ public class EditorPage extends JScrollPane
 	private void onTabCloseButtonClicked()
 	{
 		host.onTabCloseButtonClicked(this);
+	}
+
+	private void fireCaretPositionChangeEvent()
+	{
+		LineColumn lineColumn = getLineColumn();
+		for (CaretPositionChangeListener l : listenerList.getListeners(CaretPositionChangeListener.class))
+		{
+			l.caretPositionChanged(lineColumn);
+		}
 	}
 
 	private static Icon getFileIcon(String title)

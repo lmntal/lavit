@@ -40,8 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JTabbedPane;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -61,7 +59,7 @@ public class TabView extends JTabbedPane
 			public void stateChanged(ChangeEvent e)
 			{
 				dispatchTabChangeEvent();
-				dispatchCaretPositionChangeEvent();
+				dispatchCaretPositionChangeEvent(getSelectedPage().getLineColumn());
 			}
 		});
 	}
@@ -80,11 +78,11 @@ public class TabView extends JTabbedPane
 		EditorPage page = new EditorPage(this);
 		page.setFont(getFont());
 		page.setTabWidth(4);
-		page.addCaretListener(new CaretListener()
+		page.addCaretPositionChangeListener(new CaretPositionChangeListener()
 		{
-			public void caretUpdate(CaretEvent e)
+			public void caretPositionChanged(LineColumn lineColumn)
 			{
-				dispatchCaretPositionChangeEvent();
+				dispatchCaretPositionChangeEvent(lineColumn);
 			}
 		});
 		addTab(null, page);
@@ -154,9 +152,8 @@ public class TabView extends JTabbedPane
 		listenerList.remove(CaretPositionChangeListener.class, listener);
 	}
 
-	private void dispatchCaretPositionChangeEvent()
+	private void dispatchCaretPositionChangeEvent(LineColumn lineColumn)
 	{
-		LineColumn lineColumn = getSelectedPage().getLineColumn();
 		for (CaretPositionChangeListener l : listenerList.getListeners(CaretPositionChangeListener.class))
 		{
 			l.caretPositionChanged(lineColumn);

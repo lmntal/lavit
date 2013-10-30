@@ -36,7 +36,9 @@
 package lavit.editor;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -56,12 +58,17 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.GroupLayout;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.filechooser.FileFilter;
@@ -72,8 +79,10 @@ import lavit.Lang;
 import lavit.event.TabChangeListener;
 import lavit.frame.FindReplaceDialog;
 import lavit.multiedit.EditorPage;
+import lavit.multiedit.LineColumn;
 import lavit.multiedit.TabView;
 import lavit.multiedit.coloring.lexer.TokenLabel;
+import lavit.multiedit.event.CaretPositionChangeListener;
 import lavit.multiedit.event.TabButtonListener;
 import lavit.system.FileHistory;
 import lavit.util.CommonFontUser;
@@ -120,10 +129,51 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			}
 		});
 
+		final JLabel labelSelLength = new JLabel();
+		labelSelLength.setHorizontalAlignment(SwingConstants.RIGHT);
+		final JLabel labelLineColumn = new JLabel();
+		labelLineColumn.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		tabView.addCaretPositionChangeListener(new CaretPositionChangeListener()
+		{
+			public void caretPositionChanged(LineColumn lineColumn)
+			{
+				labelLineColumn.setText(lineColumn.line + " : " + lineColumn.column);
+				if (lineColumn.selectionLength == 0)
+				{
+					labelSelLength.setText("--");
+				}
+				else
+				{
+					labelSelLength.setText(String.valueOf(lineColumn.selectionLength));
+				}
+			}
+		});
+
+		JPanel panelStatus = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+		panelStatus.setBorder(BorderFactory.createCompoundBorder(
+			BorderFactory.createMatteBorder(1, 1, 0, 0, Color.LIGHT_GRAY),
+			BorderFactory.createMatteBorder(0, 0, 1, 1, Color.WHITE)));
+
+		GroupLayout gl = new GroupLayout(panelStatus);
+		panelStatus.setLayout(gl);
+		gl.setHorizontalGroup(gl.createSequentialGroup()
+			.addComponent(labelLineColumn, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+			.addComponent(labelSelLength, 40, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE)
+		);
+		gl.setVerticalGroup(gl.createParallelGroup(Alignment.BASELINE)
+			.addComponent(labelLineColumn)
+			.addComponent(labelSelLength)
+		);
+
+		JPanel panelEditor = new JPanel(new BorderLayout());
+		panelEditor.add(tabView, BorderLayout.CENTER);
+		panelEditor.add(panelStatus, BorderLayout.SOUTH);
+
 		loadFont();
 		FrontEnd.addFontUser(this);
 
-		fileView = new FileViewPane(tabView);
+		fileView = new FileViewPane(panelEditor);
 		fileView.addFileSelectedListener(new FileSelectedListener()
 		{
 			public void fileSelected(File selectedFile)

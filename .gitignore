@@ -3,8 +3,6 @@ bin/
 .settings/
 
 *.class
-*.classpath
-*.jar
 
 properties/
 lmntal/

@@ -33,7 +33,7 @@
 		</javac>
 		<!-- copy resources -->
 		<copy todir="${bin}">
-			<fileset dir="${src}" includes="**/*.png,**/*.gif,**/*.jpg" />
+			<fileset dir="${src}" includes="**/*" excludes="**/*.class" />
 		</copy>
 	</target>
 

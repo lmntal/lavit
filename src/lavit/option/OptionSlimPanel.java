@@ -35,11 +35,30 @@
 
 package lavit.option;
 
+import java.awt.BorderLayout;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.border.TitledBorder;
+
 @SuppressWarnings("serial")
-class OptionSlimPanel extends AbstractOptionPanel
+class OptionSlimPanel extends JPanel
 {
+	private AbstractOptionPanel panel;
+	private JTextArea stdinData;
+
 	public OptionSlimPanel(String[] options)
 	{
-		super("SLIM Option", "SLIM_OPTION", options);
+		setLayout(new BorderLayout(0, 8));
+
+		panel = new AbstractOptionPanel("SLIM Option", "SLIM_OPTION", options);
+		add(panel, BorderLayout.CENTER);
+
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setBorder(new TitledBorder("Standard Input Data"));
+		stdinData = new JTextArea(3, 40);
+		bottomPanel.add(new JScrollPane(stdinData));
+		add(bottomPanel, BorderLayout.SOUTH);
 	}
 }

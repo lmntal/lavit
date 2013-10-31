@@ -36,50 +36,69 @@
 package lavit.system.versioncheck;
 
 import java.awt.Frame;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Map;
 
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import lavit.util.FileUtils;
+
 public class UpdateChecker
 {
-	public static void checkVersion(Frame owner, String versionText, String dateText, String remoteUrl)
+	public static void checkVersion(final Frame owner, String versionText, String dateText, String remoteUrl)
 	{
 		Map<String, String> table = ColonSeparatedTableReader.loadFromURL(remoteUrl, 3);
 		String remoteVersionText = table.get("version");
 		String remoteDateText = table.get("release-date");
-		String downloadUrl = getDefault(table, "download-url", "");
-		String desc = getDefault(table, "description", "(no description)");
 
-		VersionInfo currentVersion = VersionInfo.create(versionText, dateText);
-		VersionInfo releaseVersion = VersionInfo.create(remoteVersionText, remoteDateText);
+		final VersionInfo currentVersion = VersionInfo.create(versionText, dateText);
+		final VersionInfo releaseVersion = VersionInfo.create(remoteVersionText, remoteDateText);
 		if (currentVersion != null && releaseVersion != null)
 		{
 			if (releaseVersion.isNewer(currentVersion))
 			{
-				showDialog(owner, releaseVersion, downloadUrl, desc);
-			}
-			else
-			{
-				System.err.println("update check: this is the latest version.");
+				final String downloadUrl = getDefault(table, "download-url", "");
+				final String desc = getDefault(table, "description", "(no description)");
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						showDialog(owner, releaseVersion, downloadUrl, desc);
+					}
+				});
 			}
 		}
 	}
 
-	private static void showDialog(final Frame owner, final VersionInfo v, final String url, final String desc)
+	private static void showDialog(Frame owner, VersionInfo v, String url, String desc)
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		UpdateNotifierFrame frame = new UpdateNotifierFrame(owner, "Update", "Newer LaViT is now available.", v.getVersionText(), v.getDateText());
+		frame.setDescriptionText(desc);
+		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+		if (frame.isApproved())
 		{
-			public void run()
+			if (!FileUtils.exists("updater.jar"))
 			{
-				UpdateNotifierFrame frame = new UpdateNotifierFrame(owner, "Update", "Newer LaViT is now available.", v.getVersionText(), v.getDateText());
-				frame.setLinkUrl(url);
-				frame.setDescriptionText(desc);
-				frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-				frame.setLocationRelativeTo(null);
-				frame.setVisible(true);
+				extractUpdater();
 			}
-		});
+			ProcessBuilder pb = new ProcessBuilder("java", "-jar", "updater.jar", url);
+			try
+			{
+				pb.start();
+				System.exit(0);
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private static String getDefault(Map<String, String> map, String key, String defval)
@@ -90,5 +109,30 @@ public class UpdateChecker
 			value = defval;
 		}
 		return value;
+	}
+
+	private static void extractUpdater()
+	{
+		BufferedInputStream is = new BufferedInputStream(UpdateChecker.class.getResourceAsStream("updater.jar"));
+		try
+		{
+			BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream("updater.jar"));
+			byte[] buf = new byte[4096];
+			int n;
+			while ((n = is.read(buf)) != -1)
+			{
+				os.write(buf, 0, n);
+			}
+			is.close();
+			os.close();
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

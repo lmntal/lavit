@@ -37,22 +37,15 @@ package lavit.system.versioncheck;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Frame;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -67,7 +60,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import lavit.Env;
@@ -75,8 +67,8 @@ import lavit.Env;
 @SuppressWarnings("serial")
 public class UpdateNotifierFrame extends JDialog
 {
-	private LinkLabel link;
 	private JTextArea details;
+	private boolean approved;
 
 	public UpdateNotifierFrame(Frame owner, String title, String headerText, String versionText, String releaseText)
 	{
@@ -117,9 +109,6 @@ public class UpdateNotifierFrame extends JDialog
 		labelVersionValue.setFont(textFont);
 		JLabel labelReleaseValue = new JLabel(releaseText);
 		labelReleaseValue.setFont(textFont);
-		link = new LinkLabel("Download Site");
-		link.setFont(textFont);
-		link.setHorizontalAlignment(SwingConstants.CENTER);
 
 		final JLabel labelShowDetail = new JLabel("+ Show Description");
 		labelShowDetail.setFont(textFont);
@@ -178,7 +167,6 @@ public class UpdateNotifierFrame extends JDialog
 					.addComponent(labelReleaseValue, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 				)
 			)
-			.addComponent(link, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 			.addComponent(labelShowDetail)
 			.addComponent(detailJsp)
 			.addComponent(checkDisable)
@@ -192,7 +180,6 @@ public class UpdateNotifierFrame extends JDialog
 				.addComponent(labelRelease)
 				.addComponent(labelReleaseValue)
 			)
-			.addComponent(link)
 			.addComponent(labelShowDetail)
 			.addComponent(detailJsp)
 			.addComponent(checkDisable)
@@ -200,25 +187,38 @@ public class UpdateNotifierFrame extends JDialog
 		panelCenter.setLayout(gl);
 		add(panelCenter, BorderLayout.CENTER);
 
-		JButton buttonClose = new JButton("OK");
-		buttonClose.addActionListener(new ActionListener()
+		JButton buttonUpdate = new JButton("Update Now");
+		buttonUpdate.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				approved = true;
 				close();
 			}
 		});
-		ButtonPanel buttonPanel = new ButtonPanel(buttonClose);
+		JButton buttonCancel = new JButton("Cancel");
+		buttonCancel.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				approved = false;
+				close();
+			}
+		});
+		ButtonPanel buttonPanel = new ButtonPanel(buttonUpdate, buttonCancel);
 		add(buttonPanel, BorderLayout.SOUTH);
 
-		getRootPane().setDefaultButton(buttonClose);
+		getRootPane().setDefaultButton(buttonUpdate);
+
+		setAlwaysOnTop(true);
+		setModalityType(ModalityType.APPLICATION_MODAL);
 
 		pack();
 	}
 
-	public void setLinkUrl(String url)
+	public boolean isApproved()
 	{
-		link.setURL(url);
+		return approved;
 	}
 
 	public void setDescriptionText(String text)
@@ -264,86 +264,6 @@ class ButtonPanel extends JPanel
 		for (JComponent c : components)
 		{
 			c.setPreferredSize(size);
-		}
-	}
-}
-
-@SuppressWarnings("serial")
-class LinkLabel extends JLabel
-{
-	private String url;
-	private boolean hover;
-
-	public LinkLabel(String text)
-	{
-		this(text, "");
-	}
-
-	public LinkLabel(String text, String url)
-	{
-		super(text);
-		addMouseListener(new MouseHandler());
-		setForeground(Color.BLUE);
-		setCursor(new Cursor(Cursor.HAND_CURSOR));
-		setURL(url);
-	}
-
-	public void setURL(String url)
-	{
-		this.url = url;
-		setToolTipText(url);
-	}
-
-	protected void paintComponent(Graphics g)
-	{
-		if (hover)
-		{
-			FontMetrics fm = g.getFontMetrics();
-			int w = fm.stringWidth(getText());
-			int x = (getWidth() - w) / 2;
-			int y = getBaseline(getWidth(), getHeight()) + 1;
-			g.setColor(getForeground());
-			g.drawLine(x, y, x + w, y);
-		}
-		super.paintComponent(g);
-	}
-
-	private void browseUrl()
-	{
-		if (url != null && !url.isEmpty())
-		{
-			try
-			{
-				Desktop.getDesktop().browse(new URI(url));
-			}
-			catch (URISyntaxException e)
-			{
-				e.printStackTrace();
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-		}
-	}
-
-	private class MouseHandler extends MouseAdapter
-	{
-		public void mouseEntered(MouseEvent e)
-		{
-			hover = true;
-			repaint();
-		}
-
-		public void mouseExited(MouseEvent e)
-		{
-			hover = false;
-			repaint();
-		}
-
-		public void mouseClicked(MouseEvent e)
-		{
-			browseUrl();
 		}
 	}
 }

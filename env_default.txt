@@ -78,3 +78,5 @@ options.lmntal_slim=--interpret --slimcode --hl-opt --optimize-slimoptimizer
 options.slim=-t --nd --dump-lmn --dump-inc --mem-enc --delta-mem --show-proxy --hide-ruleset --show-transition --show-ends --hl --use-builtin-rule
 options.stateviewer=--hide-ruleset --mem-enc --show-transition --use-builtin-rule
 options.ltl=--hide-ruleset -t --dump-lavit --mem-enc --show-transition
+updatecheck.enabled=true
+updatecheck.url=http\://www.ueda.info.waseda.ac.jp/~shinobu/lavit/update

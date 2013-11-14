@@ -126,7 +126,7 @@ public class VersionFrame extends JDialog
 			"LaViT\n" +
 			"Version : " + Env.APP_VERSION + "\n" +
 			"Date : " + Env.APP_DATE + "\n\n" +
-			"LMNtal : " + lmntalVersion + "\n" +
+			lmntalVersion + "\n" +
 			"SLIM : " + slimVersion + "\n" +
 			Env.UNYO_VERSION;
 		infoText.setText(info);

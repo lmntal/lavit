@@ -47,6 +47,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import lavit.util.FileUtils;
+import lavit.util.StringUtils;
 
 public class UpdateChecker
 {
@@ -63,7 +64,7 @@ public class UpdateChecker
 			if (releaseVersion.isNewer(currentVersion))
 			{
 				final String downloadUrl = getDefault(table, "download-url", "");
-				final String desc = getDefault(table, "description", "(no description)");
+				final String desc = getDefault(table, "description", "");
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -77,6 +78,11 @@ public class UpdateChecker
 
 	private static void showDialog(Frame owner, VersionInfo v, String url, String desc)
 	{
+		if (StringUtils.nullOrEmpty(desc))
+		{
+			desc = "(no description)";
+		}
+
 		UpdateNotifierFrame frame = new UpdateNotifierFrame(owner, "Update", "Newer LaViT is now available.", v.getVersionText(), v.getDateText());
 		frame.setDescriptionText(desc);
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

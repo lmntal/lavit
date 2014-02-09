@@ -36,17 +36,22 @@
 package lavit.option;
 
 import java.awt.BorderLayout;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
+
+import lavit.Env;
+import lavit.option.slim.SLIMStandardInputDialog;
 
 @SuppressWarnings("serial")
 class OptionSlimPanel extends JPanel
 {
 	private AbstractOptionPanel panel;
-	private JTextArea stdinData;
 
 	public OptionSlimPanel(String[] options)
 	{
@@ -55,10 +60,32 @@ class OptionSlimPanel extends JPanel
 		panel = new AbstractOptionPanel("SLIM Option", "SLIM_OPTION", options);
 		add(panel, BorderLayout.CENTER);
 
-		JPanel bottomPanel = new JPanel();
+		JPanel bottomPanel = new JPanel(new BorderLayout());
 		bottomPanel.setBorder(new TitledBorder("Standard Input Data"));
-		stdinData = new JTextArea(3, 40);
-		bottomPanel.add(new JScrollPane(stdinData));
+		JButton button = new JButton("Standard Input");
+		button.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Window owner = SwingUtilities.getWindowAncestor(OptionSlimPanel.this);
+				SLIMStandardInputDialog dialog = new SLIMStandardInputDialog(owner, new AbstractConfigEdit<String>("")
+				{
+					public void set(String value)
+					{
+						value = value.replace("\n", "\\n");
+						Env.set("slim.stdin.str", value);
+					}
+
+					public String get()
+					{
+						String s = Env.get("slim.stdin.str", "");
+						return s.replace("\\n", "\n");
+					}
+				});
+				dialog.setVisible(true);
+			}
+		});
+		bottomPanel.add(button);
 		add(bottomPanel, BorderLayout.SOUTH);
 	}
 }

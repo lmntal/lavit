@@ -38,9 +38,17 @@ package lavit.editor;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -51,7 +59,12 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.runner.LmntalRunner;
+import lavit.runner.PrintLineListener;
+import lavit.runner.ProcessFinishListener;
+import lavit.runner.ProcessTask;
 import lavit.runner.SlimRunner;
+import lavit.util.FileUtils;
+import lavit.util.StringUtils;
 
 @SuppressWarnings("serial")
 public class EditorButtonPanel extends JPanel implements ActionListener
@@ -80,7 +93,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		//ボタン列
 		buttonPanel = new JPanel(new GridLayout(2,4));
 
-		lmntalButton = new JButton(Lang.m[11]);
+		lmntalButton = new JButton("Compile");
 		lmntalButton.addActionListener(this);
 		buttonPanel.add(lmntalButton);
 
@@ -144,34 +157,97 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		FrontEnd.mainFrame.toolTab.ltlPanel.setButtonsEnabled(enable);
 	}
 
+	/**
+	 * LMNtalソースコードをコンパイルし、中間命令列を開く
+	 */
+	private void compileLMNtal()
+	{
+		if (editorPanel.isChanged())
+		{
+			if (!editorPanel.fileSave())
+			{
+				return;
+			}
+		}
+		try
+		{
+			compile(editorPanel.getFile());
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * {@code file}をコンパイルし、生成された中間命令列ファイルを開く
+	 */
+	private void compile(File file) throws FileNotFoundException
+	{
+		final File output = createILCodeFile(file);
+		final PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(output)));
+
+		List<String> javaArgs = new ArrayList<String>();
+		javaArgs.add("-DLMNTAL_HOME=lmntal");
+
+		Set<String> options = StringUtils.splitToSet(Env.get("LMNTAL_OPTION"), "\\s+");
+		List<String> args = new ArrayList<String>();
+		args.addAll(options);
+		args.add(Env.getSpaceEscape(file.getAbsolutePath()));
+
+		ProcessTask task = ProcessTask.createJarProcessTask(Env.getLmntalLinuxPath() + "/bin/lmntal.jar", javaArgs, args);
+		Env.setProcessEnvironment(task.getEnvironment());
+
+		FrontEnd.mainFrame.toolTab.setTab("System");
+		FrontEnd.println("(compile) " + task.getCommand());
+
+		task.setStandardErrorListener(new PrintLineListener()
+		{
+			public void println(String line)
+			{
+				FrontEnd.mainFrame.toolTab.systemPanel.outputPanel.errPrintln(line);
+			}
+		});
+		task.setStandardOutputListener(new PrintLineListener()
+		{
+			public void println(String line)
+			{
+				writer.println(line);
+			}
+		});
+		task.addProcessFinishListener(new ProcessFinishListener()
+		{
+			public void processFinished(int id, int exitCode, boolean isAborted)
+			{
+				writer.close();
+				if (exitCode == 0)
+				{
+					editorPanel.openFile(output);
+				}
+			}
+		});
+		task.execute();
+	}
+
+	/**
+	 * LMNtalソースコードのファイル名から中間命令列のファイル名を生成する。
+	 * 典型的には、拡張子を.ilにしたものを返す。
+	 */
+	private File createILCodeFile(File lmntalFile)
+	{
+		String dir = lmntalFile.getParent();
+		String name = FileUtils.removeExtension(lmntalFile.getName()) + ".il";
+		return new File(dir + File.separator + name);
+	}
+
 	public void actionPerformed(ActionEvent e) {
 		JButton src = (JButton)e.getSource();
 
-		if (src == lmntalButton) {
-
-			if(editorPanel.isChanged()){
-				editorPanel.fileSave();
-			}
-
-			setButtonEnable(false);
-
-			FrontEnd.mainFrame.toolTab.setTab("System");
-
-			FrontEnd.println("(LMNtal) Doing...");
-			lmntalRunner = new LmntalRunner(Env.get("LMNTAL_OPTION"));
-			lmntalRunner.run();
-			(new Thread(new Runnable() { public void run() {
-				while(lmntalRunner.isRunning()){
-					FrontEnd.sleep(200);
-				}
-				FrontEnd.println("(LMNtal) Done! ["+(lmntalRunner.getTime()/1000.0)+"s]");
-				lmntalRunner = null;
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-					setButtonEnable(true);
-				}});
-			}})).start();
-
-		}else if (src == lmntalgButton) {
+		if (src == lmntalButton)
+		{
+			compileLMNtal();
+		}
+		else if (src == lmntalgButton) {
 
 			if(editorPanel.isChanged()){
 				editorPanel.fileSave();

@@ -169,9 +169,21 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 				return;
 			}
 		}
+
+		File file = editorPanel.getFile();
+		final File outputFile = createILCodeFile(file);
 		try
 		{
-			compile(editorPanel.getFile());
+			compile(file, outputFile, new ProcessFinishListener()
+			{
+				public void processFinished(int id, int exitCode, boolean isAborted)
+				{
+					if (exitCode == 0)
+					{
+						editorPanel.openFile(outputFile);
+					}
+				}
+			});
 		}
 		catch (FileNotFoundException e)
 		{
@@ -182,10 +194,9 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 	/**
 	 * {@code file}をコンパイルし、生成された中間命令列ファイルを開く
 	 */
-	private void compile(File file) throws FileNotFoundException
+	private void compile(File file, File outputFile, ProcessFinishListener onFinished) throws FileNotFoundException
 	{
-		final File output = createILCodeFile(file);
-		final PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(output)));
+		final PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(outputFile)));
 
 		List<String> javaArgs = new ArrayList<String>();
 		javaArgs.add("-DLMNTAL_HOME=lmntal");
@@ -220,12 +231,9 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 			public void processFinished(int id, int exitCode, boolean isAborted)
 			{
 				writer.close();
-				if (exitCode == 0)
-				{
-					editorPanel.openFile(output);
-				}
 			}
 		});
+		task.addProcessFinishListener(onFinished);
 		task.execute();
 	}
 
@@ -238,6 +246,45 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		String dir = lmntalFile.getParent();
 		String name = FileUtils.removeExtension(lmntalFile.getName()) + ".il";
 		return new File(dir + File.separator + name);
+	}
+
+	private void runSlim()
+	{
+		boolean changed = false;
+
+		if (editorPanel.isChanged())
+		{
+			if (!editorPanel.fileSave())
+			{
+				return;
+			}
+			changed = true;
+		}
+
+		File file = editorPanel.getFile();
+		final File outputFile = createILCodeFile(file);
+
+		if (changed || !outputFile.exists())
+		{
+			try
+			{
+				compile(file, outputFile, new ProcessFinishListener()
+				{
+					public void processFinished(int id, int exitCode, boolean isAborted)
+					{
+						FrontEnd.executeILFileInSLIM(outputFile);
+					}
+				});
+			}
+			catch (FileNotFoundException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			FrontEnd.executeILFileInSLIM(outputFile);
+		}
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -294,6 +341,8 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 			}
 			else
 			{
+				runSlim();
+				/*
 				setButtonEnable(false);
 
 				FrontEnd.mainFrame.toolTab.setTab("System");
@@ -311,6 +360,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 						setButtonEnable(true);
 					}});
 				}})).start();
+				*/
 			}
 		}
 		else if (src == sviewerButton) {

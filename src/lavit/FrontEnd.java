@@ -167,6 +167,53 @@ public class FrontEnd
 		}
 	}
 
+	/**
+	 * 中間命令列ファイルをSLIMで実行
+	 */
+	public static void executeILFileInSLIM(File file)
+	{
+		println("(SLIM) executing...");
+		mainFrame.toolTab.systemPanel.outputPanel.outputStart("slim", Env.get("SLIM_OPTION"), file);
+
+		List<String> args = new ArrayList<String>();
+		args.addAll(StringUtils.splitToSet(Env.get("SLIM_OPTION"), "\\s+"));
+		args.add(Env.getSpaceEscape(file.getAbsolutePath()));
+
+		final ProcessTask slimTask = ProcessTask.createProcessTask(Env.get("SLIM_EXE_PATH"), args);
+		slimTask.setDirectory(".");
+		slimTask.setStandardInputData(Env.get("slim.stdin.str", ""));
+
+		slimTask.setStandardOutputListener(new PrintLineListener()
+		{
+			public void println(String line)
+			{
+				mainFrame.toolTab.systemPanel.outputPanel.println(line);
+			}
+		});
+
+		slimTask.setStandardErrorListener(new PrintLineListener()
+		{
+			public void println(String line)
+			{
+				mainFrame.toolTab.systemPanel.outputPanel.errPrintln(line);
+			}
+		});
+
+		slimTask.addProcessFinishListener(new ProcessFinishListener()
+		{
+			public void processFinished(int id, int exitCode, boolean isAborted)
+			{
+				printTerminationMessage("SLIM", id, slimTask.getElapsedSeconds(), exitCode, isAborted);
+				mainFrame.toolTab.systemPanel.outputPanel.outputEnd();
+			}
+		});
+
+		if (slimTask.execute())
+		{
+			addProcessTask(slimTask);
+		}
+	}
+
 	public static void addProcessTask(ProcessTask task)
 	{
 		cleanProcessTasks();

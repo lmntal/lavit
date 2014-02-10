@@ -68,7 +68,7 @@ class OptionSlimPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				Window owner = SwingUtilities.getWindowAncestor(OptionSlimPanel.this);
-				SLIMStandardInputDialog dialog = new SLIMStandardInputDialog(owner, new AbstractConfigEdit<String>("")
+				SLIMStandardInputDialog dialog = new SLIMStandardInputDialog(owner, new AbstractConfigEdit<String>()
 				{
 					public void set(String value)
 					{
@@ -82,6 +82,7 @@ class OptionSlimPanel extends JPanel
 						return s.replace("\\n", "\n");
 					}
 				});
+				dialog.setLocationRelativeTo(null);
 				dialog.setVisible(true);
 			}
 		});

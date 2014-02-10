@@ -185,8 +185,7 @@ public class SLIMStandardInputDialog extends JDialog
 
 	private void onReset()
 	{
-		edit.revert();
-		textArea.setText(edit.get());
+		textArea.setText(edit.getInitialValue());
 	}
 
 	private void close()

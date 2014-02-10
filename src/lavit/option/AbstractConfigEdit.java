@@ -39,14 +39,14 @@ public abstract class AbstractConfigEdit<T>
 {
 	protected T initialValue;
 
-	public AbstractConfigEdit(T initialValue)
+	public AbstractConfigEdit()
 	{
-		this.initialValue = initialValue;
+		this.initialValue = get();
 	}
 
-	public void revert()
+	public T getInitialValue()
 	{
-		set(initialValue);
+		return initialValue;
 	}
 
 	public abstract T get();

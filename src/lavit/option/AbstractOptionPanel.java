@@ -56,7 +56,7 @@ import extgui.text.HintTextField;
  * 継承の必然性はなく、コンポジットとファクトリによる設計に切り替える可能性もある。
  */
 @SuppressWarnings("serial")
-abstract class AbstractOptionPanel extends JPanel
+class AbstractOptionPanel extends JPanel
 {
 	private String propertyName;
 	private List<String> majorOptions = new ArrayList<String>();

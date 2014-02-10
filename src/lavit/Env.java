@@ -54,10 +54,13 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -217,6 +220,21 @@ public final class Env
 		return value;
 	}
 
+	public static List<String> getList(String key)
+	{
+		return new ArrayList<String>(StringUtils.splitToList(get(key, ""), "\\s+"));
+	}
+
+	public static Set<String> getSet(String key)
+	{
+		return new HashSet<String>(StringUtils.splitToSet(get(key, ""), "\\s+"));
+	}
+
+	public static void setList(String key, Collection<String> values)
+	{
+		set(key, StringUtils.join(values, " "));
+	}
+
 	public static Font getEditorFont()
 	{
 		String fontFamily = get("EDITER_FONT_FAMILY", Font.MONOSPACED);
@@ -346,11 +364,10 @@ public final class Env
 	{
 		char sep = File.separatorChar;
 		String cmd = "java";
-		cmd += " -classpath ";
-		cmd += LMNTAL_LIBRARY_DIR + sep + "bin" + sep + "lmntal.jar" + File.pathSeparator;
+		cmd += " -cp ";
 		cmd += LMNTAL_LIBRARY_DIR + sep + "lib" + sep + "std_lib.jar";
-		cmd += " -DLMNTAL_HOME=" + LMNTAL_LIBRARY_DIR;
-		cmd += " runtime.FrontEnd --interpret ";
+		cmd += " -DLMNTAL_HOME=" + LMNTAL_LIBRARY_DIR + " -jar ";
+		cmd += LMNTAL_LIBRARY_DIR + sep + "bin" + sep + "lmntal.jar ";
 		return cmd;
     }
 

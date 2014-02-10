@@ -68,7 +68,10 @@ public class TabView extends JTabbedPane
 			public void stateChanged(ChangeEvent e)
 			{
 				dispatchTabChangeEvent();
-				dispatchCaretPositionChangeEvent(getSelectedPage().getLineColumn());
+				if (getTabCount() > 0)
+				{
+					dispatchCaretPositionChangeEvent(getSelectedPage().getLineColumn());
+				}
 			}
 		});
 

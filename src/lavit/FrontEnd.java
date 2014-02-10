@@ -173,6 +173,7 @@ public class FrontEnd
 	public static void executeILFileInSLIM(File file)
 	{
 		println("(SLIM) executing...");
+		mainFrame.toolTab.setTab("System");
 		mainFrame.toolTab.systemPanel.outputPanel.outputStart("slim", Env.get("SLIM_OPTION"), file);
 
 		List<String> args = new ArrayList<String>();

@@ -71,14 +71,12 @@ class OptionSlimPanel extends JPanel
 				{
 					public void set(String value)
 					{
-						value = value.replace("\n", "\\n");
 						Env.set("slim.stdin.str", value);
 					}
 
 					public String get()
 					{
-						String s = Env.get("slim.stdin.str", "");
-						return s.replace("\\n", "\n");
+						return Env.get("slim.stdin.str", "");
 					}
 				});
 				dialog.setLocationRelativeTo(null);

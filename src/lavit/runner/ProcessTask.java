@@ -41,6 +41,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import lavit.Env;
 import lavit.util.StringUtils;
@@ -87,6 +88,16 @@ public class ProcessTask
 	public double getElapsedSeconds()
 	{
 		return elapsedTime / 1000.0;
+	}
+
+	public String getCommand()
+	{
+		return StringUtils.join(pb.command(), " ");
+	}
+
+	public Map<String, String> getEnvironment()
+	{
+		return pb.environment();
 	}
 
 	public void setDirectory(String dirPath)
@@ -255,6 +266,17 @@ public class ProcessTask
 	{
 		List<String> commands = new ArrayList<String>();
 		commands.add("java");
+		commands.add("-jar");
+		commands.add(jarName);
+		commands.addAll(args);
+		return new ProcessTask(commands);
+	}
+
+	public static ProcessTask createJarProcessTask(String jarName, List<String> javaArgs, List<String> args)
+	{
+		List<String> commands = new ArrayList<String>();
+		commands.add("java");
+		commands.addAll(javaArgs);
 		commands.add("-jar");
 		commands.add(jarName);
 		commands.addAll(args);

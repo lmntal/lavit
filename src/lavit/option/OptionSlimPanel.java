@@ -66,24 +66,37 @@ class OptionSlimPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				Window owner = SwingUtilities.getWindowAncestor(OptionSlimPanel.this);
-				SLIMStandardInputDialog dialog = new SLIMStandardInputDialog(owner, new AbstractConfigEdit<String>()
-				{
-					public void set(String value)
-					{
-						Env.set("slim.stdin.str", value);
-					}
-
-					public String get()
-					{
-						return Env.get("slim.stdin.str", "");
-					}
-				});
-				dialog.setLocationRelativeTo(null);
-				dialog.setVisible(true);
+				showDialog();
 			}
 		});
 		bottomPanel.add(button);
 		add(bottomPanel, BorderLayout.SOUTH);
+	}
+
+	private void showDialog()
+	{
+		final Window owner = SwingUtilities.getWindowAncestor(this);
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				SLIMStandardInputDialog dialog = new SLIMStandardInputDialog(owner, new SlimStdinEdit());
+				dialog.setLocationRelativeTo(null);
+				dialog.setVisible(true);
+			}
+		});
+	}
+
+	private static class SlimStdinEdit extends AbstractConfigEdit<String>
+	{
+		public void set(String value)
+		{
+			Env.set("slim.stdin.str", value);
+		}
+
+		public String get()
+		{
+			return Env.get("slim.stdin.str", "");
+		}
 	}
 }

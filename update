@@ -1,5 +1,5 @@
 app-name: LaViT
-version: 2.8.1
-release-date: 2014/02/10
-download-url: http://www.ueda.info.waseda.ac.jp/~shinobu/lavit/releases/LaViT-2.8.1.jar
-description: Change the `LMNtal(Java)' button to `Compile'
+version: 2.8.2
+release-date: 2014/02/11
+download-url: http://www.ueda.info.waseda.ac.jp/~shinobu/lavit/releases/LaViT-2.8.2.jar
+description: enabled to set stdin-data for slim execution.

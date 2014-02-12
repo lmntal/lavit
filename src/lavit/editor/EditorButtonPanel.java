@@ -182,6 +182,10 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 					{
 						editorPanel.openFile(outputFile);
 					}
+					else
+					{
+						FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) failed.");
+					}
 				}
 			});
 		}
@@ -210,7 +214,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		Env.setProcessEnvironment(task.getEnvironment());
 
 		FrontEnd.mainFrame.toolTab.setTab("System");
-		FrontEnd.println("(compile) " + task.getCommand());
+		FrontEnd.println("(compile[" + task.getTaskID() + "]) " + task.getCommand());
 
 		task.setStandardErrorListener(new PrintLineListener()
 		{
@@ -272,7 +276,14 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 				{
 					public void processFinished(int id, int exitCode, boolean isAborted)
 					{
-						FrontEnd.executeILFileInSLIM(outputFile);
+						if (exitCode == 0)
+						{
+							FrontEnd.executeILFileInSLIM(outputFile);
+						}
+						else
+						{
+							FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) failed.");
+						}
 					}
 				});
 			}

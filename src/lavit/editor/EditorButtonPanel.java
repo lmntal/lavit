@@ -39,12 +39,9 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +82,8 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 	public JButton nullButton;
 	public JButton killButton;
 
-	public EditorButtonPanel(EditorPanel editorPanel){
+	public EditorButtonPanel(EditorPanel editorPanel)
+	{
 		this.editorPanel = editorPanel;
 
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
@@ -138,7 +136,8 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		add(buttonPanel);
 	}
 
-	public void setAllEnable(boolean enable){
+	public void setAllEnable(boolean enable)
+	{
 		//nullButton.setEnabled(enable);
 
 		lmntalButton.setEnabled(enable);
@@ -152,7 +151,8 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		killButton.setEnabled(!enable);
 	}
 
-	private void setButtonEnable(boolean enable){
+	private void setButtonEnable(boolean enable)
+	{
 		setAllEnable(enable);
 		FrontEnd.mainFrame.toolTab.ltlPanel.setButtonsEnabled(enable);
 	}
@@ -298,16 +298,19 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		}
 	}
 
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent e)
+	{
 		JButton src = (JButton)e.getSource();
 
 		if (src == lmntalButton)
 		{
 			compileLMNtal();
 		}
-		else if (src == lmntalgButton) {
+		else if (src == lmntalgButton)
+		{
 
-			if(editorPanel.isChanged()){
+			if (editorPanel.isChanged())
+			{
 				editorPanel.fileSave();
 			}
 
@@ -318,17 +321,25 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 			FrontEnd.println("(LMNtal) Doing...");
 			lmntalRunner = new LmntalRunner("-g "+Env.get("UNYO_OPTION"));
 			lmntalRunner.run();
-			(new Thread(new Runnable() { public void run() {
-				while(lmntalRunner.isRunning()){
-					FrontEnd.sleep(200);
+			new Thread()
+			{
+				public void run()
+				{
+					while (lmntalRunner.isRunning())
+					{
+						FrontEnd.sleep(200);
+					}
+					FrontEnd.println("(LMNtal) Done!");
+					lmntalRunner = null;
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							setButtonEnable(true);
+						}
+					});
 				}
-				FrontEnd.println("(LMNtal) Done!");
-				lmntalRunner = null;
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-					setButtonEnable(true);
-				}});
-			}})).start();
-
+			}.start();
 		}
 		else if (src == unyoButton)
 		{
@@ -374,9 +385,10 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 				*/
 			}
 		}
-		else if (src == sviewerButton) {
-
-			if(editorPanel.isChanged()){
+		else if (src == sviewerButton)
+		{
+			if (editorPanel.isChanged())
+			{
 				editorPanel.fileSave();
 			}
 
@@ -386,54 +398,47 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 
 			FrontEnd.println("(StateViewer) Doing...");
 			String opt = "";
-			if(Env.is("SLIM2")){
-				opt = "--nd -t --dump-lavit "+Env.get("SV_OPTION");
-			}else{
-				opt = "--nd "+Env.get("SV_OPTION");
-				if(!Env.get("SV_DEPTH_LIMIT").equals("unset")){
-					opt += " --bfs_depth "+Env.get("SV_DEPTH_LIMIT");
+			if (Env.is("SLIM2"))
+			{
+				opt = "--nd -t --dump-lavit " + Env.get("SV_OPTION");
+			}
+			else
+			{
+				opt = "--nd " + Env.get("SV_OPTION");
+				if (!Env.get("SV_DEPTH_LIMIT").equals("unset"))
+				{
+					opt += " --bfs_depth " + Env.get("SV_DEPTH_LIMIT");
 				}
 			}
 			slimRunner = new SlimRunner(opt);
 			slimRunner.setBuffering(true);
 			slimRunner.run();
-			(new Thread(new Runnable() { public void run() {
-				while(slimRunner.isRunning()){
-					FrontEnd.sleep(200);
-				}
-				FrontEnd.println("(SLIM) Done! ["+(slimRunner.getTime()/1000.0)+"s]");
-				if(slimRunner.isSucceeded()){
-					FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(),false);
-				}
-				slimRunner = null;
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-					setButtonEnable(true);
-				}});
-			}})).start();
-
-		}else if (src == svporButton) {
-			if (Env.isSet("CUSTOM_COMMAND"))
+			new Thread()
 			{
-				String cmd = Env.get("CUSTOM_COMMAND");
-				cmd = cmd.replace("<FILE>", editorPanel.getFileName());
-				System.out.println("Custom Command: " + cmd);
-				try
+				public void run()
 				{
-					ProcessBuilder pb = new ProcessBuilder(cmd.split("\\s+"));
-					pb.redirectErrorStream(true);
-					Process p = pb.start();
-					BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-					String line;
-					while ((line = reader.readLine()) != null)
+					while (slimRunner.isRunning())
 					{
-						System.out.println(line);
+						FrontEnd.sleep(200);
 					}
+					FrontEnd.println("(SLIM) Done! ["+(slimRunner.getTime()/1000.0)+"s]");
+					if (slimRunner.isSucceeded())
+					{
+						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(),false);
+					}
+					slimRunner = null;
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							setButtonEnable(true);
+						}
+					});
 				}
-				catch (IOException e1)
-				{
-					e1.printStackTrace();
-				}
-			}
+			}.start();
+		}
+		else if (src == svporButton)
+		{
 			/*
 			if(editorPanel.isChanged()){
 				editorPanel.fileSave();
@@ -495,10 +500,11 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 			}})).start();
 */
 
-		}else if (src == stateProfilerButton) {
-
-
-			if(editorPanel.isChanged()){
+		}
+		else if (src == stateProfilerButton)
+		{
+			if (editorPanel.isChanged())
+			{
 				editorPanel.fileSave();
 			}
 
@@ -507,26 +513,36 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 			FrontEnd.mainFrame.toolTab.setTab("StateProfiler");
 
 			FrontEnd.println("(StateProfiler) Doing...");
-			if(Env.is("SLIM2")){
+			if (Env.is("SLIM2"))
+			{
 				slimRunner = new SlimRunner("--nd --dump-inc --dump-lavit");
-			}else{
+			}
+			else
+			{
 				slimRunner = new SlimRunner("--nd_dump --hideruleset");
 			}
 			slimRunner.setOutputGetter(FrontEnd.mainFrame.toolTab.stateProfilePanel);
 
 			slimRunner.run();
-			(new Thread(new Runnable() { public void run() {
-				while(slimRunner.isRunning()){
-					FrontEnd.sleep(200);
+			new Thread()
+			{
+				public void run()
+				{
+					while (slimRunner.isRunning())
+					{
+						FrontEnd.sleep(200);
+					}
+					FrontEnd.println("(StateProfiler) Done!");
+					slimRunner = null;
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							setButtonEnable(true);
+						}
+					});
 				}
-				FrontEnd.println("(StateProfiler) Done!");
-				slimRunner = null;
-				SwingUtilities.invokeLater(new Runnable(){public void run() {
-					setButtonEnable(true);
-				}});
-			}})).start();
-
-
+			}.start();
 		}
 		else if (src == killButton)
 		{
@@ -538,5 +554,4 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 			FrontEnd.errPrintln("Kill");
 		}
 	}
-
 }

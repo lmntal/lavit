@@ -84,6 +84,7 @@ import lavit.multiedit.event.CaretPositionChangeListener;
 import lavit.multiedit.event.TabButtonListener;
 import lavit.system.FileHistory;
 import lavit.util.CommonFontUser;
+import lavit.util.FileFilters;
 import lavit.util.FileUtils;
 import extgui.dialog.AskDialogBuilder;
 import extgui.dialog.DialogResult;
@@ -591,9 +592,9 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		}
 
 		JFileChooser jfc = new JFileChooser(chooserDir);
-		jfc.addChoosableFileFilter(LMNtalFileFilter.getInstance());
-		jfc.addChoosableFileFilter(ILCodeFileFilter.getInstance());
-		jfc.setFileFilter(LMNtalFileFilter.getInstance());
+		jfc.addChoosableFileFilter(FileFilters.getLMNFileFilter());
+		jfc.addChoosableFileFilter(FileFilters.getILFileFilter());
+		jfc.setFileFilter(FileFilters.getLMNFileFilter());
 		int r = jfc.showOpenDialog(FrontEnd.mainFrame);
 		if (r != JFileChooser.APPROVE_OPTION)
 		{
@@ -606,10 +607,14 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 	private File chooseWriteFile()
 	{
+		FileFilter lmnFilter = FileFilters.getLMNFileFilter();
+		FileFilter ilFilter = FileFilters.getILFileFilter();
+
 		JFileChooser jfc = new JFileChooser(Env.get("EDITER_FILE_LAST_CHOOSER_DIR"));
-		jfc.addChoosableFileFilter(LMNtalFileFilter.getInstance());
-		jfc.addChoosableFileFilter(ILCodeFileFilter.getInstance());
-		jfc.setFileFilter(LMNtalFileFilter.getInstance());
+		jfc.addChoosableFileFilter(lmnFilter);
+		jfc.addChoosableFileFilter(ilFilter);
+		jfc.setFileFilter(lmnFilter);
+
 		File file = null;
 		while (true)
 		{
@@ -622,11 +627,11 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 			if (!file.exists() && !FileUtils.hasExtension(file.getName()))
 			{
-				if (jfc.getFileFilter() == LMNtalFileFilter.getInstance())
+				if (jfc.getFileFilter() == lmnFilter)
 				{
 					file = new File(file.getAbsolutePath() + ".lmn");
 				}
-				else if (jfc.getFileFilter() == ILCodeFileFilter.getInstance())
+				else if (jfc.getFileFilter() == ilFilter)
 				{
 					file = new File(file.getAbsolutePath() + ".il");
 				}
@@ -816,64 +821,6 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		public void filesDropped(List<File> files)
 		{
 			openFiles(files);
-		}
-	}
-
-	/**
-	 * <p>File name filter for LMNtal source file.</p>
-	 * <p>This class is designed as singleton.</p>
-	 */
-	private static final class LMNtalFileFilter extends FileFilter
-	{
-		private static LMNtalFileFilter instance;
-
-		private LMNtalFileFilter() { }
-
-		public boolean accept(File f)
-		{
-			return f.isDirectory() || f.getName().toLowerCase().endsWith(".lmn");
-		}
-
-		public String getDescription()
-		{
-			return "LMNtal " + Lang.d[5] + " (*.lmn)";
-		}
-
-		public static LMNtalFileFilter getInstance()
-		{
-			if (instance == null) instance = new LMNtalFileFilter();
-			return instance;
-		}
-	}
-
-	/**
-	 * <p>File name filter for LMNtal intermediate code file.</p>
-	 * <p>This class is designed as singleton.</p>
-	 */
-	private static final class ILCodeFileFilter extends FileFilter
-	{
-		private static ILCodeFileFilter instance;
-
-		private ILCodeFileFilter() { }
-
-		public boolean accept(File f)
-		{
-			String name = f.getName().toLowerCase();
-			return f.isDirectory() || name.endsWith(".il") || name.endsWith(".tal");
-		}
-
-		public String getDescription()
-		{
-			return Lang.d[9] + " (*.il, *.tal)";
-		}
-
-		public static ILCodeFileFilter getInstance()
-		{
-			if (instance == null)
-			{
-				instance = new ILCodeFileFilter();
-			}
-			return instance;
 		}
 	}
 }

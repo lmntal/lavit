@@ -46,8 +46,9 @@ import lavit.stateviewer.StatePanel;
 import lavit.system.SystemPanel;
 import lavit.visualeditor.VisualPanel;
 
-public class ToolTab extends JTabbedPane {
-
+@SuppressWarnings("serial")
+public class ToolTab extends JTabbedPane
+{
 	public SystemPanel systemPanel;
 	public VisualPanel visualPanel;
 	public LtlPanel ltlPanel;
@@ -55,8 +56,9 @@ public class ToolTab extends JTabbedPane {
 	public StateProfilePanel stateProfilePanel;
 	public OptionPanel optionPanel;
 
-	public ToolTab(){
-		setMinimumSize(new Dimension(0,0));
+	public ToolTab()
+	{
+		setMinimumSize(new Dimension(0, 0));
 		setFocusable(false);
 
 		systemPanel = new SystemPanel();
@@ -76,17 +78,21 @@ public class ToolTab extends JTabbedPane {
 
 		optionPanel = new OptionPanel();
 		addTab("Option", optionPanel);
-
 	}
 
-	public void setTab(String tab){
-		if(tab.equals("System")){
+	public void setTab(String tab)
+	{
+		if (tab.equals("System"))
+		{
 			setSelectedComponent(systemPanel);
-		}else if(tab.equals("StateViewer")){
+		}
+		else if (tab.equals("StateViewer"))
+		{
 			setSelectedComponent(statePanel);
-		}else if(tab.equals("StateProfiler")){
+		}
+		else if (tab.equals("StateProfiler"))
+		{
 			setSelectedComponent(stateProfilePanel);
 		}
 	}
-
 }

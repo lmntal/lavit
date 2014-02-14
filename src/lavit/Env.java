@@ -102,7 +102,6 @@ public final class Env
 		env = this;
 
 		//ファイルの作成
-		boolean firstMake = false;
 		try
 		{
 			File e = new File(ENV_FILE);
@@ -110,7 +109,6 @@ public final class Env
 			{
 				System.out.println("make " + ENV_FILE);
 				e.createNewFile();
-				firstMake = true;
 			}
 		}
 		catch (IOException e)
@@ -145,10 +143,10 @@ public final class Env
 			default_prop.load(in);
 			in.close();
 
-			for (Object k : default_prop.keySet())
+			for (Map.Entry<Object, Object> ent : default_prop.entrySet())
 			{
-				String key = (String)k;
-				String value = default_prop.getProperty(key);
+				String key = (String)ent.getKey();
+				String value = (String)ent.getValue();
 				if (!prop.containsKey(key))
 				{
 					prop.setProperty(key, value);

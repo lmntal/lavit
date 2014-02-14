@@ -57,8 +57,10 @@ import javax.swing.text.Utilities;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 
+import lavit.Env;
 import lavit.multiedit.coloring.lexer.ColorLabel;
 import lavit.multiedit.coloring.lexer.TokenLabel;
+import lavit.util.TextAntialias;
 
 public class LmnContext implements ViewFactory
 {
@@ -96,14 +98,14 @@ class LmnView extends PlainView
 
 		Graphics2D g2 = (Graphics2D)g;
 		RenderingHints hints = g2.getRenderingHints();
-		if (g.getFont().getSize() < 24)
+
+		TextAntialias textaa = TextAntialias.of(Env.get("editor.antialias", ""));
+		if (textaa == null)
 		{
-			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+			textaa = TextAntialias.DEFAULT;
 		}
-		else
-		{
-			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		}
+		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, textaa.value);
+
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST, 250);
 
 		super.paint(g, alloc);

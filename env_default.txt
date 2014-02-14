@@ -80,3 +80,4 @@ options.stateviewer=--hide-ruleset --mem-enc --show-transition --use-builtin-rul
 options.ltl=--hide-ruleset -t --dump-lavit --mem-enc --show-transition
 updatecheck.enabled=true
 updatecheck.url=http\://www.ueda.info.waseda.ac.jp/~shinobu/lavit/update
+editor.antialias=LCD-H-RGB

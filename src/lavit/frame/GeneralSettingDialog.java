@@ -86,6 +86,7 @@ import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.util.FixFlowLayout;
 import lavit.util.StringUtils;
+import lavit.util.TextAntialias;
 
 @SuppressWarnings("serial")
 public class GeneralSettingDialog extends JDialog
@@ -348,25 +349,49 @@ public class GeneralSettingDialog extends JDialog
 				tabSizeComboBox.addItem(String.valueOf(tabWidth));
 			}
 
+			JLabel labelTextAA = new JLabel("Antialias:");
+			final JComboBox comboTextAA = new JComboBox();
+			for (TextAntialias item : TextAntialias.values())
+			{
+				comboTextAA.addItem(item);
+			}
+			TextAntialias textaa = TextAntialias.of(Env.get("editor.antialias", ""));
+			if (textaa != null)
+			{
+				comboTextAA.setSelectedItem(textaa);
+			}
+
 			GroupLayout gl = new GroupLayout(this);
 			setLayout(gl);
 			gl.setAutoCreateGaps(true);
 			gl.setAutoCreateContainerGaps(true);
-			gl.setHorizontalGroup(gl.createSequentialGroup()
-				.addComponent(labelFamily)
-				.addComponent(fontFamilyComboBox)
-				.addComponent(labelSize)
-				.addComponent(fontSizeController)
-				.addComponent(labelTabWidth)
-				.addComponent(tabSizeComboBox)
+			gl.setHorizontalGroup(gl.createParallelGroup()
+				.addGroup(gl.createSequentialGroup()
+					.addComponent(labelFamily)
+					.addComponent(fontFamilyComboBox)
+					.addComponent(labelSize)
+					.addComponent(fontSizeController)
+					.addComponent(labelTabWidth)
+					.addComponent(tabSizeComboBox)
+				)
+				.addGroup(gl.createSequentialGroup()
+					.addComponent(labelTextAA)
+					.addComponent(comboTextAA, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				)
 			);
-			gl.setVerticalGroup(gl.createParallelGroup(Alignment.BASELINE)
-				.addComponent(labelFamily)
-				.addComponent(fontFamilyComboBox)
-				.addComponent(labelSize)
-				.addComponent(fontSizeController)
-				.addComponent(labelTabWidth)
-				.addComponent(tabSizeComboBox)
+			gl.setVerticalGroup(gl.createSequentialGroup()
+				.addGroup(gl.createParallelGroup(Alignment.BASELINE)
+					.addComponent(labelFamily)
+					.addComponent(fontFamilyComboBox)
+					.addComponent(labelSize)
+					.addComponent(fontSizeController)
+					.addComponent(labelTabWidth)
+					.addComponent(tabSizeComboBox)
+				)
+				.addGroup(gl.createParallelGroup(Alignment.BASELINE)
+					.addComponent(labelTextAA)
+					.addComponent(comboTextAA)
+				)
 			);
 
 			fontFamilyComboBox.addActionListener(new ActionListener()
@@ -392,6 +417,15 @@ public class GeneralSettingDialog extends JDialog
 				{
 					Env.set("EDITER_TAB_SIZE", (String)tabSizeComboBox.getSelectedItem());
 					FrontEnd.loadAllFont();
+				}
+			});
+			comboTextAA.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					TextAntialias textaa = (TextAntialias)comboTextAA.getSelectedItem();
+					Env.set("editor.antialias", textaa.name);
+					FrontEnd.mainFrame.repaint();
 				}
 			});
 

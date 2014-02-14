@@ -191,22 +191,39 @@ public final class Env
 		}
 	}
 
+	/**
+	 * キー値 key に設定されている値を取得する。
+	 * キー値 key に対応する項目が存在しない場合は{@code null}を返す。
+	 */
 	public static String get(String key)
 	{
 		return prop.getProperty(key);
 	}
 
+	/**
+	 * キー値 key に設定されている値を取得する。
+	 * キー値 key に対応する項目が存在しない場合もしくは値が空文字列の場合は defaultValue を返す。
+	 */
 	public static String get(String key, String defaultValue)
 	{
 		String value = prop.getProperty(key);
 		return StringUtils.nullOrEmpty(value) ? defaultValue : value;
 	}
 
+	/**
+	 * キー値 key に設定されている値を整数値として取得する。
+	 * 値が有効な整数値でない場合、例外 {@link NumberFormatException} を発生させる。
+	 */
 	public static int getInt(String key) throws NumberFormatException
 	{
 		return Integer.valueOf(prop.getProperty(key));
 	}
 
+	/**
+	 * キー値 key に設定されている値を整数値として取得する。
+	 * 値が有効な整数値でない場合にデフォルト値 defaultValue を返す。
+	 * このメソッドは例外安全である。
+	 */
 	public static int getInt(String key, int defaultValue)
 	{
 		int value = defaultValue;
@@ -220,11 +237,17 @@ public final class Env
 		return value;
 	}
 
+	/**
+	 * 値を文字列リストとして取得する。
+	 */
 	public static List<String> getList(String key)
 	{
 		return new ArrayList<String>(StringUtils.splitToList(get(key, ""), "\\s+"));
 	}
 
+	/**
+	 * 値を文字列集合として取得する。
+	 */
 	public static Set<String> getSet(String key)
 	{
 		return new HashSet<String>(StringUtils.splitToSet(get(key, ""), "\\s+"));

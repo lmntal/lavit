@@ -132,13 +132,19 @@ public final class Env
 			System.exit(0);
 		}
 
+		loadDefault();
+	}
+
+	private void loadDefault()
+	{
 		//バージョンアップの処理（設定値がない場合はその値を入れる）
 		Properties default_prop = new Properties();
 		try
 		{
-			InputStream in = getInputStreamOfFile(ENV_DEFAULT_FILE);
+			InputStream in = Env.class.getResourceAsStream("/resources/" + ENV_DEFAULT_FILE);
 			default_prop.load(in);
 			in.close();
+
 			for (Object k : default_prop.keySet())
 			{
 				String key = (String)k;
@@ -146,10 +152,7 @@ public final class Env
 				if (!prop.containsKey(key))
 				{
 					prop.setProperty(key, value);
-					if (!firstMake)
-					{
-						System.out.println("auto update " + ENV_FILE + " : " + key + "=" + value);
-					}
+					System.out.println("auto update " + ENV_FILE + " : " + key + "=" + value);
 				}
 			}
 		}

@@ -56,10 +56,10 @@ public class OptionPanel extends JPanel
 		setLayout(new BorderLayout());
 
 		CollapsiblePane cp = new CollapsiblePane()
-			.addPage("lmntal", "LMNtal Options", new OptionLMNtalPanel(readOptions("options.lmntal")))
-			.addPage("unyo", "UNYO Options", new OptionUnyoPanel(readOptions("options.unyo")))
-			.addPage("slim-compile", "SLIM Compile Options", new OptionCompilePanel(readOptions("options.lmntal_slim")))
+			.addPage("lmntal", "Compile Options", new OptionLMNtalPanel(readOptions("options.lmntal")))
 			.addPage("slim", "SLIM Options", new OptionSlimPanel(readOptions("options.slim")))
+			.addPage("unyo", "UNYO Options", new OptionUnyoPanel(readOptions("options.unyo")))
+			//.addPage("slim-compile", "SLIM Compile Options", new OptionCompilePanel(readOptions("options.lmntal_slim")))
 			.addPage("sv", "StateViewer SLIM Options", new OptionSVPanel(readOptions("options.stateviewer")))
 			.addPage("ltl", "LTL Model Check SLIM Options", new OptionLtlPanel(readOptions("options.ltl")))
 		;

@@ -45,26 +45,6 @@ public class PropertyEditorDialog extends JDialog
 		};
 		tableModel.addColumn("Key");
 		tableModel.addColumn("Value");
-		tableModel.addTableModelListener(new TableModelListener()
-		{
-			public void tableChanged(TableModelEvent e)
-			{
-				if (e.getType() == TableModelEvent.UPDATE)
-				{
-					int row = table.getSelectedRow();
-					String key = (String)tableModel.getValueAt(row, 0);
-					String value = (String)tableModel.getValueAt(row, 1);
-					if (value.equals(originalValues.get(key)))
-					{
-						editedRows.remove(row);
-					}
-					else
-					{
-						editedRows.add(row);
-					}
-				}
-			}
-		});
 
 		table = new JTable(tableModel);
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer()
@@ -99,7 +79,8 @@ public class PropertyEditorDialog extends JDialog
 		table.setAutoCreateRowSorter(true);
 		add(new JScrollPane(table), BorderLayout.CENTER);
 
-		JButton buttonApply = new JButton("Apply");
+		final JButton buttonApply = new JButton("Apply");
+		buttonApply.setEnabled(false);
 		buttonApply.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -107,6 +88,7 @@ public class PropertyEditorDialog extends JDialog
 				applyChanges();
 			}
 		});
+
 		JButton buttonReload = new JButton("Reload");
 		buttonReload.addActionListener(new ActionListener()
 		{
@@ -115,6 +97,7 @@ public class PropertyEditorDialog extends JDialog
 				reload();
 			}
 		});
+
 		JButton buttonClose = new JButton("Close");
 		buttonClose.addActionListener(new ActionListener()
 		{
@@ -123,11 +106,38 @@ public class PropertyEditorDialog extends JDialog
 				close();
 			}
 		});
+
 		JPanel panelBottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		panelBottom.add(buttonApply);
 		panelBottom.add(buttonReload);
 		panelBottom.add(buttonClose);
 		add(panelBottom, BorderLayout.SOUTH);
+
+		tableModel.addTableModelListener(new TableModelListener()
+		{
+			public void tableChanged(TableModelEvent e)
+			{
+				if (e.getType() == TableModelEvent.UPDATE)
+				{
+					int row = table.getSelectedRow();
+					String key = (String)tableModel.getValueAt(row, 0);
+					String value = (String)tableModel.getValueAt(row, 1);
+					if (value.equals(originalValues.get(key)))
+					{
+						editedRows.remove(row);
+						if (editedRows.isEmpty())
+						{
+							buttonApply.setEnabled(false);
+						}
+					}
+					else
+					{
+						editedRows.add(row);
+						buttonApply.setEnabled(true);
+					}
+				}
+			}
+		});
 
 		reload();
 

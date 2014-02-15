@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.WindowConstants;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -33,9 +35,12 @@ public class PropertyEditorDialog extends JDialog
 	private Map<String, String> originalValues = new HashMap<String, String>();
 	private Set<String> editedKeys = new HashSet<String>();
 
-	public PropertyEditorDialog()
+	public PropertyEditorDialog(Window owner)
 	{
+		super(owner);
+
 		setTitle("Property Editor");
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		tableModel = new DefaultTableModel()
 		{

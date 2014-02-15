@@ -40,6 +40,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -56,6 +57,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import lavit.Env;
+import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.util.StringUtils;
 
@@ -66,8 +68,10 @@ public class VersionDialog extends JDialog
 
 	private JTextArea infoText;
 
-	private VersionDialog()
+	private VersionDialog(Window owner)
 	{
+		super(owner);
+
 		Icon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
 
 		setTitle("Version information");
@@ -136,7 +140,7 @@ public class VersionDialog extends JDialog
 	{
 		if (instance == null)
 		{
-			instance = new VersionDialog();
+			instance = new VersionDialog(FrontEnd.mainFrame);
 		}
 		SwingUtilities.invokeLater(new Runnable()
 		{

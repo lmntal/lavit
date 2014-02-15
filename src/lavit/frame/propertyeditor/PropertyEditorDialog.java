@@ -6,8 +6,6 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -32,16 +30,17 @@ public class PropertyEditorDialog extends JDialog
 	private JTable table;
 
 	private Map<String, String> originalValues = new HashMap<String, String>();
-	private Set<Integer> deletedRows = new HashSet<Integer>();
 	private Set<Integer> editedRows = new HashSet<Integer>();
 
 	public PropertyEditorDialog()
 	{
+		setTitle("Property Editor");
+
 		tableModel = new DefaultTableModel()
 		{
 			public boolean isCellEditable(int row, int column)
 			{
-				return column == 1 && !deletedRows.contains(row);
+				return column == 1;
 			}
 		};
 		tableModel.addColumn("Key");
@@ -91,14 +90,6 @@ public class PropertyEditorDialog extends JDialog
 						}
 					}
 				}
-				if (deletedRows.contains(row))
-				{
-					comp.setForeground(Color.LIGHT_GRAY);
-				}
-				else
-				{
-					comp.setForeground(table.getForeground());
-				}
 				return comp;
 			}
 		});
@@ -106,19 +97,6 @@ public class PropertyEditorDialog extends JDialog
 		table.setColumnSelectionAllowed(false);
 		table.getTableHeader().setReorderingAllowed(false);
 		table.setAutoCreateRowSorter(true);
-		table.addKeyListener(new KeyAdapter()
-		{
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_DELETE)
-				{
-					int row = table.getSelectedRow();
-					tableModel.setValueAt("", row, 1);
-					deletedRows.add(row);
-					editedRows.add(row);
-				}
-			}
-		});
 		add(new JScrollPane(table), BorderLayout.CENTER);
 
 		JButton buttonApply = new JButton("Apply");
@@ -165,7 +143,6 @@ public class PropertyEditorDialog extends JDialog
 			originalValues.put(e[0], e[1]);
 			addRow(e[0], e[1]);
 		}
-		deletedRows.clear();
 		editedRows.clear();
 	}
 
@@ -176,6 +153,14 @@ public class PropertyEditorDialog extends JDialog
 
 	private void applyChanges()
 	{
+		for (int row : editedRows)
+		{
+			String key = (String)tableModel.getValueAt(row, 0);
+			String newValue = (String)tableModel.getValueAt(row, 1);
+			Env.set(key, newValue);
+			System.err.println(key + " has been changed to " + newValue);
+		}
+		reload();
 	}
 
 	private void close()

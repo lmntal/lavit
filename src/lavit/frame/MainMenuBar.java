@@ -490,7 +490,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		}
 		else if (src == iVersion)
 		{
-			VersionFrame.showDialog();
+			VersionDialog.showDialog();
 		}
 		else if (src == iRuntime)
 		{

@@ -60,13 +60,13 @@ import lavit.Lang;
 import lavit.util.StringUtils;
 
 @SuppressWarnings("serial")
-public class VersionFrame extends JDialog
+public class VersionDialog extends JDialog
 {
-	private static VersionFrame instance;
+	private static VersionDialog instance;
 
 	private JTextArea infoText;
 
-	private VersionFrame()
+	private VersionDialog()
 	{
 		Icon image = new ImageIcon(Env.getImageOfFile("img/logo.png"));
 
@@ -136,7 +136,7 @@ public class VersionFrame extends JDialog
 	{
 		if (instance == null)
 		{
-			instance = new VersionFrame();
+			instance = new VersionDialog();
 		}
 		SwingUtilities.invokeLater(new Runnable()
 		{

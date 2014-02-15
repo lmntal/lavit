@@ -16,6 +16,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -30,7 +31,7 @@ public class PropertyEditorDialog extends JDialog
 	private JTable table;
 
 	private Map<String, String> originalValues = new HashMap<String, String>();
-	private Set<Integer> editedRows = new HashSet<Integer>();
+	private Set<String> editedKeys = new HashSet<String>();
 
 	public PropertyEditorDialog()
 	{
@@ -54,7 +55,8 @@ public class PropertyEditorDialog extends JDialog
 				Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 				if (!isSelected && !hasFocus)
 				{
-					if (editedRows.contains(row))
+					String key = (String)table.getValueAt(row, 0);
+					if (editedKeys.contains(key))
 					{
 						comp.setBackground(new Color(255, 220, 220));
 					}
@@ -77,6 +79,7 @@ public class PropertyEditorDialog extends JDialog
 		table.setColumnSelectionAllowed(false);
 		table.getTableHeader().setReorderingAllowed(false);
 		table.setAutoCreateRowSorter(true);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		add(new JScrollPane(table), BorderLayout.CENTER);
 
 		final JButton buttonApply = new JButton("Apply");
@@ -119,22 +122,23 @@ public class PropertyEditorDialog extends JDialog
 			{
 				if (e.getType() == TableModelEvent.UPDATE)
 				{
-					int row = table.getSelectedRow();
+					int row = e.getFirstRow();
 					String key = (String)tableModel.getValueAt(row, 0);
 					String value = (String)tableModel.getValueAt(row, 1);
 					if (value.equals(originalValues.get(key)))
 					{
-						editedRows.remove(row);
-						if (editedRows.isEmpty())
+						editedKeys.remove(key);
+						if (editedKeys.isEmpty())
 						{
 							buttonApply.setEnabled(false);
 						}
 					}
 					else
 					{
-						editedRows.add(row);
+						editedKeys.add(key);
 						buttonApply.setEnabled(true);
 					}
+					repaint();
 				}
 			}
 		});
@@ -153,7 +157,7 @@ public class PropertyEditorDialog extends JDialog
 			originalValues.put(e[0], e[1]);
 			addRow(e[0], e[1]);
 		}
-		editedRows.clear();
+		editedKeys.clear();
 	}
 
 	private void addRow(String key, String value)
@@ -163,12 +167,15 @@ public class PropertyEditorDialog extends JDialog
 
 	private void applyChanges()
 	{
-		for (int row : editedRows)
+		for (int i = 0; i < tableModel.getRowCount(); i++)
 		{
-			String key = (String)tableModel.getValueAt(row, 0);
-			String newValue = (String)tableModel.getValueAt(row, 1);
-			Env.set(key, newValue);
-			System.err.println(key + " has been changed to " + newValue);
+			String key = (String)tableModel.getValueAt(i, 0);
+			if (editedKeys.contains(key))
+			{
+				String newValue = (String)tableModel.getValueAt(i, 1);
+				Env.set(key, newValue);
+				System.err.println(key + " has been changed to " + newValue);
+			}
 		}
 		reload();
 	}

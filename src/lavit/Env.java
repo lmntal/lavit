@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -190,6 +191,16 @@ public final class Env
 		{
 			System.err.println("save error. check "+ENV_FILE);
 		}
+	}
+
+	public static Collection<String[]> getEntries()
+	{
+		List<String[]> entries = new LinkedList<String[]>();
+		for (Map.Entry<Object, Object> e : prop.entrySet())
+		{
+			entries.add(new String[] { (String)e.getKey(), (String)e.getValue() });
+		}
+		return entries;
 	}
 
 	/**

@@ -84,6 +84,7 @@ import javax.swing.plaf.FontUIResource;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
+import lavit.frame.propertyeditor.PropertyEditorDialog;
 import lavit.util.FixFlowLayout;
 import lavit.util.LookAndFeelEntry;
 import lavit.util.StringUtils;
@@ -98,8 +99,12 @@ public class GeneralSettingDialog extends JDialog
 	private EditorColorPanel panelEditor;
 	private FontSettingPanel panelFont;
 
-	private GeneralSettingDialog()
+	private PropertyEditorDialog propertyDialog;
+
+	private GeneralSettingDialog(Window owner)
 	{
+		super(owner);
+
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setTitle("Preferences");
 		setIconImages(Env.getApplicationIcons());
@@ -114,6 +119,15 @@ public class GeneralSettingDialog extends JDialog
 		JPanel panelView = new ViewSettingPanel();
 		JPanel panelUIFont = new UIFontSizeSettingPanel();
 
+		JButton buttonEditProperty = new JButton("Edit properties (env.txt)");
+		buttonEditProperty.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				showPropertyEditDialog();
+			}
+		});
+
 		GroupLayout gl = new GroupLayout(panel);
 		panel.setLayout(gl);
 		gl.setAutoCreateGaps(true);
@@ -125,7 +139,10 @@ public class GeneralSettingDialog extends JDialog
 				.addComponent(panelEncoding)
 				.addComponent(panelView)
 			)
-			.addComponent(panelUIFont)
+			.addGroup(gl.createSequentialGroup()
+				.addComponent(panelUIFont)
+				.addComponent(buttonEditProperty)
+			)
 		);
 		gl.setVerticalGroup(gl.createSequentialGroup()
 			.addComponent(panelEditor)
@@ -134,7 +151,10 @@ public class GeneralSettingDialog extends JDialog
 				.addComponent(panelEncoding)
 				.addComponent(panelView)
 			)
-			.addComponent(panelUIFont)
+			.addGroup(gl.createParallelGroup(Alignment.CENTER)
+				.addComponent(panelUIFont)
+				.addComponent(buttonEditProperty)
+			)
 		);
 
 		add(panel, BorderLayout.CENTER);
@@ -177,7 +197,7 @@ public class GeneralSettingDialog extends JDialog
 		if (instance == null || !currentLaf.equals(laf))
 		{
 			laf = currentLaf;
-			instance = new GeneralSettingDialog();
+			instance = new GeneralSettingDialog(FrontEnd.mainFrame);
 			instance.pack();
 			instance.setLocationRelativeTo(null);
 		}
@@ -188,6 +208,23 @@ public class GeneralSettingDialog extends JDialog
 				instance.initialize();
 				instance.pack();
 				instance.setVisible(true);
+			}
+		});
+	}
+
+	private void showPropertyEditDialog()
+	{
+		final Window owner = this;
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				if (propertyDialog == null)
+				{
+					propertyDialog = new PropertyEditorDialog(owner);
+					propertyDialog.setLocationRelativeTo(owner);
+				}
+				propertyDialog.setVisible(true);
 			}
 		});
 	}

@@ -85,6 +85,7 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.Lang;
 import lavit.util.FixFlowLayout;
+import lavit.util.LookAndFeelEntry;
 import lavit.util.StringUtils;
 import lavit.util.TextAntialias;
 

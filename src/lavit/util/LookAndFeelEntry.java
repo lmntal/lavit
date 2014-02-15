@@ -33,7 +33,7 @@
  *
  */
 
-package lavit.frame;
+package lavit.util;
 
 import java.util.ArrayList;
 import java.util.List;

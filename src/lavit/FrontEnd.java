@@ -50,7 +50,6 @@ import javax.swing.UIManager;
 import lavit.frame.CygwinPathSetting;
 import lavit.frame.LaViTSplashWindow;
 import lavit.frame.LanguageSetting;
-import lavit.frame.LookAndFeelEntry;
 import lavit.frame.MainFrame;
 import lavit.frame.SlimPathSetting;
 import lavit.runner.PrintLineListener;
@@ -59,6 +58,7 @@ import lavit.runner.ProcessTask;
 import lavit.runner.RebootRunner;
 import lavit.system.versioncheck.UpdateChecker;
 import lavit.util.CommonFontUser;
+import lavit.util.LookAndFeelEntry;
 import lavit.util.StringUtils;
 
 public class FrontEnd

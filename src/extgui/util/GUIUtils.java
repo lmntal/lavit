@@ -13,18 +13,19 @@ public final class GUIUtils
 
 	public static void fixButtonWidth(JButton ... buttons)
 	{
-		fixButtonWidth(0, 0, buttons);
+		fixButtonWidth(0, buttons);
 	}
 
-	public static void fixButtonWidth(int minWidth, int minHeight, JButton ... buttons)
+	public static void fixButtonWidth(int padding, JButton ... buttons)
 	{
-		Dimension d = new Dimension(minWidth, minHeight);
+		Dimension d = new Dimension();
 		for (JButton b : buttons)
 		{
 			Dimension size = b.getPreferredSize();
 			d.width = Math.max(size.width, d.width);
 			d.height = Math.max(size.height, d.height);
 		}
+		d.width += 2 * padding;
 		for (JButton b : buttons)
 		{
 			b.setPreferredSize(d);

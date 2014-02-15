@@ -25,6 +25,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import lavit.Env;
+import extgui.util.GUIUtils;
 
 @SuppressWarnings("serial")
 public class PropertyEditorDialog extends JDialog
@@ -116,9 +117,11 @@ public class PropertyEditorDialog extends JDialog
 		});
 
 		JPanel panelBottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		panelBottom.setBorder(GUIUtils.createDialogBottomBorder());
 		panelBottom.add(buttonApply);
 		panelBottom.add(buttonReload);
 		panelBottom.add(buttonClose);
+		GUIUtils.fixButtonWidth(buttonApply, buttonReload, buttonClose);
 		add(panelBottom, BorderLayout.SOUTH);
 
 		tableModel.addTableModelListener(new TableModelListener()
@@ -149,6 +152,8 @@ public class PropertyEditorDialog extends JDialog
 		});
 
 		reload();
+
+		getRootPane().setDefaultButton(buttonApply);
 
 		pack();
 	}

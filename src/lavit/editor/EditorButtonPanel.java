@@ -359,7 +359,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 
 			if (editorPanel.getFile().getName().endsWith(".il"))
 			{
-				FrontEnd.mainFrame.runILCodeOnSLIM();
+				FrontEnd.executeILFileInSLIM(editorPanel.getFile());
 			}
 			else
 			{

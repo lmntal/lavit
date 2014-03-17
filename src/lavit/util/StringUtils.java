@@ -36,7 +36,6 @@
 package lavit.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -75,14 +74,25 @@ public final class StringUtils
 		Set<String> set = new LinkedHashSet<String>();
 		for (String item : s.split(regex))
 		{
-			set.add(item);
+			if (!item.isEmpty())
+			{
+				set.add(item);
+			}
 		}
 		return set;
 	}
 
 	public static List<String> splitToList(String s, String regex)
 	{
-		return new ArrayList<String>(Arrays.asList(s.split(regex)));
+		List<String> list = new ArrayList<String>();
+		for (String item : s.split(regex))
+		{
+			if (!item.isEmpty())
+			{
+				list.add(item);
+			}
+		}
+		return list;
 	}
 
 	public static String convertLineDelimiter(String text, LineDelimiter mode)

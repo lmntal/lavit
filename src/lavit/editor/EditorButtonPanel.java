@@ -180,12 +180,20 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 				{
 					if (exitCode == 0)
 					{
-						editorPanel.openFile(outputFile);
+						if (outputFile.exists())
+						{
+							editorPanel.openFile(outputFile);
+						}
+						else
+						{
+							FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) output file does not exists.");
+						}
 					}
 					else
 					{
 						FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) failed.");
 					}
+					FrontEnd.mainFrame.toolTab.systemPanel.logPanel.println("compile finished. [" + id + "]");
 				}
 			});
 		}
@@ -206,6 +214,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		javaArgs.add("-DLMNTAL_HOME=lmntal");
 
 		Set<String> options = StringUtils.splitToSet(Env.get("LMNTAL_OPTION"), "\\s+");
+		options.add("--slimcode");
 		List<String> args = new ArrayList<String>();
 		args.addAll(options);
 		args.add(Env.getSpaceEscape(file.getAbsolutePath()));
@@ -279,12 +288,20 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 					{
 						if (exitCode == 0)
 						{
-							FrontEnd.executeILFileInSLIM(outputFile);
+							if (outputFile.exists())
+							{
+								FrontEnd.executeILFileInSLIM(outputFile);
+							}
+							else
+							{
+								FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) output file does not exists.");
+							}
 						}
 						else
 						{
 							FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) failed.");
 						}
+						FrontEnd.mainFrame.toolTab.systemPanel.logPanel.println("compile finished. [" + id + "]");
 					}
 				});
 			}

@@ -1,5 +1,5 @@
 app-name: LaViT
-version: 2.8.2
-release-date: 2014/02/11
-download-url: http://www.ueda.info.waseda.ac.jp/~shinobu/lavit/releases/LaViT-2.8.2.jar
-description: enabled to set stdin-data for slim execution.
+version: 2.8.3
+release-date: 2014/03/17
+download-url: http://www.ueda.info.waseda.ac.jp/~shinobu/lavit/releases/LaViT-2.8.3.jar
+description: implemented a property (env.txt) editor\nfixed problems of execution buttons

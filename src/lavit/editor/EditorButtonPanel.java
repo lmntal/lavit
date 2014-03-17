@@ -370,13 +370,15 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		}
 		else if (src == slimButton)
 		{
-			if (editorPanel.isChanged())
-			{
-				editorPanel.fileSave();
-			}
-
 			if (editorPanel.getFile().getName().endsWith(".il"))
 			{
+				if (editorPanel.isChanged())
+				{
+					if (!editorPanel.fileSave())
+					{
+						return;
+					}
+				}
 				FrontEnd.executeILFileInSLIM(editorPanel.getFile());
 			}
 			else

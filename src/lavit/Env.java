@@ -90,7 +90,6 @@ public final class Env
 	private static final String ENV_DEFAULT_FILE = "env_default.txt";
 	private static final String DIR_NAME_PROPERTIES = "properties";
 
-	private static Env env = null;
 	private static Properties prop = new Properties();
 
 	private static String cachedLMNtalVersion = null;
@@ -98,10 +97,11 @@ public final class Env
 
 	private static List<Image> appIcons;
 
+	/**
+	 * FIXME: staticな処理をコンストラクタで行い、しかもインスタンスを利用していないので、static classにするかsingletonに直す。
+	 */
 	public Env()
 	{
-		env = this;
-
 		//ファイルの作成
 		try
 		{
@@ -134,7 +134,7 @@ public final class Env
 		loadDefault();
 	}
 
-	private void loadDefault()
+	private static void loadDefault()
 	{
 		//バージョンアップの処理（設定値がない場合はその値を入れる）
 		Properties default_prop = new Properties();
@@ -488,7 +488,7 @@ public final class Env
 			}
 			else
 			{
-				in = env.getClass().getResourceAsStream("/" + filename);
+				in = Env.class.getResourceAsStream("/" + filename);
 			}
 		}
 		catch (FileNotFoundException e)

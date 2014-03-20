@@ -308,7 +308,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 
 	public void actionPerformed(ActionEvent e)
 	{
-		JButton src = (JButton)e.getSource();
+		Object src = e.getSource();
 
 		if (src == lmntalButton)
 		{
@@ -320,7 +320,6 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		}
 		else if (src == lmntalgButton)
 		{
-
 			if (editorPanel.isChanged())
 			{
 				editorPanel.fileSave();

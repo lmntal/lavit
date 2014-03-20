@@ -186,14 +186,14 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 						}
 						else
 						{
-							FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) output file does not exists.");
+							logError("(compile[" + id + "]) output file does not exists.");
 						}
 					}
 					else
 					{
-						FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) failed.");
+						logError("(compile[" + id + "]) failed.");
 					}
-					FrontEnd.mainFrame.toolTab.systemPanel.logPanel.println("compile finished. [" + id + "]");
+					logInfo("compile finished. [" + id + "]");
 				}
 			});
 		}
@@ -289,14 +289,14 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 						}
 						else
 						{
-							FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) output file does not exists.");
+							logError("(compile[" + id + "]) output file does not exists.");
 						}
 					}
 					else
 					{
-						FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) failed.");
+						logError("(compile[" + id + "]) failed.");
 					}
-					FrontEnd.mainFrame.toolTab.systemPanel.logPanel.println("compile finished. [" + id + "]");
+					logInfo("compile finished. [" + id + "]");
 				}
 			});
 		}
@@ -553,5 +553,15 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 			FrontEnd.abortAllProcessTasks();
 			FrontEnd.errPrintln("Kill");
 		}
+	}
+
+	private static void logInfo(String message)
+	{
+		FrontEnd.println(message);
+	}
+
+	private static void logError(String message)
+	{
+		FrontEnd.errPrintln(message);
 	}
 }

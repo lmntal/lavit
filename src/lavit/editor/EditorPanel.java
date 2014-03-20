@@ -246,9 +246,13 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		return page != null ? page.getJTextPane() : null;
 	}
 
+	/**
+	 * 選択されているページが存在しない場合は{@code null}を返す。
+	 */
 	public File getFile()
 	{
-		return tabView.getSelectedPage().getFile();
+		EditorPage page = tabView.getSelectedPage();
+		return page != null ? page.getFile() : null;
 	}
 
 	public List<File> getFiles()
@@ -754,12 +758,20 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 	public void editorUndo()
 	{
-		tabView.getSelectedPage().undo();
+		EditorPage page = tabView.getSelectedPage();
+		if (page != null)
+		{
+			page.undo();
+		}
 	}
 
 	public void editorRedo()
 	{
-		tabView.getSelectedPage().redo();
+		EditorPage page = tabView.getSelectedPage();
+		if (page != null)
+		{
+			page.redo();
+		}
 	}
 
 	public void redoundoUpdate()

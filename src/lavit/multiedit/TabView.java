@@ -131,6 +131,9 @@ public class TabView extends JTabbedPane
 		return page;
 	}
 
+	/**
+	 * 選択されたページが存在しない場合は{@code null}を返す。
+	 */
 	public EditorPage getSelectedPage()
 	{
 		return (EditorPage)getSelectedComponent();
@@ -139,7 +142,11 @@ public class TabView extends JTabbedPane
 	public void setSelectedPage(int index)
 	{
 		setSelectedIndex(index);
-		getSelectedPage().requestFocus();
+		EditorPage page = getSelectedPage();
+		if (page != null)
+		{
+			page.requestFocus();
+		}
 	}
 
 	public void setSelectedPage(EditorPage page)

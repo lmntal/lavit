@@ -264,55 +264,45 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 
 	private void runSlim()
 	{
-		boolean changed = false;
-
 		if (editorPanel.isChanged())
 		{
 			if (!editorPanel.fileSave())
 			{
 				return;
 			}
-			changed = true;
 		}
 
 		File file = editorPanel.getFile();
 		final File outputFile = createILCodeFile(file);
 
-		if (changed || !outputFile.exists())
+		try
 		{
-			try
+			compile(file, outputFile, new ProcessFinishListener()
 			{
-				compile(file, outputFile, new ProcessFinishListener()
+				public void processFinished(int id, int exitCode, boolean isAborted)
 				{
-					public void processFinished(int id, int exitCode, boolean isAborted)
+					if (exitCode == 0)
 					{
-						if (exitCode == 0)
+						if (outputFile.exists())
 						{
-							if (outputFile.exists())
-							{
-								FrontEnd.executeILFileInSLIM(outputFile);
-							}
-							else
-							{
-								FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) output file does not exists.");
-							}
+							FrontEnd.executeILFileInSLIM(outputFile);
 						}
 						else
 						{
-							FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) failed.");
+							FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) output file does not exists.");
 						}
-						FrontEnd.mainFrame.toolTab.systemPanel.logPanel.println("compile finished. [" + id + "]");
 					}
-				});
-			}
-			catch (FileNotFoundException e)
-			{
-				e.printStackTrace();
-			}
+					else
+					{
+						FrontEnd.mainFrame.toolTab.systemPanel.logPanel.errPrintln("(compile[" + id + "]) failed.");
+					}
+					FrontEnd.mainFrame.toolTab.systemPanel.logPanel.println("compile finished. [" + id + "]");
+				}
+			});
 		}
-		else
+		catch (FileNotFoundException e)
 		{
-			FrontEnd.executeILFileInSLIM(outputFile);
+			e.printStackTrace();
 		}
 	}
 

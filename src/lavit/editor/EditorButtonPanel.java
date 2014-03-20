@@ -322,7 +322,11 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 
 		if (src == lmntalButton)
 		{
-			compileLMNtal();
+			File file = editorPanel.getFile();
+			if (file != null && file.getName().endsWith(".lmn"))
+			{
+				compileLMNtal();
+			}
 		}
 		else if (src == lmntalgButton)
 		{
@@ -370,7 +374,12 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		}
 		else if (src == slimButton)
 		{
-			if (editorPanel.getFile().getName().endsWith(".il"))
+			File file = editorPanel.getFile();
+			if (file == null)
+			{
+				return;
+			}
+			if (file.getName().endsWith(".il"))
 			{
 				if (editorPanel.isChanged())
 				{
@@ -379,30 +388,11 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 						return;
 					}
 				}
-				FrontEnd.executeILFileInSLIM(editorPanel.getFile());
+				FrontEnd.executeILFileInSLIM(file);
 			}
 			else
 			{
 				runSlim();
-				/*
-				setButtonEnable(false);
-
-				FrontEnd.mainFrame.toolTab.setTab("System");
-
-				FrontEnd.println("(SLIM) Doing...");
-				slimRunner = new SlimRunner(Env.get("SLIM_OPTION"));
-				slimRunner.run();
-				(new Thread(new Runnable() { public void run() {
-					while(slimRunner.isRunning()){
-						FrontEnd.sleep(200);
-					}
-					FrontEnd.println("(SLIM) Done! ["+(slimRunner.getTime()/1000.0)+"s]");
-					slimRunner = null;
-					javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-						setButtonEnable(true);
-					}});
-				}})).start();
-				*/
 			}
 		}
 		else if (src == sviewerButton)

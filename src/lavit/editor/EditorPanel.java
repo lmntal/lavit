@@ -396,7 +396,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			}
 			reader.close();
 
-			EditorPage page = createPage(buf.toString());
+			EditorPage page = createPage(file, buf.toString());
 			page.setFile(file);
 			tabView.setSelectedPage(page);
 
@@ -467,14 +467,31 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		}
 	}
 
-	private EditorPage createPage(String text)
+	private EditorPage createPage(File file, String text)
 	{
-		EditorPage page = createEmptyPage();
+		EditorPage page = createIfNotOpened(file);
 		page.setText(text);
 		page.setCaretPosition(0);
 		page.setModified(false);
 		page.clearUndo();
 		return page;
+	}
+
+	private EditorPage createIfNotOpened(File file)
+	{
+		EditorPage[] pages = tabView.getPages();
+		for (int i = 0; i < pages.length; i++)
+		{
+			EditorPage page = pages[i];
+			if (page.hasFile())
+			{
+				if (page.getFile().equals(file))
+				{
+					return page;
+				}
+			}
+		}
+		return createEmptyPage();
 	}
 
 	private EditorPage createEmptyPage()

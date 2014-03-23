@@ -488,7 +488,11 @@ public class FrontEnd
 	{
 		LaViTSplashWindow.showSplash(2000);
 
-		new Env();
+		if (!Env.loadEnvironment())
+		{
+			System.err.println("Error: failed to load environment");
+			return;
+		}
 
 		setLookAndFeel(LookAndFeelEntry.getLookAndFeelEntry(Env.get("LookAndFeel")));
 

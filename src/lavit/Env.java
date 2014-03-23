@@ -97,28 +97,24 @@ public final class Env
 
 	private static List<Image> appIcons;
 
-	/**
-	 * FIXME: staticな処理をコンストラクタで行い、しかもインスタンスを利用していないので、static classにするかsingletonに直す。
-	 */
-	public Env()
+	private Env() { }
+
+	public static boolean loadEnvironment()
 	{
-		//ファイルの作成
+		File envFile = new File(ENV_FILE);
 		try
 		{
-			File e = new File(ENV_FILE);
-			if (!e.exists())
+			if (!envFile.exists())
 			{
-				System.out.println("make " + ENV_FILE);
-				e.createNewFile();
+				System.err.println("creating " + ENV_FILE);
+				envFile.createNewFile();
 			}
 		}
 		catch (IOException e)
 		{
-			System.err.println(ENV_FILE + " make error. check " + new File(".").getAbsolutePath());
-			System.exit(0);
+			System.err.println("Error: failed to create " + envFile);
+			return false;
 		}
-
-		//ファイルの読み込み
 		try
 		{
 			InputStream in = getInputStreamOfFile(ENV_FILE);
@@ -127,11 +123,11 @@ public final class Env
 		}
 		catch (IOException e)
 		{
-			System.err.println("read error. check " + ENV_FILE);
-			System.exit(0);
+			System.err.println("Error: failed to read file " + ENV_FILE);
+			return false;
 		}
-
 		loadDefault();
+		return true;
 	}
 
 	private static void loadDefault()

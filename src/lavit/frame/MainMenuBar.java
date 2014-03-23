@@ -96,6 +96,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 
 	private JMenu setting;
 	private JMenuItem iCygwinPath;
+	private JMenuItem iLMNtalCompilerPath;
 	private JMenuItem iSlimPath;
 	private JMenuItem iGeneral;
 
@@ -343,6 +344,11 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		setting.add(iCygwinPath);
 		iCygwinPath.addActionListener(this);
 
+		//TODO: LMNtalコンパイラを指定可能に（LMNTAL_HOMEとの関係も考慮して正式に実装する）
+		//iLMNtalCompilerPath = new JMenuItem("LMNtal Compiler Path...");
+		//setting.add(iLMNtalCompilerPath);
+		//iLMNtalCompilerPath.addActionListener(this);
+
 		iSlimPath = new JMenuItem(Lang.m[24]);
 		setting.add(iSlimPath);
 		iSlimPath.addActionListener(this);
@@ -478,6 +484,10 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		else if (src == iCygwinPath)
 		{
 			CygwinPathSetting.showDialog();
+		}
+		else if (src == iLMNtalCompilerPath)
+		{
+			LMNtalCompilerPathSetting.showDialog(FrontEnd.mainFrame);
 		}
 		else if (src == iSlimPath)
 		{

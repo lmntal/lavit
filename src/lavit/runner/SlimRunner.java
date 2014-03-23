@@ -181,7 +181,7 @@ public class SlimRunner implements OuterRunner
 				long startTimeMillis = System.currentTimeMillis();
 
 				// LMNtal起動
-				String cmd1 = Env.getLmntalCmd() + " " + Env.get("SLIM_LMNTAL_COMPILE_OPTION") + " " + Env.getSpaceEscape(targetFile.getAbsolutePath());
+				String cmd1 = Env.getLmntalCmd() + " " + Env.get("LMNTAL_OPTION") + " " + Env.getSpaceEscape(targetFile.getAbsolutePath());
 
 				if (!quiet) FrontEnd.println("(SLIM) " + cmd1);
 

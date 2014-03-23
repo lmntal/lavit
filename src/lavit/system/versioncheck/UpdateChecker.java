@@ -41,6 +41,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.swing.SwingUtilities;
@@ -64,7 +65,7 @@ public class UpdateChecker
 			if (releaseVersion.isNewer(currentVersion))
 			{
 				final String downloadUrl = getDefault(table, "download-url", "");
-				final String desc = getDefault(table, "description", "");
+				final String desc = getLocalizedDescription(table);
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -105,6 +106,18 @@ public class UpdateChecker
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private static String getLocalizedDescription(Map<String, String> map)
+	{
+		String desc = getDefault(map, "description", "");
+		Locale l = Locale.getDefault();
+		String localizedDesc = map.get("description-" + l.getLanguage());
+		if (localizedDesc != null)
+		{
+			desc = localizedDesc;
+		}
+		return desc;
 	}
 
 	private static String getDefault(Map<String, String> map, String key, String defval)

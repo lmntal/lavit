@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+@Deprecated
 public class Lang
 {
 	public static String[] m = new String[40];

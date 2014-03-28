@@ -423,6 +423,7 @@ public class FrontEnd
 			}
 		}
 		Lang.set(Env.get("LANG"));
+		Env.loadMsg();
 
 		if (Env.isWindows() && !Env.isSet("WINDOWS_CYGWIN_DIR"))
 		{

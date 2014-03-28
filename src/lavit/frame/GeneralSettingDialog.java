@@ -61,6 +61,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -600,9 +601,17 @@ public class GeneralSettingDialog extends JDialog
 
 			JLabel labelLanguage = new JLabel("Language:");
 			langComboBox = new JComboBox();
-			langComboBox.addItem(new Item("jp", "Japanese"));
-			langComboBox.addItem(new Item("en", "English"));
-			langComboBox.setSelectedItem(Env.get("LANG"));
+			langComboBox.addItem(new Item("ja", "Japanese (ja)"));
+			langComboBox.addItem(new Item("en", "English (en)"));
+			String langCode = Env.get("LANG");
+			for (int i = 0; i < langComboBox.getItemCount(); i++)
+			{
+				Item item = (Item)langComboBox.getItemAt(i);
+				if (item.id.equals(langCode))
+				{
+					langComboBox.setSelectedItem(item);
+				}
+			}
 			langComboBox.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -660,7 +669,15 @@ public class GeneralSettingDialog extends JDialog
 		{
 			Item item = (Item)langComboBox.getSelectedItem();
 			Env.set("LANG", item.id);
-			JOptionPane.showMessageDialog(this, Env.getMsg(MsgID.text_please_reboot), "Change Language", JOptionPane.INFORMATION_MESSAGE);
+
+			final JComponent parent = this;
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					JOptionPane.showMessageDialog(parent, Env.getMsg(MsgID.text_please_reboot), "Reboot required", JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
 		}
 
 		private void changeLAF()

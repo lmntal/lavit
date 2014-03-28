@@ -42,30 +42,23 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import lavit.Env;
-import lavit.FrontEnd;
-import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.localizedtext.MsgID;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNodeSet;
 
@@ -371,7 +364,7 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object,Double>
 			graph = new GraphPanel();
 			panel.add(graph, BorderLayout.CENTER);
 
-			end = new JButton(Lang.d[7]);
+			end = new JButton(Env.getMsg(MsgID.text_end));
 			end.addActionListener(this);
 			panel.add(end, BorderLayout.SOUTH);
 

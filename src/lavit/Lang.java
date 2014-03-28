@@ -35,8 +35,6 @@
 
 package lavit;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -51,6 +49,10 @@ public class Lang {
 	public static String[] w = new String[30];
 
 	public static void set(String lang){
+		if (lang.equals("ja"))
+		{
+			lang = "jp";
+		}
 		Properties prop = new Properties();
 		String fn = LANG_DIR + "/" + lang + LANG_EXT;
 		try {

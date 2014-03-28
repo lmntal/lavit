@@ -54,7 +54,7 @@ import javax.swing.SwingUtilities;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.Lang;
+import lavit.localizedtext.MsgID;
 import lavit.runner.LmntalRunner;
 import lavit.runner.PrintLineListener;
 import lavit.runner.ProcessFinishListener;
@@ -95,23 +95,23 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		lmntalButton.addActionListener(this);
 		buttonPanel.add(lmntalButton);
 
-		lmntalgButton = new JButton(Lang.m[12]);
+		lmntalgButton = new JButton(Env.getMsg(MsgID.button_unyo_2g));
 		lmntalgButton.addActionListener(this);
 		buttonPanel.add(lmntalgButton);
 
-		unyoButton = new JButton(Lang.m[13]);
+		unyoButton = new JButton(Env.getMsg(MsgID.button_unyo_3g));
 		unyoButton.addActionListener(this);
 		buttonPanel.add(unyoButton);
 
-		stateProfilerButton = new JButton(Lang.m[21]);
+		stateProfilerButton = new JButton(Env.getMsg(MsgID.button_stateprofiler));
 		stateProfilerButton.addActionListener(this);
 		buttonPanel.add(stateProfilerButton);
 
-		slimButton = new JButton(Lang.m[14]);
+		slimButton = new JButton(Env.getMsg(MsgID.button_slim));
 		slimButton.addActionListener(this);
 		buttonPanel.add(slimButton);
 
-		sviewerButton = new JButton(Lang.m[15]);
+		sviewerButton = new JButton(Env.getMsg(MsgID.button_stateviewer));
 		sviewerButton.addActionListener(this);
 		buttonPanel.add(sviewerButton);
 
@@ -128,7 +128,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		//nullButton = new JButton();
 		//buttonPanel.add(nullButton);
 
-		killButton = new JButton(Lang.m[20]);
+		killButton = new JButton(Env.getMsg(MsgID.button_kill));
 		killButton.addActionListener(this);
 		buttonPanel.add(killButton);
 

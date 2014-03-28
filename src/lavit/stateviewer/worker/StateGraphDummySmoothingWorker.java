@@ -47,8 +47,8 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import lavit.Env;
-import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.localizedtext.MsgID;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
@@ -173,7 +173,7 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 			bar.setIndeterminate(true);
 			panel.add(bar);
 
-			cancel = new JButton(Lang.d[2]);
+			cancel = new JButton(Env.getMsg(MsgID.text_cancel));
 			cancel.addActionListener(this);
 			panel.add(cancel);
 

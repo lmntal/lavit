@@ -83,8 +83,8 @@ import javax.swing.plaf.FontUIResource;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.Lang;
 import lavit.frame.propertyeditor.PropertyEditorDialog;
+import lavit.localizedtext.MsgID;
 import lavit.util.FixFlowLayout;
 import lavit.util.LookAndFeelEntry;
 import lavit.util.StringUtils;
@@ -660,7 +660,7 @@ public class GeneralSettingDialog extends JDialog
 		{
 			Item item = (Item)langComboBox.getSelectedItem();
 			Env.set("LANG", item.id);
-			JOptionPane.showMessageDialog(this, Lang.f[4], "Change Language", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this, Env.getMsg(MsgID.text_please_reboot), "Change Language", JOptionPane.INFORMATION_MESSAGE);
 		}
 
 		private void changeLAF()

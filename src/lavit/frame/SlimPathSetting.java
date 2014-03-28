@@ -53,9 +53,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import lavit.Env;
-import lavit.Lang;
 import lavit.frame.ModalSettingDialog.ClosingEvent;
 import lavit.frame.SlimPathSetting.Result;
+import lavit.localizedtext.MsgID;
 import lavit.runner.SlimInstaller;
 import lavit.ui.PathInputField;
 import lavit.util.FileUtils;
@@ -88,7 +88,7 @@ public final class SlimPathSetting
 			dialog.setDialogIconImages(Env.getApplicationIcons());
 			dialog.setDialogTitle("SLIM Setting");
 			dialog.setHeadLineText("Setup SLIM path");
-			dialog.setDescriptionText(Lang.w[8] + Env.getSlimBinaryName() + Lang.w[9]);
+			dialog.setDescriptionText(Env.getMsg(MsgID.text_need_slim_path));
 			dialog.setClosingListener(new ModalSettingDialog.ClosingListener()
 			{
 				public void dialogClosing(ClosingEvent e)
@@ -182,10 +182,10 @@ class SlimPathPanel extends JPanel
 
 	private void initializeComponents()
 	{
-		useInstalled = new JRadioButton(Lang.w[13] + SLIM_BIN + Lang.w[14]);
+		useInstalled = new JRadioButton(Env.getMsg(MsgID.text_use_already_installed));
 		add(useInstalled);
 
-		install = new JRadioButton(Lang.w[2] + SLIM_BIN + Lang.w[3]);
+		install = new JRadioButton(Env.getMsg(MsgID.text_install_slim));
 		add(install);
 
 		JLabel label1 = new JLabel("Source Location:");
@@ -200,7 +200,7 @@ class SlimPathPanel extends JPanel
 			chooser.setDialogTitle("SLIM Source Location");
 			chooser.setMultiSelectionEnabled(false);
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			pathSource = new PathInputField(chooser, Lang.w[0], 25);
+			pathSource = new PathInputField(chooser, Env.getMsg(MsgID.button_browse), 25);
 			panel.add(label1);
 			panel.add(pathSource);
 			add(panel);
@@ -214,7 +214,7 @@ class SlimPathPanel extends JPanel
 			chooser.setDialogTitle("Install Location");
 			chooser.setMultiSelectionEnabled(false);
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			pathInstall = new PathInputField(chooser, Lang.w[0], 25);
+			pathInstall = new PathInputField(chooser, Env.getMsg(MsgID.button_browse), 25);
 			pathInstall.addChangeListener(new ChangeListener()
 			{
 				public void stateChanged(ChangeEvent e)
@@ -230,10 +230,10 @@ class SlimPathPanel extends JPanel
 			add(panel);
 		}
 
-		useIncluded = new JRadioButton(Lang.w[4] + SLIM_BIN + Lang.w[5]);
+		useIncluded = new JRadioButton(Env.getMsg(MsgID.text_included_slim));
 		add(useIncluded);
 
-		useOther = new JRadioButton(Lang.w[6] + SLIM_BIN + Lang.w[7]);
+		useOther = new JRadioButton(Env.getMsg(MsgID.text_input_slim_path));
 		add(useOther);
 
 		{
@@ -244,7 +244,7 @@ class SlimPathPanel extends JPanel
 			chooser.setDialogTitle("SLIM Location");
 			chooser.setMultiSelectionEnabled(false);
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			pathSlim = new PathInputField(chooser, Lang.w[0], 25);
+			pathSlim = new PathInputField(chooser, Env.getMsg(MsgID.button_browse), 25);
 			panel.add(label3);
 			panel.add(pathSlim);
 			add(panel);

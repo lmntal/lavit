@@ -67,8 +67,8 @@ import javax.swing.text.StyleConstants;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.localizedtext.MsgID;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
 import lavit.stateviewer.StatePanel;
@@ -488,11 +488,11 @@ public class StateSimulationPanel extends JPanel {
 	        btnPanel =  new JPanel();
 	        btnPanel.setLayout(new GridLayout(1,2));
 
-	        ok = new JButton(Lang.d[6]);
+	        ok = new JButton(Env.getMsg(MsgID.text_ok));
 	        ok.addActionListener(this);
 	        btnPanel.add(ok);
 
-	        cancel = new JButton(Lang.d[2]);
+	        cancel = new JButton(Env.getMsg(MsgID.text_cancel));
 	        cancel.addActionListener(this);
 	        btnPanel.add(cancel);
 

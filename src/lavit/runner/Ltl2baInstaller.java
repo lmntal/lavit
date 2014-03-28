@@ -35,14 +35,12 @@
 
 package lavit.runner;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -53,36 +51,29 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.zip.GZIPInputStream;
 
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
-
-import org.apache.tools.tar.TarEntry;
-import org.apache.tools.tar.TarInputStream;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.localizedtext.MsgID;
 import lavit.util.OuterRunner;
+
+import org.apache.tools.tar.TarEntry;
+import org.apache.tools.tar.TarInputStream;
 
 public class Ltl2baInstaller implements OuterRunner  {
 
@@ -215,7 +206,7 @@ public class Ltl2baInstaller implements OuterRunner  {
 
 				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
 						FrontEnd.mainFrame,
-						Lang.w[10],
+						Env.getMsg(MsgID.text_install_completed),
 						"LTL2BA INSTALL",
 						JOptionPane.PLAIN_MESSAGE
 				);}});
@@ -227,7 +218,7 @@ public class Ltl2baInstaller implements OuterRunner  {
 
 				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
 						FrontEnd.mainFrame,
-						Lang.w[11],
+						Env.getMsg(MsgID.text_install_failed),
 						"LTL2BA INSTALL",
 						JOptionPane.PLAIN_MESSAGE
 				);}});

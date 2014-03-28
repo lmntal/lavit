@@ -73,9 +73,9 @@ import javax.swing.filechooser.FileFilter;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.Lang;
 import lavit.event.TabChangeListener;
 import lavit.frame.FindReplaceDialog;
+import lavit.localizedtext.MsgID;
 import lavit.multiedit.EditorPage;
 import lavit.multiedit.LineColumn;
 import lavit.multiedit.TabView;
@@ -569,11 +569,11 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		if (page.isModified())
 		{
 			String title = page.hasFile() ? page.getFile().getName() : "untitled";
-			String message = title + Lang.f[2];
+			String message = Env.getMsg(MsgID.text_modified, title);
 
 			AskDialogBuilder builder = AskDialogBuilder.getInstance();
 			builder
-				.setButtonCaptions(Lang.d[0], Lang.d[1], Lang.d[2])
+				.setButtonCaptions(Env.getMsg(MsgID.text_yes), Env.getMsg(MsgID.text_no), Env.getMsg(MsgID.text_cancel))
 				.setDialogTitle(title)
 				.setText(message)
 				.setMessageType(MessageType.QUESTION);
@@ -662,9 +662,9 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			{
 				AskDialogBuilder builder = AskDialogBuilder.getInstance();
 				builder
-					.setButtonCaptions(Lang.d[0], Lang.d[1], Lang.d[2])
-					.setDialogTitle(Lang.f[1])
-					.setText(file.getName() + Lang.f[0])
+					.setButtonCaptions(Env.getMsg(MsgID.text_yes), Env.getMsg(MsgID.text_no), Env.getMsg(MsgID.text_cancel))
+					.setDialogTitle(Env.getMsg(MsgID.text_overwrite))
+					.setText(Env.getMsg(MsgID.text_already_exists, file.getName()))
 					.setMessageType(MessageType.QUESTION);
 				DialogResult res = builder.showDialog();
 				if (res == DialogResult.YES)
@@ -696,11 +696,11 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	{
 		EditorPage page = tabView.getSelectedPage();
 		String title = page.hasFile() ? page.getFile().getName() : "untitled";
-		String message = title + Lang.f[2];
+		String message = Env.getMsg(MsgID.text_modified, title);
 
 		AskDialogBuilder builder = AskDialogBuilder.getInstance();
 		builder
-			.setButtonCaptions(Lang.d[0], Lang.d[1], Lang.d[2])
+			.setButtonCaptions(Env.getMsg(MsgID.text_yes), Env.getMsg(MsgID.text_no), Env.getMsg(MsgID.text_cancel))
 			.setDialogTitle(title)
 			.setText(message)
 			.setMessageType(MessageType.QUESTION);

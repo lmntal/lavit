@@ -58,7 +58,7 @@ import javax.swing.WindowConstants;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.Lang;
+import lavit.localizedtext.MsgID;
 import lavit.util.StringUtils;
 
 @SuppressWarnings("serial")
@@ -124,7 +124,7 @@ public class VersionDialog extends JDialog
 		String slimVersion = Env.getSlimVersion();
 		if (StringUtils.nullOrEmpty(slimVersion))
 		{
-			slimVersion = Lang.w[15];
+			slimVersion = Env.getMsg(MsgID.text_unavailable);
 		}
 		String info =
 			"LaViT\n" +

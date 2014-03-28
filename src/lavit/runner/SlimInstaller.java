@@ -71,8 +71,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import lavit.Env;
-import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.localizedtext.MsgID;
 import lavit.ui.ColoredLinePrinter;
 import lavit.util.Cygpath;
 import lavit.util.FileUtils;
@@ -419,14 +419,14 @@ public class SlimInstaller implements OuterRunner
 				logPrintLine("== SLIM INSTALL SUCCEEDED ==");
 				logPrintLine("slim is in " + getSlimInstallPathName());
 				JOptionPane.showMessageDialog(
-					window, Lang.w[10], "SLIM INSTALL",
+					window, Env.getMsg(MsgID.text_install_completed), "SLIM INSTALL",
 					JOptionPane.PLAIN_MESSAGE, ICON_SUCCESS);
 			}
 			else
 			{
 				logPrintLine("== SLIM INSTALL FAILED ==");
 				JOptionPane.showMessageDialog(
-					window, Lang.w[11], "SLIM INSTALL",
+					window, Env.getMsg(MsgID.text_install_failed), "SLIM INSTALL",
 					JOptionPane.PLAIN_MESSAGE, ICON_FAILED);
 			}
 

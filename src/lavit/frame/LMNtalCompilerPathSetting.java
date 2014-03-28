@@ -43,7 +43,7 @@ import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 
 import lavit.Env;
-import lavit.Lang;
+import lavit.localizedtext.MsgID;
 import lavit.ui.PathInputField;
 
 public final class LMNtalCompilerPathSetting
@@ -87,7 +87,7 @@ public final class LMNtalCompilerPathSetting
 					return file.isDirectory() || file.getName().equals("lmntal.jar");
 				}
 			});
-			pathInput = new PathInputField(chooser, Lang.w[0], 20);
+			pathInput = new PathInputField(chooser, Env.getMsg(MsgID.button_browse), 20);
 			pathInput.setPathText(Env.get("path.lmntalcompiler", "lmntal/bin/lmntal.jar"));
 
 			add(pathInput);

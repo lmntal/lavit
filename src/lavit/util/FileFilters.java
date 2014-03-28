@@ -38,12 +38,13 @@ package lavit.util;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import lavit.Lang;
+import lavit.Env;
+import lavit.localizedtext.MsgID;
 
 public final class FileFilters
 {
-	private static final FileFilter lmnFileFilter = new FileNameExtensionFilter("LMNtal " + Lang.d[5] + " (*.lmn)", "lmn");
-	private static final FileFilter ilFileFilter = new FileNameExtensionFilter(Lang.d[9] + " (*.il, *.tal)", "il", "tal");
+	private static final FileFilter lmnFileFilter = new FileNameExtensionFilter("LMNtal " + Env.getMsg(MsgID.text_file) + " (*.lmn)", "lmn");
+	private static final FileFilter ilFileFilter = new FileNameExtensionFilter(Env.getMsg(MsgID.text_lmntal_il) + " (*.il, *.tal)", "il", "tal");
 
 	private FileFilters() { }
 

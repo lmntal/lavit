@@ -509,7 +509,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		}
 		else if (src == iBrowse)
 		{
-			openInBrowser(Env.APP_HREF);
+			showInDefaultBrowser(Env.APP_HREF);
 		}
 	}
 
@@ -596,22 +596,35 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		}
 	}
 
-	private static void openInBrowser(String uri)
+	//TODO: ブラウザ起動のサポートは事前に調べ、サポートされない場合はメニューを表示しないように変更する。
+	private static void showInDefaultBrowser(String uri)
 	{
 		if (Desktop.isDesktopSupported())
 		{
-			try
+			Desktop desktop = Desktop.getDesktop();
+			if (desktop.isSupported(Desktop.Action.BROWSE))
 			{
-				Desktop.getDesktop().browse(new URI(uri));
+				try
+				{
+					desktop.browse(new URI(uri));
+				}
+				catch (URISyntaxException e)
+				{
+					e.printStackTrace();
+				}
+				catch(IOException e)
+				{
+					e.printStackTrace();
+				}
 			}
-			catch (URISyntaxException e)
+			else
 			{
-				e.printStackTrace();
+				System.err.println("showInDefaultBrowser failed: Desktop does not support \"browse\" action.");
 			}
-			catch(IOException e)
-			{
-				e.printStackTrace();
-			}
+		}
+		else
+		{
+			System.err.println("showInDefaultBrowser failed: Desktop is not supported.");
 		}
 	}
 

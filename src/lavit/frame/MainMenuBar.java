@@ -52,6 +52,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -617,21 +618,28 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 	private static void showRuntimeInformation()
 	{
 		Runtime rt = Runtime.getRuntime();
-		int maxMem = (int)(rt.maxMemory() / 1024 / 1024);
-		int useMem = (int)(rt.totalMemory() / 1024 / 1024);
-		int procs = rt.availableProcessors();
-		String javaVersion = System.getProperty("java.version");
-		String javaRuntimeVersion = System.getProperty("java.runtime.version");
-		String jvmVersion = System.getProperty("java.vm.version");
-		JOptionPane.showMessageDialog(
-			FrontEnd.mainFrame,
-			"Max Memory : " + maxMem + " MB\n" +
-			"Use Memory : " + useMem + " MB\n" +
-			"Available Processors : " + procs + " \n" +
-			"Java Version : " + javaVersion + " \n" +
-			"Java Runtime Version : " + javaRuntimeVersion + " \n"+
-			"Java VM Version : " + jvmVersion + " \n",
-			"Java Runtime Info",
-			JOptionPane.INFORMATION_MESSAGE);
+		final int maxMem = (int)(rt.maxMemory() / 1024 / 1024);
+		final int useMem = (int)(rt.totalMemory() / 1024 / 1024);
+		final int procs = rt.availableProcessors();
+		final String javaVersion = System.getProperty("java.version");
+		final String javaRuntimeVersion = System.getProperty("java.runtime.version");
+		final String jvmVersion = System.getProperty("java.vm.version");
+
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				JOptionPane.showMessageDialog(
+					FrontEnd.mainFrame,
+					"Max Memory : " + maxMem + " MB\n" +
+					"Use Memory : " + useMem + " MB\n" +
+					"Available Processors : " + procs + " \n" +
+					"Java Version : " + javaVersion + " \n" +
+					"Java Runtime Version : " + javaRuntimeVersion + " \n"+
+					"Java VM Version : " + jvmVersion + " \n",
+					"Java Runtime Info",
+					JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
 	}
 }

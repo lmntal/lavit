@@ -39,50 +39,59 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class Lang {
-
-	static final String LANG_DIR = "lang";
-	static final String LANG_EXT = ".xml";
+public class Lang
+{
 	public static String[] m = new String[40];
 	public static String[] d = new String[30];
 	public static String[] f = new String[30];
 	public static String[] w = new String[30];
 
-	public static void set(String lang){
+	private static final String LANG_DIR = "lang";
+	private static final String LANG_EXT = ".xml";
+
+	public static void set(String lang)
+	{
 		if (lang.equals("ja"))
 		{
 			lang = "jp";
 		}
 		Properties prop = new Properties();
 		String fn = LANG_DIR + "/" + lang + LANG_EXT;
-		try {
+		try
+		{
 			InputStream in = Env.getInputStreamOfFile(fn);
 			prop.loadFromXML(in);
-            in.close();
-        } catch (IOException e) {
-            System.err.println("check "+fn);
-            System.exit(0);
-        }
-        set(prop);
+			in.close();
+		}
+		catch (IOException e)
+		{
+			System.err.println("check " + fn);
+			System.exit(0);
+		}
+		set(prop);
 	}
 
-	public static void set(Properties prop){
-		for(int i=0;i<m.length;++i){
-			String str = prop.getProperty("m"+i);
-			if(str!=null){ m[i] = str; }
+	public static void set(Properties prop)
+	{
+		for (int i = 0; i < m.length; ++i)
+		{
+			String str = prop.getProperty("m" + i);
+			if (str != null) { m[i] = str; }
 		}
-		for(int i=0;i<d.length;++i){
-			String str = prop.getProperty("d"+i);
-			if(str!=null){ d[i] = str; }
+		for (int i = 0; i < d.length; ++i)
+		{
+			String str = prop.getProperty("d" + i);
+			if (str != null) { d[i] = str; }
 		}
-		for(int i=0;i<f.length;++i){
-			String str = prop.getProperty("f"+i);
-			if(str!=null){ f[i] = str; }
+		for (int i = 0; i < f.length; ++i)
+		{
+			String str = prop.getProperty("f" + i);
+			if (str != null) { f[i] = str; }
 		}
-		for(int i=0;i<w.length;++i){
-			String str = prop.getProperty("w"+i);
-			if(str!=null){ w[i] = str; }
+		for (int i = 0; i < w.length; ++i)
+		{
+			String str = prop.getProperty("w" + i);
+			if (str != null) { w[i] = str; }
 		}
 	}
-
 }

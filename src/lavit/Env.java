@@ -65,6 +65,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lavit.localizedtext.Msg;
 import lavit.util.FileUtils;
 import lavit.util.FontSizeUtils;
 import lavit.util.StringUtils;
@@ -96,6 +97,8 @@ public final class Env
 	private static String cachedSLIMVersion = null;
 
 	private static List<Image> appIcons;
+
+	private static Msg msg;
 
 	private Env() { }
 
@@ -187,6 +190,29 @@ public final class Env
 		{
 			System.err.println("save error. check "+ENV_FILE);
 		}
+	}
+
+	public static void loadMsg()
+	{
+		msg = new Msg(Env.get("LANG", ""));
+	}
+
+	public static String getMsg(int msgid)
+	{
+		if (msg == null)
+		{
+			throw new RuntimeException("Messages are not loaded. Call the method Env.loadMsg().");
+		}
+		return msg.get(msgid);
+	}
+
+	public static String getMsg(int msgid, String ... args)
+	{
+		if (msg == null)
+		{
+			throw new RuntimeException("Messages are not loaded. Call the method Env.loadMsg().");
+		}
+		return msg.get(msgid, args);
 	}
 
 	public static Collection<String[]> getEntries()

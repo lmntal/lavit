@@ -57,7 +57,7 @@ import javax.swing.event.MenuListener;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.Lang;
+import lavit.localizedtext.MsgID;
 import lavit.system.FileHistory;
 
 @SuppressWarnings("serial")
@@ -107,45 +107,45 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 
 	public MainMenuBar()
 	{
-		file = new JMenu(Lang.m[0]);
+		file = new JMenu(Env.getMsg(MsgID.menu_file));
 		add(file);
 		file.setMnemonic(KeyEvent.VK_F);
 
-		iNew = new JMenuItem(Lang.m[1]);
+		iNew = new JMenuItem(Env.getMsg(MsgID.menu_new));
 		file.add(iNew);
 		iNew.addActionListener(this);
 		iNew.setMnemonic(KeyEvent.VK_N);
 
-		iOpen = new JMenuItem(Lang.m[2]);
+		iOpen = new JMenuItem(Env.getMsg(MsgID.menu_open));
 		file.add(iOpen);
 		iOpen.addActionListener(this);
 		iOpen.setMnemonic(KeyEvent.VK_O);
 
-		iSave = new JMenuItem(Lang.m[3]);
+		iSave = new JMenuItem(Env.getMsg(MsgID.menu_save));
 		file.add(iSave);
 		iSave.addActionListener(this);
 		iSave.setMnemonic(KeyEvent.VK_S);
 
-		iSaveAs = new JMenuItem(Lang.m[4]);
+		iSaveAs = new JMenuItem(Env.getMsg(MsgID.menu_saveas));
 		file.add(iSaveAs);
 		iSaveAs.addActionListener(this);
 		iSaveAs.setMnemonic(KeyEvent.VK_A);
 
 		file.addSeparator();
 
-		iClose = new JMenuItem(Lang.m[31]);
+		iClose = new JMenuItem(Env.getMsg(MsgID.menu_close));
 		file.add(iClose);
 		iClose.addActionListener(this);
 		iClose.setMnemonic(KeyEvent.VK_C);
 
-		iCloseAll = new JMenuItem(Lang.m[32]);
+		iCloseAll = new JMenuItem(Env.getMsg(MsgID.menu_closeall));
 		file.add(iCloseAll);
 		iCloseAll.addActionListener(this);
 		iCloseAll.setMnemonic(KeyEvent.VK_L);
 
 		file.addSeparator();
 
-		iSVOpen = new JMenuItem(Lang.m[30]);
+		iSVOpen = new JMenuItem(Env.getMsg(MsgID.menu_open_sv_file));
 		file.add(iSVOpen);
 		iSVOpen.addActionListener(this);
 
@@ -156,22 +156,22 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 
 		file.addSeparator();
 
-		iExit = new JMenuItem(Lang.m[5]);
+		iExit = new JMenuItem(Env.getMsg(MsgID.menu_exit));
 		file.add(iExit);
 		iExit.addActionListener(this);
 		iExit.setMnemonic(KeyEvent.VK_X);
 
-		edit = new JMenu(Lang.m[6]);
+		edit = new JMenu(Env.getMsg(MsgID.menu_edit));
 		add(edit);
 		edit.setMnemonic(KeyEvent.VK_E);
 
-		iUndo = new JMenuItem(Lang.m[16]);
+		iUndo = new JMenuItem(Env.getMsg(MsgID.menu_undo));
 		edit.add(iUndo);
 		iUndo.setEnabled(false);
 		iUndo.addActionListener(this);
 		iUndo.setMnemonic(KeyEvent.VK_U);
 
-		iRedo = new JMenuItem(Lang.m[17]);
+		iRedo = new JMenuItem(Env.getMsg(MsgID.menu_redo));
 		edit.add(iRedo);
 		iRedo.setEnabled(false);
 		iRedo.addActionListener(this);
@@ -179,17 +179,17 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 
 		edit.addSeparator();
 
-		iCopy = new JMenuItem(Lang.m[7]);
+		iCopy = new JMenuItem(Env.getMsg(MsgID.menu_copy));
 		edit.add(iCopy);
 		iCopy.addActionListener(this);
 		iCopy.setMnemonic(KeyEvent.VK_C);
 
-		iCut = new JMenuItem(Lang.m[8]);
+		iCut = new JMenuItem(Env.getMsg(MsgID.menu_cut));
 		edit.add(iCut);
 		iCut.addActionListener(this);
 		iCut.setMnemonic(KeyEvent.VK_T);
 
-		iPaste = new JMenuItem(Lang.m[9]);
+		iPaste = new JMenuItem(Env.getMsg(MsgID.menu_paste));
 		edit.add(iPaste);
 		iPaste.addActionListener(this);
 		iPaste.setMnemonic(KeyEvent.VK_P);
@@ -238,9 +238,9 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		edit.add(iTemplate);
 		*/
 
-		JMenu menuView = new JMenu(Lang.m[36]);
+		JMenu menuView = new JMenu(Env.getMsg(MsgID.menu_group_view));
 		add(menuView);
-		final JCheckBoxMenuItem itemShowFileView = new JCheckBoxMenuItem(Lang.m[37]);
+		final JCheckBoxMenuItem itemShowFileView = new JCheckBoxMenuItem(Env.getMsg(MsgID.menu_item_filesystem));
 		itemShowFileView.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -265,33 +265,33 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		});
 		menuView.add(itemShowFileView);
 
-		run = new JMenu(Lang.m[10]);
+		run = new JMenu(Env.getMsg(MsgID.menu_run));
 		add(run);
 		run.setMnemonic(KeyEvent.VK_R);
 
-		iLMNtal = new JMenuItem(Lang.m[11]);
+		iLMNtal = new JMenuItem(Env.getMsg(MsgID.button_lmntal_java));
 		run.add(iLMNtal);
 		iLMNtal.addActionListener(this);
 		iLMNtal.setMnemonic(KeyEvent.VK_L);
 
-		iLMNtalg = new JMenuItem(Lang.m[12]);
+		iLMNtalg = new JMenuItem(Env.getMsg(MsgID.button_unyo_2g));
 		run.add(iLMNtalg);
 		iLMNtalg.addActionListener(this);
 		iLMNtalg.setMnemonic(KeyEvent.VK_G);
 
-		iUNYO = new JMenuItem(Lang.m[13]);
+		iUNYO = new JMenuItem(Env.getMsg(MsgID.button_unyo_3g));
 		run.add(iUNYO);
 		iUNYO.addActionListener(this);
 		iUNYO.setMnemonic(KeyEvent.VK_U);
 
-		iSLIM = new JMenuItem(Lang.m[14]);
+		iSLIM = new JMenuItem(Env.getMsg(MsgID.button_slim));
 		run.add(iSLIM);
 		iSLIM.addActionListener(this);
 		iSLIM.setMnemonic(KeyEvent.VK_S);
 
 		run.addSeparator();
 
-		iILJavaRun = new JMenuItem(Lang.m[33]);
+		iILJavaRun = new JMenuItem(Env.getMsg(MsgID.menu_run_il_java));
 		run.add(iILJavaRun);
 		iILJavaRun.addActionListener(new ActionListener()
 		{
@@ -302,7 +302,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		});
 		iILJavaRun.setMnemonic(KeyEvent.VK_I);
 
-		iILSlimRun = new JMenuItem(Lang.m[38]);
+		iILSlimRun = new JMenuItem(Env.getMsg(MsgID.menu_item_run_slim));
 		run.add(iILSlimRun);
 		iILSlimRun.addActionListener(new ActionListener()
 		{
@@ -315,32 +315,32 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 
 		run.addSeparator();
 
-		iSViewer = new JMenuItem(Lang.m[15]);
+		iSViewer = new JMenuItem(Env.getMsg(MsgID.button_stateviewer));
 		run.add(iSViewer);
 		iSViewer.addActionListener(this);
 		iSViewer.setMnemonic(KeyEvent.VK_V);
 
-		iStateProfiler = new JMenuItem(Lang.m[21]);
+		iStateProfiler = new JMenuItem(Env.getMsg(MsgID.button_stateprofiler));
 		run.add(iStateProfiler);
 		iStateProfiler.addActionListener(this);
 		iStateProfiler.setMnemonic(KeyEvent.VK_P);
 
-		iKill = new JMenuItem(Lang.m[20]);
+		iKill = new JMenuItem(Env.getMsg(MsgID.button_kill));
 		run.add(iKill);
 		iKill.addActionListener(this);
 		iKill.setMnemonic(KeyEvent.VK_K);
 
 		run.addSeparator();
 
-		iReboot = new JMenuItem(Lang.m[27]);
+		iReboot = new JMenuItem(Env.getMsg(MsgID.menu_reboot));
 		run.add(iReboot);
 		iReboot.addActionListener(this);
 
-		setting = new JMenu(Lang.m[22]);
+		setting = new JMenu(Env.getMsg(MsgID.menu_setting));
 		add(setting);
 		setting.setMnemonic(KeyEvent.VK_S);
 
-		iCygwinPath = new JMenuItem(Lang.m[23]);
+		iCygwinPath = new JMenuItem(Env.getMsg(MsgID.menu_cygwin_path));
 		setting.add(iCygwinPath);
 		iCygwinPath.addActionListener(this);
 
@@ -349,27 +349,27 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		//setting.add(iLMNtalCompilerPath);
 		//iLMNtalCompilerPath.addActionListener(this);
 
-		iSlimPath = new JMenuItem(Lang.m[24]);
+		iSlimPath = new JMenuItem(Env.getMsg(MsgID.menu_slim_path));
 		setting.add(iSlimPath);
 		iSlimPath.addActionListener(this);
 
-		iGeneral = new JMenuItem(Lang.m[29]);
+		iGeneral = new JMenuItem(Env.getMsg(MsgID.menu_general_setting));
 		setting.add(iGeneral);
 		iGeneral.addActionListener(this);
 
-		help = new JMenu(Lang.m[18]);
+		help = new JMenu(Env.getMsg(MsgID.menu_help));
 		add(help);
 		help.setMnemonic(KeyEvent.VK_H);
 
-		iVersion = new JMenuItem(Lang.m[19]);
+		iVersion = new JMenuItem(Env.getMsg(MsgID.menu_version));
 		help.add(iVersion);
 		iVersion.addActionListener(this);
 
-		iRuntime = new JMenuItem(Lang.m[26]);
+		iRuntime = new JMenuItem(Env.getMsg(MsgID.menu_jre_info));
 		help.add(iRuntime);
 		iRuntime.addActionListener(this);
 
-		iBrowse = new JMenuItem(Lang.m[28]);
+		iBrowse = new JMenuItem(Env.getMsg(MsgID.menu_webpage));
 		help.add(iBrowse);
 		iBrowse.addActionListener(this);
 
@@ -519,7 +519,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 
 	private static JMenu createRecentFilesMenu(JMenu owner)
 	{
-		final JMenuItem miClearRecentFiles = new JMenuItem(Lang.m[35]);
+		final JMenuItem miClearRecentFiles = new JMenuItem(Env.getMsg(MsgID.menu_clear_recent));
 		miClearRecentFiles.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -528,10 +528,10 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 			}
 		});
 
-		final JMenuItem miEmpty = new JMenuItem("(Empty)");
+		final JMenuItem miEmpty = new JMenuItem(Env.getMsg(MsgID.menu_recent_empty));
 		miEmpty.setEnabled(false);
 
-		final JMenu menu = new JMenu(Lang.m[34]);
+		final JMenu menu = new JMenu(Env.getMsg(MsgID.menu_recent));
 		owner.addMenuListener(new MenuListener()
 		{
 			public void menuSelected(MenuEvent e)

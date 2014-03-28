@@ -416,13 +416,14 @@ public class FrontEnd
 	{
 		if (!Env.isSet("LANG"))
 		{
-			Lang.set("en");
+			//Lang.set("en");
 			if (!LanguageSetting.showDialog())
 			{
 				System.exit(0);
 			}
 		}
-		Lang.set(Env.get("LANG"));
+		//Lang.set(Env.get("LANG"));
+		Env.loadMsg();
 
 		if (Env.isWindows() && !Env.isSet("WINDOWS_CYGWIN_DIR"))
 		{

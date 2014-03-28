@@ -4,6 +4,7 @@
 	<property file="build.properties" />
 
 	<property name="src" location="src" />
+	<property name="gen" location="gen" />
 	<property name="bin" location="bin" />
 
 	<property name="java.encoding" value="UTF-8" />
@@ -27,13 +28,14 @@
 
 	<!-- Compile Java Sources -->
 	<target name="javac" depends="mkdir" description="compile all">
-		<javac srcdir="${src}" destdir="${bin}" encoding="${java.encoding}"
+		<javac srcdir="${src};${gen}" destdir="${bin}" encoding="${java.encoding}"
 			target="${java.target}" source="${java.source}" includeantruntime="false">
 			<classpath refid="classpath" />
 		</javac>
 		<!-- copy resources -->
 		<copy todir="${bin}">
-			<fileset dir="${src}" includes="**/*" excludes="**/*.class" />
+			<fileset dir="${src}" includes="**/*" excludes="**/*.java" />
+			<fileset dir="${gen}" includes="**/*" excludes="**/*.java" />
 		</copy>
 	</target>
 

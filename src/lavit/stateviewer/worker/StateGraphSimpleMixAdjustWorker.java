@@ -35,38 +35,27 @@
 
 package lavit.stateviewer.worker;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.SwingWorker;
-
 import lavit.Env;
-import lavit.Lang;
-import lavit.frame.ChildWindowListener;
 import lavit.stateviewer.StateGraphPanel;
-import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
 
-public class StateGraphSimpleMixAdjustWorker extends Thread {
+public class StateGraphSimpleMixAdjustWorker extends Thread
+{
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
 
-	public StateGraphSimpleMixAdjustWorker(StateGraphPanel panel){
+	public StateGraphSimpleMixAdjustWorker(StateGraphPanel panel)
+	{
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
 	}
 
-	public void run(){
+	public void run()
+	{
 		panel.setActive(false);
 
 		boolean crossreduction_dummyonly = Env.is("SV_CROSSREDUCTION_DUMMYONLY");
-		Env.set("SV_CROSSREDUCTION_DUMMYONLY",false);
+		Env.set("SV_CROSSREDUCTION_DUMMYONLY", false);
 
 		drawNodes.removeDummy();
 
@@ -74,10 +63,11 @@ public class StateGraphSimpleMixAdjustWorker extends Thread {
 		drawNodes.dummyCentering();
 		drawNodes.updateNodeLooks();
 
-		(new StateGraphAdjust2Worker(panel)).waitExecute();
-		(new StateGraphExchangeWorker(panel)).waitExecute();
+		new StateGraphAdjust2Worker(panel).waitExecute();
+		new StateGraphExchangeWorker(panel).waitExecute();
 
-		if(panel.statePanel.isLtl()){
+		if (panel.statePanel.isLtl())
+		{
 			panel.searchShortCycle();
 		}
 
@@ -88,5 +78,4 @@ public class StateGraphSimpleMixAdjustWorker extends Thread {
 		panel.autoCentering();
 		panel.setActive(true);
 	}
-
 }

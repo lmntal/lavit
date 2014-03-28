@@ -51,7 +51,7 @@ import javax.swing.SwingUtilities;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.Lang;
+import lavit.localizedtext.MsgID;
 
 @SuppressWarnings("serial")
 public class RebootFrame extends JDialog
@@ -89,8 +89,8 @@ public class RebootFrame extends JDialog
 
 		private JTextField pathInput = new JTextField();
 
-		private JButton reboot = new JButton(Lang.m[27]);
-		private JButton cancel = new JButton(Lang.d[2]);
+		private JButton reboot = new JButton(Env.getMsg(MsgID.menu_reboot));
+		private JButton cancel = new JButton(Env.getMsg(MsgID.text_cancel));
 
 		public SelectPanel(Window frame)
 		{

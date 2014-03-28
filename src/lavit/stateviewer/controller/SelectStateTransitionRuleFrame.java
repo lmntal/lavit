@@ -36,36 +36,27 @@
 package lavit.stateviewer.controller;
 
 import java.awt.BorderLayout;
-import java.awt.Checkbox;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Set;
 
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.Lang;
 import lavit.frame.ChildWindowListener;
-import lavit.stateviewer.*;
+import lavit.localizedtext.MsgID;
+import lavit.stateviewer.StateGraphPanel;
+import lavit.stateviewer.StateRule;
+import lavit.stateviewer.StateTransition;
+import lavit.stateviewer.StateTransitionCatcher;
 
 public class SelectStateTransitionRuleFrame extends JFrame implements ActionListener {
 	private StateGraphPanel graphPanel;
@@ -110,11 +101,11 @@ public class SelectStateTransitionRuleFrame extends JFrame implements ActionList
         btnPanel =  new JPanel();
         btnPanel.setLayout(new GridLayout(1,2));
 
-        ok = new JButton(Lang.d[6]);
+        ok = new JButton(Env.getMsg(MsgID.text_ok));
         ok.addActionListener(this);
         btnPanel.add(ok);
 
-        rev = new JButton(Lang.d[8]);
+        rev = new JButton(Env.getMsg(MsgID.text_reverse));
         rev.addActionListener(this);
         btnPanel.add(rev);
 

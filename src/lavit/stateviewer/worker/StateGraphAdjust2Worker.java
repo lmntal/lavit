@@ -53,8 +53,8 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import lavit.Env;
-import lavit.Lang;
 import lavit.frame.ChildWindowListener;
+import lavit.localizedtext.MsgID;
 import lavit.stateviewer.NodeYComparator;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
@@ -722,7 +722,7 @@ public class StateGraphAdjust2Worker extends SwingWorker<Object,Object>{
 			bar.setStringPainted(true);
 			panel.add(bar);
 
-			cancel = new JButton(Lang.d[2]);
+			cancel = new JButton(Env.getMsg(MsgID.text_cancel));
 			cancel.addActionListener(this);
 			panel.add(cancel);
 

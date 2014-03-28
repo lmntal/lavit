@@ -48,7 +48,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import lavit.Env;
-import lavit.Lang;
+import lavit.localizedtext.MsgID;
 import lavit.util.StringUtils;
 
 public final class CygwinPathSetting
@@ -66,7 +66,7 @@ public final class CygwinPathSetting
 			dialog = ModalSettingDialog.createDialog(sp);
 			dialog.setDialogTitle("Cygwin Path Setting");
 			dialog.setHeadLineText("Cygwin path setting");
-			dialog.setDescriptionText(Lang.w[1]);
+			dialog.setDescriptionText(Env.getMsg(MsgID.text_cygwin_required));
 			dialog.setDialogIconImages(Env.getApplicationIcons());
 			dialog.setDialogResizable(false);
 		}
@@ -104,7 +104,7 @@ class SelectPanel extends JPanel
 		textPath.setColumns(20);
 		add(textPath);
 
-		JButton buttonBrowse = new JButton(Lang.w[0]);
+		JButton buttonBrowse = new JButton(Env.getMsg(MsgID.button_browse));
 		buttonBrowse.addActionListener(new ActionListener()
 		{
 			@Override

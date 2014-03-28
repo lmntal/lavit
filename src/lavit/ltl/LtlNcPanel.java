@@ -52,7 +52,7 @@ import javax.swing.undo.UndoManager;
 
 import lavit.Env;
 import lavit.FrontEnd;
-import lavit.Lang;
+import lavit.localizedtext.MsgID;
 import lavit.runner.Ltl2baInstaller;
 import lavit.runner.Ltl2baRunner;
 import lavit.util.CommonFontUser;
@@ -136,7 +136,7 @@ class LtlNcPanel extends JPanel implements ActionListener, CommonFontUser
 						{
 							JOptionPane.showMessageDialog(
 								FrontEnd.mainFrame,
-								Lang.w[12]+" (lmntal/"+Env.getDirNameOfLtl2ba()+")",
+								Env.getMsg(MsgID.text_ltl2ba_not_found)  + " (lmntal/" + Env.getDirNameOfLtl2ba() + ")",
 								"LTL2BA INSTALL",
 								JOptionPane.PLAIN_MESSAGE);
 						}

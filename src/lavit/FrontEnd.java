@@ -451,6 +451,7 @@ public class FrontEnd
 		try
 		{
 			mainFrame = new MainFrame();
+			mainFrame.setVisible(true);
 			mainFrame.editorPanel.openInitialFiles();
 
 			loadArgs(args); //起動オプションの読み込み

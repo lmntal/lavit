@@ -49,6 +49,7 @@ import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.text.BadLocationException;
 
@@ -64,13 +65,12 @@ import extgui.flatsplitpane.FlatSplitPane;
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame
 {
-	public Set<Window> childFrames;
-
-	public MainMenuBar mainMenuBar;
 	public EditorPanel editorPanel;
-	public JSplitPane jsp;
 	public ToolTab toolTab;
 
+	private JSplitPane editorSplit;
+
+	private Set<Window> childFrames = new HashSet<Window>();
 	private Dimension sizeSave;
 	private Point locationSave;
 
@@ -78,12 +78,10 @@ public class MainFrame extends JFrame
 
 	public MainFrame()
 	{
-		childFrames = new HashSet<Window>();
-
 		sizeSave = new Dimension(Env.getInt("WINDOW_WIDTH"), Env.getInt("WINDOW_HEIGHT"));
 		setSize(sizeSave);
 
-		locationSave = new Point(Env.getInt("WINDOW_X"),Env.getInt("WINDOW_Y"));
+		locationSave = new Point(Env.getInt("WINDOW_X"), Env.getInt("WINDOW_Y"));
 		setLocation(locationSave);
 
 		String state = Env.get("WINDOW_STATE");
@@ -106,7 +104,7 @@ public class MainFrame extends JFrame
 			{
 				if (getExtendedState() == JFrame.NORMAL)
 				{
-					if (getX() > 0 && getY() > 0)
+					if (getX() >= 0 && getY() >= 0)
 					{
 						locationSave = getLocation();
 					}
@@ -118,11 +116,11 @@ public class MainFrame extends JFrame
 		setIconImages(Env.getApplicationIcons());
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
-		mainMenuBar = new MainMenuBar();
-		setJMenuBar(mainMenuBar);
+		setJMenuBar(new MainMenuBar());
 
 		editorPanel = new EditorPanel();
 		editorPanel.setFileViewVisible(Env.is("window.fileview.visible"));
+		editorPanel.setFileViewExtensionFilterText(Env.get("window.fileview.filter", ""));
 		editorPanel.addTabChangeListener(new TabChangeListener()
 		{
 			public void tabChanged()
@@ -140,27 +138,30 @@ public class MainFrame extends JFrame
 
 		toolTab = new ToolTab();
 
-		final double editorPer = IntUtils.clamp(Env.getInt("window.divider_location", 50), 0, 100) / 100.0;
-		jsp = new FlatSplitPane();
-		jsp.setLeftComponent(editorPanel);
-		jsp.setRightComponent(toolTab);
-		jsp.setOneTouchExpandable(true);
-		jsp.setResizeWeight(0.5);
+		final int fileViewDividerLocation = Env.getInt("window.fileview.divider", 25);
+		final double editorDividerRatio = IntUtils.clamp(Env.getInt("window.divider_location", 50), 0, 100) / 100.0;
+		editorSplit = new FlatSplitPane();
+		editorSplit.setLeftComponent(editorPanel);
+		editorSplit.setRightComponent(toolTab);
+		editorSplit.setOneTouchExpandable(true);
+		editorSplit.setResizeWeight(0.5);
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowOpened(WindowEvent e)
 			{
-				int location = Env.getInt("window.fileview.divider", 25);
-				editorPanel.setFileViewDividerLocation(location);
-				jsp.setDividerLocation((int)Math.round(getWidth() * editorPer));
-				editorPanel.setFileViewExtensionFilterText(Env.get("window.fileview.filter", ""));
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						editorPanel.setFileViewDividerLocation(fileViewDividerLocation);
+						editorSplit.setDividerLocation((int)Math.round(getWidth() * editorDividerRatio));
+					}
+				});
 			}
 		});
-		setContentPane(jsp);
+		setContentPane(editorSplit);
 
 		addWindowListener(new MainWindowListener(this));
-
-		setVisible(true);
 	}
 
 	public void addChildWindow(Window window)
@@ -274,7 +275,7 @@ public class MainFrame extends JFrame
 		Env.set("WINDOW_WIDTH", sizeSave.width);
 		Env.set("WINDOW_HEIGHT", sizeSave.height);
 		Env.set("WINDOW_STATE", getExtendedState() == JFrame.MAXIMIZED_BOTH ? "maximized" : "normal");
-		Env.set("window.divider_location", (int)Math.round(100.0 * jsp.getDividerLocation() / getWidth()));
+		Env.set("window.divider_location", (int)Math.round(100.0 * editorSplit.getDividerLocation() / getWidth()));
 		Env.set("window.fileview.visible", editorPanel.isFileViewVisible());
 		Env.set("window.fileview.divider", editorPanel.getFileViewDividerLocation());
 		Env.set("window.fileview.filter", editorPanel.getFileViewExtensionFilterText());

@@ -237,71 +237,86 @@ public class FindReplaceDialog extends JDialog
 		return checkWrap.isSelected();
 	}
 
-	private void doFind(boolean forward, final boolean replace)
+	private void doFind(final boolean forward, final boolean replace)
 	{
 		setMessage("");
-		if (isRegex())
+		getTextFinder().accept(new Option.IVisitor<ITextFinder, Object>()
 		{
-			progressFindRegex(forward, isWrapSearch()).accept(new Option.IVisitor<Boolean, Object>()
+			public Object visitSome(ITextFinder finder)
 			{
-				public Object visitSome(Boolean found)
+				progressFind(finder, forward, isWrapSearch()).accept(new Option.IVisitor<Range, Object>()
 				{
-					if (found)
+					public Object visitSome(Range range)
 					{
+						setSelection(range);
 						if (replace)
 						{
 							askReplace();
 						}
+						return null;
 					}
-					else
+
+					public Object visitNone()
 					{
 						setErrorMessage("text not found.");
+						return null;
 					}
-					return null;
-				}
+				});
+				return null;
+			}
 
-				public Object visitNone()
-				{
-					return null;
-				}
-			});
-		}
-		else
-		{
-			if (progressFind(forward, isWrapSearch()))
+			public Object visitNone()
 			{
-				if (replace)
-				{
-					askReplace();
-				}
+				return null;
 			}
-			else
-			{
-				setErrorMessage("text not found.");
-			}
-		}
+		});
 	}
 
 	private void doReplaceAll()
 	{
-		executeReplaceAll(true, isWrapSearch());
+		setMessage("");
+		getTextFinder().accept(new Option.IVisitor<ITextFinder, Object>()
+		{
+			public Object visitSome(ITextFinder finder)
+			{
+				executeReplaceAll(finder, true, isWrapSearch());
+				return null;
+			}
+
+			public Object visitNone()
+			{
+				return null;
+			}
+		});
 	}
 
-	private Option<Pattern> getQueryPattern(String patternText)
+	private Option<ITextFinder> getTextFinder()
 	{
-		if (isQueryDirty)
+		String text = findText.getText();
+		if (text.isEmpty())
 		{
-			try
-			{
-				queryPattern = Pattern.compile(patternText);
-				isQueryDirty = false;
-			}
-			catch (PatternSyntaxException e)
-			{
-				return Option.none();
-			}
+			setErrorMessage("text is empty.");
+			return Option.none();
 		}
-		return Option.some(queryPattern);
+
+		if (isRegex())
+		{
+			if (isQueryDirty)
+			{
+				try
+				{
+					queryPattern = Pattern.compile(text);
+					isQueryDirty = false;
+				}
+				catch (PatternSyntaxException e)
+				{
+					setErrorMessage("regular expression syntax error.");
+					return Option.none();
+				}
+			}
+			return Option.some(ITextFinder.Factory.create(queryPattern));
+		}
+		return Option.some(ITextFinder.Factory.create(text));
 	}
 
 	private String getText()
@@ -309,52 +324,41 @@ public class FindReplaceDialog extends JDialog
 		return targetTextComponent.getText().replace("\r\n", "\n");
 	}
 
-	private boolean progressFind(boolean forward, boolean wrap)
+	private Option<Range> progressFind(final ITextFinder finder, final boolean forward, final boolean wrap)
 	{
-		return progressFind(new TextFinder(findText.getText()), forward, wrap);
-	}
-
-	private Option<Boolean> progressFindRegex(final boolean forward, final boolean wrap)
-	{
-		return getQueryPattern(findText.getText()).accept(new Option.IVisitor<Pattern, Option<Boolean>>()
-		{
-			public Option<Boolean> visitNone()
-			{
-				setErrorMessage("regular expression syntax error.");
-				return Option.none();
-			}
-
-			public Option<Boolean> visitSome(Pattern pattern)
-			{
-				return Option.some(progressFind(new RegexTextFinder(pattern), forward, wrap));
-			}
-		});
-	}
-
-	private boolean progressFind(ITextFinder finder, boolean forward, boolean wrap)
-	{
-		String text = getText();
+		final String text = getText();
+		Option<Range> result;
 		if (forward)
 		{
-			if (!finder.selectNextMatch(text, targetTextComponent.getSelectionEnd()))
-			{
-				if (!wrap || !finder.selectNextMatch(text, 0))
-				{
-					return false;
-				}
-			}
+			result = finder.selectNextMatch(text, targetTextComponent.getSelectionEnd());
 		}
 		else
 		{
-			if (!finder.selectPreviousMatch(text, targetTextComponent.getSelectionStart()))
-			{
-				if (!wrap || !finder.selectPreviousMatch(text, text.length()))
-				{
-					return false;
-				}
-			}
+			result = finder.selectPreviousMatch(text, targetTextComponent.getSelectionStart());
 		}
-		return true;
+		return result.accept(new Option.IVisitor<Range, Option<Range>>()
+		{
+			public Option<Range> visitNone()
+			{
+				if (wrap)
+				{
+					if (forward)
+					{
+						return finder.selectNextMatch(text, 0);
+					}
+					else
+					{
+						return finder.selectPreviousMatch(text, text.length());
+					}
+				}
+				return Option.none();
+			}
+
+			public Option<Range> visitSome(Range item)
+			{
+				return Option.some(item);
+			}
+		});
 	}
 
 	private void askReplace()
@@ -368,33 +372,54 @@ public class FindReplaceDialog extends JDialog
 		}
 	}
 
-	private void executeReplaceAll(boolean forward, boolean wrap)
+	private void executeReplaceAll(ITextFinder finder, boolean forward, boolean wrap)
 	{
-		int count = stepReplaceAll(forward, wrap);
-		setMessage("replaced " + count + " tokens.");
+		initiateReplaceAll(finder, forward, wrap);
 	}
 
-	private int stepReplaceAll(boolean forward, boolean wrap)
+	private void initiateReplaceAll(final ITextFinder finder , final boolean forward, final boolean wrap)
 	{
-		return progressFindRegex(forward, wrap).accept(new Option.IVisitor<Boolean, Integer>()
+		progressFind(finder, forward, wrap).accept(new Option.IVisitor<Range, Object>()
 		{
-			public Integer visitSome(Boolean b)
+			public Object visitSome(Range range)
 			{
+				setSelection(range);
 				targetTextComponent.replaceSelection(replaceText.getText());
-				return 1;
+				int count = 1 + stepReplaceAll(finder, forward, wrap);
+				setMessage("replaced " + count + " tokens.");
+				return null;
+			}
+
+			public Object visitNone()
+			{
+				setErrorMessage("not found.");
+				return null;
+			}
+		});
+	}
+
+	private int stepReplaceAll(final ITextFinder finder, final boolean forward, final boolean wrap)
+	{
+		return progressFind(finder, forward, wrap).accept(new Option.IVisitor<Range, Integer>()
+		{
+			public Integer visitSome(Range range)
+			{
+				setSelection(range);
+				targetTextComponent.replaceSelection(replaceText.getText());
+				return 1 + stepReplaceAll(finder, forward, wrap);
 			}
 
 			public Integer visitNone()
 			{
 				return 0;
 			}
-		}) + stepReplaceAll(forward, wrap);
+		});
 	}
 
-	private void setSelection(int start, int end)
+	private void setSelection(Range range)
 	{
-		targetTextComponent.setSelectionStart(start);
-		targetTextComponent.setSelectionEnd(end);
+		targetTextComponent.setSelectionStart(range.start);
+		targetTextComponent.setSelectionEnd(range.end);
 		targetTextComponent.requestFocusInWindow();
 	}
 
@@ -455,13 +480,37 @@ public class FindReplaceDialog extends JDialog
 		}
 	}
 
-	private interface ITextFinder
+	private static class Range
 	{
-		public boolean selectNextMatch(String text, int startIndex);
-		public boolean selectPreviousMatch(String text, int endIndex);
+		public final int start, end;
+
+		public Range(int i, int j)
+		{
+			this.start = Math.min(i, j);
+			this.end = Math.max(i, j);
+		}
 	}
 
-	private class TextFinder implements ITextFinder
+	private interface ITextFinder
+	{
+		public Option<Range> selectNextMatch(String text, int startIndex);
+		public Option<Range> selectPreviousMatch(String text, int endIndex);
+
+		public static final class Factory
+		{
+			public static ITextFinder create(String text)
+			{
+				return new TextFinder(text);
+			}
+
+			public static ITextFinder create(Pattern pattern)
+			{
+				return new RegexTextFinder(pattern);
+			}
+		}
+	}
+
+	private static class TextFinder implements ITextFinder
 	{
 		private String query;
 
@@ -470,18 +519,17 @@ public class FindReplaceDialog extends JDialog
 			this.query = query;
 		}
 
-		public boolean selectNextMatch(String text, int startIndex)
+		public Option<Range> selectNextMatch(String text, int startIndex)
 		{
 			int i = text.indexOf(query, startIndex);
 			if (i != -1)
 			{
-				setSelection(i, i + query.length());
-				return true;
+				return Option.some(new Range(i, i + query.length()));
 			}
-			return false;
+			return Option.none();
 		}
 
-		public boolean selectPreviousMatch(String text, int endIndex)
+		public Option<Range> selectPreviousMatch(String text, int endIndex)
 		{
 			int i = 0, j = -1;
 			while (i < text.length())
@@ -496,14 +544,13 @@ public class FindReplaceDialog extends JDialog
 			}
 			if (j != -1)
 			{
-				setSelection(j, j + query.length());
-				return true;
+				return Option.some(new Range(j, j + query.length()));
 			}
-			return false;
+			return Option.none();
 		}
 	}
 
-	private class RegexTextFinder implements ITextFinder
+	private static class RegexTextFinder implements ITextFinder
 	{
 		private Pattern pattern;
 
@@ -512,18 +559,17 @@ public class FindReplaceDialog extends JDialog
 			this.pattern = pattern;
 		}
 
-		public boolean selectNextMatch(String text, int startIndex)
+		public Option<Range> selectNextMatch(String text, int startIndex)
 		{
 			Matcher m = pattern.matcher(text);
 			if (m.find(startIndex))
 			{
-				setSelection(m.start(), m.end());
-				return true;
+				return Option.some(new Range(m.start(), m.end()));
 			}
-			return false;
+			return Option.none();
 		}
 
-		public boolean selectPreviousMatch(String text, int endIndex)
+		public Option<Range> selectPreviousMatch(String text, int endIndex)
 		{
 			Matcher m = pattern.matcher(text);
 			int start = -1, end = -1;
@@ -538,10 +584,9 @@ public class FindReplaceDialog extends JDialog
 			}
 			if (start != -1)
 			{
-				setSelection(start, end);
-				return true;
+				return Option.some(new Range(start, end));
 			}
-			return false;
+			return Option.none();
 		}
 	}
 }

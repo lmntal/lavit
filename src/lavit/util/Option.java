@@ -121,7 +121,7 @@ public abstract class Option<T> implements Iterable<T>
 
 	private static class UnitIterator<T> implements Iterator<T>
 	{
-		private boolean hasNext;
+		private boolean hasNext = true;
 		private T x;
 
 		public UnitIterator(T x)
@@ -141,10 +141,7 @@ public abstract class Option<T> implements Iterable<T>
 				hasNext = false;
 				return x;
 			}
-			else
-			{
-				throw new NoSuchElementException();
-			}
+			throw new NoSuchElementException();
 		}
 
 		public void remove()

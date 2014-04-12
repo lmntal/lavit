@@ -22,6 +22,7 @@ menu_cut                   = 切り取り(T)
 menu_paste                 = 貼り付け(P)
 menu_undo                  = 元に戻す
 menu_redo                  = やり直し
+menu_find_replace          = 検索・置換(F)...
 
 menu_run                   = 実行(R)
 menu_run_il_java           = 中間命令列を実行 (LMNtal Java)

@@ -237,33 +237,36 @@ public class FindReplaceDialog extends JDialog
 		return checkWrap.isSelected();
 	}
 
-	private void doFind(boolean forward, final boolean replace)
+	private void doFind(final boolean forward, final boolean replace)
 	{
 		setMessage("");
-		Option<Range> result;
-		if (isRegex())
+		getTextFinder().accept(new Option.IVisitor<ITextFinder, Object>()
 		{
-			result = progressFindRegex(forward, isWrapSearch());
-		}
-		else
-		{
-			result = progressFind(forward, isWrapSearch());
-		}
-		result.accept(new Option.IVisitor<Range, Object>()
-		{
-			public Object visitSome(Range range)
+			public Object visitSome(ITextFinder finder)
 			{
-				setSelection(range);
-				if (replace)
+				progressFind(finder, forward, isWrapSearch()).accept(new Option.IVisitor<Range, Object>()
 				{
-					askReplace();
-				}
+					public Object visitSome(Range range)
+					{
+						setSelection(range);
+						if (replace)
+						{
+							askReplace();
+						}
+						return null;
+					}
+
+					public Object visitNone()
+					{
+						setErrorMessage("text not found.");
+						return null;
+					}
+				});
 				return null;
 			}
 
 			public Object visitNone()
 			{
-				setErrorMessage("text not found.");
 				return null;
 			}
 		});

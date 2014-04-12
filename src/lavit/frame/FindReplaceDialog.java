@@ -274,6 +274,35 @@ public class FindReplaceDialog extends JDialog
 		executeReplaceAll(true, isWrapSearch());
 	}
 
+	private Option<ITextFinder> getTextFinder()
+	{
+		String text = findText.getText();
+		if (text.isEmpty())
+		{
+			setErrorMessage("text is empty.");
+			return Option.none();
+		}
+
+		if (isRegex())
+		{
+			if (isQueryDirty)
+			{
+				try
+				{
+					queryPattern = Pattern.compile(text);
+					isQueryDirty = false;
+				}
+				catch (PatternSyntaxException e)
+				{
+					setErrorMessage("regular expression syntax error.");
+					return Option.none();
+				}
+			}
+			return Option.some(ITextFinder.Factory.create(queryPattern));
+		}
+		return Option.some(ITextFinder.Factory.create(text));
+	}
+
 	private Option<Pattern> getQueryPattern(String patternText)
 	{
 		if (isQueryDirty)
@@ -489,6 +518,19 @@ public class FindReplaceDialog extends JDialog
 	{
 		public Option<Range> selectNextMatch(String text, int startIndex);
 		public Option<Range> selectPreviousMatch(String text, int endIndex);
+
+		public static final class Factory
+		{
+			public static ITextFinder create(String text)
+			{
+				return new TextFinder(text);
+			}
+
+			public static ITextFinder create(Pattern pattern)
+			{
+				return new RegexTextFinder(pattern);
+			}
+		}
 	}
 
 	private static class TextFinder implements ITextFinder

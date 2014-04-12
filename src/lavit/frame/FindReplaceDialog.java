@@ -274,7 +274,20 @@ public class FindReplaceDialog extends JDialog
 
 	private void doReplaceAll()
 	{
-		executeReplaceAll(true, isWrapSearch());
+		setMessage("");
+		getTextFinder().accept(new Option.IVisitor<ITextFinder, Object>()
+		{
+			public Object visitSome(ITextFinder finder)
+			{
+				executeReplaceAll(finder, true, isWrapSearch());
+				return null;
+			}
+
+			public Object visitNone()
+			{
+				return null;
+			}
+		});
 	}
 
 	private Option<ITextFinder> getTextFinder()
@@ -306,48 +319,9 @@ public class FindReplaceDialog extends JDialog
 		return Option.some(ITextFinder.Factory.create(text));
 	}
 
-	private Option<Pattern> getQueryPattern(String patternText)
-	{
-		if (isQueryDirty)
-		{
-			try
-			{
-				queryPattern = Pattern.compile(patternText);
-				isQueryDirty = false;
-			}
-			catch (PatternSyntaxException e)
-			{
-				return Option.none();
-			}
-		}
-		return Option.some(queryPattern);
-	}
-
 	private String getText()
 	{
 		return targetTextComponent.getText().replace("\r\n", "\n");
-	}
-
-	private Option<Range> progressFind(boolean forward, boolean wrap)
-	{
-		return progressFind(new TextFinder(findText.getText()), forward, wrap);
-	}
-
-	private Option<Range> progressFindRegex(final boolean forward, final boolean wrap)
-	{
-		return getQueryPattern(findText.getText()).accept(new Option.IVisitor<Pattern, Option<Range>>()
-		{
-			public Option<Range> visitNone()
-			{
-				setErrorMessage("regular expression syntax error.");
-				return Option.none();
-			}
-
-			public Option<Range> visitSome(Pattern pattern)
-			{
-				return progressFind(new RegexTextFinder(pattern), forward, wrap);
-			}
-		});
 	}
 
 	private Option<Range> progressFind(final ITextFinder finder, final boolean forward, final boolean wrap)
@@ -398,20 +372,20 @@ public class FindReplaceDialog extends JDialog
 		}
 	}
 
-	private void executeReplaceAll(boolean forward, boolean wrap)
+	private void executeReplaceAll(ITextFinder finder, boolean forward, boolean wrap)
 	{
-		initiateReplaceAll(forward, wrap);
+		initiateReplaceAll(finder, forward, wrap);
 	}
 
-	private void initiateReplaceAll(final boolean forward, final boolean wrap)
+	private void initiateReplaceAll(final ITextFinder finder , final boolean forward, final boolean wrap)
 	{
-		progressFindRegex(forward, wrap).accept(new Option.IVisitor<Range, Object>()
+		progressFind(finder, forward, wrap).accept(new Option.IVisitor<Range, Object>()
 		{
 			public Object visitSome(Range range)
 			{
 				setSelection(range);
 				targetTextComponent.replaceSelection(replaceText.getText());
-				int count = 1 + stepReplaceAll(forward, wrap);
+				int count = 1 + stepReplaceAll(finder, forward, wrap);
 				setMessage("replaced " + count + " tokens.");
 				return null;
 			}
@@ -424,15 +398,15 @@ public class FindReplaceDialog extends JDialog
 		});
 	}
 
-	private int stepReplaceAll(final boolean forward, final boolean wrap)
+	private int stepReplaceAll(final ITextFinder finder, final boolean forward, final boolean wrap)
 	{
-		return progressFindRegex(forward, wrap).accept(new Option.IVisitor<Range, Integer>()
+		return progressFind(finder, forward, wrap).accept(new Option.IVisitor<Range, Integer>()
 		{
 			public Integer visitSome(Range range)
 			{
 				setSelection(range);
 				targetTextComponent.replaceSelection(replaceText.getText());
-				return 1 + stepReplaceAll(forward, wrap);
+				return 1 + stepReplaceAll(finder, forward, wrap);
 			}
 
 			public Integer visitNone()

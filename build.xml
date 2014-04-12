@@ -26,6 +26,14 @@
 		<mkdir dir="${bin}" />
 	</target>
 
+	<target name="msgid">
+		<java jar="tools/msgid.jar" fork="true">
+			<arg value="." />
+			<arg value="gen" />
+			<arg value="lavit.localizedtext" />
+		</java>
+	</target>
+
 	<!-- Compile Java Sources -->
 	<target name="javac" depends="mkdir" description="compile all">
 		<javac srcdir="${src};${gen}" destdir="${bin}" encoding="${java.encoding}"

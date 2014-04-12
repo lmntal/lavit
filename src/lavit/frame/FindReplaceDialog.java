@@ -253,7 +253,7 @@ public class FindReplaceDialog extends JDialog
 		{
 			public Object visitSome(Range range)
 			{
-				setSelection(range.start, range.end);
+				setSelection(range);
 				if (replace)
 				{
 					askReplace();
@@ -368,8 +368,28 @@ public class FindReplaceDialog extends JDialog
 
 	private void executeReplaceAll(boolean forward, boolean wrap)
 	{
-		int count = stepReplaceAll(forward, wrap);
-		setMessage("replaced " + count + " tokens.");
+		initiateReplaceAll(forward, wrap);
+	}
+
+	private void initiateReplaceAll(final boolean forward, final boolean wrap)
+	{
+		progressFindRegex(forward, wrap).accept(new Option.IVisitor<Range, Object>()
+		{
+			public Object visitSome(Range range)
+			{
+				setSelection(range);
+				targetTextComponent.replaceSelection(replaceText.getText());
+				int count = 1 + stepReplaceAll(forward, wrap);
+				setMessage("replaced " + count + " tokens.");
+				return null;
+			}
+
+			public Object visitNone()
+			{
+				setErrorMessage("not found.");
+				return null;
+			}
+		});
 	}
 
 	private int stepReplaceAll(final boolean forward, final boolean wrap)
@@ -378,7 +398,7 @@ public class FindReplaceDialog extends JDialog
 		{
 			public Integer visitSome(Range range)
 			{
-				setSelection(range.start, range.end);
+				setSelection(range);
 				targetTextComponent.replaceSelection(replaceText.getText());
 				return 1 + stepReplaceAll(forward, wrap);
 			}
@@ -390,10 +410,10 @@ public class FindReplaceDialog extends JDialog
 		});
 	}
 
-	private void setSelection(int start, int end)
+	private void setSelection(Range range)
 	{
-		targetTextComponent.setSelectionStart(start);
-		targetTextComponent.setSelectionEnd(end);
+		targetTextComponent.setSelectionStart(range.start);
+		targetTextComponent.setSelectionEnd(range.end);
 		targetTextComponent.requestFocusInWindow();
 	}
 

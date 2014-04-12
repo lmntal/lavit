@@ -214,7 +214,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 
 		edit.addSeparator();
 
-		JMenuItem itemFind = new JMenuItem("Find/Replace...");
+		JMenuItem itemFind = new JMenuItem(Env.getMsg(MsgID.menu_find_replace));
+		itemFind.setMnemonic(KeyEvent.VK_F);
 		itemFind.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

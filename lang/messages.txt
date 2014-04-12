@@ -22,6 +22,7 @@ menu_cut                   = Cut
 menu_paste                 = Paste
 menu_undo                  = Undo
 menu_redo                  = Redo
+menu_find_replace          = Find/Replace...
 
 menu_run                   = Run
 menu_run_il_java           = Run Intermediate Code (LMNtal Java)

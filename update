@@ -1,6 +1,6 @@
 app-name: LaViT
-version: 2.8.4
-release-date: 2014/03/23
-download-url: http://www.ueda.info.waseda.ac.jp/~shinobu/lavit/releases/LaViT-2.8.4.jar
-description: Fixed to always compile .lmn when executing SLIM.\nFixed to move existing page to front when reopening a file.\nFixed a problem that LMNtal compile options were ignored.
-description-ja: SLIM実行時に.lmnファイルを常にコンパイルするように修正。\n既に開いているファイルを開いたときに既存のタブをアクティブにするように修正。\nLMNtalコンパイラへ渡すオプションが正しくなかった不具合を修正。
+version: 2.8.5
+release-date: 2014/04/14
+download-url: http://www.ueda.info.waseda.ac.jp/~shinobu/lavit/releases/LaViT-2.8.5.jar
+description: Fixed several problems of the find/replace dialog and redesign the dialog.
+description-ja: 検索・置換ダイアログの再設計、および処理の不具合の修正。

@@ -2,9 +2,9 @@
 LaViT - LMNtal IDE
 ===============================
 
-LaViTははプログラミング言語LMNtalのグラフィカルな統合開発環境です。
-バグ報告は lmntal@ueda.info.waseda.ac.jp までお願いします。
-LMNtal公開ページからダウンロード可能です。
+LaViTははプログラミング言語LMNtalのグラフィカルな統合開発環境です。  
+バグ報告は lmntal@ueda.info.waseda.ac.jp までお願いします。  
+LMNtal公開ページからダウンロード可能です。  
 
 ---
 
@@ -17,22 +17,22 @@ LMNtal公開ページからダウンロード可能です。
 ## Develop
 
 ### リリース方法
-- version.txt に変更内容を追記．
+- version.txt に変更内容を追記
 
-- Env.java のフィールドを書き換える．
+- Env.java のフィールドを書き換える
 
-- この時点でちゃんと commit/tag/push をしておく．__
+- この時点でちゃんと commit/tag/push をしておく  
 YYYY 年 MM 月 DD 日のコミットでバージョン A.B.C に更新する場合，  
 tag name: A.B.C  
 tag message: version A.B.C (YYYY-MM-DD)  
 
--（SLIM なども更新する場合はバンドル版）バージョン X.Y.Z のリリースは LaViTX_Y_Z というディレクトリに入れ，アーカイブ化して公開する．__
-今まで tar.gz は用意していなかったが，zip ではパーミッションが保存されないために問題が生じることがあるので，tar.gz も用意したい．__
-（LaViT のみの更新）LaViT-X.Y.Z.jar という名前で公開する．__
+-（SLIM なども更新する場合はバンドル版）バージョン X.Y.Z のリリースはLaViTX_Y_Z というディレクトリに入れ、アーカイブ化して公開する。  
+今までtar.gz は用意していなかったが、zip ではパーミッションが保存されないために問題が生じることがあるので、tar.gzも用意したい。．  
+（LaViT のみの更新LaViT-X.Y.Z.jarという名前で公開する。  
 
-- 現状では /~shinobu/lavit/releases/ に置いている．__
-バージョンチェックとダウンロードもここを参照している．__
-将来的には，admin (webadmin?) と連携して LaViT リリース用のディレクトリを作るか，（今までは google code でやっていたが）どこかのホスティングサービスを使っても良い．__
+- 現状では /~shinobu/lavit/releases/ に置いている__
+バージョンチェックとダウンロードもここを参照している。  
+将来的には、admin (webadmin?) と連携して LaViT リリース用のディレクトリを作るか、（今までは google code でやっていたが）どこかのホスティングサービスを使っても良い。  
 
 
 

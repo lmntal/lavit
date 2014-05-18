@@ -414,15 +414,15 @@ public class FrontEnd
 
 	private static void initialSetup()
 	{
+		Env.loadMsg();
+
 		if (!Env.isSet("LANG"))
 		{
-			Env.loadMsg();
 			if (!LanguageSetting.showDialog())
 			{
 				System.exit(0);
 			}
 		}
-		Env.loadMsg();
 
 		if (Env.isWindows() && !Env.isSet("WINDOWS_CYGWIN_DIR"))
 		{

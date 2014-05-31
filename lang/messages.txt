@@ -51,6 +51,7 @@ button_kill                = Kill
 button_stateprofiler       = StateProfiler
 button_browse              = Browse...
 button_clear               = Clear
+button_graphene            = Graphene
 
 text_yes                   = Yes
 text_no                    = No

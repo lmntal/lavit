@@ -1,0 +1,44 @@
+#!/bin/sh
+
+ANT_VERSION=1.9.4
+if [ ! -z $1 ]; then
+  ANT_VERSION=$1
+fi
+
+DIR_LIB=${PWD}/lib
+if [ ! -d ${DIR_LIB} ]; then
+  mkdir ${DIR_LIB}
+fi
+cd ${DIR_LIB}
+
+ANT_DIR=apache-ant-${ANT_VERSION}
+ANT_ARCHIVE=${ANT_DIR}-bin.tar.gz
+ANT_JAR=${ANT_DIR}/lib/ant.jar
+
+DIST_URL=http://archive.apache.org/dist/ant/binaries
+if [ ! -e ${ANT_ARCHIVE} ]; then
+  wget ${DIST_URL}/${ANT_ARCHIVE}
+fi
+
+if [ ! -e ${ANT_ARCHIVE} ]; then
+  printf "\033[31mFailed to download ${ANT_ARCHIVE}\033[m\n"
+  exit 1
+fi
+
+tar xzf ${ANT_ARCHIVE}
+if [ ! -e ${ANT_JAR} ]; then
+  printf "\033[31mFailed to extract ant.jar\033[m\n"
+  exit 1
+fi
+
+if [ -e ant.jar ]; then
+  rm ant.jar
+fi
+
+echo "create link to ${ANT_JAR}"
+ln -s ${ANT_JAR} ant.jar
+
+${ANT_DIR}/bin/ant -version
+if [ $? -eq 0 ]; then
+  printf "\033[32mOK, ant.jar is now available\033[m\n"
+fi

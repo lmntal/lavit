@@ -6,9 +6,7 @@ if [ ! -z $1 ]; then
 fi
 
 DIR_LIB=${PWD}/lib
-if [ ! -d ${DIR_LIB} ]; then
-  mkdir ${DIR_LIB}
-fi
+mkdir -p ${DIR_LIB}
 cd ${DIR_LIB}
 
 ANT_DIR=apache-ant-${ANT_VERSION}

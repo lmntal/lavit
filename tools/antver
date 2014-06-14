@@ -1,13 +1,17 @@
 #!/bin/sh
 
+BASEDIR=${PWD}
+
 ANT_VERSION=1.9.4
 if [ ! -z $1 ]; then
   ANT_VERSION=$1
 fi
 
-DIR_LIB=${PWD}/lib
-mkdir -p ${DIR_LIB}
-cd ${DIR_LIB}
+DIR_LIB=${BASEDIR}/lib
+DIR_CACHE=${DIR_LIB}/.cache
+
+mkdir -p ${DIR_CACHE}
+cd ${DIR_CACHE}
 
 ANT_DIR=apache-ant-${ANT_VERSION}
 ANT_ARCHIVE=${ANT_DIR}-bin.tar.gz
@@ -33,10 +37,15 @@ if [ -e ant.jar ]; then
   rm ant.jar
 fi
 
-echo "create link to ${ANT_JAR}"
-ln -s ${ANT_JAR} ant.jar
+DIR_LIB_ANT=${DIR_LIB}/apache-ant
 
-${ANT_DIR}/bin/ant -version
+mkdir -p ${DIR_LIB_ANT}
+cd ${DIR_LIB_ANT}
+
+echo "create link to ${ANT_JAR}"
+ln -s ${DIR_CACHE}/${ANT_JAR} ant.jar
+
+${DIR_CACHE}/${ANT_DIR}/bin/ant -version
 if [ $? -eq 0 ]; then
   printf "\033[32mOK, ant.jar is now available\033[m\n"
 fi

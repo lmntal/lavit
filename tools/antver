@@ -33,21 +33,24 @@ if [ ! -e ${ANT_JAR} ]; then
   exit 1
 fi
 
-if [ -e ant.jar ]; then
-  rm ant.jar
-fi
-
 DIR_LIB_ANT=${DIR_LIB}/apache-ant
 
 mkdir -p ${DIR_LIB_ANT}
 cd ${DIR_LIB_ANT}
 
-echo "Create symbolic links"
-ln -s ${DIR_CACHE}/${ANT_JAR} ant.jar
-ln -s ${DIR_CACHE}/${ANT_DIR}/LICENSE LICENSE
-ln -s ${DIR_CACHE}/${ANT_DIR}/NOTICE NOTICE
+DIR_ANT_CACHE=${DIR_CACHE}/${ANT_DIR}
 
-${DIR_CACHE}/${ANT_DIR}/bin/ant -version
+echo "Create symbolic links"
+for FILE in lib/ant.jar LICENSE NOTICE
+do
+  NAME=./`basename ${FILE}`
+  if [ -e ${NAME} ]; then
+    rm ${NAME}
+  fi
+  ln -s ${DIR_ANT_CACHE}/${FILE} ${NAME}
+done
+
+${DIR_ANT_CACHE}/bin/ant -version
 if [ $? -eq 0 ]; then
   printf "\033[32mOK, ant.jar is now available\033[m\n"
 fi

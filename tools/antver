@@ -42,8 +42,10 @@ DIR_LIB_ANT=${DIR_LIB}/apache-ant
 mkdir -p ${DIR_LIB_ANT}
 cd ${DIR_LIB_ANT}
 
-echo "create link to ${ANT_JAR}"
+echo "Create symbolic links"
 ln -s ${DIR_CACHE}/${ANT_JAR} ant.jar
+ln -s ${DIR_CACHE}/${ANT_DIR}/LICENSE LICENSE
+ln -s ${DIR_CACHE}/${ANT_DIR}/NOTICE NOTICE
 
 ${DIR_CACHE}/${ANT_DIR}/bin/ant -version
 if [ $? -eq 0 ]; then

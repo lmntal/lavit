@@ -414,8 +414,6 @@ public class FrontEnd
 
 	private static void initialSetup()
 	{
-		Env.loadMsg();
-
 		if (!Env.isSet("LANG"))
 		{
 			if (!LanguageSetting.showDialog())
@@ -423,6 +421,7 @@ public class FrontEnd
 				System.exit(0);
 			}
 		}
+		Env.loadMsg();
 
 		if (Env.isWindows() && !Env.isSet("WINDOWS_CYGWIN_DIR"))
 		{

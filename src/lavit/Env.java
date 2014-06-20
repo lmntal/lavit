@@ -65,6 +65,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lavit.config.ConfigUpdater;
 import lavit.localizedtext.Msg;
 import lavit.util.FileUtils;
 import lavit.util.FontSizeUtils;
@@ -158,6 +159,7 @@ public final class Env
 		{
 			System.err.println("read error. check " + ENV_DEFAULT_FILE);
 		}
+		ConfigUpdater.update(prop);
 	}
 
 	public static void save()

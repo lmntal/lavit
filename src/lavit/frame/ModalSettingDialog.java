@@ -63,9 +63,6 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 
-import lavit.Env;
-import lavit.localizedtext.MsgID;
-
 /**
  * 設定画面用のダイアログテンプレート。
  * 中央にコンポーネントを設定して使う。
@@ -164,8 +161,8 @@ public final class ModalSettingDialog
 		//
 		// Buttons
 		//
-		okButton = new JButton(Env.getMsg(MsgID.text_ok));
-		cancelButton = new JButton(Env.getMsg(MsgID.text_cancel));
+		okButton = new JButton("OK");
+		cancelButton = new JButton("Cancel");
 
 		fixButtons(90, 24, okButton, cancelButton);
 

@@ -120,6 +120,27 @@ public class FrontEnd
 		}
 	}
 
+	public static void executeGraphene(File file)
+	{
+		println("(Graphene) executing...");
+
+		final List<String> args = Arrays.asList("--lmntal.file", file.getAbsolutePath());
+		final ProcessTask grapheneTask = ProcessTask.createJarProcessTask("graphene.jar", args);
+		grapheneTask.setDirectory(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfGraphene());
+		grapheneTask.addProcessFinishListener(new ProcessFinishListener()
+		{
+			public void processFinished(int id, int exitCode, boolean isAborted)
+			{
+				printTerminationMessage("Graphene", id, grapheneTask.getElapsedSeconds(), exitCode, isAborted);
+			}
+		});
+
+		if (grapheneTask.execute())
+		{
+			addProcessTask(grapheneTask);
+		}
+	}
+
 	public static void executeILCodeInSLIM()
 	{
 		File file = mainFrame.editorPanel.getFile();

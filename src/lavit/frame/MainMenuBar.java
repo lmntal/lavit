@@ -85,8 +85,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 
 	private JMenu run;
 	private JMenuItem iLMNtal;
-	private JMenuItem iLMNtalg;
 	private JMenuItem iUNYO;
+	private JMenuItem iGraphene;
 	private JMenuItem iSLIM;
 	private JMenuItem iILJavaRun;
 	private JMenuItem iILSlimRun;
@@ -276,15 +276,15 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		iLMNtal.addActionListener(this);
 		iLMNtal.setMnemonic(KeyEvent.VK_L);
 
-		iLMNtalg = new JMenuItem(Env.getMsg(MsgID.button_unyo_2g));
-		run.add(iLMNtalg);
-		iLMNtalg.addActionListener(this);
-		iLMNtalg.setMnemonic(KeyEvent.VK_G);
-
 		iUNYO = new JMenuItem(Env.getMsg(MsgID.button_unyo_3g));
 		run.add(iUNYO);
 		iUNYO.addActionListener(this);
 		iUNYO.setMnemonic(KeyEvent.VK_U);
+
+		iGraphene = new JMenuItem(Env.getMsg(MsgID.button_graphene));
+		run.add(iGraphene);
+		iGraphene.addActionListener(this);
+		iGraphene.setMnemonic(KeyEvent.VK_G);
 
 		iSLIM = new JMenuItem(Env.getMsg(MsgID.button_slim));
 		run.add(iSLIM);
@@ -386,8 +386,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		setAccelerator(iPaste, KeyEvent.VK_V, mask);
 		setAccelerator(itemFind, KeyEvent.VK_F, mask);
 		setAccelerator(iLMNtal, KeyEvent.VK_F1, 0);
-		setAccelerator(iLMNtalg, KeyEvent.VK_F2, 0);
-		setAccelerator(iUNYO, KeyEvent.VK_F3, 0);
+		setAccelerator(iUNYO, KeyEvent.VK_F2, 0);
+		setAccelerator(iGraphene, KeyEvent.VK_F3, 0);
 		setAccelerator(iSLIM, KeyEvent.VK_F4, 0);
 		setAccelerator(iSViewer, KeyEvent.VK_F5, 0);
 		setAccelerator(iKill, KeyEvent.VK_ESCAPE, 0);
@@ -459,13 +459,13 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		{
 			FrontEnd.mainFrame.editorPanel.buttonPanel.lmntalButton.doClick();
 		}
-		else if (src == iLMNtalg)
-		{
-			FrontEnd.mainFrame.editorPanel.buttonPanel.lmntalgButton.doClick();
-		}
 		else if (src == iUNYO)
 		{
 			FrontEnd.mainFrame.editorPanel.buttonPanel.unyoButton.doClick();
+		}
+		else if (src == iGraphene)
+		{
+			FrontEnd.mainFrame.editorPanel.buttonPanel.grapheneButton.doClick();
 		}
 		else if (src == iSLIM)
 		{

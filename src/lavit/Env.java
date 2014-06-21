@@ -82,9 +82,10 @@ public final class Env
 	public static final String SLIM_VERSION   = "SLIM : 2.2.2 (2012/05/12)";
 	public static final String UNYO_VERSION   = "UNYO UNYO : 1.1.1 (2010/03/07)";
 
-	public static final String DIR_NAME_SLIM = "slim-2.2.2";
-	public static final String DIR_NAME_UNYO = "unyo1_1_1";
-	public static final String DIR_NAME_LTL2BA = "ltl2ba-1.1";
+	public static final String DIR_NAME_SLIM     = "slim-2.2.2";
+	public static final String DIR_NAME_UNYO     = "unyo1_1_1";
+	public static final String DIR_NAME_GRAPHENE = "graphene";
+	public static final String DIR_NAME_LTL2BA   = "ltl2ba-1.1";
 
 	public static final String LMNTAL_LIBRARY_DIR = "lmntal";
 
@@ -354,6 +355,11 @@ public final class Env
 	public static String getDirNameOfUnyo()
 	{
 		return get("DIR_NAME_UNYO", DIR_NAME_UNYO);
+	}
+
+	public static String getDirNameOfGraphene()
+	{
+		return get("DIR_NAME_GRAPHENE", DIR_NAME_GRAPHENE);
 	}
 
 	public static String getDirNameOfLtl2ba()

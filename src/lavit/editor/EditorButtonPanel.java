@@ -73,8 +73,8 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 
 	private JPanel buttonPanel;
 	public JButton lmntalButton;
-	public JButton lmntalgButton;
 	public JButton unyoButton;
+	public JButton grapheneButton;
 	public JButton stateProfilerButton;
 	public JButton slimButton;
 	public JButton sviewerButton;
@@ -95,13 +95,13 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		lmntalButton.addActionListener(this);
 		buttonPanel.add(lmntalButton);
 
-		lmntalgButton = new JButton(Env.getMsg(MsgID.button_unyo_2g));
-		lmntalgButton.addActionListener(this);
-		buttonPanel.add(lmntalgButton);
-
 		unyoButton = new JButton(Env.getMsg(MsgID.button_unyo_3g));
 		unyoButton.addActionListener(this);
 		buttonPanel.add(unyoButton);
+
+		grapheneButton = new JButton(Env.getMsg(MsgID.button_graphene));
+		grapheneButton.addActionListener(this);
+		buttonPanel.add(grapheneButton);
 
 		stateProfilerButton = new JButton(Env.getMsg(MsgID.button_stateprofiler));
 		stateProfilerButton.addActionListener(this);
@@ -141,8 +141,8 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		//nullButton.setEnabled(enable);
 
 		lmntalButton.setEnabled(enable);
-		lmntalgButton.setEnabled(enable);
 		unyoButton.setEnabled(enable);
+		grapheneButton.setEnabled(enable);
 		slimButton.setEnabled(enable);
 		sviewerButton.setEnabled(enable);
 		svporButton.setEnabled(enable);
@@ -318,40 +318,6 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 				compileLMNtal();
 			}
 		}
-		else if (src == lmntalgButton)
-		{
-			if (editorPanel.isChanged())
-			{
-				editorPanel.fileSave();
-			}
-
-			setButtonEnable(false);
-
-			FrontEnd.mainFrame.toolTab.setTab("System");
-
-			FrontEnd.println("(LMNtal) Doing...");
-			lmntalRunner = new LmntalRunner("-g "+Env.get("UNYO_OPTION"));
-			lmntalRunner.run();
-			new Thread()
-			{
-				public void run()
-				{
-					while (lmntalRunner.isRunning())
-					{
-						FrontEnd.sleep(200);
-					}
-					FrontEnd.println("(LMNtal) Done!");
-					lmntalRunner = null;
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							setButtonEnable(true);
-						}
-					});
-				}
-			}.start();
-		}
 		else if (src == unyoButton)
 		{
 			if (editorPanel.isChanged())
@@ -360,6 +326,15 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 			}
 			FrontEnd.mainFrame.toolTab.setTab("System");
 			FrontEnd.executeUnyo(FrontEnd.mainFrame.editorPanel.getFile());
+		}
+		else if (src == grapheneButton)
+		{
+			if (editorPanel.isChanged())
+			{
+				editorPanel.fileSave();
+			}
+			FrontEnd.mainFrame.toolTab.setTab("System");
+			FrontEnd.executeGraphene(FrontEnd.mainFrame.editorPanel.getFile());
 		}
 		else if (src == slimButton)
 		{

@@ -1,0 +1,56 @@
+#!/bin/sh
+
+BASEDIR=${PWD}
+
+ANT_VERSION=1.9.4
+if [ ! -z $1 ]; then
+  ANT_VERSION=$1
+fi
+
+DIR_LIB=${BASEDIR}/lib
+DIR_CACHE=${DIR_LIB}/.cache
+
+mkdir -p ${DIR_CACHE}
+cd ${DIR_CACHE}
+
+ANT_DIR=apache-ant-${ANT_VERSION}
+ANT_ARCHIVE=${ANT_DIR}-bin.tar.gz
+ANT_JAR=${ANT_DIR}/lib/ant.jar
+
+DIST_URL=http://archive.apache.org/dist/ant/binaries
+if [ ! -e ${ANT_ARCHIVE} ]; then
+  wget ${DIST_URL}/${ANT_ARCHIVE}
+fi
+
+if [ ! -e ${ANT_ARCHIVE} ]; then
+  printf "\033[31mFailed to download ${ANT_ARCHIVE}\033[m\n"
+  exit 1
+fi
+
+tar xzf ${ANT_ARCHIVE}
+if [ ! -e ${ANT_JAR} ]; then
+  printf "\033[31mFailed to extract ant.jar\033[m\n"
+  exit 1
+fi
+
+DIR_LIB_ANT=${DIR_LIB}/apache-ant
+
+mkdir -p ${DIR_LIB_ANT}
+cd ${DIR_LIB_ANT}
+
+DIR_ANT_CACHE=${DIR_CACHE}/${ANT_DIR}
+
+echo "Create symbolic links"
+for FILE in lib/ant.jar LICENSE NOTICE
+do
+  NAME=./`basename ${FILE}`
+  if [ -e ${NAME} ]; then
+    rm ${NAME}
+  fi
+  ln -s ${DIR_ANT_CACHE}/${FILE} ${NAME}
+done
+
+${DIR_ANT_CACHE}/bin/ant -version
+if [ $? -eq 0 ]; then
+  printf "\033[32mOK, ant.jar is now available\033[m\n"
+fi

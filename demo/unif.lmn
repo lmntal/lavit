@@ -1,0 +1,71 @@
+% Unification over type expressions
+% by K. Ueda, 2014-07-13
+% V: type variable represented by a hyperlink
+% T: type represented using ordinary links 
+%    except for type variables occurring as leaves
+
+% Nondeteministically rewrite equations
+vv@@unify(!V,!V) :- .
+vt@@unify(!V,!V2) :- !V \= !V2 | !V><!V2.
+vt1@@unify(!V,int), lock :- unify_vt(!V,int).
+vt2@@unify(!V,list(T)), lock :- unify_vt(!V,list(T)).
+vt3@@unify(!V,arrow(S,T)), lock :- unify_vt(!V,arrow(S,T)).
+tv1@@unify(int,!V) :- unify(!V,int).
+tv2@@unify(list(T),!V) :- unify(!V,list(T)).
+tv3@@unify(arrow(S,T),!V) :- unify(!V,arrow(S,T)).
+ii@@unify(int,int) :- .
+ll@@unify(list(T1),list(T2)) :- unify(T1,T2).
+aa@@unify(arrow(S1,T1),arrow(S2,T2)) :-
+    unify(S1,S2), unify(T1,T2).
+
+% Unification between a type variable and a type needs
+% occurs check, during which we need locking
+% Res is ok or fail
+oc@@unify_vt(!V,T) :-
+    T2=occurs_check(!V,T,Res), unify2(Res,!V,T2).
+u21@@unify2(no,!V,T) :- fail(T), lock.
+u22@@unify2(ok,!V,T) :- subst(!V,T).
+
+% T2=occurs_check(!V,T): returns T throught T2 for later use 
+oc1@@T2=occurs_check(!V,!V,Res) :- Res=no, T2=!V.
+oc2@@T2=occurs_check(!V1,!V2,Res) :- !V1 \= !V2 | T2=!V2, Res=ok.
+oc3@@T2=occurs_check(!V,int,Res) :- T2=int, Res=ok.
+oc4@@T2=occurs_check(!V,list(V0),Res) :-
+    T2=list(occurs_check(!V,V0,Res)).
+oc5@@T2=occurs_check(!V,arrow(V0,V1),Res) :-
+    T2=arrow(occurs_check(!V,V0,Res0), occurs_check(Res0,!V,V1,Res)).
+oc6@@T2=occurs_check(ok,!V,V1,Res) :- T2=occurs_check(!V,V1,Res).
+oc7@@T2=occurs_check(no,!V,V1,Res) :- T2=V1, Res=no.
+
+% Apply substitution
+s1@@subst(!V,T), unify(!V,Y) :- ground(T) | subst(!V,T), unify(T,Y).
+s2@@subst(!V,T), unify(X,!V) :- ground(T) | subst(!V,T), unify(X,T).
+s3@@subst(!V,T), U=arrow(!V,Y) :- ground(T) | subst(!V,T), U=arrow(T,Y).
+s4@@subst(!V,T), U=arrow(X,!V) :- ground(T) | subst(!V,T), U=arrow(X,T).
+s5@@subst(!V,T), U=list(!V) :- ground(T) | subst(!V,T), U=list(T).
+s6@@subst(!V,T), ans(X,!V) :- ground(T) | subst(!V,T), ans(X,T).
+s7@@subst(!V,T) :- num(!V,1), ground(T) | lock.
+
+% Examples
+init.
+% Simple ones
+//init :- unify(!U,list(!V)), ans(u,!U), ans(v,!V), lock.
+//init :- unify(arrow(!A,!B),arrow(!B,!A)), ans(a,!A), ans(b,!B), lock.
+//init :- unify(!U,list(!U)), ans(u,!U), lock.
+
+% \f.\x.f(f x)  (twice function)
+/*
+init :- lock, ans(t,!T),
+  unify(!T,arrow(!A,!T2)),
+  unify(!T2,arrow(!B,!T3)),
+  unify(!A,arrow(!T4,!T3)),
+  unify(!A,arrow(!B,!T4)).
+  */
+
+% fun map f nil = nil | map f (h::t) = (f h) :: map f t;
+init :- lock, ans(t,!T),
+  unify(!T,arrow(!T1,arrow(!T2,!T3))),
+  unify(!T2,list(!T4)), unify(!T3,list(!T6)),
+  unify(!T1,arrow(!T5,!T6)), unify(!T4,!T5).
+  
+   

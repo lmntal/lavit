@@ -379,6 +379,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		setAccelerator(iNew, KeyEvent.VK_N, mask);
 		setAccelerator(iOpen, KeyEvent.VK_O, mask);
 		setAccelerator(iSave, KeyEvent.VK_S, mask);
+		setAccelerator(iClose, KeyEvent.VK_W, mask);
 		setAccelerator(iUndo, KeyEvent.VK_Z, mask);
 		setAccelerator(iRedo, KeyEvent.VK_Y, mask);
 		setAccelerator(iCopy, KeyEvent.VK_C, mask);

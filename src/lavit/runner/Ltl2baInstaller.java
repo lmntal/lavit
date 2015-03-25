@@ -42,20 +42,12 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.zip.GZIPInputStream;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -72,14 +64,10 @@ import lavit.frame.ChildWindowListener;
 import lavit.localizedtext.MsgID;
 import lavit.util.OuterRunner;
 
-import org.apache.tools.tar.TarEntry;
-import org.apache.tools.tar.TarInputStream;
-
 public class Ltl2baInstaller implements OuterRunner  {
 
 	private ThreadRunner runner;
 	private boolean success;
-	private String tarDir = Env.LMNTAL_LIBRARY_DIR+File.separator;
 
 	public Ltl2baInstaller(){
 		this.runner = null;
@@ -92,11 +80,7 @@ public class Ltl2baInstaller implements OuterRunner  {
 	}
 
 	public boolean isInstallable(){
-		return dirFile().exists()||tarFile().exists();
-	}
-
-	File tarFile(){
-		return new File(tarDir+Env.get("FILE_NAME_LTL2BA_PACK"));
+		return dirFile().exists();
 	}
 
 	File dirFile(){
@@ -129,37 +113,6 @@ public class Ltl2baInstaller implements OuterRunner  {
 		return success;
 	}
 
-	public ArrayList<String> unTar() throws IOException{
-
-		ArrayList<String> names = new ArrayList<String>();
-		TarInputStream tar = new TarInputStream(new GZIPInputStream(new FileInputStream(tarFile())));
-		TarEntry tarEnt = tar.getNextEntry();
-		while (tarEnt != null) {
-
-			String name = tarEnt.getName();
-			names.add(name);
-
-			if(name.endsWith("/")){
-				(new File(tarDir+name)).mkdir();
-			}else{
-				ByteArrayOutputStream bos = new ByteArrayOutputStream((int)tarEnt.getSize());
-				tar.copyEntryContents(bos);
-				InputStream in = new DataInputStream(new ByteArrayInputStream(bos.toByteArray()));
-				FileOutputStream out = new FileOutputStream(tarDir+name);
-				int size;
-				byte bytes[] = new byte[1024];
-				while((size = in.read(bytes)) >= 0) {
-					out.write(bytes,0,size);
-				}
-				out.close();
-				in.close();
-			}
-			tarEnt = tar.getNextEntry();
-		}
-		tar.close();
-		return names;
-	}
-
 	private class ThreadRunner extends Thread {
 		private Process p;
 		private BufferedReader in;
@@ -172,16 +125,6 @@ public class Ltl2baInstaller implements OuterRunner  {
 
 		public void run() {
 			try {
-
-				if(tarFile().exists()){
-					if(dirFile().exists()) dirFile().delete();
-					ArrayList<String> names = unTar();
-					window.println("unpacking: "+tarFile().getName());
-					for(String name : names){
-						window.println(name);
-					}
-				}
-
 				ProcessBuilder pb;
 				String str;
 				String makeCmd = Env.getBinaryAbsolutePath("make");
@@ -204,29 +147,31 @@ public class Ltl2baInstaller implements OuterRunner  {
 
 				window.println("make end. exit="+p.exitValue()+".\n");
 
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
-						FrontEnd.mainFrame,
-						Env.getMsg(MsgID.text_install_completed),
-						"LTL2BA INSTALL",
-						JOptionPane.PLAIN_MESSAGE
-				);}});
+				javax.swing.SwingUtilities.invokeLater(new Runnable(){@Override
+					public void run(){JOptionPane.showMessageDialog(
+							FrontEnd.mainFrame,
+							Env.getMsg(MsgID.text_install_completed),
+							"LTL2BA INSTALL",
+							JOptionPane.PLAIN_MESSAGE
+							);}});
 
 				window.dispose();
 				success = true;
 
 			}catch(Exception e){
 
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
-						FrontEnd.mainFrame,
-						Env.getMsg(MsgID.text_install_failed),
-						"LTL2BA INSTALL",
-						JOptionPane.PLAIN_MESSAGE
-				);}});
+				javax.swing.SwingUtilities.invokeLater(new Runnable(){@Override
+					public void run(){JOptionPane.showMessageDialog(
+							FrontEnd.mainFrame,
+							Env.getMsg(MsgID.text_install_failed),
+							"LTL2BA INSTALL",
+							JOptionPane.PLAIN_MESSAGE
+							);}});
 
 				StringWriter sw = new StringWriter();
-			    e.printStackTrace(new PrintWriter(sw));
-			    window.println(sw.toString());
-			    window.exit();
+				e.printStackTrace(new PrintWriter(sw));
+				window.println(sw.toString());
+				window.exit();
 
 			}finally{
 

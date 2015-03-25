@@ -85,7 +85,7 @@ public final class Env
 	public static final String DIR_NAME_SLIM     = "slim-2.2.2";
 	public static final String DIR_NAME_UNYO     = "unyo1_1_1";
 	public static final String DIR_NAME_GRAPHENE = "graphene";
-	public static final String DIR_NAME_LTL2BA   = "ltl2ba-1.1";
+	public static final String DIR_NAME_LTL2BA   = "ltl2ba";
 
 	public static final String LMNTAL_LIBRARY_DIR = "lmntal";
 

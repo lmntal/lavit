@@ -51,7 +51,7 @@
 	<target name="jar" depends="javac" description="create jar">
 		<jar destfile="${target-jar}" basedir="${bin}" compress="false" update="false">
 			<manifest>
-				<attribute name="Class-Path" value="lib/ant.jar" />
+				<attribute name="Class-Path" value="lib/apache-ant/ant.jar" />
 				<attribute name="Main-Class" value="lavit.FrontEnd" />
 			</manifest>
 			<fileset dir="." includes="img/**/*,lang/*.xml" />

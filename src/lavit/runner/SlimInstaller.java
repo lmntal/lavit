@@ -496,6 +496,7 @@ class InstallWindow extends JFrame
 		text.setBackground(Color.BLACK);
 		text.setForeground(Color.WHITE);
 		text.setFont(new Font(Font.DIALOG, Font.PLAIN, 11));
+		text.setMaximumNumberOfLines(10000);
 		JScrollPane textScrollPane = new JScrollPane(text);
 		textScrollPane.setPreferredSize(new Dimension(image.getIconWidth(), image.getIconHeight() / 2));
 		panel.add(textScrollPane);

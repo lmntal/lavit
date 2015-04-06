@@ -74,15 +74,15 @@ import lavit.util.StringUtils;
 public final class Env
 {
 	public static final String APP_NAME    = "LaViT";
-	public static final String APP_VERSION = "2.8.6";
-	public static final String APP_DATE    = "2014/05/31";
+	public static final String APP_VERSION = "2.8.7";
+	public static final String APP_DATE    = "2015/04/06";
 	public static final String APP_HREF    = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
 
-	public static final String LMNTAL_VERSION = "LMNtal : 1.21 (2011/12/26)";
-	public static final String SLIM_VERSION   = "SLIM : 2.2.2 (2012/05/12)";
+	public static final String LMNTAL_VERSION = "LMNtal : 1.42 (2015/04/06)";
+	public static final String SLIM_VERSION   = "SLIM : 2.2.6 (2015/03/26)";
 	public static final String UNYO_VERSION   = "UNYO UNYO : 1.1.1 (2010/03/07)";
 
-	public static final String DIR_NAME_SLIM     = "slim-2.2.2";
+	public static final String DIR_NAME_SLIM     = "slim-2.2.6";
 	public static final String DIR_NAME_UNYO     = "unyo1_1_1";
 	public static final String DIR_NAME_GRAPHENE = "graphene";
 	public static final String DIR_NAME_LTL2BA   = "ltl2ba";

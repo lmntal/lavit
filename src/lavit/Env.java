@@ -54,6 +54,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -345,6 +346,22 @@ public final class Env
 				map.put("PATH", paths);
 			}
 		}
+		
+		if (isMac())
+		{
+			// MacでFinderからjarをダブルクリックしてLaViTを起動した場合は、
+			// シェルの環境変数ではなくFinderの環境変数が設定される。
+			// その場合、PATHに/usr/loca/binが含まれていない(Yosemiteから?)。
+			// SLIMをインストールするときに使用するautotoolsのコマンドは、
+			// HomebrewやMacPortsでインストールすることが多いので、
+			// /usr/local/binがパスに含まれていないとコマンドが見つからない。
+			// この問題を回避するため、ここでパスに追加する。
+			String path = System.getenv("PATH");
+			if (!Arrays.asList(path.split(":")).contains("/usr/local/bin"))
+			{
+				map.put("PATH", "/usr/local/bin:" + path);
+			}
+		}
 	}
 
 	public static String getDirNameOfSlim()
@@ -545,6 +562,11 @@ public final class Env
 	public static boolean isWindows()
 	{
 		return File.pathSeparatorChar == ';';
+	}
+	
+	public static boolean isMac()
+	{
+		return System.getProperty("os.name").toLowerCase().contains("mac");
 	}
 
 	public static List<Image> getApplicationIcons()

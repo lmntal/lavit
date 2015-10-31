@@ -346,21 +346,27 @@ public final class Env
 				map.put("PATH", paths);
 			}
 		}
-		
+
 		if (isMac())
 		{
 			// MacでFinderからjarをダブルクリックしてLaViTを起動した場合は、
 			// シェルの環境変数ではなくFinderの環境変数が設定される。
-			// その場合、PATHに/usr/loca/binが含まれていない(Yosemiteから?)。
+			// その場合、PATHに/usr/loca/binや/opt/local/binが含まれていない(Yosemiteから?)。
 			// SLIMをインストールするときに使用するautotoolsのコマンドは、
 			// HomebrewやMacPortsでインストールすることが多いので、
-			// /usr/local/binがパスに含まれていないとコマンドが見つからない。
+			// /usr/local/binや/opt/local/binがパスに含まれていないとコマンドが見つからない。
 			// この問題を回避するため、ここでパスに追加する。
-			String path = System.getenv("PATH");
-			if (!Arrays.asList(path.split(":")).contains("/usr/local/bin"))
+			String paths = System.getenv("PATH");
+			Set<String> pathsSet = new HashSet<String>(Arrays.asList(paths.split(":")));
+			if (!pathsSet.contains("/usr/local/bin"))
 			{
-				map.put("PATH", "/usr/local/bin:" + path);
+				paths = "/usr/local/bin:" + paths;
 			}
+			if (!pathsSet.contains("/opt/local/bin"))
+			{
+				paths = "/opt/local/bin:" + paths;
+			}
+			map.put("PATH", paths);
 		}
 	}
 
@@ -563,7 +569,7 @@ public final class Env
 	{
 		return File.pathSeparatorChar == ';';
 	}
-	
+
 	public static boolean isMac()
 	{
 		return System.getProperty("os.name").toLowerCase().contains("mac");

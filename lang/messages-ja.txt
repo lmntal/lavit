@@ -51,6 +51,7 @@ button_kill                = Kill
 button_stateprofiler       = StateProfiler
 button_browse              = 参照...
 button_clear               = クリア
+button_graphene            = Graphene
 
 text_yes                   = はい(Y)
 text_no                    = いいえ(N)

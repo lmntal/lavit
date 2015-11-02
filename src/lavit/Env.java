@@ -54,6 +54,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -65,6 +66,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lavit.config.ConfigUpdater;
 import lavit.localizedtext.Msg;
 import lavit.util.FileUtils;
 import lavit.util.FontSizeUtils;
@@ -73,17 +75,18 @@ import lavit.util.StringUtils;
 public final class Env
 {
 	public static final String APP_NAME    = "LaViT";
-	public static final String APP_VERSION = "2.8.6";
-	public static final String APP_DATE    = "2014/05/31";
+	public static final String APP_VERSION = "2.8.8";
+	public static final String APP_DATE    = "2015/10/31";
 	public static final String APP_HREF    = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
 
-	public static final String LMNTAL_VERSION = "LMNtal : 1.21 (2011/12/26)";
-	public static final String SLIM_VERSION   = "SLIM : 2.2.2 (2012/05/12)";
+	public static final String LMNTAL_VERSION = "LMNtal : 1.43 (2015/10/31)";
+	public static final String SLIM_VERSION   = "SLIM : 2.2.7 (2015/10/31)";
 	public static final String UNYO_VERSION   = "UNYO UNYO : 1.1.1 (2010/03/07)";
 
-	public static final String DIR_NAME_SLIM = "slim-2.2.2";
-	public static final String DIR_NAME_UNYO = "unyo1_1_1";
-	public static final String DIR_NAME_LTL2BA = "ltl2ba-1.1";
+	public static final String DIR_NAME_SLIM     = "slim-2.2.7";
+	public static final String DIR_NAME_UNYO     = "unyo1_1_1";
+	public static final String DIR_NAME_GRAPHENE = "graphene";
+	public static final String DIR_NAME_LTL2BA   = "ltl2ba";
 
 	public static final String LMNTAL_LIBRARY_DIR = "lmntal";
 
@@ -158,6 +161,7 @@ public final class Env
 		{
 			System.err.println("read error. check " + ENV_DEFAULT_FILE);
 		}
+		ConfigUpdater.update(prop);
 	}
 
 	public static void save()
@@ -342,6 +346,28 @@ public final class Env
 				map.put("PATH", paths);
 			}
 		}
+
+		if (isMac())
+		{
+			// MacでFinderからjarをダブルクリックしてLaViTを起動した場合は、
+			// シェルの環境変数ではなくFinderの環境変数が設定される。
+			// その場合、PATHに/usr/loca/binや/opt/local/binが含まれていない(Yosemiteから?)。
+			// SLIMをインストールするときに使用するautotoolsのコマンドは、
+			// HomebrewやMacPortsでインストールすることが多いので、
+			// /usr/local/binや/opt/local/binがパスに含まれていないとコマンドが見つからない。
+			// この問題を回避するため、ここでパスに追加する。
+			String paths = System.getenv("PATH");
+			Set<String> pathsSet = new HashSet<String>(Arrays.asList(paths.split(":")));
+			if (!pathsSet.contains("/usr/local/bin"))
+			{
+				paths = "/usr/local/bin:" + paths;
+			}
+			if (!pathsSet.contains("/opt/local/bin"))
+			{
+				paths = "/opt/local/bin:" + paths;
+			}
+			map.put("PATH", paths);
+		}
 	}
 
 	public static String getDirNameOfSlim()
@@ -352,6 +378,11 @@ public final class Env
 	public static String getDirNameOfUnyo()
 	{
 		return get("DIR_NAME_UNYO", DIR_NAME_UNYO);
+	}
+
+	public static String getDirNameOfGraphene()
+	{
+		return get("DIR_NAME_GRAPHENE", DIR_NAME_GRAPHENE);
 	}
 
 	public static String getDirNameOfLtl2ba()
@@ -537,6 +568,11 @@ public final class Env
 	public static boolean isWindows()
 	{
 		return File.pathSeparatorChar == ';';
+	}
+
+	public static boolean isMac()
+	{
+		return System.getProperty("os.name").toLowerCase().contains("mac");
 	}
 
 	public static List<Image> getApplicationIcons()

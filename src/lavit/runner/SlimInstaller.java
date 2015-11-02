@@ -375,6 +375,7 @@ public class SlimInstaller implements OuterRunner
 		public void run()
 		{
 			String shCmd = Env.getBinaryAbsolutePath("sh") + " configure --prefix=" + getLinuxStyleSlimInstallPathName() + " " + Env.get("SLIM_CONFIGURE_OPTION");
+			String makeCleanCmd = Env.getBinaryAbsolutePath("make") + " clean";
 			String makeCmd = Env.getBinaryAbsolutePath("make");
 			String makeInstallCmd = Env.getBinaryAbsolutePath("make") + " install";
 			boolean succeeded = true;
@@ -388,6 +389,18 @@ public class SlimInstaller implements OuterRunner
 			logPrintLine("LaViT: End - configure (Exit Code = " + ret + ")\n");
 			succeeded = (ret == 0);
 
+			// execute "make clean"
+			// 一度インストールに失敗すると
+			// ゴミが残って二度とインストールできなくなることがある
+			// そのため、make cleanしておく
+			if (succeeded)
+			{
+				logPrintLine("LaViT: Execute - " + makeCleanCmd);
+				ret = execCommand(makeCleanCmd);
+				logPrintLine("LaViT: End - make clean (Exit Code = " + ret + ")\n");
+				succeeded = (ret == 0);
+			}
+			
 			// execute "make"
 			if (succeeded)
 			{
@@ -496,6 +509,7 @@ class InstallWindow extends JFrame
 		text.setBackground(Color.BLACK);
 		text.setForeground(Color.WHITE);
 		text.setFont(new Font(Font.DIALOG, Font.PLAIN, 11));
+		text.setMaximumNumberOfLines(10000);
 		JScrollPane textScrollPane = new JScrollPane(text);
 		textScrollPane.setPreferredSize(new Dimension(image.getIconWidth(), image.getIconHeight() / 2));
 		panel.add(textScrollPane);

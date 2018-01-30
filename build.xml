@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="LaViT" basedir="." default="jar">
+
+	<property file="build.properties" />
+
+	<property name="src" location="src" />
+	<property name="gen" location="gen" />
+	<property name="bin" location="bin" />
+
+	<property name="java.encoding" value="UTF-8" />
+	<property name="java.target" value="1.6" />
+	<property name="java.source" value="1.6" />
+
+	<property name="target-jar" value="LaViT.jar" />
+
+	<!-- Class Path -->
+	<path id="classpath">
+		<pathelement path="/usr/share/java/j3dcore.jar" />
+		<pathelement path="/usr/share/java/j3dutils.jar" />
+		<pathelement path="/usr/share/java/vecmath.jar" />
+	</path>
+
+	<!-- Create Output Directory -->
+	<target name="mkdir">
+		<mkdir dir="${bin}" />
+	</target>
+
+	<target name="msgid">
+		<java jar="tools/msgid.jar" fork="true">
+			<arg value="." />
+			<arg value="gen" />
+			<arg value="lavit.localizedtext" />
+		</java>
+	</target>
+
+	<!-- Compile Java Sources -->
+	<target name="javac" depends="mkdir" description="compile all">
+		<javac srcdir="${src};${gen}" destdir="${bin}" encoding="${java.encoding}"
+			target="${java.target}" source="${java.source}" includeantruntime="false">
+			<classpath refid="classpath" />
+		</javac>
+		<!-- copy resources -->
+		<copy todir="${bin}">
+			<fileset dir="${src}" includes="**/*" excludes="**/*.java" />
+			<fileset dir="${gen}" includes="**/*" excludes="**/*.java" />
+		</copy>
+	</target>
+
+	<!-- Create JAR -->
+	<target name="jar" depends="javac" description="create jar">
+		<jar destfile="${target-jar}" basedir="${bin}" compress="false" update="false">
+			<manifest>
+				<attribute name="Main-Class" value="lavit.FrontEnd" />
+			</manifest>
+			<fileset dir="." includes="img/**/*,lang/*.xml" />
+		</jar>
+	</target>
+
+	<!-- Clean -->
+	<target name="clean">
+		<delete dir="${bin}" file="${target-jar}" />
+	</target>
+
+</project>

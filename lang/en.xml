@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="EUC-JP"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<entry key="m0">File</entry>
+<entry key="m1">New</entry>
+<entry key="m2">Open</entry>
+<entry key="m3">Save</entry>
+<entry key="m4">Save As...</entry>
+<entry key="m5">Exit</entry>
+<entry key="m6">Edit</entry>
+<entry key="m7">Copy</entry>
+<entry key="m8">Cut</entry>
+<entry key="m9">Paste</entry>
+<entry key="m10">Run</entry>
+
+<entry key="m11">LMNtal(Java)</entry>
+<entry key="m12">UNYO(2G)</entry>
+<entry key="m13">UNYO(3G)</entry>
+<entry key="m14">SLIM</entry>
+<entry key="m15">StateViewer</entry>
+<entry key="m16">Undo</entry>
+<entry key="m17">Redo</entry>
+<entry key="m18">Help</entry>
+<entry key="m19">Version</entry>
+<entry key="m20">Kill</entry>
+<entry key="m21">StateProfiler</entry>
+<entry key="m22">Setting</entry>
+<entry key="m23">Cygwin PATH</entry>
+<entry key="m24">SLIM PATH</entry>
+<entry key="m25">Language</entry>
+<entry key="m26">Java Runtime Info</entry>
+<entry key="m27">Reboot</entry>
+<entry key="m28">LaViT Web Page</entry>
+<entry key="m29">General Setting</entry>
+<entry key="m30">Open StateViewer File</entry>
+
+<entry key="m31">Close</entry>
+<entry key="m32">Close All</entry>
+<entry key="m33">Run Intermediate Code (LMNtal Java)</entry>
+<entry key="m34">Recent Files</entry>
+<entry key="m35">Clear</entry>
+
+<entry key="m36">View</entry>
+<entry key="m37">File System</entry>
+
+<entry key="m38">Run Intermediate Code (SLIM)</entry>
+
+<entry key="d0">Yes</entry>
+<entry key="d1">No</entry>
+<entry key="d2">Cancel</entry>
+<entry key="d3">Change</entry>
+<entry key="d4">Changed</entry>
+<entry key="d5">file</entry>
+<entry key="d6">OK</entry>
+<entry key="d7">END</entry>
+<entry key="d8">Reverse</entry>
+<entry key="d9">LMNtal Intermediate Code</entry>
+
+<entry key="f0"> already exists. Do you want to overwrite it?</entry>
+<entry key="f1">overwrite</entry>
+<entry key="f2"> has been modified. Save the changes before close?</entry>
+<entry key="f3">no file</entry>
+<entry key="f4">Please restart LaViT for the changes to take effect.</entry>
+<entry key="f5">Editing...</entry>
+<entry key="f6">New UNYO UNYO is unavailable now.</entry>
+
+<entry key="w0">Browse...</entry>
+<entry key="w1">In Windows, Cygwin path is required (for example, C:\cygwin.)</entry>
+<entry key="w2">Install </entry>
+<entry key="w3">.</entry>
+<entry key="w4">Use </entry>
+<entry key="w5"> included in LaViT.</entry>
+<entry key="w6">Input </entry>
+<entry key="w7"> path.</entry>
+<entry key="w8">LaViT need </entry>
+<entry key="w9"> path.</entry>
+<entry key="w10">Installation completed.</entry>
+<entry key="w11">Installation failed.</entry>
+<entry key="w12">LTL2BA is not found. </entry>
+<entry key="w13">Use already installed </entry>
+<entry key="w14">.</entry>
+<entry key="w15">(unavailable)</entry>
+
+</properties>

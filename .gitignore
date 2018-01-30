@@ -1,0 +1,30 @@
+# files
+bin/
+lib/
+.settings/
+
+*.class
+
+properties/
+lmntal/
+
+env.txt
+LaViT.jar
+
+
+# misc
+GPATH
+GRTAGS
+GTAGS
+TAGS
+tags
+gtags.conf
+*~
+\#*\#
+
+#mac 
+.DS_Store
+
+#win
+Thumbs.db
+

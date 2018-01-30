@@ -1,0 +1,13 @@
+p = { elv({open(true),act(move(M)),$q}),$p,@p } :- int(M)
+f1 = { elv({act(move(M)),$q }),f(1),$p,@p } :- int(M)
+f2 = { elv({act(move(M)),$q }),f(2),$p,@p } :- int(M)
+f3 = { elv({act(move(M)),$q }),f(3),$p,@p } :- int(M)
+b = { btn(true),$p,@p }
+b1 = { btn(true),f(1),$p,@p }
+b2 = { btn(true),f(2),$p,@p }
+bb2 = { elv({{btn(2,true),$b},$q}),$p,@p }
+m = { elv({act(move(M)),$q}),$p,@p } :- int(M)
+c = { elv({open(false),$q}),$p,@p }
+fp1 = { p,f(1),$p,@p }
+fp2 = { p,f(2),$p,@p }
+ep = { elv({p,$q}),$p,@p }

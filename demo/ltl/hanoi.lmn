@@ -1,0 +1,9 @@
+/*
+ * Tower of Hanoi puzzle
+ * 2007/06/09(Sat) by okabe
+ */
+
+poles(p([1,2,3,4,99]),p([99]),p([99])).
+
+P1=p([H1|T1]), P2=p([H2|T2]) :- H1<H2 |
+  P1=p(T1), P2=p([H1,H2|T2]).

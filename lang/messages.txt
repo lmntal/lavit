@@ -1,0 +1,84 @@
+#
+# messages in English (default)
+#
+
+menu_file                  = File
+menu_new                   = New
+menu_open                  = Open...
+menu_open_sv_file          = Open StateViewer File
+menu_recent                = Recent Files
+menu_clear_recent          = Clear
+menu_recent_empty          = (Empty)
+menu_save                  = Save
+menu_saveas                = Save As...
+menu_close                 = Close
+menu_closeall              = Close All
+menu_reboot                = Reboot
+menu_exit                  = Exit
+
+menu_edit                  = Edit
+menu_copy                  = Copy
+menu_cut                   = Cut
+menu_paste                 = Paste
+menu_undo                  = Undo
+menu_redo                  = Redo
+menu_find_replace          = Find/Replace...
+
+menu_run                   = Run
+menu_run_il_java           = Run Intermediate Code (LMNtal Java)
+menu_item_run_slim         = Run Intermediate Code (SLIM)
+
+menu_group_view            = View
+menu_item_filesystem       = File System
+
+menu_setting               = Setting
+menu_cygwin_path           = Cygwin PATH
+menu_slim_path             = SLIM PATH
+menu_lang                  = Language
+menu_general_setting       = General Setting
+
+menu_help                  = Help
+menu_webpage               = LaViT Web Page
+menu_jre_info              = Java Runtime Info
+menu_version               = Version
+
+button_lmntal_java         = LMNtal(Java)
+button_unyo_2g             = UNYO(2G)
+button_unyo_3g             = UNYO(3G)
+button_slim                = SLIM
+button_stateviewer         = StateViewer
+button_kill                = Kill
+button_stateprofiler       = StateProfiler
+button_browse              = Browse...
+button_clear               = Clear
+button_graphene            = Graphene
+
+text_yes                   = Yes
+text_no                    = No
+text_cancel                = Cancel
+text_change                = Change
+text_changed               = Changed
+text_file                  = file
+text_ok                    = OK
+text_end                   = END
+text_reverse               = Reverse
+text_lmntal_il             = LMNtal Intermediate Code
+
+text_already_exists        = $1 already exists. Do you want to overwrite it?
+text_overwrite             = overwrite
+text_modified              = $1 has been modified. Save the changes before close?
+text_no_file               = no file
+text_please_reboot         = Please restart LaViT for the changes to take effect.
+text_editing               = Editing...
+text_unyo_unavailable      = New UNYO UNYO is unavailable now.
+
+text_cygwin_required       = In Windows, Cygwin path is required (for example, C:\backslashcygwin.)
+text_install_slim          = Install SLIM.
+text_included_slim         = Use SLIM included in LaViT.
+text_input_slim_path       = Input SLIM path.
+text_need_slim_path        = LaViT need SLIM path.
+text_install_completed     = Installation completed.
+text_install_failed        = Installation failed.
+text_ltl2ba_not_found      = LTL2BA is not found. 
+text_use_already_installed = Use already installed SLIM.
+text_unavailable           = (unavailable)

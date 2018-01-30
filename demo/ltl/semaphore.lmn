@@ -1,0 +1,7 @@
+/* binary semaphore */
+
+s(1).
+person(bob, out). person(mike, out).
+
+person(X, out), s(1) :- person(X, in) , s(0).
+person(X, in) , s(0) :- person(X, out), s(1).

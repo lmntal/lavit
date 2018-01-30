@@ -1,0 +1,2 @@
+mike_in = person(mike, in) :-
+bob_in = person(bob, in) :-

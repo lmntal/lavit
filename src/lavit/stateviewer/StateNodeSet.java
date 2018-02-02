@@ -306,6 +306,7 @@ public class StateNodeSet
 		//endNodeの登録
 		for(StateNode node : allNode.values()){
 			if(node.getToTransitions().size()==0){
+				node.end=true;
 				endNode.add(node);
 			}
 		}

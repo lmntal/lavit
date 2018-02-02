@@ -187,6 +187,7 @@ public class StateGraphBasicDraw extends StateDraw {
 		if(drawNodes.getStartNode().size()!=1){ return; }
 
 		StateNode node = drawNodes.getStartNodeOne();
+		node.start=true;
 		if(!node.isInFrame()){ return; }
 
 		if(node.weak){

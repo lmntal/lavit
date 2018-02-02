@@ -144,7 +144,9 @@ public class StateAbstractionMaker {
 		drawNodes.addNode(newNode);
 		//if(newNode.getFromNodes().size()==0){ drawNodes.setStartNode(newNode); }
 		if(newNode.depth==0){ drawNodes.setStartNode(newNode); }
-		if(newNode.getToNodes().size()==0){ drawNodes.addEndNode(newNode); }
+		if(newNode.getToNodes().size()==0){
+			drawNodes.addEndNode(newNode);
+		}
 	}
 
 	/*

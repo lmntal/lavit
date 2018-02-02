@@ -124,7 +124,6 @@ public class FrontEnd
 	public static void executeGraphene(File file)
 	{
 		println("(Graphene) executing...");
-		System.out.println("test: "+file);
 
 		final List<String> args = Arrays.asList("--lmntal.file", file.getAbsolutePath());
 		final ProcessTask grapheneTask = ProcessTask.createJarProcessTask("graphene.jar", args);

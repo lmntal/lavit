@@ -52,6 +52,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.TreeSet;
+import java.util.Iterator;
+import java.util.List;
 
 import lavit.Env;
 import lavit.FrontEnd;
@@ -61,6 +63,9 @@ import lavit.util.UtilTextDialog;
 
 public class StateNode implements Shape {
 	public long id;
+
+	public boolean start=false;
+	public boolean end=false;
 
 	public StateNodeSet parentSet;
 	public StateNodeSet childSet;
@@ -77,8 +82,8 @@ public class StateNode implements Shape {
 	public boolean backDummy; //dummy=trueの場合のみtrueになる可能性がある
 	public boolean weak;
 
-	private LinkedHashSet<StateTransition> toes = new LinkedHashSet<StateTransition>();
-	private LinkedHashSet<StateTransition> froms = new LinkedHashSet<StateTransition>();
+  private LinkedHashSet<StateTransition> toes = new LinkedHashSet<StateTransition>();
+  private LinkedHashSet<StateTransition> froms = new LinkedHashSet<StateTransition>();
 
 	private boolean marked;
 	private boolean inFrame;
@@ -697,9 +702,32 @@ public class StateNode implements Shape {
 
 	public void runGraphene()
 	{
+		/*List<String> stateList = new ArrayList<String>();
+		StateNode parent = this;
+		StateNode child = this;
+		int count=0;
+		stateList.add(this.state);
+		while(!parent.start){
+			Iterator<StateTransition>itrFroms = parent.froms.iterator();
+			StateNode temp = itrFroms.next().from;
+			stateList.add(0, temp.state);
+			parent=temp;
+			count+=1;
+		}
+		while(!child.end){
+			Iterator<StateTransition>itrToes = child.toes.iterator();
+			StateNode temp = itrToes.next().to;
+			stateList.add(temp.state);
+			child=temp;
+		}*/
+
 		File tempFile = new File("temp.lmn");
 		try{
 			FileWriter writer = new FileWriter(tempFile);
+			/*writer.write(count+"\n");
+			for(String str: stateList){
+				writer.write(str+"\n");
+			}*/
 			writer.write(state);
 			writer.close();
 			FrontEnd.executeGraphene(tempFile);

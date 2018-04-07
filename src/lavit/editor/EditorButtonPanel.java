@@ -384,7 +384,8 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 					opt += " --bfs_depth " + Env.get("SV_DEPTH_LIMIT");
 				}
 			}
-			slimRunner = new SlimRunner(opt);
+			boolean runOnlySlim = editorPanel.getFileName().endsWith(".il");
+			slimRunner = new SlimRunner(opt, runOnlySlim);
 			slimRunner.setBuffering(true);
 			slimRunner.run();
 			new Thread()

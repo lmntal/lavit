@@ -38,6 +38,7 @@ package lavit.runner;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -63,17 +64,28 @@ public class SlimRunner implements OuterRunner
 	private boolean success;
 
 	private boolean quiet;
+	private boolean runOnlySlim;
 
 	private long time;
 
 	public SlimRunner(String option)
 	{
-		this(option, FrontEnd.mainFrame.editorPanel.getFile());
+		this(option, false);
 	}
 
 	public SlimRunner(String option, File targetFile)
 	{
-		this.runner = new ThreadRunner();
+		this(option, false, targetFile);
+	}
+
+	public SlimRunner(String option, boolean runOnlySlim)
+	{
+		this(option, runOnlySlim, FrontEnd.mainFrame.editorPanel.getFile());
+	}
+
+	public SlimRunner(String option, boolean runOnlySlim, File targetFile)
+	{
+		this.runner = new ThreadRunner(runOnlySlim);
 		this.output = null;
 		this.buffer = null;
 
@@ -163,9 +175,11 @@ public class SlimRunner implements OuterRunner
 		private Process p1;
 		private Process p2;
 		private String slim_path;
+		private boolean runOnlySlim;
 
-		ThreadRunner()
+		ThreadRunner(boolean runOnlySlim)
 		{
+			this.runOnlySlim = runOnlySlim;
 			slim_path = Env.get("SLIM_EXE_PATH");
 			if (slim_path == null || slim_path.equals(""))
 			{
@@ -180,19 +194,29 @@ public class SlimRunner implements OuterRunner
 				//計測開始
 				long startTimeMillis = System.currentTimeMillis();
 
+				ProcessBuilder pb;
+				BufferedInputStream in1;
+				ErrorStreamPrinter err1;
 				// LMNtal起動
-				String cmd1 = Env.getLmntalCmd() + " " + Env.get("LMNTAL_OPTION") + " " + Env.getSpaceEscape(targetFile.getAbsolutePath());
+				if (!this.runOnlySlim)
+				{
+					String cmd1 = Env.getLmntalCmd() + " " + Env.get("LMNTAL_OPTION") + " " + Env.getSpaceEscape(targetFile.getAbsolutePath());
 
-				if (!quiet) FrontEnd.println("(SLIM) " + cmd1);
+					if (!quiet) FrontEnd.println("(SLIM) " + cmd1);
 
-				ProcessBuilder pb = new ProcessBuilder(strList(cmd1));
-				pb.directory(new File("."));
-				Env.setProcessEnvironment(pb.environment());
-				//pb.redirectErrorStream(redirectErrorStream);
-				p1 = pb.start();
-				BufferedInputStream in1 = new BufferedInputStream(p1.getInputStream());
-				ErrorStreamPrinter err1 = new ErrorStreamPrinter(p1.getErrorStream());
-				err1.start();
+					pb = new ProcessBuilder(strList(cmd1));
+					pb.directory(new File("."));
+					Env.setProcessEnvironment(pb.environment());
+					//pb.redirectErrorStream(redirectErrorStream);
+					p1 = pb.start();
+					in1 = new BufferedInputStream(p1.getInputStream());
+					err1 = new ErrorStreamPrinter(p1.getErrorStream());
+					err1.start();
+				}
+				else {
+					in1 = new BufferedInputStream(new FileInputStream(targetFile));
+					err1 = new ErrorStreamPrinter(null);
+				}
 
 				// SLIM起動
 				//String cmd2 = slim_path+" -Ilmntal"+File.separator+Env.getDirNameOfSlim()+File.separator+"lib"+File.separator+" "+option;
@@ -242,7 +266,10 @@ public class SlimRunner implements OuterRunner
 				out2.close();
 				in1.close();
 				err1.join();
-				p1.waitFor();
+				if (!this.runOnlySlim)
+				{
+					p1.waitFor();
+				}
 
 				// SLIMの出力を得る
 				if (buffer == null)

@@ -69,6 +69,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 	private JMenuItem remove = new JMenuItem("Remove");
 	private JMenuItem unyo2 = new JMenuItem("Unyo(2G)");
 	private JMenuItem unyo3 = new JMenuItem("Unyo(3G)");
+	private JMenuItem graphene = new JMenuItem("Graphene");
 	private JMenuItem add = new JMenuItem("add Editor");
 
 	private JMenu transitionSearchSubmenu = new JMenu("Transition Search");
@@ -95,6 +96,9 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 
 		unyo3.addActionListener(this);
 		nodeSubmenu.add(unyo3);
+
+		graphene.addActionListener(this);
+		nodeSubmenu.add(graphene);
 
 		add.addActionListener(this);
 		nodeSubmenu.add(add);
@@ -154,6 +158,10 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 			for(StateNode node : graphPanel.getSelectNodes()){
 				node.runUnyo3();
 			}
+		}else if(src==graphene){
+			for(StateNode node : graphPanel.getSelectNodes()){
+				node.runGraphene();
+			}
 		}else if(src==add){
 			for(StateNode node : graphPanel.getSelectNodes()){
 				FrontEnd.mainFrame.editorPanel.getSelectedEditor().replaceSelection(node.state);
@@ -179,6 +187,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 		remove.setEnabled(true);
 		unyo2.setEnabled(true);
 		unyo3.setEnabled(true);
+		graphene.setEnabled(true);
 		add.setEnabled(true);
 
 		backNs.setEnabled(true);
@@ -196,6 +205,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener{
 		if(graphPanel.getSelectNodes().size()!=1){
 			unyo2.setEnabled(false);
 			unyo3.setEnabled(false);
+			graphene.setEnabled(false);
 			add.setEnabled(false);
 		}
 

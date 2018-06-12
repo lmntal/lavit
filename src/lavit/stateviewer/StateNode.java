@@ -712,6 +712,23 @@ public class StateNode implements Shape {
 		}
 	}
 
+	public void runGraphene()
+	{
+		File tempFile = new File("temp.lmn");
+		try
+		{
+			FileWriter writer = new FileWriter(tempFile);
+			writer.write(state);
+			writer.close();
+
+			FrontEnd.executeGraphene(tempFile);
+		}
+		catch (IOException e)
+		{
+			FrontEnd.printException(e);
+		}
+	}
+
 	boolean isMatch(String str){
 		if(dummy) return false;
 		if(childSet==null){

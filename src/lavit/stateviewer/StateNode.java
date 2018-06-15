@@ -683,18 +683,6 @@ public class StateNode implements Shape {
 		return str;
 	}
 
-	public void runUnyo2(){
-		File f = new File("temp.lmn");
-		try {
-			FileWriter fp = new FileWriter(f);
-			fp.write(state);
-			fp.close();
-		} catch (IOException e) {
-			FrontEnd.printException(e);
-		}
-		(new LmntalRunner("-g "+Env.get("UNYO_OPTION"),f)).run();
-	}
-
 	public void runUnyo3()
 	{
 		File tempFile = new File("temp.lmn");
@@ -705,6 +693,23 @@ public class StateNode implements Shape {
 			writer.close();
 
 			FrontEnd.executeUnyo(tempFile);
+		}
+		catch (IOException e)
+		{
+			FrontEnd.printException(e);
+		}
+	}
+
+	public void runGraphene()
+	{
+		File tempFile = new File("temp.lmn");
+		try
+		{
+			FileWriter writer = new FileWriter(tempFile);
+			writer.write(state);
+			writer.close();
+
+			FrontEnd.executeGraphene(tempFile);
 		}
 		catch (IOException e)
 		{

@@ -208,24 +208,24 @@ public class LmnTextPane extends JTextPane
 
 	public LmnDocument getLMNDocument()
 	{
-    Document doc = getDocument();
+		Document doc = getDocument();
 
-    if(doc instanceof LmnDocument){
-      return (LmnDocument) doc;
-    }else {
-      LmnDocument lmndoc = new LmnDocument();
-      try {
-        lmndoc.initializeText(doc.getText(0, doc.getLength()));
-        // 0からdocのlengthまでを取ってるだけでBadLocationExceptionは起きないはずなので握り潰す
-      } catch (BadLocationException e){
-        System.err.println(e);
-      }
+		if(doc instanceof LmnDocument){
+			return (LmnDocument) doc;
+		}else {
+			LmnDocument lmndoc = new LmnDocument();
+			try {
+				lmndoc.initializeText(doc.getText(0, doc.getLength()));
+				// 0からdocのlengthまでを取ってるだけでBadLocationExceptionは起きないはずなので握り潰す
+			} catch (BadLocationException e){
+				System.err.println(e);
+			}
 
-      // なぜかハイライトがされなくなったのでLmnDocument.updateHighlight()をコピペ
-      lmndoc.setDirty(true);
-      lmndoc.reparse();
-      return lmndoc;
-    }
+			// なぜかハイライトがされなくなったのでLmnDocument.updateHighlight()をコピペ
+			lmndoc.setDirty(true);
+			lmndoc.reparse();
+			return lmndoc;
+		}
 	}
 
 	public void setTabWidth(int spaces)

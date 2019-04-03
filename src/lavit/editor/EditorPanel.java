@@ -318,7 +318,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	 */
 	public void firstFileOpen()
 	{
-		File first = new File("first.lmn");
+		File first = new File("first.lmn").getAbsoluteFile();
 		if (!first.exists())
 		{
 			try

@@ -55,7 +55,6 @@ public class StateControlTab extends JTabbedPane {
 	public StateSimulationPanel simulationPanel;
 	public StateSearchPanel searchPanel;
 	public StateDynamicControlPanel dynamicPanel;
-	public State3DControlPanel s3dPanel;
 	public StateOtherPanel otherPanel;
 	public StateBetaPanel betaPanel;
 
@@ -74,9 +73,6 @@ public class StateControlTab extends JTabbedPane {
 		dynamicPanel = new StateDynamicControlPanel(statePanel);
 		addTab("Dynamic", dynamicPanel);
 
-		s3dPanel = new State3DControlPanel(statePanel);
-		addTab("3D", s3dPanel);
-
 		otherPanel = new StateOtherPanel(statePanel);
 		addTab("Other", otherPanel);
 
@@ -89,14 +85,7 @@ public class StateControlTab extends JTabbedPane {
 		dynamicPanel.setEnabled(enabled);
 		searchPanel.setEnabled(enabled);
 		buttonPanel.setEnabled(enabled);
-		s3dPanel.setEnabled(enabled);
 		otherPanel.setEnabled(enabled);
 		betaPanel.setEnabled(enabled);
-	}
-
-	public void setTab(String tab) {
-		if (tab.equals("3D")) {
-			setSelectedComponent(s3dPanel);
-		}
 	}
 }

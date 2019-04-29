@@ -51,13 +51,9 @@ import javax.swing.JPanel;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.stateviewer.controller.StateControlPanel;
-import lavit.stateviewer.s3d.State3DPanel;
 
 public class StatePanel extends JPanel {
 	public StateGraphPanel stateGraphPanel;
-	public State3DPanel state3DPanel = null;
-	public boolean view3D = false;
-	public boolean created3D = false;
 
 	public StateControlPanel stateControlPanel;
 
@@ -108,12 +104,6 @@ public class StatePanel extends JPanel {
 			stateGraphPanel.init(drawNodes);
 			stateGraphPanel.getDraw().setCycleMode(ltlMode);
 			FrontEnd.mainFrame.toolTab.setTab("StateViewer");
-
-			created3D = false;
-			if (Env.is("SV3D")) {
-				start3D();
-				stateControlPanel.stateControllerTab.setTab("3D");
-			}
 		} else {
 			FrontEnd.println("(StateViewer) error.");
 		}
@@ -188,37 +178,4 @@ public class StatePanel extends JPanel {
 	public boolean isLtl() {
 		return ltlMode;
 	}
-
-	public void toggle3D() {
-		if (view3D) {
-			stop3D();
-		} else {
-			start3D();
-		}
-	}
-
-	public void start3D() {
-		if (state3DPanel == null) {
-			state3DPanel = new State3DPanel(this);
-		}
-		if (!created3D) {
-			state3DPanel.createGraph();
-			created3D = true;
-		}
-
-		remove(stateGraphPanel);
-		add(state3DPanel, BorderLayout.CENTER);
-		revalidate();
-
-		view3D = true;
-	}
-
-	public void stop3D() {
-		remove(state3DPanel);
-		add(stateGraphPanel, BorderLayout.CENTER);
-		revalidate();
-
-		view3D = false;
-	}
-
 }

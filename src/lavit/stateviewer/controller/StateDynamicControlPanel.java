@@ -35,45 +35,25 @@
 
 package lavit.stateviewer.controller;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import lavit.*;
-import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StatePanel;
-import lavit.stateviewer.StateTransitionAbstraction;
-import lavit.stateviewer.worker.State3DDynamicMover;
 import lavit.stateviewer.worker.StateDynamicMover;
-import lavit.stateviewer.worker.StateGraphExchangeWorker;
-import lavit.util.CommonFontUser;
-import lavit.util.FixFlowLayout;
 
 public class StateDynamicControlPanel extends JPanel implements ChangeListener, ActionListener {
 
@@ -154,15 +134,6 @@ public class StateDynamicControlPanel extends JPanel implements ChangeListener, 
 		mover.setInnerMaxSpeed(maxSpeedSlider.getValue());
 		Env.set("SV_DYNAMIC_MAXSPEED", maxSpeedSlider.getValue());
 		stateUpdate();
-		if (statePanel.state3DPanel == null) {
-			return;
-		}
-		State3DDynamicMover mover3d = statePanel.state3DPanel.mover;
-		mover3d.setInnerSpring(springSlider.getValue());
-		mover3d.setInnerNodeRepulsion(nodeRepulsionSlider.getValue());
-		mover3d.setInnerDummyRepulsion(dummyRepulsionSlider.getValue());
-		mover3d.setInnerInterval(intervalSlider.getValue());
-		mover3d.setInnerMaxSpeed(maxSpeedSlider.getValue());
 	}
 
 	public void stateUpdate() {
@@ -189,7 +160,7 @@ public class StateDynamicControlPanel extends JPanel implements ChangeListener, 
 	 * pos=100; } springSlider.removeChangeListener(this);
 	 * springSlider.setValue(pos); springSlider.addChangeListener(this);
 	 * stateUpdate(); }
-	 * 
+	 *
 	 * public void setRepulsionSliderPos(int pos){ if(pos<1){ pos=1; }else
 	 * if(pos>100){ pos=100; } repulsionSlider.removeChangeListener(this);
 	 * repulsionSlider.setValue(pos); repulsionSlider.addChangeListener(this);

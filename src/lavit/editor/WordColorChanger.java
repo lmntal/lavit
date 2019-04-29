@@ -37,7 +37,8 @@ package lavit.editor;
 
 import java.awt.Color;
 
-import lavit.*;
+import lavit.Env;
+import lavit.FrontEnd;
 
 public class WordColorChanger extends Thread {
 	private AutoStyledDocument doc;

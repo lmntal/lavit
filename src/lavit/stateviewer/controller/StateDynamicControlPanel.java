@@ -51,7 +51,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import lavit.*;
+import lavit.Env;
 import lavit.stateviewer.StatePanel;
 import lavit.stateviewer.worker.StateDynamicMover;
 

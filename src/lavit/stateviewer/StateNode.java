@@ -768,21 +768,22 @@ public class StateNode implements Shape {
 	}
 
 	/*
-	 * boolean isLmntalMatch(String head,String guard){ File f = new
-	 * File("temp.lmn"); try { FileWriter fp = new FileWriter(f);
-	 * fp.write("sVr_nomatch,"+state+"\n"); fp.write("sVr_nomatch,"+head+" :- ");
-	 * if(!guard.equals("")){ fp.write(guard+" | "); } fp.write(head+".");
-	 * fp.close(); } catch (IOException e) { FrontEnd.printException(e); }
+	 * private class TextDialog extends JDialog{
 	 *
-	 * final LmntalRunner lr = new LmntalRunner("",f); lr.setBuffering(true);
-	 * lr.run();
+	 * TextDialog(String title,String state){
 	 *
-	 * while(lr.isRunning()){ FrontEnd.sleep(200); } if(lr.isSuccess()){ String str
-	 * = lr.getBufferString(); if(str.indexOf("sVr_nomatch")==-1){ return true; } }
-	 * return false; }
-	 */
-
-	/*
+	 * super(FrontEnd.mainFrame);
+	 *
+	 * setTitle(title);
+	 *
+	 * JTextArea text = new JTextArea(state); text.setLineWrap(true);
+	 * text.setFont(new Font(Env.get("EDITOR_FONT_FAMILY"), Font.PLAIN,
+	 * Env.getInt("EDITOR_FONT_SIZE")));
+	 *
+	 * add(text);
+	 *
+	 * setVisible(true);
+	 *
 	 * private class TextDialog extends JDialog{
 	 *
 	 * TextDialog(String title,String state){

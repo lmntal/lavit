@@ -171,7 +171,7 @@ public class LtlPanel extends JPanel
 
 		try
 		{
-			String encoding = Env.get("EDITER_FILE_READ_ENCODING");
+			String encoding = Env.get("EDITOR_FILE_READ_ENCODING");
 			BufferedReader reader = new BufferedReader(
 				new InputStreamReader(new FileInputStream(file), encoding));
 
@@ -200,7 +200,7 @@ public class LtlPanel extends JPanel
 	{
 		try
 		{
-			String encoding = Env.get("EDITER_FILE_WRITE_ENCODING");
+			String encoding = Env.get("EDITOR_FILE_WRITE_ENCODING");
 			BufferedWriter writer = new BufferedWriter(
 				new OutputStreamWriter(new FileOutputStream(file), encoding));
 			writer.write(str + "\r\n");

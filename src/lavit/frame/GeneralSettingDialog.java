@@ -332,20 +332,20 @@ public class GeneralSettingDialog extends JDialog {
 
 			fontFamilyComboBox.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					Env.set("EDITER_FONT_FAMILY", (String) fontFamilyComboBox.getSelectedItem());
+					Env.set("EDITOR_FONT_FAMILY", (String) fontFamilyComboBox.getSelectedItem());
 					FrontEnd.loadAllFont();
 				}
 			});
 			fontSizeController.addChangeListener(new ChangeListener() {
 				public void stateChanged(ChangeEvent e) {
 					int fontSize = (Integer) fontSizeController.getValue();
-					Env.set("EDITER_FONT_SIZE", fontSize);
+					Env.set("EDITOR_FONT_SIZE", fontSize);
 					FrontEnd.loadAllFont();
 				}
 			});
 			tabSizeComboBox.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					Env.set("EDITER_TAB_SIZE", (String) tabSizeComboBox.getSelectedItem());
+					Env.set("EDITOR_TAB_SIZE", (String) tabSizeComboBox.getSelectedItem());
 					FrontEnd.loadAllFont();
 				}
 			});
@@ -361,9 +361,9 @@ public class GeneralSettingDialog extends JDialog {
 		}
 
 		public void initialize() {
-			fontFamilyComboBox.setSelectedItem(Env.get("EDITER_FONT_FAMILY"));
-			fontSizeController.setValue(Env.getInt("EDITER_FONT_SIZE", 12));
-			tabSizeComboBox.setSelectedItem(Env.get("EDITER_TAB_SIZE"));
+			fontFamilyComboBox.setSelectedItem(Env.get("EDITOR_FONT_FAMILY"));
+			fontSizeController.setValue(Env.getInt("EDITOR_FONT_SIZE", 12));
+			tabSizeComboBox.setSelectedItem(Env.get("EDITOR_TAB_SIZE"));
 		}
 	}
 
@@ -409,11 +409,11 @@ public class GeneralSettingDialog extends JDialog {
 		}
 
 		private void setSelectedReadEncoding() {
-			Env.set("EDITER_FILE_READ_ENCODING", (String) readComboBox.getSelectedItem());
+			Env.set("EDITOR_FILE_READ_ENCODING", (String) readComboBox.getSelectedItem());
 		}
 
 		private void setSelectedWriteEncoding() {
-			Env.set("EDITER_FILE_WRITE_ENCODING", (String) writeComboBox.getSelectedItem());
+			Env.set("EDITOR_FILE_WRITE_ENCODING", (String) writeComboBox.getSelectedItem());
 		}
 	}
 

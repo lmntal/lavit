@@ -258,8 +258,8 @@ public final class Env {
 	}
 
 	public static Font getEditorFont() {
-		String fontFamily = get("EDITER_FONT_FAMILY", Font.MONOSPACED);
-		int fontSize = FontSizeUtils.getActualFontSize(getInt("EDITER_FONT_SIZE", 12));
+		String fontFamily = get("EDITOR_FONT_FAMILY", Font.MONOSPACED);
+		int fontSize = FontSizeUtils.getActualFontSize(getInt("EDITOR_FONT_SIZE", 12));
 		return new Font(fontFamily, Font.PLAIN, fontSize);
 	}
 
@@ -409,7 +409,7 @@ public final class Env {
 
 	/**
 	 * Finds a directory whose name starts with "slim" in "./lmntal".
-	 * 
+	 *
 	 * @return If found, returns path string of the directory found first.
 	 *         Otherwise, returns empty string.
 	 */

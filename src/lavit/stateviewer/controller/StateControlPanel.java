@@ -35,59 +35,35 @@
 
 package lavit.stateviewer.controller;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import lavit.*;
-import lavit.stateviewer.StateGraphPanel;
+import lavit.Env;
 import lavit.stateviewer.StatePanel;
-import lavit.util.CommonFontUser;
-import lavit.util.FixFlowLayout;
 
-public class StateControlPanel extends JPanel implements ChangeListener,MouseListener {
+@SuppressWarnings("serial")
+public class StateControlPanel extends JPanel implements ChangeListener, MouseListener {
 
 	private StatePanel statePanel;
 
-    public StateControlTab stateControllerTab;
-    private JSlider zoomSlider = new JSlider(1,399);
-    private StateUnderInfoPanel infoPanel;
+	public StateControlTab stateControllerTab;
+	private JSlider zoomSlider = new JSlider(1, 399);
+	private StateUnderInfoPanel infoPanel;
 
-	public StateControlPanel(StatePanel statePanel){
+	public StateControlPanel(StatePanel statePanel) {
 
 		this.statePanel = statePanel;
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		stateControllerTab = new StateControlTab(statePanel);
 		stateControllerTab.setVisible(Env.is("SV_CONTROLLER"));
-		//stateControllerTab.addMouseListener(this);
+		stateControllerTab.addMouseListener(this);
 		add(stateControllerTab);
 
 		zoomSlider.addChangeListener(this);
@@ -103,58 +79,71 @@ public class StateControlPanel extends JPanel implements ChangeListener,MouseLis
 
 	}
 
-	public void setEnabled(boolean enabled){
+	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		stateControllerTab.setEnabled(enabled);
 		zoomSlider.setEnabled(enabled);
 	}
 
-	public void setSliderPos(double z){
-		int pos = (int)(Math.sqrt(z*10000)*2-1);
-		if(pos<1){ pos=1; }else if(pos>399){ pos=399; }
+	public void setSliderPos(double z) {
+		int pos = (int) (Math.sqrt(z * 10000) * 2 - 1);
+		if (pos < 1) {
+			pos = 1;
+		} else if (pos > 399) {
+			pos = 399;
+		}
 		zoomSlider.removeChangeListener(this);
 		zoomSlider.setValue(pos);
 		zoomSlider.addChangeListener(this);
 	}
 
 	public void stateChanged(ChangeEvent e) {
-		double z = (zoomSlider.getValue()+1)/2.0;
-		statePanel.stateGraphPanel.setInnerZoom(z*z/10000.0);
+		double z = (zoomSlider.getValue() + 1) / 2.0;
+		statePanel.stateGraphPanel.setInnerZoom(z * z / 10000.0);
 		statePanel.stateGraphPanel.update();
 	}
 
-	public void updateInfo(){
+	public void updateInfo() {
 		infoPanel.updateInfo();
 	}
 
-	public void toggleControllerVisible(){
+	public void toggleControllerVisible() {
 		stateControllerTab.setVisible(!stateControllerTab.isVisible());
 		Env.set("SV_CONTROLLER", stateControllerTab.isVisible());
 	}
 
-	public void toggleZoomSliderVisible(){
+	public void toggleZoomSliderVisible() {
 		zoomSlider.setVisible(!zoomSlider.isVisible());
-		Env.set("SV_ZOOMSLIDER",zoomSlider.isVisible());
+		Env.set("SV_ZOOMSLIDER", zoomSlider.isVisible());
 	}
 
-	public void toggleInfoVisible(){
+	public void toggleInfoVisible() {
 		infoPanel.setVisible(!infoPanel.isVisible());
-		Env.set("SV_INFO",infoPanel.isVisible());
+		Env.set("SV_INFO", infoPanel.isVisible());
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if(e.getClickCount()>0&&e.getClickCount()%2==0){
+		if (e.getClickCount() > 0 && e.getClickCount() % 2 == 0) {
 			toggleControllerVisible();
-			javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-				statePanel.stateGraphPanel.fitCentering();
-			}});
+			javax.swing.SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					statePanel.stateGraphPanel.fitCentering();
+				}
+			});
 		}
 	}
 
-	public void mouseReleased(MouseEvent e) {}
-	public void mouseClicked(MouseEvent e) {}
-	public void mouseEntered(MouseEvent e) {}
-	public void mouseExited(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {
+	}
+
+	public void mouseClicked(MouseEvent e) {
+	}
+
+	public void mouseEntered(MouseEvent e) {
+	}
+
+	public void mouseExited(MouseEvent e) {
+	}
 
 }

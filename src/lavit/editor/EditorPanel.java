@@ -382,7 +382,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	 */
 	public void openFile(File file)
 	{
-		String encoding = Env.get("EDITER_FILE_READ_ENCODING");
+		String encoding = Env.get("EDITOR_FILE_READ_ENCODING");
 		try
 		{
 			BufferedReader reader = new BufferedReader(
@@ -507,7 +507,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	private void editorFileSave(File file) throws IOException
 	{
 		EditorPage page = tabView.getSelectedPage();
-		String encoding = Env.get("EDITER_FILE_WRITE_ENCODING");
+		String encoding = Env.get("EDITOR_FILE_WRITE_ENCODING");
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile()), encoding));
 		page.write(writer);
 		writer.close();
@@ -605,7 +605,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 	private File chooseOpenFile()
 	{
-		String chooserDir = Env.get("EDITER_FILE_LAST_CHOOSER_DIR");
+		String chooserDir = Env.get("EDITOR_FILE_LAST_CHOOSER_DIR");
 		if (chooserDir == null || !FileUtils.exists(chooserDir))
 		{
 			File dirDemo = new File("demo");
@@ -622,7 +622,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			return null;
 		}
 		File file = jfc.getSelectedFile();
-		Env.set("EDITER_FILE_LAST_CHOOSER_DIR", jfc.getCurrentDirectory().getAbsolutePath());
+		Env.set("EDITOR_FILE_LAST_CHOOSER_DIR", jfc.getCurrentDirectory().getAbsolutePath());
 		return file;
 	}
 
@@ -631,7 +631,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		FileFilter lmnFilter = FileFilters.getLMNFileFilter();
 		FileFilter ilFilter = FileFilters.getILFileFilter();
 
-		JFileChooser jfc = new JFileChooser(Env.get("EDITER_FILE_LAST_CHOOSER_DIR"));
+		JFileChooser jfc = new JFileChooser(Env.get("EDITOR_FILE_LAST_CHOOSER_DIR"));
 		jfc.addChoosableFileFilter(lmnFilter);
 		jfc.addChoosableFileFilter(ilFilter);
 		jfc.setFileFilter(lmnFilter);
@@ -669,7 +669,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 				DialogResult res = builder.showDialog();
 				if (res == DialogResult.YES)
 				{
-					Env.set("EDITER_FILE_LAST_CHOOSER_DIR", file.getParent());
+					Env.set("EDITOR_FILE_LAST_CHOOSER_DIR", file.getParent());
 					return file;
 				}
 				else if (res == DialogResult.CANCEL)
@@ -683,7 +683,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			}
 			else
 			{
-				Env.set("EDITER_FILE_LAST_CHOOSER_DIR", file.getParent());
+				Env.set("EDITOR_FILE_LAST_CHOOSER_DIR", file.getParent());
 				return file;
 			}
 		}
@@ -711,7 +711,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 	{
 		Font font = Env.getEditorFont();
 		tabView.setFont(font);
-		setTabWidth(Env.getInt("EDITER_TAB_SIZE"));
+		setTabWidth(Env.getInt("EDITOR_TAB_SIZE"));
 	}
 
 	public boolean isChanged()
@@ -798,17 +798,17 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 	private static void addFontSize(int addition)
 	{
-		int fontSize = Env.getInt("EDITER_FONT_SIZE", 12) + addition;
+		int fontSize = Env.getInt("EDITOR_FONT_SIZE", 12) + addition;
 		if (0 < fontSize && fontSize < 120)
 		{
-			Env.set("EDITER_FONT_SIZE", fontSize);
+			Env.set("EDITOR_FONT_SIZE", fontSize);
 			FrontEnd.loadAllFont();
 		}
 	}
 
 	private static void scaleDefault()
 	{
-		Env.set("EDITER_FONT_SIZE", 12);
+		Env.set("EDITOR_FONT_SIZE", 12);
 		FrontEnd.loadAllFont();
 	}
 

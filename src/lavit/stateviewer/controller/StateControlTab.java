@@ -35,19 +35,12 @@
 
 package lavit.stateviewer.controller;
 
-import java.awt.Dimension;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import lavit.Env;
 import lavit.stateviewer.StatePanel;
 
-public class StateControlTab extends JTabbedPane{
+@SuppressWarnings("serial")
+public class StateControlTab extends JTabbedPane {
 
 	public StatePanel statePanel;
 
@@ -55,14 +48,13 @@ public class StateControlTab extends JTabbedPane{
 	public StateSimulationPanel simulationPanel;
 	public StateSearchPanel searchPanel;
 	public StateDynamicControlPanel dynamicPanel;
-	public State3DControlPanel s3dPanel;
 	public StateOtherPanel otherPanel;
 	public StateBetaPanel betaPanel;
 
-    StateControlTab(StatePanel statePanel){
-    	this.statePanel = statePanel;
+	StateControlTab(StatePanel statePanel) {
+		this.statePanel = statePanel;
 
-    	buttonPanel = new StateButtonPanel(statePanel);
+		buttonPanel = new StateButtonPanel(statePanel);
 		addTab("Control Button", buttonPanel);
 
 		simulationPanel = new StateSimulationPanel(statePanel);
@@ -71,36 +63,22 @@ public class StateControlTab extends JTabbedPane{
 		searchPanel = new StateSearchPanel(statePanel);
 		addTab("Search", searchPanel);
 
-    	dynamicPanel = new StateDynamicControlPanel(statePanel);
+		dynamicPanel = new StateDynamicControlPanel(statePanel);
 		addTab("Dynamic", dynamicPanel);
-
-		s3dPanel = new State3DControlPanel(statePanel);
-		addTab("3D", s3dPanel);
 
 		otherPanel = new StateOtherPanel(statePanel);
 		addTab("Other", otherPanel);
 
 		betaPanel = new StateBetaPanel(statePanel);
 		addTab("Beta", betaPanel);
-
-		//this.addMouseListener(this);
-
-    }
-
-    public void setEnabled(boolean enabled) {
-    	super.setEnabled(enabled);
-    	dynamicPanel.setEnabled(enabled);
-    	searchPanel.setEnabled(enabled);
-		buttonPanel.setEnabled(enabled);
-		s3dPanel.setEnabled(enabled);
-		otherPanel.setEnabled(enabled);
-		betaPanel.setEnabled(enabled);
-    }
-
-    public void setTab(String tab){
-		if(tab.equals("3D")){
-			setSelectedComponent(s3dPanel);
-		}
 	}
 
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		dynamicPanel.setEnabled(enabled);
+		searchPanel.setEnabled(enabled);
+		buttonPanel.setEnabled(enabled);
+		otherPanel.setEnabled(enabled);
+		betaPanel.setEnabled(enabled);
+	}
 }

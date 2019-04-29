@@ -53,121 +53,132 @@ public class StateDynamicMover extends Thread {
 	private long interval;
 	private int maxSpeed;
 
-	public StateDynamicMover(StateGraphPanel panel){
+	public StateDynamicMover(StateGraphPanel panel) {
 		this.panel = panel;
 		this.active = false;
 	}
 
-	public void setInnerSpring(int k){
-		this.k = (double)k/100.0;
+	public void setInnerSpring(int k) {
+		this.k = (double) k / 100.0;
 	}
 
-	public void setInnerNodeRepulsion(int nc){
-		this.nc = (double)nc*10.0;
+	public void setInnerNodeRepulsion(int nc) {
+		this.nc = (double) nc * 10.0;
 	}
 
-	public void setInnerDummyRepulsion(int dc){
-		this.dc = (double)dc*10.0;
+	public void setInnerDummyRepulsion(int dc) {
+		this.dc = (double) dc * 10.0;
 	}
 
-	public void setInnerInterval(int interval){
+	public void setInnerInterval(int interval) {
 		this.interval = interval;
 	}
 
-	public void setInnerMaxSpeed(int maxSpeed){
-		this.maxSpeed = maxSpeed*10;
+	public void setInnerMaxSpeed(int maxSpeed) {
+		this.maxSpeed = maxSpeed * 10;
 	}
 
-	public void setPhysicsMode(boolean physicsMode){
+	public void setPhysicsMode(boolean physicsMode) {
 		this.physicsMode = physicsMode;
 	}
 
-	public void run(){
+	public void run() {
 		long sleepTime = 0;
-		while(true){
-			try{
+		while (true) {
+			try {
 				StateNodeSet drawNodes = panel.getDrawNodes();
-				if(active){
+				if (active) {
 					double springLength = 30;
-					if(drawNodes.getDepth()>=2){
-						springLength = drawNodes.getDepthNode().get(1).get(0).getX() - drawNodes.getDepthNode().get(0).get(0).getX();
+					if (drawNodes.getDepth() >= 2) {
+						springLength = drawNodes.getDepthNode().get(1).get(0).getX()
+								- drawNodes.getDepthNode().get(0).get(0).getX();
 					}
 
-					//ばね
-					for(StateNode node : drawNodes.getAllNode()){
-						for(StateNode to : node.getToNodes()){
-							double l = Math.sqrt((node.getX()-to.getX())*(node.getX()-to.getX())+(node.getY()-to.getY())*(node.getY()-to.getY()));
-							if(l==0){ continue; }
-							double f = -1.0 * (l-springLength)*k;
-							double rateY = (node.getY()-to.getY())/l;
-							node.ddy += f*rateY;
+					// ばね
+					for (StateNode node : drawNodes.getAllNode()) {
+						for (StateNode to : node.getToNodes()) {
+							double l = Math.sqrt((node.getX() - to.getX()) * (node.getX() - to.getX())
+									+ (node.getY() - to.getY()) * (node.getY() - to.getY()));
+							if (l == 0) {
+								continue;
+							}
+							double f = -1.0 * (l - springLength) * k;
+							double rateY = (node.getY() - to.getY()) / l;
+							node.ddy += f * rateY;
 						}
-						for(StateNode from : node.getFromNodes()){
-							double l = Math.sqrt((node.getX()-from.getX())*(node.getX()-from.getX())+(node.getY()-from.getY())*(node.getY()-from.getY()));
-							if(l==0){ continue; }
-							double f = -1.0 * (l-springLength)*k;
-							double rateY = (node.getY()-from.getY())/l;
-							node.ddy += f*rateY;
+						for (StateNode from : node.getFromNodes()) {
+							double l = Math.sqrt((node.getX() - from.getX()) * (node.getX() - from.getX())
+									+ (node.getY() - from.getY()) * (node.getY() - from.getY()));
+							if (l == 0) {
+								continue;
+							}
+							double f = -1.0 * (l - springLength) * k;
+							double rateY = (node.getY() - from.getY()) / l;
+							node.ddy += f * rateY;
 						}
 					}
 
-					//斥力
+					// 斥力
 					int d = 10;
-					for(List<StateNode> nodes : drawNodes.getDepthNode()){
-						for(StateNode node : nodes){
-							for(StateNode n : nodes){
-								if(node.id==n.id) continue;
-								double r = node.getY()-n.getY();
-								if(r==0) continue;
-								if(0<r&&r<d){ r=d; }
-								if(-d<r&&r<0){ r=-d; }
+					for (List<StateNode> nodes : drawNodes.getDepthNode()) {
+						for (StateNode node : nodes) {
+							for (StateNode n : nodes) {
+								if (node.id == n.id)
+									continue;
+								double r = node.getY() - n.getY();
+								if (r == 0)
+									continue;
+								if (0 < r && r < d) {
+									r = d;
+								}
+								if (-d < r && r < 0) {
+									r = -d;
+								}
 								double f;
-								if(r>0){
-									f = ((node.dummy?dc:nc)+(n.dummy?dc:nc))/(r*r);
-								}else{
-									f = -((node.dummy?dc:nc)+(n.dummy?dc:nc))/(r*r);
+								if (r > 0) {
+									f = ((node.dummy ? dc : nc) + (n.dummy ? dc : nc)) / (r * r);
+								} else {
+									f = -((node.dummy ? dc : nc) + (n.dummy ? dc : nc)) / (r * r);
 								}
 								/*
-							r/=20;
-							if(-1<r&&r<0){
-								f = -1*(5*r*r*r/4-19*r*r/8+9/8);
-							}else if(0<r&&r<1){
-								f = 1*(5*r*r*r/4-19*r*r/8+9/8);
-							}else{
-								f = 0;
-							}
+								 * r/=20; if(-1<r&&r<0){ f = -1*(5*r*r*r/4-19*r*r/8+9/8); }else if(0<r&&r<1){ f
+								 * = 1*(5*r*r*r/4-19*r*r/8+9/8); }else{ f = 0; }
 								 */
 								node.ddy += f;
 							}
 						}
 					}
 
-					//摩擦力
-					for(StateNode node : drawNodes.getAllNode()){
-						node.ddy += -0.5 * (node.dy+node.ddy);
+					// 摩擦力
+					for (StateNode node : drawNodes.getAllNode()) {
+						node.ddy += -0.5 * (node.dy + node.ddy);
 					}
 
-					//移動
-					for(StateNode node : drawNodes.getAllNode()){
-						if(panel.getSelectNodes().contains(node)&&panel.isDragg()) continue;
+					// 移動
+					for (StateNode node : drawNodes.getAllNode()) {
+						if (panel.getSelectNodes().contains(node) && panel.isDragg())
+							continue;
 						node.dy += node.ddy;
-						if(node.dy>maxSpeed){
-							node.move(0,maxSpeed);
-						}else if(node.dy<-maxSpeed){
-							node.move(0,-maxSpeed);
-						}else{
-							//dyがおかしくなった場合は0にする
-							if(!(-1000000000<node.dy&&node.dy<1000000000)){ node.dy=0; node.ddy=0; }
-							node.move(0,node.dy);
+						if (node.dy > maxSpeed) {
+							node.move(0, maxSpeed);
+						} else if (node.dy < -maxSpeed) {
+							node.move(0, -maxSpeed);
+						} else {
+							// dyがおかしくなった場合は0にする
+							if (!(-1000000000 < node.dy && node.dy < 1000000000)) {
+								node.dy = 0;
+								node.ddy = 0;
+							}
+							node.move(0, node.dy);
 						}
-						//System.out.println("id:"+node.id+",y:"+node.getY()+".dy:"+node.dy+",ddy:"+node.ddy);
+						// System.out.println("id:"+node.id+",y:"+node.getY()+".dy:"+node.dy+",ddy:"+node.ddy);
 					}
 					panel.repaint();
-					while(System.currentTimeMillis()<sleepTime+interval){
+					while (System.currentTimeMillis() < sleepTime + interval) {
 						sleep(1);
 					}
-					sleepTime=System.currentTimeMillis();
-				}else{
+					sleepTime = System.currentTimeMillis();
+				} else {
 					sleep(300);
 				}
 			} catch (Exception e) {
@@ -177,11 +188,11 @@ public class StateDynamicMover extends Thread {
 
 	}
 
-	public void setActive(boolean active){
+	public void setActive(boolean active) {
 		this.active = active;
 	}
 
-	public boolean isActive(){
+	public boolean isActive() {
 		return active;
 	}
 

@@ -35,7 +35,6 @@
 
 package lavit.visualeditor;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -45,41 +44,44 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import lavit.Env;
-import lavit.stateviewer.StateGraphPanel;
-
-public class VisualControlPanel extends JPanel implements ChangeListener,ActionListener{
+@SuppressWarnings("serial")
+public class VisualControlPanel extends JPanel implements ChangeListener, ActionListener {
 	VisualPanel visualPanel;
 
-	private JSlider zoomSlider = new JSlider(1,39);
+	private JSlider zoomSlider = new JSlider(1, 39);
 
-	VisualControlPanel(VisualPanel visualPanel){
+	VisualControlPanel(VisualPanel visualPanel) {
 		this.visualPanel = visualPanel;
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		zoomSlider.addChangeListener(this);
 		add(zoomSlider);
 	}
 
-	public void allButtonSetEnabled(boolean enabled){
+	public void allButtonSetEnabled(boolean enabled) {
 		zoomSlider.setEnabled(enabled);
 	}
 
-	public void setSliderPos(double z){
-		int pos = (int)(Math.sqrt(z*100)*2-1);
-		if(pos<1){ pos=1; }else if(pos>39){ pos=39; }
+	public void setSliderPos(double z) {
+		int pos = (int) (Math.sqrt(z * 100) * 2 - 1);
+		if (pos < 1) {
+			pos = 1;
+		} else if (pos > 39) {
+			pos = 39;
+		}
 		zoomSlider.removeChangeListener(this);
 		zoomSlider.setValue(pos);
 		zoomSlider.addChangeListener(this);
 	}
-	public void toggleZoomSliderVisible(){
+
+	public void toggleZoomSliderVisible() {
 		zoomSlider.setVisible(!zoomSlider.isVisible());
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		double z = (zoomSlider.getValue()+1)/2.0;
-		visualPanel.drawPanel.setZoom(z*z/100.0);
+		double z = (zoomSlider.getValue() + 1) / 2.0;
+		visualPanel.drawPanel.setZoom(z * z / 100.0);
 		visualPanel.drawPanel.update();
 	}
 

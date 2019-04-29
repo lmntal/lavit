@@ -50,7 +50,8 @@ import javax.swing.text.ViewFactory;
 
 //折り返しをしないためのクラス
 
-public class NoWrapEditorKit extends StyledEditorKit{
+@SuppressWarnings("serial")
+public class NoWrapEditorKit extends StyledEditorKit {
 
 	public ViewFactory getViewFactory() {
 		return new NoWrapViewFactory();
@@ -60,15 +61,15 @@ public class NoWrapEditorKit extends StyledEditorKit{
 		public View create(Element elem) {
 			String kind = elem.getName();
 			if (kind != null) {
-				if(kind.equals(AbstractDocument.ContentElementName)) {
+				if (kind.equals(AbstractDocument.ContentElementName)) {
 					return new LabelView(elem);
-				}else if (kind.equals(AbstractDocument.ParagraphElementName)) {
+				} else if (kind.equals(AbstractDocument.ParagraphElementName)) {
 					return new NoWrapParagraphView(elem);
-				}else if (kind.equals(AbstractDocument.SectionElementName)) {
+				} else if (kind.equals(AbstractDocument.SectionElementName)) {
 					return new BoxView(elem, View.Y_AXIS);
-				}else if (kind.equals(StyleConstants.ComponentElementName)) {
+				} else if (kind.equals(StyleConstants.ComponentElementName)) {
 					return new ComponentView(elem);
-				}else if (kind.equals(StyleConstants.IconElementName)) {
+				} else if (kind.equals(StyleConstants.IconElementName)) {
 					return new IconView(elem);
 				}
 			}
@@ -79,11 +80,13 @@ public class NoWrapEditorKit extends StyledEditorKit{
 			public NoWrapParagraphView(Element elem) {
 				super(elem);
 			}
+
 			protected SizeRequirements calculateMinorAxisRequirements(int axis, SizeRequirements r) {
 				SizeRequirements req = super.calculateMinorAxisRequirements(axis, r);
 				req.minimum = req.preferred;
 				return req;
 			}
+
 			public int getFlowSpan(int index) {
 				return Integer.MAX_VALUE;
 			}

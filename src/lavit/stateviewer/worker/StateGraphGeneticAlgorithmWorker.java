@@ -343,6 +343,7 @@ public class StateGraphGeneticAlgorithmWorker extends SwingWorker<Object, Double
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private class ProgressFrame extends JDialog implements ActionListener {
 		private JPanel panel;
 		private JLabel label;

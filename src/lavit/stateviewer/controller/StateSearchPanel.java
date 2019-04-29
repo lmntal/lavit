@@ -38,7 +38,6 @@ package lavit.stateviewer.controller;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,18 +45,14 @@ import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import lavit.Env;
-import lavit.FrontEnd;
 import lavit.stateviewer.StatePanel;
 import lavit.stateviewer.StateTransitionEm;
-import lavit.util.CommonFontUser;
-import lavit.util.FixFlowLayout;
 
+@SuppressWarnings("serial")
 public class StateSearchPanel extends JPanel implements ActionListener {
 
 	private StatePanel statePanel;

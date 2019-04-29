@@ -37,31 +37,18 @@ package lavit.stateviewer.controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
-import lavit.stateviewer.StateTransitionEm;
-import lavit.stateviewer.worker.StateGraphExchangeWorker;
 
+@SuppressWarnings("serial")
 public class StateRightMenu extends JPopupMenu implements ActionListener {
 	private StateGraphPanel graphPanel;
 

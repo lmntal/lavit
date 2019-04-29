@@ -75,6 +75,7 @@ import lavit.stateviewer.StatePanel;
 import lavit.stateviewer.StateRule;
 import lavit.stateviewer.StateTransition;
 
+@SuppressWarnings("serial")
 public class StateSimulationPanel extends JPanel {
 	private StatePanel statePanel;
 	private StateSimulationPanel simulationPanel;
@@ -570,7 +571,7 @@ public class StateSimulationPanel extends JPanel {
 
 		private class RuleLine extends JPanel {
 			StateRule rule;
-			JComboBox box = new JComboBox();
+			JComboBox<String> box = new JComboBox<String>();
 
 			RuleLine(StateRule rule, int ruleCount) {
 				this.rule = rule;
@@ -580,7 +581,7 @@ public class StateSimulationPanel extends JPanel {
 				JLabel label = new JLabel(rule.getName());
 				add(label);
 
-				box = new JComboBox();
+				box = new JComboBox<String>();
 				for (int i = 0; i < ruleCount; ++i) {
 					box.addItem("" + i);
 				}

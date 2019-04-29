@@ -43,6 +43,7 @@ import javax.swing.JPanel;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StatePanel;
 
+@SuppressWarnings("serial")
 public class StateUnderInfoPanel extends JPanel {
 
 	public StatePanel statePanel;

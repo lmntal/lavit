@@ -35,18 +35,11 @@
 
 package lavit.stateviewer.controller;
 
-import java.awt.Dimension;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import lavit.Env;
 import lavit.stateviewer.StatePanel;
 
+@SuppressWarnings("serial")
 public class StateControlTab extends JTabbedPane {
 
 	public StatePanel statePanel;

@@ -58,6 +58,7 @@ import lavit.stateviewer.StateRule;
 import lavit.stateviewer.StateTransition;
 import lavit.stateviewer.StateTransitionCatcher;
 
+@SuppressWarnings("serial")
 public class SelectStateTransitionRuleFrame extends JFrame implements ActionListener {
 	private StateGraphPanel graphPanel;
 	private StateTransitionCatcher catcher;

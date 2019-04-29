@@ -241,9 +241,9 @@ public class StateGraphExchangeWorker extends SwingWorker<Object, Object> {
 	/*
 	 * private boolean reduction(int start, int end, int cmp, int startProgress, int
 	 * endNodeNum){
-	 * 
+	 *
 	 * ArrayList<ArrayList<StateNode>> depthNode = drawNodes.getDepthNode();
-	 * 
+	 *
 	 * for(int i=start;i!=end;i-=cmp){ ArrayList<StateNode> nodes =
 	 * depthNode.get(i); int backCross = Integer.MAX_VALUE; while(true){
 	 * for(StateNode n1 : nodes){ for(StateNode n2 : nodes){
@@ -255,7 +255,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object, Object> {
 	 * if(isCancelled()){ return false; } } int cross = getLayerCross(i+cmp,i);
 	 * if(cross>=backCross){ break; } backCross = cross; if(isCancelled()){ return
 	 * false; } }
-	 * 
+	 *
 	 * //progress更新 endNodeNum += nodes.size();
 	 * setProgress(startProgress+50*endNodeNum/drawNodes.size()); if(isCancelled()){
 	 * return false; } } return true; }
@@ -454,6 +454,7 @@ public class StateGraphExchangeWorker extends SwingWorker<Object, Object> {
 		return cross;
 	}
 
+	@SuppressWarnings("serial")
 	private class ProgressFrame extends JDialog implements PropertyChangeListener, ActionListener {
 		private JPanel panel;
 		private JProgressBar bar;

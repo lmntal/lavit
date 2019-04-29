@@ -40,7 +40,6 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -49,8 +48,8 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.stateviewer.StateNode;
 import lavit.util.CommonFontUser;
-import lavit.util.FixFlowLayout;
 
+@SuppressWarnings("serial")
 public class StateNodeLabel extends JPanel implements CommonFontUser {
 	private JPanel stateStatus;
 	private JLabel stateNodenum;

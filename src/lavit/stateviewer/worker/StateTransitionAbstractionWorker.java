@@ -242,6 +242,7 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object, Object
 		return null;
 	}
 
+	@SuppressWarnings("serial")
 	private class ProgressFrame extends JDialog implements PropertyChangeListener, ActionListener {
 		private JPanel panel;
 		private JProgressBar bar;

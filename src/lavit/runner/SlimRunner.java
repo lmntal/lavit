@@ -63,7 +63,6 @@ public class SlimRunner implements OuterRunner {
 	private boolean success;
 
 	private boolean quiet;
-	private boolean runOnlySlim;
 
 	private long time;
 
@@ -290,23 +289,23 @@ public class SlimRunner implements OuterRunner {
 				 * "java -DLMNTAL_HOME=lmntal -classpath lmntal"+File.separator+"bin"+File.
 				 * separator+"lmntal.jar runtime.FrontEnd -O2 --interpret --slimcode \""
 				 * +targetFile.getAbsolutePath()+"\""; FrontEnd.println("(SLIM) "+cmd1);
-				 * 
+				 *
 				 * ProcessBuilder pb = new ProcessBuilder(strList(cmd1));
 				 * pb.redirectErrorStream(true); p1 = pb.start(); BufferedInputStream in1 = new
 				 * BufferedInputStream(p1.getInputStream());
-				 * 
+				 *
 				 * FileOutputStream fos = new
 				 * FileOutputStream(targetFile.getAbsolutePath()+".slimcode"); int b = -1; while
 				 * ((b = in1.read()) != -1) { fos.write(b); } fos.flush(); fos.close();
 				 * in1.close(); p1.waitFor();
-				 * 
+				 *
 				 * String cmd2 =
 				 * Env.get("SLIM_EXE_PATH")+" "+option+" \""+targetFile.getAbsolutePath()+
 				 * ".slimcode\""; FrontEnd.println("(SLIM) "+cmd2);
-				 * 
+				 *
 				 * pb = new ProcessBuilder(strList(cmd2)); pb.redirectErrorStream(true); p2 =
 				 * pb.start();
-				 * 
+				 *
 				 * BufferedReader in2 = new BufferedReader(new
 				 * InputStreamReader(p2.getInputStream())); if(buffer==null){ if(output==null){
 				 * output = FrontEnd.mainFrame.toolTab.systemPanel.outputPanel; }
@@ -314,11 +313,11 @@ public class SlimRunner implements OuterRunner {
 				 * ((str=in2.readLine())!=null) { output.outputLine(str); } output.outputEnd();
 				 * }else{ String str; while ((str=in2.readLine())!=null) {
 				 * buffer.append(str+"\n"); } }
-				 * 
+				 *
 				 * in2.close(); p2.waitFor();
-				 * 
+				 *
 				 * exit(); success = true;
-				 * 
+				 *
 				 */
 
 			} catch (Exception e) {

@@ -204,15 +204,15 @@ public class StateGraphAdjustWorker extends SwingWorker<Object, Object> {
 		 * //最大高さの深さを求める int maxDepth = 0; double maxHeight = Double.MIN_VALUE; for(int
 		 * i=0;i<depthHeight.size();++i){ if(maxHeight<depthHeight.get(i)){ maxDepth=i;
 		 * maxHeight=depthHeight.get(i); } }
-		 * 
+		 *
 		 * //最大高さからの遷移先平均配置バックトラック for(int i=maxDepth-1;i>=0;--i){
-		 * 
+		 *
 		 * ArrayList<StateNode> nodes = depthNode.get(i);
-		 * 
+		 *
 		 * //平均場所決定 for(StateNode node : nodes){ int c = 0; double t = 0; for(StateNode
 		 * to : node.getToNodes()){ if(to.depth>node.depth){ ++c; t += to.getY(); } }
 		 * if(c!=0){ node.setPosition(node.getX(),t/c); } }
-		 * 
+		 *
 		 * //ほぐす(counter打ち切り) for(int counter=0;counter<100;++counter){ boolean res =
 		 * detanglingNodes(nodes,yInterval*3/2); if(!res) break; } }
 		 */
@@ -521,7 +521,7 @@ public class StateGraphAdjustWorker extends SwingWorker<Object, Object> {
 		 * for(StateNode n1 : sortNodes){ for(StateNode n2 : sortNodes){
 		 * if(n1.no==n2.no){ break; } //if(n1.no<=n2.no){ continue; } double distance =
 		 * Math.abs(n1.getY()-n2.getY());
-		 * 
+		 *
 		 * if(distance==0){ distanceMin = 0; if(zeroDistances.size()==0){ zoreY =
 		 * n1.getY(); zeroDistances.add(n1); zeroDistances.add(n2); }else
 		 * if(zoreY==n1.getY()){ zeroDistances.add(n1); zeroDistances.add(n2); } }else
@@ -665,12 +665,13 @@ public class StateGraphAdjustWorker extends SwingWorker<Object, Object> {
 	 * newhits.add(n); } } } //新しくヒットしたノードがあれば、再帰的にさらに新しくヒットするノードを探す
 	 * if(newhits.size()>0){ noes.removeAll(newhits); hits.addAll(newhits);
 	 * newhits.addAll(getHitNodes(yInterval,noes,newhits)); } return newhits; }
-	 * 
+	 *
 	 * private StateNode getMinYNode(ArrayList<StateNode> nodes){ StateNode min =
 	 * null; double minY= Double.MAX_VALUE; for(StateNode node : nodes){
 	 * if(node.getY()<minY){ minY = node.getY(); min = node; } } return min; }
 	 */
 
+	@SuppressWarnings("serial")
 	private class ProgressFrame extends JDialog implements PropertyChangeListener, ActionListener {
 		private JPanel panel;
 		private JProgressBar bar;

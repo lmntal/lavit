@@ -45,6 +45,7 @@ import javax.swing.JPanel;
 
 import lavit.stateviewer.*;
 
+@SuppressWarnings("serial")
 public class StateGenerationControlPanel extends JPanel implements ActionListener {
 
 	private StateGraphPanel graphPanel;

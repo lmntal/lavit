@@ -140,6 +140,7 @@ public class StateGraphStretchMoveWorker extends SwingWorker<Object, Integer> {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private class ProgressFrame extends JDialog implements ActionListener {
 		private JPanel panel;
 		private JLabel label;

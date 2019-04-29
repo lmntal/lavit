@@ -171,6 +171,7 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object, Object> 
 		return false;
 	}
 
+	@SuppressWarnings("serial")
 	private class ProgressFrame extends JDialog implements ActionListener {
 		private JPanel panel;
 		private JProgressBar bar;

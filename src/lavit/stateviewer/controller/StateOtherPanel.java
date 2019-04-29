@@ -36,7 +36,6 @@
 package lavit.stateviewer.controller;
 
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,11 +48,8 @@ import java.io.OutputStreamWriter;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
@@ -64,6 +60,7 @@ import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StatePanel;
 import lavit.stateviewer.worker.StateGraphExchangeWorker;
 
+@SuppressWarnings("serial")
 public class StateOtherPanel extends JPanel implements ActionListener {
 	private StatePanel statePanel;
 

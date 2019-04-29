@@ -55,6 +55,7 @@ import lavit.*;
 import lavit.stateviewer.StatePanel;
 import lavit.stateviewer.worker.StateDynamicMover;
 
+@SuppressWarnings("serial")
 public class StateDynamicControlPanel extends JPanel implements ChangeListener, ActionListener {
 
 	private StatePanel statePanel;

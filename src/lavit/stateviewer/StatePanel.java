@@ -52,6 +52,7 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.stateviewer.controller.StateControlPanel;
 
+@SuppressWarnings("serial")
 public class StatePanel extends JPanel {
 	public StateGraphPanel stateGraphPanel;
 

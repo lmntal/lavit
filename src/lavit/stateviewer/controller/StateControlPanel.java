@@ -47,6 +47,7 @@ import javax.swing.event.ChangeListener;
 import lavit.Env;
 import lavit.stateviewer.StatePanel;
 
+@SuppressWarnings("serial")
 public class StateControlPanel extends JPanel implements ChangeListener, MouseListener {
 
 	private StatePanel statePanel;

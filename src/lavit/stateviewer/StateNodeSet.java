@@ -577,11 +577,11 @@ public class StateNodeSet {
 		 * LinkedList<StateTransition>(outTrans)){
 		 * if(t.from.childSet!=null||t.to.childSet!=null){ outTrans.remove(t); } }
 		 * this.outTransition = outTrans;
-		 * 
-		 * 
+		 *
+		 *
 		 * //nodeの登録 for(StateNode node : nodes){ allNode.put(node.id, node);
 		 * node.parentSet = this; }
-		 * 
+		 *
 		 * //transitionの登録,内でないtransitionを削除 for(StateNode node : nodes){ // to
 		 * for(StateTransition t : new
 		 * ArrayList<StateTransition>(node.getToTransitions())){
@@ -590,21 +590,21 @@ public class StateNodeSet {
 		 * ArrayList<StateTransition>(node.getFromTransitions())){
 		 * if(allNode.containsKey(f.from.id)){ addTransition(f); }else{
 		 * node.removeFromTransition(f); } } }
-		 * 
+		 *
 		 * //fromの登録 for(StateNode node : nodes){ node.resetFromTransition();
 		 * for(StateTransition t : node.getToTransitions()){ t.to.addFromTransition(t);
 		 * } }
-		 * 
+		 *
 		 * //startNode と endNodeの登録 for(StateNode node : nodes){
 		 * if(node.getFromNodes().size()==0){ startNode.add(node); }
 		 * if(node.getToNodes().size()==0){ endNode.add(node); } }
-		 * 
-		 * 
+		 *
+		 *
 		 * //for(StateTransition t : outTrans){ //
 		 * if(!nodes.contains(t.from)&&nodes.contains(t.to)){ // startNode.add(t.to); //
 		 * } //}
-		 * 
-		 * 
+		 *
+		 *
 		 * //startNodeから全て遷移できるかチェック ArrayList<StateNode> aN = new
 		 * ArrayList<StateNode>(getAllNode()); while(aN.size()>0){ LinkedList<StateNode>
 		 * queue = new LinkedList<StateNode>(); allNodeUnMark(); for(StateNode node :
@@ -615,15 +615,15 @@ public class StateNodeSet {
 		 * = aN.get(0); for(StateNode n : aN){
 		 * if(n.getToTransitions().size()>maxToNode.getToTransitions().size()){
 		 * maxToNode = n; } } startNode.add(maxToNode); } }
-		 * 
+		 *
 		 * setTreeDepth();
-		 * 
+		 *
 		 * resetOrder(); positionReset();
-		 * 
+		 *
 		 * if(Env.is("SV_STARTUP_SET_BACKDUMMY")){ setDummy(); dummyCentering(); }
-		 * 
+		 *
 		 * updateNodeLooks();
-		 * 
+		 *
 		 * return true;
 		 */
 	}
@@ -877,7 +877,7 @@ public class StateNodeSet {
 		for (StateNode node : startNode) {
 			return node;
 		}
-		return allNode.get(0);
+		return allNode.get(0L);
 	}
 
 	public void resetOrder() {
@@ -939,11 +939,11 @@ public class StateNodeSet {
 	/*
 	 * public void remove(StateNode node){ removeInnerTransitionData(node);
 	 * removeInnerNodeData(node);
-	 * 
+	 *
 	 * ArrayList<StateNode> sameDepth = depthNode.get(node.depth);
 	 * sameDepth.remove(node); for(StateNode n : sameDepth){ if(n.nth>node.nth){
 	 * n.nth--; } }
-	 * 
+	 *
 	 * if(sameDepth.size()==0){ depthNode.remove(node.depth); for(StateNode n :
 	 * getAllNode()){ if(n.depth>node.depth){ n.depth--; } } } updateNodeLooks(); }
 	 */
@@ -1035,15 +1035,15 @@ public class StateNodeSet {
 		/*
 		 * //to:1,from:1の場合は結びつける if(ft.size()==1&&tt.size()==1){ StateTransition f =
 		 * ft.get(0); StateTransition t = tt.get(0);
-		 * 
+		 *
 		 * StateTransition newTrans = new StateTransition(); newTrans.from = f.from;
 		 * newTrans.to = t.to; newTrans.cycle = f.cycle && t.cycle; newTrans.weak =
 		 * f.weak && t.weak;
-		 * 
+		 *
 		 * ArrayList<String> rules = new ArrayList<String>(); for(String fr :
 		 * f.getRules()){ for(String tr : t.getRules()){ if(fr.equals(tr)){
 		 * rules.add(tr); } } } newTrans.addRules(rules);
-		 * 
+		 *
 		 * newTrans.from.addToTransition(newTrans);
 		 * newTrans.to.addFromTransition(newTrans); addTransition(newTrans); }
 		 */
@@ -1053,13 +1053,13 @@ public class StateNodeSet {
 		 * to.removeFromNode(removenode); for(StateNode from :
 		 * removenode.getFromNodes()){ if(from==removenode){ continue; }
 		 * to.addFromNode(from); } }
-		 * 
+		 *
 		 * for(StateNode from : removenode.getFromNodes()){ if(from==removenode){
 		 * continue; } ArrayList<String> ruleNames = from.getToRuleNames(removenode);
 		 * removeTransition(from.removeToNode(removenode)); for(StateNode to :
 		 * removenode.getToNodes()){ if(to==removenode){ continue; }
 		 * addTransition(from.addToNode(to,ruleNames,removenode.isEmToNode(to))); } }
-		 * 
+		 *
 		 * for(StateTransition t : removenode.getToTransition()){ removeTransition(t); }
 		 */
 	}
@@ -1209,9 +1209,9 @@ public class StateNodeSet {
 
 		/*
 		 * long newId = getMaxNodeId();
-		 * 
+		 *
 		 * ArrayList<StateNode> newNode = new ArrayList<StateNode>();
-		 * 
+		 *
 		 * for(StateNode node : getAllNode()){ ArrayList<StateNode> addToNodes = new
 		 * ArrayList<StateNode>(); ArrayList<ArrayList<String>> addToRuleNames = new
 		 * ArrayList<ArrayList<String>>(); ArrayList<StateNode> addEmToNodes = new
@@ -1226,7 +1226,7 @@ public class StateNodeSet {
 		 * endY; StateNode dummy =
 		 * makeDummyNode(++newId,dummyDepth,node.label,node.accept,inCycle,y,node.weak);
 		 * newNode.add(dummy);
-		 * 
+		 *
 		 * addTransition(dummy.addToNode(to,ruleNames,from.isEmToNode(to)));
 		 * dummy.addFromNode(from); if(from==node){ addToNodes.add(dummy);
 		 * if(from.isEmToNode(to)){ addEmToNodes.add(dummy); }
@@ -1234,7 +1234,7 @@ public class StateNodeSet {
 		 * addTransition(from.addToNode(dummy,ruleNames,from.isEmToNode(to)));
 		 * removeTransition(from.removeToNode(to)); } to.addFromNode(dummy);
 		 * to.removeFromNode(from);
-		 * 
+		 *
 		 * //次のループの準備 from = dummy; dummyDepth--; } } } for(int
 		 * i=0;i<addToNodes.size();++i){
 		 * addTransition(node.addToNode(addToNodes.get(i),addToRuleNames.get(i),
@@ -1243,7 +1243,7 @@ public class StateNodeSet {
 		 * dummy : newNode){ allNode.put(dummy.id, dummy); } for(ArrayList<StateNode>
 		 * dnodes : depthNode){ Collections.sort(dnodes, new NodeYComparator()); for(int
 		 * i=0;i<dnodes.size();++i){ dnodes.get(i).nth = i; } } updateMaxNodeId();
-		 * 
+		 *
 		 * if(FrontEnd.mainFrame.toolTab.statePanel.isLtl()){ for(StateNode node : new
 		 * LinkedList<StateNode>(getAllNode())){ if(node.inCycle){ node.weak = false;
 		 * setLastOrder(node); }else{ node.weak = true; } } } updateNodeLooks();
@@ -1487,182 +1487,182 @@ public class StateNodeSet {
 
 	/*
 	 * public boolean setSlimNdResult(String str){ Env.startWatch("parsing[1]");
-	 * 
+	 *
 	 * HashMap<Long,TempNode> temps = new HashMap<Long,TempNode>(); TempNode
 	 * startNode = null; int line=0;
-	 * 
+	 *
 	 * String[] strs = str.split("\n");
-	 * 
+	 *
 	 * Env.stopWatch("parsing[1]"); Env.startWatch("parsing[2]");
-	 * 
+	 *
 	 * // States探し for(;line<strs.length;++line){
 	 * if(strs[line].equals(stateMarkString)) break; } if(line>=strs.length) return
 	 * false; //エラー
-	 * 
+	 *
 	 * int no = 0; for(line++;line<strs.length;++line){ String ss[] =
 	 * strs[line].split("::",2); if(ss.length<2){ break; }
-	 * 
+	 *
 	 * long id = Long.parseLong(ss[0]); TempNode node = new TempNode(id,no++,ss[1]);
 	 * temps.put(id,node); }
-	 * 
+	 *
 	 * // Transitions探し for(;line<strs.length;++line){
 	 * if(strs[line].equals(graphMarkString)) break; } if(line>=strs.length) return
 	 * false; //エラー
-	 * 
+	 *
 	 * // init line++; if(strs[line].startsWith(initStartMarkString)){ long id =
 	 * Long.parseLong(strs[line].substring(initStartMarkString.length())); startNode
 	 * = temps.get(id); }else{ return false; //エラー }
-	 * 
+	 *
 	 * for(line++;line<strs.length;++line){ String ss[] = strs[line].split("::",2);
 	 * if(ss.length<2){ break; }
-	 * 
+	 *
 	 * long id = Long.parseLong(ss[0]); TempNode node = temps.get(id);
 	 * if(node==null){ break; } node.setToId(ss[1]); }
-	 * 
+	 *
 	 * //エラー if(startNode==null) return false;
-	 * 
-	 * 
+	 *
+	 *
 	 * Env.stopWatch("parsing[2]"); Env.startWatch("buliding");
-	 * 
-	 * 
+	 *
+	 *
 	 * setNodeFrom(temps);
-	 * 
+	 *
 	 * // temp -> state makeAllFromTemps(temps,startNode);
-	 * 
+	 *
 	 * setTreeDepth();
-	 * 
+	 *
 	 * resetOrder(); positionReset();
-	 * 
+	 *
 	 * if(Env.is("SV_STARTUP_SET_BACKDUMMY")){ setDummy(); }
-	 * 
+	 *
 	 * updateNodeLooks();
-	 * 
-	 * 
+	 *
+	 *
 	 * Env.stopWatch("buliding");
-	 * 
-	 * 
+	 *
+	 *
 	 * return true; }
-	 * 
+	 *
 	 * public boolean setSlimLtlResult(String str){ HashMap<Long,TempNode> temps =
 	 * new HashMap<Long,TempNode>(); int line=0; TempNode startNode = null;
-	 * 
+	 *
 	 * ArrayList<Long> cycles = new ArrayList<Long>();
-	 * 
+	 *
 	 * String[] strs = str.split("\n");
-	 * 
+	 *
 	 * // States探し int findCycle = 0; for(;line<strs.length;++line){
-	 * 
+	 *
 	 * String ss[] = strs[line].split(":",3);
-	 * 
+	 *
 	 * //cycleの状態を取得
 	 * if(findCycle<=1&&ss.length==3&&ss[0].length()*ss[1].length()*ss[2].length()>0
 	 * ){ long id = Long.parseLong(ss[2].trim()); cycles.add(id); findCycle=1; }else
 	 * if(findCycle==1){ findCycle=2; }
-	 * 
+	 *
 	 * if(strs[line].equals(stateMarkString)) break; }
-	 * 
+	 *
 	 * //エラー if(line>=strs.length) return false;
-	 * 
+	 *
 	 * int no = 0; for(line++;line<strs.length;++line){ String ss[] =
 	 * strs[line].split("::",2); if(ss.length<2){ break; }
-	 * 
+	 *
 	 * long id = Long.parseLong(ss[0]); TempNode node = new TempNode(id,no++,ss[1]);
 	 * temps.put(id,node); }
-	 * 
-	 * 
+	 *
+	 *
 	 * // Transitions探し for(;line<strs.length;++line){
 	 * if(strs[line].equals(graphMarkString)) break; } if(line>=strs.length) return
 	 * false; //エラー
-	 * 
+	 *
 	 * // init line++; if(strs[line].startsWith(initStartMarkString)){ long id =
 	 * Long.parseLong(strs[line].substring(initStartMarkString.length())); startNode
 	 * = temps.get(id); }else{ return false; //エラー }
-	 * 
+	 *
 	 * for(line++;line<strs.length;++line){ String ss[] = strs[line].split("::",2);
 	 * if(ss.length<2){ break; }
-	 * 
+	 *
 	 * long id = Long.parseLong(ss[0]); TempNode node = temps.get(id);
 	 * if(node==null){ break; } node.setToId(ss[1]); }
-	 * 
-	 * 
+	 *
+	 *
 	 * // Labels探し for(;line<strs.length;++line){
 	 * if(strs[line].equals(labelMarkString)) break; } if(line>=strs.length) return
 	 * false; //エラー
-	 * 
+	 *
 	 * for(line++;line<strs.length;++line){ //状態名を解析 String ss[] =
 	 * strs[line].split("::",2); if(ss.length<2){ break; }
-	 * 
+	 *
 	 * long id = Long.parseLong(ss[0]); TempNode node = temps.get(id);
 	 * if(node==null){ break; } node.setLabel(ss[1]); }
-	 * 
+	 *
 	 * // incycle for(long id : cycles){ TempNode node = temps.get(id);
 	 * if(node==null){ break; } node.inCycle = true; }
-	 * 
+	 *
 	 * //エラー if(startNode==null) return false;
-	 * 
+	 *
 	 * setNodeFrom(temps);
-	 * 
+	 *
 	 * for(int i=0;i<cycles.size()-1;++i){ TempNode node = temps.get(cycles.get(i));
 	 * node.setEmToId(cycles.get(i+1)); }
-	 * 
+	 *
 	 * for(int i=cycles.size()-2;i>=0;--i){ TempNode endNode =
 	 * temps.get(cycles.get(cycles.size()-1)); long nodeId = cycles.get(i);
 	 * if(endNode.isToNodeId(nodeId)){ endNode.setEmToId(nodeId); break; } }
-	 * 
+	 *
 	 * // temp -> state makeAllFromTemps(temps,startNode);
-	 * 
+	 *
 	 * setTreeDepth();
-	 * 
+	 *
 	 * resetOrder(); positionReset();
-	 * 
+	 *
 	 * if(Env.is("SV_STARTUP_SET_BACKDUMMY")){ setDummy(); }
-	 * 
+	 *
 	 * for(StateNode node : getAllNode()){ if(node.inCycle){ node.weak = false;
 	 * }else{ node.weak = true; } }
-	 * 
+	 *
 	 * Collections.reverse(cycles);
-	 * 
+	 *
 	 * for(Long id : cycles){ StateNode node = allNode.get(id); setLastOrder(node);
 	 * }
-	 * 
-	 * 
+	 *
+	 *
 	 * updateNodeLooks();
-	 * 
+	 *
 	 * return true; }
 	 */
 
 	/*
 	 * private StateNode makeDummyNode(long id,int depth,String label,boolean
 	 * accept,boolean inCycle,double y,boolean weak){
-	 * 
+	 *
 	 * StateNode dummy = new StateNode(id, this);
 	 * dummy.init("",label,accept,inCycle); dummy.dummy = true; dummy.weak = weak;
-	 * 
+	 *
 	 * // 位置の設定 dummy.setX(depthNode.get(depth).get(0).getX()); dummy.setY(y);
-	 * 
+	 *
 	 * // depth, nthの設定 insertDepthNode(dummy,depth);
-	 * 
+	 *
 	 * return dummy; }
-	 * 
+	 *
 	 * private StateNode getNewNode(long id){ StateNode node = allNode.get(id);
 	 * if(node==null){ node = new StateNode(id,this); allNode.put(id,node); } return
 	 * node; }
-	 * 
+	 *
 	 * private void setNodeFrom(HashMap<Long,TempNode> temps){ for(TempNode node :
 	 * temps.values()){ for(TempTransition to : node.toes){
 	 * temps.get(to.node).setFromId(node.id); } } }
-	 * 
+	 *
 	 * private void makeAllFromTemps(HashMap<Long,TempNode> temps,TempNode
 	 * startNode){ for(TempNode temp: temps.values()){ StateNode node =
 	 * getNewNode(temp.id); node.init(temp.state, temp.label, temp.accept,
 	 * temp.inCycle);
-	 * 
+	 *
 	 * for(TempTransition to : temp.toes){
 	 * addTransition(node.addToNode(getNewNode(to.node),to.rules,to.em)); } for(Long
 	 * from : temp.fromIds){ node.addFromNode(getNewNode(from)); }
 	 * if(temp.toes.size()==0){ endNode.add(node); } }
 	 * this.startNode.add(getNewNode(startNode.id)); updateMaxNodeId(); }
-	 * 
+	 *
 	 */
 
 	/*
@@ -1682,7 +1682,7 @@ public class StateNodeSet {
 	 * if(n1==acceptStartNode){ if(n2==cycleNode.get(cycleNode.size()-1)) return
 	 * true; }else if(n2==acceptStartNode){
 	 * if(n1==cycleNode.get(cycleNode.size()-1)) return true; }
-	 * 
+	 *
 	 * return false; }
 	 */
 
@@ -1691,14 +1691,14 @@ public class StateNodeSet {
 	 * ""; boolean accept = false; boolean inCycle = false; public
 	 * ArrayList<TempTransition> toes = new ArrayList<TempTransition>(); public
 	 * ArrayList<Long> fromIds = new ArrayList<Long>();
-	 * 
+	 *
 	 * TempNode(long id,int no,String state){ this.id = id; this.no = no; this.state
 	 * = state; }
-	 * 
+	 *
 	 * void setToId(String toIdsStr){ try{ if(toIdsStr.length()>0){ String[] toStrs
 	 * = toIdsStr.split(","); for(String toIdStr : toStrs){ TempTransition to = new
 	 * TempTransition();
-	 * 
+	 *
 	 * int leftBracketIndex = toIdStr.indexOf("("); int rightBracketIndex = -1;
 	 * if(leftBracketIndex>0){ rightBracketIndex =
 	 * toIdStr.indexOf(")",leftBracketIndex); } if(rightBracketIndex>0){ to.node =
@@ -1706,20 +1706,20 @@ public class StateNodeSet {
 	 * toIdStr.substring(leftBracketIndex+1,rightBracketIndex).split(" ")){
 	 * to.rules.add(s); } }else{ to.node = Long.parseLong(toIdStr); } toes.add(to);
 	 * } } }catch(NumberFormatException e){ } }
-	 * 
+	 *
 	 * void setFromId(long id){ if(!fromIds.contains(id)) fromIds.add(id); }
-	 * 
+	 *
 	 * void setLabel(String label){ this.label = label;
 	 * if(label.toLowerCase().indexOf("accept")!=-1){ this.accept = true; } }
-	 * 
+	 *
 	 * void setEmToId(long toId){ for(TempTransition t : toes){ if(t.node==toId){
 	 * t.em = true; } } }
-	 * 
+	 *
 	 * boolean isToNodeId(long toId){ for(TempTransition t : toes){
 	 * if(t.node==toId){ return true; } } return false; }
-	 * 
+	 *
 	 * }
-	 * 
+	 *
 	 * class TempTransition{ Long node; boolean em = false; private
 	 * ArrayList<String> rules = new ArrayList<String>(); }
 	 */

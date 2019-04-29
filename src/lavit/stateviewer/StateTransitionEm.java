@@ -37,7 +37,6 @@ package lavit.stateviewer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 public class StateTransitionEm implements StateTransitionCatcher {
 	private StateGraphPanel graphPanel;
@@ -51,13 +50,13 @@ public class StateTransitionEm implements StateTransitionCatcher {
 		/*
 		 * StateNodeSet drawNodes = graphPanel.getDrawNodes(); ArrayList<StateNode>
 		 * weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
-		 * 
+		 *
 		 * for(StateTransition t : trans){ t.from.inCycle = true; weaks.remove(t.from);
-		 * 
+		 *
 		 * t.to.inCycle = true; weaks.remove(t.to);
-		 * 
+		 *
 		 * t.from.setEmToNode(t.to, true); }
-		 * 
+		 *
 		 * for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
 		 * graphPanel.update();
 		 */

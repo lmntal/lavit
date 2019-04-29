@@ -35,32 +35,23 @@
 
 package lavit.stateviewer.controller;
 
-import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.LinkedList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.border.TitledBorder;
 
 import lavit.Env;
-import lavit.FrontEnd;
 import lavit.stateviewer.StateGraphPanel;
-import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StatePanel;
 import lavit.stateviewer.StateTransitionAbstraction;
-import lavit.stateviewer.worker.StateGraphExchangeWorker;
 
+@SuppressWarnings("serial")
 public class StateButtonPanel extends JPanel implements ActionListener {
 	private StatePanel statePanel;
 
@@ -93,21 +84,17 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	private JButton fitCentering = new JButton("Fit Centering");
 	private JButton allReset = new JButton("All Reset");
 
-	private JComponent comps[] = {
-		posReset,adjustReset,adjust2Reset,adjust3Reset,simpleMixAdjust,dummyMixAdjust,
-		geneticAlgorithm,exchangeReset,exchangeDummyOnly,
-		setBackDummy,setVerticalDummy,removeDummy,dummyCentering,dummySmoothing,
-		transitionAbstraction,selectAbstraction,
-		autoCentering,fitCentering,allReset
-	};
+	private JComponent comps[] = { posReset, adjustReset, adjust2Reset, adjust3Reset, simpleMixAdjust, dummyMixAdjust,
+			geneticAlgorithm, exchangeReset, exchangeDummyOnly, setBackDummy, setVerticalDummy, removeDummy, dummyCentering,
+			dummySmoothing, transitionAbstraction, selectAbstraction, autoCentering, fitCentering, allReset };
 
-	StateButtonPanel(StatePanel statePanel){
+	StateButtonPanel(StatePanel statePanel) {
 		this.statePanel = statePanel;
 
-		//setLayout(new GridLayout(5,1));
-		setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
+		// setLayout(new GridLayout(5,1));
+		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-		resetPanel.setLayout(new GridLayout(2,3));
+		resetPanel.setLayout(new GridLayout(2, 3));
 		resetPanel.setBorder(new TitledBorder("Transformation"));
 		posReset.addActionListener(this);
 		resetPanel.add(posReset);
@@ -123,7 +110,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		resetPanel.add(dummyMixAdjust);
 		add(resetPanel);
 
-		crossPanel.setLayout(new GridLayout(1,3));
+		crossPanel.setLayout(new GridLayout(1, 3));
 		crossPanel.setBorder(new TitledBorder("Cross Reduction"));
 		geneticAlgorithm.addActionListener(this);
 		crossPanel.add(geneticAlgorithm);
@@ -134,7 +121,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		crossPanel.add(exchangeDummyOnly);
 		add(crossPanel);
 
-		dummyPanel.setLayout(new GridLayout(1,5));
+		dummyPanel.setLayout(new GridLayout(1, 5));
 		dummyPanel.setBorder(new TitledBorder("Dummy Control"));
 		setBackDummy.addActionListener(this);
 		dummyPanel.add(setBackDummy);
@@ -148,7 +135,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		dummyPanel.add(dummySmoothing);
 		add(dummyPanel);
 
-		abstractionPanel.setLayout(new GridLayout(1,2));
+		abstractionPanel.setLayout(new GridLayout(1, 2));
 		abstractionPanel.setBorder(new TitledBorder("Abstraction"));
 		transitionAbstraction.addActionListener(this);
 		abstractionPanel.add(transitionAbstraction);
@@ -156,7 +143,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		abstractionPanel.add(selectAbstraction);
 		add(abstractionPanel);
 
-		basicPanel.setLayout(new GridLayout(1,3));
+		basicPanel.setLayout(new GridLayout(1, 3));
 		autoCentering.addActionListener(this);
 		basicPanel.add(autoCentering);
 		fitCentering.addActionListener(this);
@@ -167,9 +154,9 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 
 	}
 
-	public void setEnabled(boolean enabled){
+	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
-		for(JComponent comp : comps){
+		for (JComponent comp : comps) {
 			comp.setEnabled(enabled);
 		}
 	}
@@ -178,56 +165,55 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 
-		if(src==posReset){
+		if (src == posReset) {
 			statePanel.stateGraphPanel.positionReset();
 			statePanel.stateGraphPanel.autoCentering();
-		}else if(src==adjustReset){
+		} else if (src == adjustReset) {
 			statePanel.stateGraphPanel.adjustReset();
-		}else if(src==adjust2Reset){
+		} else if (src == adjust2Reset) {
 			statePanel.stateGraphPanel.adjust2Reset();
-		}else if(src==adjust3Reset){
+		} else if (src == adjust3Reset) {
 			statePanel.stateGraphPanel.adjust3Reset();
-		}else if(src==simpleMixAdjust){
+		} else if (src == simpleMixAdjust) {
 			statePanel.stateGraphPanel.simpleMixAdjust();
-		}else if(src==dummyMixAdjust){
+		} else if (src == dummyMixAdjust) {
 			statePanel.stateGraphPanel.dummyMixAdjust();
-		}else if(src==allReset){
+		} else if (src == allReset) {
 			statePanel.reset();
-		}
-		else if(src==geneticAlgorithm){
+		} else if (src == geneticAlgorithm) {
 			statePanel.stateGraphPanel.geneticAlgorithmLength();
-		}else if(src==exchangeReset){
+		} else if (src == exchangeReset) {
 			statePanel.stateGraphPanel.exchangeReset();
-		}else if(src==exchangeDummyOnly){
-			Env.set("SV_CROSSREDUCTION_DUMMYONLY",!Env.is("SV_CROSSREDUCTION_DUMMYONLY"));
-		}else if(src==setBackDummy){
+		} else if (src == exchangeDummyOnly) {
+			Env.set("SV_CROSSREDUCTION_DUMMYONLY", !Env.is("SV_CROSSREDUCTION_DUMMYONLY"));
+		} else if (src == setBackDummy) {
 			statePanel.stateGraphPanel.getDrawNodes().setBackDummy();
 			statePanel.stateGraphPanel.getDrawNodes().dummyCentering();
 			statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
 			statePanel.stateGraphPanel.update();
-		}else if(src==setVerticalDummy){
+		} else if (src == setVerticalDummy) {
 			statePanel.stateGraphPanel.getDrawNodes().setVerticalDummy();
 			statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
 			statePanel.stateGraphPanel.update();
-		}else if(src==removeDummy){
+		} else if (src == removeDummy) {
 			statePanel.stateGraphPanel.getDrawNodes().removeDummy();
 			statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
 			statePanel.stateGraphPanel.selectClear();
 			statePanel.stateGraphPanel.update();
-		}else if(src==dummyCentering){
+		} else if (src == dummyCentering) {
 			statePanel.stateGraphPanel.getDrawNodes().dummyCentering();
 			statePanel.stateGraphPanel.update();
-		}else if(src==dummySmoothing){
+		} else if (src == dummySmoothing) {
 			statePanel.stateGraphPanel.dummySmoothing();
 			statePanel.stateGraphPanel.update();
-		}else if(src==autoCentering){
+		} else if (src == autoCentering) {
 			statePanel.stateGraphPanel.autoCentering();
-		}else if(src==fitCentering){
+		} else if (src == fitCentering) {
 			statePanel.stateGraphPanel.fitCentering();
-		}else if(src==transitionAbstraction){
+		} else if (src == transitionAbstraction) {
 			StateGraphPanel p = statePanel.stateGraphPanel;
-			new SelectStateTransitionRuleFrame(p,new StateTransitionAbstraction(p));
-		}else if(src==selectAbstraction){
+			new SelectStateTransitionRuleFrame(p, new StateTransitionAbstraction(p));
+		} else if (src == selectAbstraction) {
 			statePanel.stateGraphPanel.selectNodeAbstraction();
 		}
 	}

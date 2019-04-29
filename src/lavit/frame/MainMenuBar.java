@@ -62,8 +62,7 @@ import lavit.localizedtext.MsgID;
 import lavit.system.FileHistory;
 
 @SuppressWarnings("serial")
-public class MainMenuBar extends JMenuBar implements ActionListener
-{
+public class MainMenuBar extends JMenuBar implements ActionListener {
 	private JMenu file;
 	private JMenuItem iNew;
 	private JMenuItem iOpen;
@@ -79,9 +78,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 	private JMenuItem iCopy;
 	private JMenuItem iCut;
 	private JMenuItem iPaste;
-	public  JMenuItem iUndo;
-	public  JMenuItem iRedo;
-	private JMenuItem iTemplate;
+	public JMenuItem iUndo;
+	public JMenuItem iRedo;
 
 	private JMenu run;
 	private JMenuItem iLMNtal;
@@ -106,8 +104,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 	private JMenuItem iRuntime;
 	private JMenuItem iBrowse;
 
-	public MainMenuBar()
-	{
+	public MainMenuBar() {
 		file = new JMenu(Env.getMsg(MsgID.menu_file));
 		add(file);
 		file.setMnemonic(KeyEvent.VK_F);
@@ -195,20 +192,16 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		iPaste.addActionListener(this);
 		iPaste.setMnemonic(KeyEvent.VK_P);
 
-		edit.addMenuListener(new MenuListener()
-		{
-			public void menuSelected(MenuEvent e)
-			{
+		edit.addMenuListener(new MenuListener() {
+			public void menuSelected(MenuEvent e) {
 				iUndo.setEnabled(FrontEnd.mainFrame.editorPanel.canUndo());
 				iRedo.setEnabled(FrontEnd.mainFrame.editorPanel.canRedo());
 			}
 
-			public void menuDeselected(MenuEvent e)
-			{
+			public void menuDeselected(MenuEvent e) {
 			}
 
-			public void menuCanceled(MenuEvent e)
-			{
+			public void menuCanceled(MenuEvent e) {
 			}
 		});
 
@@ -216,53 +209,39 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 
 		JMenuItem itemFind = new JMenuItem(Env.getMsg(MsgID.menu_find_replace));
 		itemFind.setMnemonic(KeyEvent.VK_F);
-		itemFind.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		itemFind.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				FindReplaceDialog.getDialog().showDialog();
 			}
 		});
 		edit.add(itemFind);
 
 		/*
-		edit.addSeparator();
-
-		iTemplate = new JMenuItem("Insert template...");
-		iTemplate.setMnemonic(KeyEvent.VK_T);
-		iTemplate.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				FrontEnd.mainFrame.loadTemplate();
-			}
-		});
-		edit.add(iTemplate);
-		*/
+		 * edit.addSeparator();
+		 * 
+		 * iTemplate = new JMenuItem("Insert template...");
+		 * iTemplate.setMnemonic(KeyEvent.VK_T); iTemplate.addActionListener(new
+		 * ActionListener() { public void actionPerformed(ActionEvent e) {
+		 * FrontEnd.mainFrame.loadTemplate(); } }); edit.add(iTemplate);
+		 */
 
 		JMenu menuView = new JMenu(Env.getMsg(MsgID.menu_group_view));
 		add(menuView);
 		final JCheckBoxMenuItem itemShowFileView = new JCheckBoxMenuItem(Env.getMsg(MsgID.menu_item_filesystem));
-		itemShowFileView.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		itemShowFileView.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				FrontEnd.mainFrame.setFileViewVisible(itemShowFileView.isSelected());
 			}
 		});
-		menuView.addMenuListener(new MenuListener()
-		{
-			public void menuSelected(MenuEvent e)
-			{
+		menuView.addMenuListener(new MenuListener() {
+			public void menuSelected(MenuEvent e) {
 				itemShowFileView.setSelected(FrontEnd.mainFrame.isFileViewVisible());
 			}
 
-			public void menuDeselected(MenuEvent e)
-			{
+			public void menuDeselected(MenuEvent e) {
 			}
 
-			public void menuCanceled(MenuEvent e)
-			{
+			public void menuCanceled(MenuEvent e) {
 			}
 		});
 		menuView.add(itemShowFileView);
@@ -295,10 +274,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 
 		iILJavaRun = new JMenuItem(Env.getMsg(MsgID.menu_run_il_java));
 		run.add(iILJavaRun);
-		iILJavaRun.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		iILJavaRun.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				FrontEnd.mainFrame.runILCodeOnLMNtalJava();
 			}
 		});
@@ -306,10 +283,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 
 		iILSlimRun = new JMenuItem(Env.getMsg(MsgID.menu_item_run_slim));
 		run.add(iILSlimRun);
-		iILSlimRun.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		iILSlimRun.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				FrontEnd.mainFrame.runILCodeOnSLIM();
 			}
 		});
@@ -350,6 +325,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		iLMNtalCompilerPath = new JMenuItem("LMNtal Compiler Path...");
 		setting.add(iLMNtalCompilerPath);
 		iLMNtalCompilerPath.addActionListener(this);
+
 
 		iSlimPath = new JMenuItem(Env.getMsg(MsgID.menu_slim_path));
 		setting.add(iSlimPath);
@@ -394,139 +370,80 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		setAccelerator(iKill, KeyEvent.VK_ESCAPE, 0);
 	}
 
-	public void updateUndoRedo(boolean undo, boolean redo)
-	{
+	public void updateUndoRedo(boolean undo, boolean redo) {
 		iUndo.setEnabled(undo);
 		iRedo.setEnabled(redo);
 	}
 
-	public void actionPerformed(ActionEvent e)
-	{
-		JMenuItem src = (JMenuItem)e.getSource();
+	public void actionPerformed(ActionEvent e) {
+		JMenuItem src = (JMenuItem) e.getSource();
 
-		if (src == iNew)
-		{
+		if (src == iNew) {
 			FrontEnd.mainFrame.editorPanel.newFileOpen();
-		}
-		else if (src == iOpen)
-		{
+		} else if (src == iOpen) {
 			FrontEnd.mainFrame.editorPanel.fileOpen();
-		}
-		else if (src == iSave)
-		{
+		} else if (src == iSave) {
 			FrontEnd.mainFrame.editorPanel.fileSave();
-		}
-		else if (src == iSaveAs)
-		{
+		} else if (src == iSaveAs) {
 			FrontEnd.mainFrame.editorPanel.fileSaveAs();
-		}
-		else if (src == iClose)
-		{
+		} else if (src == iClose) {
 			FrontEnd.mainFrame.editorPanel.closeSelectedPage();
-		}
-		else if (src == iCloseAll)
-		{
+		} else if (src == iCloseAll) {
 			FrontEnd.mainFrame.editorPanel.closeAllPages();
-		}
-		else if (src == iSVOpen)
-		{
+		} else if (src == iSVOpen) {
 			FrontEnd.mainFrame.toolTab.statePanel.loadFile();
-		}
-		else if (src == iExit)
-		{
+		} else if (src == iExit) {
 			FrontEnd.exit();
-		}
-		else if (src == iCopy)
-		{
+		} else if (src == iCopy) {
 			FrontEnd.mainFrame.editorPanel.getSelectedEditor().copy();
-		}
-		else if (src == iCut)
-		{
+		} else if (src == iCut) {
 			FrontEnd.mainFrame.editorPanel.getSelectedEditor().cut();
-		}
-		else if (src == iPaste)
-		{
+		} else if (src == iPaste) {
 			FrontEnd.mainFrame.editorPanel.getSelectedEditor().paste();
-		}
-		else if (src == iUndo)
-		{
+		} else if (src == iUndo) {
 			FrontEnd.mainFrame.editorPanel.editorUndo();
-		}
-		else if (src == iRedo)
-		{
+		} else if (src == iRedo) {
 			FrontEnd.mainFrame.editorPanel.editorRedo();
-		}
-		else if (src == iLMNtal)
-		{
+		} else if (src == iLMNtal) {
 			FrontEnd.mainFrame.editorPanel.buttonPanel.lmntalButton.doClick();
-		}
-		else if (src == iUNYO)
-		{
+		} else if (src == iUNYO) {
 			FrontEnd.mainFrame.editorPanel.buttonPanel.unyoButton.doClick();
-		}
-		else if (src == iGraphene)
-		{
+		} else if (src == iGraphene) {
 			FrontEnd.mainFrame.editorPanel.buttonPanel.grapheneButton.doClick();
-		}
-		else if (src == iSLIM)
-		{
+		} else if (src == iSLIM) {
 			FrontEnd.mainFrame.editorPanel.buttonPanel.slimButton.doClick();
-		}
-		else if (src == iSViewer)
-		{
+		} else if (src == iSViewer) {
 			FrontEnd.mainFrame.editorPanel.buttonPanel.sviewerButton.doClick();
-		}
-		else if (src == iKill)
-		{
+		} else if (src == iKill) {
 			FrontEnd.mainFrame.editorPanel.buttonPanel.killButton.doClick();
-		}
-		else if (src == iReboot)
-		{
+		} else if (src == iReboot) {
 			new RebootFrame();
-		}
-		else if (src == iCygwinPath)
-		{
+		} else if (src == iCygwinPath) {
 			CygwinPathSetting.showDialog();
-		}
-		else if (src == iLMNtalCompilerPath)
-		{
+		} else if (src == iLMNtalCompilerPath) {
 			LMNtalCompilerPathSetting.showDialog(FrontEnd.mainFrame);
-		}
-		else if (src == iSlimPath)
-		{
+		} else if (src == iSlimPath) {
 			SlimPathSetting slimPathSetting = new SlimPathSetting();
 			slimPathSetting.showDialog();
-		}
-		else if (src == iGeneral)
-		{
+		} else if (src == iGeneral) {
 			GeneralSettingDialog.showDialog();
-		}
-		else if (src == iVersion)
-		{
+		} else if (src == iVersion) {
 			VersionDialog.showDialog();
-		}
-		else if (src == iRuntime)
-		{
+		} else if (src == iRuntime) {
 			showRuntimeInformation();
-		}
-		else if (src == iBrowse)
-		{
+		} else if (src == iBrowse) {
 			showInDefaultBrowser(Env.APP_HREF);
 		}
 	}
 
-	private static void setAccelerator(JMenuItem item, int keyCode, int modifier)
-	{
+	private static void setAccelerator(JMenuItem item, int keyCode, int modifier) {
 		item.setAccelerator(KeyStroke.getKeyStroke(keyCode, modifier));
 	}
 
-	private static JMenu createRecentFilesMenu(JMenu owner)
-	{
+	private static JMenu createRecentFilesMenu(JMenu owner) {
 		final JMenuItem miClearRecentFiles = new JMenuItem(Env.getMsg(MsgID.menu_clear_recent));
-		miClearRecentFiles.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		miClearRecentFiles.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				FileHistory.get().clear();
 			}
 		});
@@ -535,25 +452,17 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 		miEmpty.setEnabled(false);
 
 		final JMenu menu = new JMenu(Env.getMsg(MsgID.menu_recent));
-		owner.addMenuListener(new MenuListener()
-		{
-			public void menuSelected(MenuEvent e)
-			{
+		owner.addMenuListener(new MenuListener() {
+			public void menuSelected(MenuEvent e) {
 				menu.removeAll();
 				List<File> recentFiles = FileHistory.get().getFiles();
-				if (recentFiles.isEmpty())
-				{
+				if (recentFiles.isEmpty()) {
 					menu.add(miEmpty);
-				}
-				else
-				{
-					for (final File file : recentFiles)
-					{
+				} else {
+					for (final File file : recentFiles) {
 						JMenuItem item = new JMenuItem(trimFilePath(file));
-						item.addActionListener(new ActionListener()
-						{
-							public void actionPerformed(ActionEvent e)
-							{
+						item.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
 								FrontEnd.mainFrame.editorPanel.openFile(file);
 							}
 						});
@@ -564,96 +473,69 @@ public class MainMenuBar extends JMenuBar implements ActionListener
 				menu.add(miClearRecentFiles);
 			}
 
-			public void menuDeselected(MenuEvent e)
-			{
+			public void menuDeselected(MenuEvent e) {
 			}
 
-			public void menuCanceled(MenuEvent e)
-			{
+			public void menuCanceled(MenuEvent e) {
 			}
 		});
 		return menu;
 	}
 
-	private static String trimFilePath(File file)
-	{
+	private static String trimFilePath(File file) {
 		final int LIMIT = 20;
 		final String ELLIPSIS = "...";
 
 		String path = file.getAbsolutePath();
 		int i = path.lastIndexOf(File.separatorChar);
-		if (i != -1)
-		{
+		if (i != -1) {
 			String head = path.substring(0, i);
 			String name = path.substring(i);
-			if (LIMIT < head.length())
-			{
+			if (LIMIT < head.length()) {
 				head = ELLIPSIS + head.substring(head.length() - LIMIT + ELLIPSIS.length(), head.length());
 			}
 			return head + name;
-		}
-		else
-		{
+		} else {
 			return file.getName();
 		}
 	}
 
-	//TODO: ブラウザ起動のサポートは事前に調べ、サポートされない場合はメニューを表示しないように変更する。
-	private static void showInDefaultBrowser(String uri)
-	{
-		if (Desktop.isDesktopSupported())
-		{
+	// TODO: ブラウザ起動のサポートは事前に調べ、サポートされない場合はメニューを表示しないように変更する。
+	private static void showInDefaultBrowser(String uri) {
+		if (Desktop.isDesktopSupported()) {
 			Desktop desktop = Desktop.getDesktop();
-			if (desktop.isSupported(Desktop.Action.BROWSE))
-			{
-				try
-				{
+			if (desktop.isSupported(Desktop.Action.BROWSE)) {
+				try {
 					desktop.browse(new URI(uri));
-				}
-				catch (URISyntaxException e)
-				{
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				catch(IOException e)
-				{
-					e.printStackTrace();
-				}
-			}
-			else
-			{
+			} else {
 				System.err.println("showInDefaultBrowser failed: Desktop does not support \"browse\" action.");
 			}
-		}
-		else
-		{
+		} else {
 			System.err.println("showInDefaultBrowser failed: Desktop is not supported.");
 		}
 	}
 
-	private static void showRuntimeInformation()
-	{
+	private static void showRuntimeInformation() {
 		Runtime rt = Runtime.getRuntime();
-		final int maxMem = (int)(rt.maxMemory() / 1024 / 1024);
-		final int useMem = (int)(rt.totalMemory() / 1024 / 1024);
+		final int maxMem = (int) (rt.maxMemory() / 1024 / 1024);
+		final int useMem = (int) (rt.totalMemory() / 1024 / 1024);
 		final int procs = rt.availableProcessors();
 		final String javaVersion = System.getProperty("java.version");
 		final String javaRuntimeVersion = System.getProperty("java.runtime.version");
 		final String jvmVersion = System.getProperty("java.vm.version");
 
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				JOptionPane.showMessageDialog(
-					FrontEnd.mainFrame,
-					"Max Memory : " + maxMem + " MB\n" +
-					"Use Memory : " + useMem + " MB\n" +
-					"Available Processors : " + procs + " \n" +
-					"Java Version : " + javaVersion + " \n" +
-					"Java Runtime Version : " + javaRuntimeVersion + " \n"+
-					"Java VM Version : " + jvmVersion + " \n",
-					"Java Runtime Info",
-					JOptionPane.INFORMATION_MESSAGE);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				JOptionPane.showMessageDialog(FrontEnd.mainFrame,
+						"Max Memory : " + maxMem + " MB\n" + "Use Memory : " + useMem + " MB\n" + "Available Processors : " + procs
+								+ " \n" + "Java Version : " + javaVersion + " \n" + "Java Runtime Version : " + javaRuntimeVersion
+								+ " \n" + "Java VM Version : " + jvmVersion + " \n",
+						"Java Runtime Info", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 	}

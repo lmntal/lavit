@@ -310,6 +310,14 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 	{
 		Object src = e.getSource();
 
+		if (editorPanel.isChanged())
+		{
+			if (!editorPanel.fileSave())
+			{
+				return;
+			}
+		}
+
 		if (src == lmntalButton)
 		{
 			File file = editorPanel.getFile();
@@ -320,38 +328,19 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		}
 		else if (src == unyoButton)
 		{
-			if (editorPanel.isChanged())
-			{
-				editorPanel.fileSave();
-			}
 			FrontEnd.mainFrame.toolTab.setTab("System");
 			FrontEnd.executeUnyo(FrontEnd.mainFrame.editorPanel.getFile());
 		}
 		else if (src == grapheneButton)
 		{
-			if (editorPanel.isChanged())
-			{
-				editorPanel.fileSave();
-			}
 			FrontEnd.mainFrame.toolTab.setTab("System");
 			FrontEnd.executeGraphene(FrontEnd.mainFrame.editorPanel.getFile());
 		}
 		else if (src == slimButton)
 		{
 			File file = editorPanel.getFile();
-			if (file == null)
-			{
-				return;
-			}
 			if (file.getName().endsWith(".il"))
 			{
-				if (editorPanel.isChanged())
-				{
-					if (!editorPanel.fileSave())
-					{
-						return;
-					}
-				}
 				FrontEnd.executeILFileInSLIM(file);
 			}
 			else
@@ -361,11 +350,6 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		}
 		else if (src == sviewerButton)
 		{
-			if (editorPanel.isChanged())
-			{
-				editorPanel.fileSave();
-			}
-
 			setButtonEnable(false);
 
 			FrontEnd.mainFrame.toolTab.setTab("System");
@@ -478,11 +462,6 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		}
 		else if (src == stateProfilerButton)
 		{
-			if (editorPanel.isChanged())
-			{
-				editorPanel.fileSave();
-			}
-
 			setButtonEnable(false);
 
 			FrontEnd.mainFrame.toolTab.setTab("StateProfiler");

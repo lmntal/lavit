@@ -450,14 +450,23 @@ public final class Env
 
 	public static String getLmntalCmd()
 	{
+	        String compiler_path = Env.get("path.lmntalcompiler");
 		char sep = File.separatorChar;
-		String cmd = "java";
-		cmd += " -cp ";
-		cmd += LMNTAL_LIBRARY_DIR + sep + "lib" + sep + "std_lib.jar";
-		cmd += " -DLMNTAL_HOME=" + LMNTAL_LIBRARY_DIR + " -jar ";
-		cmd += LMNTAL_LIBRARY_DIR + sep + "bin" + sep + "lmntal.jar ";
+		String cmd;
+		if (compiler_path.contains(".jar"))
+		{
+		    cmd = "java";
+		    cmd += " -cp ";
+		    cmd += LMNTAL_LIBRARY_DIR + sep + "lib" + sep + "std_lib.jar";
+		    cmd += " -DLMNTAL_HOME=" + LMNTAL_LIBRARY_DIR + " -jar ";
+		    cmd += compiler_path;
+		}
+		else
+		{
+		    cmd = compiler_path;
+		}
 		return cmd;
-    }
+	}
 
 	public static String getBinaryAbsolutePath(String cmd)
 	{

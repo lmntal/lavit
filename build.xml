@@ -15,9 +15,6 @@
 
 	<!-- Class Path -->
 	<path id="classpath">
-		<pathelement path="${dir.lib.java3d}/j3dcore.jar" />
-		<pathelement path="${dir.lib.java3d}/j3dutils.jar" />
-		<pathelement path="${dir.lib.java3d}/vecmath.jar" />
 	</path>
 
 	<!-- Create Output Directory -->

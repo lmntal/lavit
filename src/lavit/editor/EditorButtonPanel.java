@@ -95,7 +95,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		lmntalButton.addActionListener(this);
 		buttonPanel.add(lmntalButton);
 
-		unyoButton = new JButton(Env.getMsg(MsgID.button_unyo_3g));
+		unyoButton = new JButton(Env.getMsg(MsgID.button_unyo));
 		unyoButton.addActionListener(this);
 		buttonPanel.add(unyoButton);
 

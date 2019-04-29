@@ -43,8 +43,7 @@ menu_jre_info              = Javaランタイム情報
 menu_version               = バージョン情報
 
 button_lmntal_java         = LMNtal(Java)
-button_unyo_2g             = UNYO(2G)
-button_unyo_3g             = UNYO(3G)
+button_unyo                = UNYO
 button_slim                = SLIM
 button_stateviewer         = StateViewer
 button_kill                = Kill

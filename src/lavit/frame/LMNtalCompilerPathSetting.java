@@ -84,7 +84,7 @@ public final class LMNtalCompilerPathSetting
 
 				public boolean accept(File file)
 				{
-					return file.isDirectory() || file.getName().equals("lmntal.jar");
+				        return file.isDirectory() || file.getName().equals("lmntal.jar") || file.getName().equals("lmntal");
 				}
 			});
 			pathInput = new PathInputField(chooser, Env.getMsg(MsgID.button_browse), 20);

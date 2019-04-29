@@ -60,7 +60,7 @@ import lavit.stateviewer.StateTransition;
 
 import com.sun.j3d.utils.geometry.Cone;
 
-public class State3DTransition{
+public class State3DTransition {
 	private StatePanel panel;
 
 	public StateTransition trans;
@@ -68,26 +68,28 @@ public class State3DTransition{
 	public State3DNode to;
 	public TransformGroup tg = null;
 
-	public State3DTransition(StateTransition trans, StatePanel panel){
+	public State3DTransition(StateTransition trans, StatePanel panel) {
 		this.trans = trans;
 		this.panel = panel;
 	}
 
-	public void updateShape(){
+	public void updateShape() {
 
-		//removeAllChildren();
+		// removeAllChildren();
 
 		tg = new TransformGroup();
 		tg.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
 		tg.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
 
 		double dis = from.getGraphPoint().distance(to.getGraphPoint());
-		if(dis==0){ return; }
+		if (dis == 0) {
+			return;
+		}
 
-		double length = dis-0.4;
-		double dx = to.getGraphPoint().x-from.getGraphPoint().x;
-		double dy = to.getGraphPoint().y-from.getGraphPoint().y;
-		double dz = to.getGraphPoint().z-from.getGraphPoint().z;
+		double length = dis - 0.4;
+		double dx = to.getGraphPoint().x - from.getGraphPoint().x;
+		double dy = to.getGraphPoint().y - from.getGraphPoint().y;
+		double dz = to.getGraphPoint().z - from.getGraphPoint().z;
 
 		// 色の設定
 		Appearance ap = new Appearance();
@@ -95,20 +97,20 @@ public class State3DTransition{
 		Color color = Color.WHITE;
 		boolean searchMode = panel.stateGraphPanel.getDraw().isSearchMode();
 		boolean cycleMode = panel.stateGraphPanel.getDraw().isCycleMode();
-		if(searchMode&&trans.weak||!searchMode&&cycleMode&&!trans.cycle){
+		if (searchMode && trans.weak || !searchMode && cycleMode && !trans.cycle) {
 			color = Color.GRAY;
-		}else if(trans.cycle){
+		} else if (trans.cycle) {
 			color = Color.RED;
 		}
 		ma.setDiffuseColor(new Color3f(color));
-		ma.setEmissiveColor(new Color3f(color)); //発光
+		ma.setEmissiveColor(new Color3f(color)); // 発光
 		ap.setMaterial(ma);
 
 		// 円錐を追加
-		Cone cone = new Cone( 0.05f, 0.3f, Cone.GENERATE_NORMALS, 20, 1, ap);
+		Cone cone = new Cone(0.05f, 0.3f, Cone.GENERATE_NORMALS, 20, 1, ap);
 		tg.addChild(cone);
 
-		//ラインを追加
+		// ラインを追加
 		Point3d[] vertex = new Point3d[2];
 		vertex[0] = new Point3d(0.0, 0.1, 0.0);
 		vertex[1] = new Point3d(0.0, -length, 0.0);
@@ -119,36 +121,36 @@ public class State3DTransition{
 		Shape3D shape = new Shape3D(geometry);
 		tg.addChild(shape);
 
-
-		//平行移動を定義
+		// 平行移動を定義
 		Transform3D transform = new Transform3D();
-		transform.set(new Vector3d(to.getGraphPoint().x - 0.3*dx/dis, to.getGraphPoint().y - 0.3*dy/dis, to.getGraphPoint().z - 0.3*dz/dis));
+		transform.set(new Vector3d(to.getGraphPoint().x - 0.3 * dx / dis, to.getGraphPoint().y - 0.3 * dy / dis,
+				to.getGraphPoint().z - 0.3 * dz / dis));
 
-		//回転を定義
+		// 回転を定義
 		Transform3D rotate = new Transform3D();
-		if(dx>=0){
+		if (dx >= 0) {
 			rotate.rotZ(-Math.PI / 2);
-		}else{
+		} else {
 			rotate.rotZ(Math.PI / 2);
 		}
 		Transform3D t3dx = new Transform3D();
-		if(dy!=0){
-			t3dx.rotX(Math.atan(dz/dy));
-		}else if(dz>0){
+		if (dy != 0) {
+			t3dx.rotX(Math.atan(dz / dy));
+		} else if (dz > 0) {
 			t3dx.rotX(-Math.PI / 2);
-		}else if(dz<0){
+		} else if (dz < 0) {
 			t3dx.rotX(Math.PI / 2);
 		}
 		Transform3D t3dz = new Transform3D();
-		if(dx!=0){
-			if(dy>0){
-				t3dz.rotZ(Math.atan(Math.sqrt(dy*dy+dz*dz)/dx));
-			}else{
-				t3dz.rotZ(Math.atan(-Math.sqrt(dy*dy+dz*dz)/dx));
+		if (dx != 0) {
+			if (dy > 0) {
+				t3dz.rotZ(Math.atan(Math.sqrt(dy * dy + dz * dz) / dx));
+			} else {
+				t3dz.rotZ(Math.atan(-Math.sqrt(dy * dy + dz * dz) / dx));
 			}
-		}else if(dy>0){
+		} else if (dy > 0) {
 			t3dz.rotZ(Math.PI / 2);
-		}else if(dy<0){
+		} else if (dy < 0) {
 			t3dz.rotZ(-Math.PI / 2);
 		}
 
@@ -158,67 +160,57 @@ public class State3DTransition{
 		tg.setTransform(transform);
 	}
 
-	public TransformGroup getTransformGroup(){
+	public TransformGroup getTransformGroup() {
 		return tg;
 	}
 
 	/*
-	public void makeChild_s(){
-		double dis = from.p.distance(to.p);
-		if(dis==0){ return; }
+	 * public void makeChild_s(){ double dis = from.p.distance(to.p); if(dis==0){
+	 * return; }
+	 * 
+	 * double dx = to.p.x-from.p.x; double dy = to.p.y-from.p.y; double dz =
+	 * to.p.z-from.p.z;
+	 * 
+	 * //ラインを追加 Point3d[] vertex; LineArray geometry;
+	 * 
+	 * vertex = new Point3d[2]; vertex[0] = from.p; vertex[1] = to.p; geometry = new
+	 * LineArray(vertex.length, GeometryArray.COORDINATES | GeometryArray.COLOR_3);
+	 * geometry.setCoordinates(0, vertex); geometry.setColor(0, new
+	 * Color3f(Color.WHITE)); geometry.setColor(1, new Color3f(Color.WHITE));
+	 * addChild(new Shape3D(geometry));
+	 * 
+	 * vertex = new Point3d[2]; vertex[0] = new
+	 * Point3d(to.p.x-0.2*dx/dis-0.2*dx/dis, to.p.y-0.2*dy/dis, to.p.z-0.2*dz/dis);
+	 * vertex[1] = new Point3d(to.p.x-0.2*dx/dis, to.p.y-0.2*dy/dis,
+	 * to.p.z-0.2*dz/dis); geometry = new LineArray(vertex.length,
+	 * GeometryArray.COORDINATES | GeometryArray.COLOR_3);
+	 * geometry.setCoordinates(0, vertex); geometry.setColor(0, new
+	 * Color3f(Color.WHITE)); geometry.setColor(1, new Color3f(Color.WHITE));
+	 * addChild(new Shape3D(geometry));
+	 * 
+	 * vertex = new Point3d[2]; vertex[0] = new Point3d(to.p.x-0.2*dx/dis,
+	 * to.p.y-0.2*dy/dis-0.2*dy/dis, to.p.z-0.2*dz/dis); vertex[1] = new
+	 * Point3d(to.p.x-0.2*dx/dis, to.p.y-0.2*dy/dis, to.p.z-0.2*dz/dis); geometry =
+	 * new LineArray(vertex.length, GeometryArray.COORDINATES |
+	 * GeometryArray.COLOR_3); geometry.setCoordinates(0, vertex);
+	 * geometry.setColor(0, new Color3f(Color.WHITE)); geometry.setColor(1, new
+	 * Color3f(Color.WHITE)); addChild(new Shape3D(geometry));
+	 * 
+	 * vertex = new Point3d[2]; vertex[0] = new Point3d(to.p.x-0.2*dx/dis,
+	 * to.p.y-0.2*dy/dis, to.p.z-0.2*dz/dis-0.2*dz/dis); vertex[1] = new
+	 * Point3d(to.p.x-0.2*dx/dis, to.p.y-0.2*dy/dis, to.p.z-0.2*dz/dis); geometry =
+	 * new LineArray(vertex.length, GeometryArray.COORDINATES |
+	 * GeometryArray.COLOR_3); geometry.setCoordinates(0, vertex);
+	 * geometry.setColor(0, new Color3f(Color.WHITE)); geometry.setColor(1, new
+	 * Color3f(Color.WHITE)); addChild(new Shape3D(geometry)); }
+	 */
 
-		double dx = to.p.x-from.p.x;
-		double dy = to.p.y-from.p.y;
-		double dz = to.p.z-from.p.z;
-
-		//ラインを追加
-		Point3d[] vertex;
-		LineArray geometry;
-
-		vertex = new Point3d[2];
-		vertex[0] = from.p;
-		vertex[1] = to.p;
-		geometry = new LineArray(vertex.length, GeometryArray.COORDINATES | GeometryArray.COLOR_3);
-		geometry.setCoordinates(0, vertex);
-		geometry.setColor(0, new Color3f(Color.WHITE));
-		geometry.setColor(1, new Color3f(Color.WHITE));
-		addChild(new Shape3D(geometry));
-
-		vertex = new Point3d[2];
-		vertex[0] = new Point3d(to.p.x-0.2*dx/dis-0.2*dx/dis, to.p.y-0.2*dy/dis, to.p.z-0.2*dz/dis);
-		vertex[1] = new Point3d(to.p.x-0.2*dx/dis, to.p.y-0.2*dy/dis, to.p.z-0.2*dz/dis);
-		geometry = new LineArray(vertex.length, GeometryArray.COORDINATES | GeometryArray.COLOR_3);
-		geometry.setCoordinates(0, vertex);
-		geometry.setColor(0, new Color3f(Color.WHITE));
-		geometry.setColor(1, new Color3f(Color.WHITE));
-		addChild(new Shape3D(geometry));
-
-		vertex = new Point3d[2];
-		vertex[0] = new Point3d(to.p.x-0.2*dx/dis, to.p.y-0.2*dy/dis-0.2*dy/dis, to.p.z-0.2*dz/dis);
-		vertex[1] = new Point3d(to.p.x-0.2*dx/dis, to.p.y-0.2*dy/dis, to.p.z-0.2*dz/dis);
-		geometry = new LineArray(vertex.length, GeometryArray.COORDINATES | GeometryArray.COLOR_3);
-		geometry.setCoordinates(0, vertex);
-		geometry.setColor(0, new Color3f(Color.WHITE));
-		geometry.setColor(1, new Color3f(Color.WHITE));
-		addChild(new Shape3D(geometry));
-
-		vertex = new Point3d[2];
-		vertex[0] = new Point3d(to.p.x-0.2*dx/dis, to.p.y-0.2*dy/dis, to.p.z-0.2*dz/dis-0.2*dz/dis);
-		vertex[1] = new Point3d(to.p.x-0.2*dx/dis, to.p.y-0.2*dy/dis, to.p.z-0.2*dz/dis);
-		geometry = new LineArray(vertex.length, GeometryArray.COORDINATES | GeometryArray.COLOR_3);
-		geometry.setCoordinates(0, vertex);
-		geometry.setColor(0, new Color3f(Color.WHITE));
-		geometry.setColor(1, new Color3f(Color.WHITE));
-		addChild(new Shape3D(geometry));
-	}
-	*/
-
-	double at(double d1, double d2){
-		if(d2!=0){
-			return Math.atan(d1/d2);
-		}else if(d1>0){
+	double at(double d1, double d2) {
+		if (d2 != 0) {
+			return Math.atan(d1 / d2);
+		} else if (d1 > 0) {
 			return Math.PI / 2;
-		}else{
+		} else {
 			return -Math.PI / 2;
 		}
 	}

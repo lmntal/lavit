@@ -70,16 +70,16 @@ public class SelectStateTransitionRuleFrame extends JFrame implements ActionList
 	private JButton rev;
 
 	private boolean end;
-	private HashMap<StateRule,ArrayList<StateTransition>> rules = new HashMap<StateRule,ArrayList<StateTransition>>();
+	private HashMap<StateRule, ArrayList<StateTransition>> rules = new HashMap<StateRule, ArrayList<StateTransition>>();
 
-	public SelectStateTransitionRuleFrame(StateGraphPanel graphPanel,StateTransitionCatcher catcher){
+	public SelectStateTransitionRuleFrame(StateGraphPanel graphPanel, StateTransitionCatcher catcher) {
 		this.graphPanel = graphPanel;
 		this.catcher = catcher;
 
-		for(StateTransition t : graphPanel.getDrawNodes().getAllTransition()){
-			for(StateRule r : t.getRules()){
-				if(!rules.containsKey(r)){
-					rules.put(r,new ArrayList<StateTransition>());
+		for (StateTransition t : graphPanel.getDrawNodes().getAllTransition()) {
+			for (StateRule r : t.getRules()) {
+				if (!rules.containsKey(r)) {
+					rules.put(r, new ArrayList<StateTransition>());
 				}
 				rules.get(r).add(t);
 			}
@@ -87,109 +87,116 @@ public class SelectStateTransitionRuleFrame extends JFrame implements ActionList
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("Rules");
-        setIconImages(Env.getApplicationIcons());
-        setAlwaysOnTop(true);
-        setResizable(false);
+		setIconImages(Env.getApplicationIcons());
+		setAlwaysOnTop(true);
+		setResizable(false);
 
-        panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout());
 
-        rulePanel = new SelectPanel();
-        panel.add(rulePanel, BorderLayout.CENTER);
+		rulePanel = new SelectPanel();
+		panel.add(rulePanel, BorderLayout.CENTER);
 
+		btnPanel = new JPanel();
+		btnPanel.setLayout(new GridLayout(1, 2));
 
-        btnPanel =  new JPanel();
-        btnPanel.setLayout(new GridLayout(1,2));
+		ok = new JButton(Env.getMsg(MsgID.text_ok));
+		ok.addActionListener(this);
+		btnPanel.add(ok);
 
-        ok = new JButton(Env.getMsg(MsgID.text_ok));
-        ok.addActionListener(this);
-        btnPanel.add(ok);
+		rev = new JButton(Env.getMsg(MsgID.text_reverse));
+		rev.addActionListener(this);
+		btnPanel.add(rev);
 
-        rev = new JButton(Env.getMsg(MsgID.text_reverse));
-        rev.addActionListener(this);
-        btnPanel.add(rev);
+		panel.add(btnPanel, BorderLayout.SOUTH);
 
-        panel.add(btnPanel, BorderLayout.SOUTH);
+		add(panel);
 
-        add(panel);
+		addWindowListener(new ChildWindowListener(this));
 
-        addWindowListener(new ChildWindowListener(this));
+		pack();
+		setLocationRelativeTo(FrontEnd.mainFrame);
+		setVisible(true);
 
-        pack();
-        setLocationRelativeTo(FrontEnd.mainFrame);
-        setVisible(true);
-
-        end = false;
+		end = false;
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
-		if(src==ok){
+		if (src == ok) {
 			ArrayList<StateTransition> trans = new ArrayList<StateTransition>();
-			for(StateRule rule : rulePanel.getSelectedRules()){
+			for (StateRule rule : rulePanel.getSelectedRules()) {
 				trans.addAll(rules.get(rule));
 			}
 			catcher.transitionCatch(rulePanel.getSelectedRules(), trans);
 			dispose();
-		}else if(src==rev){
+		} else if (src == rev) {
 			rulePanel.selectReverse();
 		}
 	}
 
-	public boolean isEnd(){
+	public boolean isEnd() {
 		return end;
 	}
 
-	public void end(){
+	public void end() {
 		end = true;
 	}
 
 	private class SelectPanel extends JPanel {
 		private JCheckBox[] ruleCheckBoxes;
 
-		SelectPanel(){
+		SelectPanel() {
 
-			//ルール名の集合
+			// ルール名の集合
 			ArrayList<String> rns = new ArrayList<String>();
-			for(StateRule r : rules.keySet()){
+			for (StateRule r : rules.keySet()) {
 				rns.add(r.getName());
 			}
 			Collections.sort(rns);
 
-			setLayout(new GridLayout(rns.size(),2));
+			setLayout(new GridLayout(rns.size(), 2));
 
 			ruleCheckBoxes = new JCheckBox[rns.size()];
-			for(int i=0;i<rns.size();++i){
+			for (int i = 0; i < rns.size(); ++i) {
 				ruleCheckBoxes[i] = new JCheckBox(rns.get(i));
 				add(ruleCheckBoxes[i]);
 
 				int c = 0;
-				for(StateTransition t : rules.get(graphPanel.getDrawNodes().getRule(rns.get(i)))){
-					if(!t.isToDummy()){ c++; }
+				for (StateTransition t : rules.get(graphPanel.getDrawNodes().getRule(rns.get(i)))) {
+					if (!t.isToDummy()) {
+						c++;
+					}
 				}
 
-				String cs = ""+c;
-				if(c<1000){ cs = " "+cs; }
-				if(c<100 ){ cs = " "+cs; }
-				if(c<10  ){ cs = " "+cs; }
-				add(new JLabel(" : "+cs+" transition(s) "));
+				String cs = "" + c;
+				if (c < 1000) {
+					cs = " " + cs;
+				}
+				if (c < 100) {
+					cs = " " + cs;
+				}
+				if (c < 10) {
+					cs = " " + cs;
+				}
+				add(new JLabel(" : " + cs + " transition(s) "));
 
 			}
 
 		}
 
-		ArrayList<StateRule> getSelectedRules(){
+		ArrayList<StateRule> getSelectedRules() {
 			ArrayList<StateRule> rules = new ArrayList<StateRule>();
-			for(JCheckBox cb : ruleCheckBoxes){
-				if(cb.isSelected()){
+			for (JCheckBox cb : ruleCheckBoxes) {
+				if (cb.isSelected()) {
 					rules.add(graphPanel.getDrawNodes().getRule(cb.getText()));
 				}
 			}
 			return rules;
 		}
 
-		void selectReverse(){
-			for(JCheckBox cb : ruleCheckBoxes){
+		void selectReverse() {
+			for (JCheckBox cb : ruleCheckBoxes) {
 				cb.setSelected(!cb.isSelected());
 			}
 		}

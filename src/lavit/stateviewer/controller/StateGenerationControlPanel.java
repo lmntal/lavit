@@ -53,7 +53,7 @@ public class StateGenerationControlPanel extends JPanel implements ActionListene
 	JButton upButton = new JButton("up");
 	JLabel ancestors = new JLabel();
 
-	public StateGenerationControlPanel(StateGraphPanel graphPanel){
+	public StateGenerationControlPanel(StateGraphPanel graphPanel) {
 		this.graphPanel = graphPanel;
 
 		setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -69,11 +69,11 @@ public class StateGenerationControlPanel extends JPanel implements ActionListene
 
 	}
 
-	public void updateLabel(StateNodeSet nodes){
+	public void updateLabel(StateNodeSet nodes) {
 		StateNode node = nodes.parentNode;
 		String str = "";
-		while(node!=null){
-			str = node.id + (str.length()>0?" -> ":"") + str;
+		while (node != null) {
+			str = node.id + (str.length() > 0 ? " -> " : "") + str;
 			node = node.parentSet.parentNode;
 		}
 		ancestors.setText(str);
@@ -83,9 +83,9 @@ public class StateGenerationControlPanel extends JPanel implements ActionListene
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 
-		if(src==rootButton){
+		if (src == rootButton) {
 			graphPanel.generationReset();
-		}else if(src==upButton){
+		} else if (src == upButton) {
 			graphPanel.generationUp();
 		}
 	}

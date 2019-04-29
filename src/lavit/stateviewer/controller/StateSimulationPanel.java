@@ -90,7 +90,7 @@ public class StateSimulationPanel extends JPanel {
 	private StateNode nowNode;
 	private int counter;
 
-	public StateSimulationPanel(StatePanel statePanel){
+	public StateSimulationPanel(StatePanel statePanel) {
 		this.statePanel = statePanel;
 		this.simulationPanel = this;
 
@@ -106,7 +106,7 @@ public class StateSimulationPanel extends JPanel {
 		jsp.setOneTouchExpandable(true);
 		jsp.setResizeWeight(0.5);
 		jsp.setDividerLocation(0.5);
-		jsp.setPreferredSize(new Dimension(500,100));
+		jsp.setPreferredSize(new Dimension(500, 100));
 
 		add(jsp, BorderLayout.CENTER);
 
@@ -120,7 +120,7 @@ public class StateSimulationPanel extends JPanel {
 
 	}
 
-	public void init(){
+	public void init() {
 		this.counter = 0;
 		this.nowNode = null;
 		outputPanel.clear();
@@ -129,36 +129,36 @@ public class StateSimulationPanel extends JPanel {
 		buttonPanel.endButton.setEnabled(false);
 		mover.setActive(false);
 		priorityRules.clear();
-		if(ruleWindow!=null){
+		if (ruleWindow != null) {
 			ruleWindow.dispose();
-			ruleWindow=null;
+			ruleWindow = null;
 		}
 	}
 
-	public void applyNode(StateNode node, StateTransition trans){
+	public void applyNode(StateNode node, StateTransition trans) {
 		++counter;
 		this.nowNode = node;
 		statePanel.stateGraphPanel.setSelectNode(node);
 		statePanel.stateGraphPanel.update();
-		if(trans!=null){
-			outputPanel.println("["+counter+"] "+node.toString()+" ("+trans.getRuleNameString()+")");
-		}else{
-			outputPanel.println("["+counter+"] "+node.toString());
+		if (trans != null) {
+			outputPanel.println("[" + counter + "] " + node.toString() + " (" + trans.getRuleNameString() + ")");
+		} else {
+			outputPanel.println("[" + counter + "] " + node.toString());
 		}
 		rulePanel.setRules();
 	}
 
-	class ButtonPanel extends JPanel implements ActionListener,ChangeListener {
+	class ButtonPanel extends JPanel implements ActionListener, ChangeListener {
 		JButton startButton = new JButton("Start");
 		JButton endButton = new JButton("End");
 		JCheckBox autoRun = new JCheckBox("Auto Run");
 		JSlider intervalSlider = new JSlider(10, 190);
 		JButton ruleWindowButton = new JButton("Rule Priority");
 
-		ButtonPanel(){
+		ButtonPanel() {
 
-			//setLayout(new FlowLayout(FlowLayout.LEFT));
-			setLayout(new GridLayout(1,5));
+			// setLayout(new FlowLayout(FlowLayout.LEFT));
+			setLayout(new GridLayout(1, 5));
 
 			startButton.addActionListener(this);
 			add(startButton);
@@ -180,7 +180,7 @@ public class StateSimulationPanel extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
 
-			if(src==startButton){
+			if (src == startButton) {
 				counter = 0;
 				outputPanel.clear();
 				mover.resetClock();
@@ -188,15 +188,15 @@ public class StateSimulationPanel extends JPanel {
 				StateNode startNode = null;
 				StateNodeSet drawNodes = statePanel.stateGraphPanel.getDrawNodes();
 				ArrayList<StateNode> selectNodes = statePanel.stateGraphPanel.getSelectNodes();
-				if(selectNodes.size()>=1){
+				if (selectNodes.size() >= 1) {
 					startNode = selectNodes.get(0);
-				}else{
+				} else {
 					startNode = drawNodes.getStartNodeOne();
 				}
-				applyNode(startNode,null);
+				applyNode(startNode, null);
 				updateMover();
 				endButton.setEnabled(true);
-			}else if(src==endButton){
+			} else if (src == endButton) {
 				counter = 0;
 				nowNode = null;
 				statePanel.stateGraphPanel.selectClear();
@@ -205,20 +205,20 @@ public class StateSimulationPanel extends JPanel {
 				rulePanel.setRules();
 				updateMover();
 				buttonPanel.endButton.setEnabled(false);
-			}else if(src==autoRun){
+			} else if (src == autoRun) {
 				updateMover();
-			}else if(src==ruleWindowButton){
-				if(ruleWindow==null){
+			} else if (src == ruleWindowButton) {
+				if (ruleWindow == null) {
 					ruleWindow = new NumberingStateTransitionRuleFrame();
 				}
 			}
 		}
 
-		public void updateMover(){
-			if(autoRun.isSelected()){
+		public void updateMover() {
+			if (autoRun.isSelected()) {
 				rulePanel.setEnabled(false);
 				mover.setActive(true);
-			}else{
+			} else {
 				rulePanel.setEnabled(true);
 				mover.setActive(false);
 			}
@@ -227,63 +227,63 @@ public class StateSimulationPanel extends JPanel {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			// TODO Auto-generated method stub
-			mover.setInterval(intervalSlider.getValue()*10);
+			mover.setInterval(intervalSlider.getValue() * 10);
 		}
 	}
 
 	class RulePanel extends JPanel {
 		ArrayList<RuleLinePanel> ruleLinePanels;
 
-		RulePanel(){
-			setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
+		RulePanel() {
+			setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 			ruleLinePanels = new ArrayList<RuleLinePanel>();
 		}
 
-		void setRules(){
+		void setRules() {
 			removeAll();
 			ruleLinePanels.clear();
-			if(nowNode!=null){
+			if (nowNode != null) {
 				ArrayList<StateTransition> trans = new ArrayList<StateTransition>(nowNode.getToTransitions());
 
-				//遷移先を見てソートする
+				// 遷移先を見てソートする
 				Collections.sort(trans, new Comparator<StateTransition>() {
 					public int compare(StateTransition t1, StateTransition t2) {
 						StateNode n1 = t1.to;
 						StateNode n2 = t2.to;
-						while(n1.dummy){
+						while (n1.dummy) {
 							n1 = n1.getToNode();
 						}
-						while(n2.dummy){
+						while (n2.dummy) {
 							n2 = n2.getToNode();
 						}
 
-						if(n1.depth<n2.depth){
+						if (n1.depth < n2.depth) {
 							return 1;
-						}else if(n1.depth>n2.depth){
+						} else if (n1.depth > n2.depth) {
 							return -1;
-						}else{
-							if(n1.getY()<n2.getY()){
+						} else {
+							if (n1.getY() < n2.getY()) {
 								return -1;
-							}else if(n1.getY()>n2.getY()){
+							} else if (n1.getY() > n2.getY()) {
 								return 1;
-							}else{
+							} else {
 								return 0;
 							}
 						}
 					}
 				});
 
-				//ラベルをつけながら表示
-				boolean forwardLabel=false,backLabel = false;
-				for(StateTransition t : trans){
-					//System.out.println(t.to.depth+" : "+t.to);
-					if(!forwardLabel&&t.from.depth<t.to.depth){
+				// ラベルをつけながら表示
+				boolean forwardLabel = false, backLabel = false;
+				for (StateTransition t : trans) {
+					// System.out.println(t.to.depth+" : "+t.to);
+					if (!forwardLabel && t.from.depth < t.to.depth) {
 						forwardLabel = true;
 						JLabel l = new JLabel("forward");
 						l.setHorizontalAlignment(JLabel.LEFT);
 						add(l);
 					}
-					if(!backLabel&&t.from.depth>=t.to.depth){
+					if (!backLabel && t.from.depth >= t.to.depth) {
 						backLabel = true;
 						JLabel l = new JLabel("back");
 						l.setHorizontalAlignment(JLabel.LEFT);
@@ -294,19 +294,19 @@ public class StateSimulationPanel extends JPanel {
 					ruleLinePanels.add(rlp);
 				}
 			}
-			if(buttonPanel.autoRun.isSelected()){
+			if (buttonPanel.autoRun.isSelected()) {
 				rulePanel.setEnabled(false);
-			}else{
+			} else {
 				rulePanel.setEnabled(true);
 			}
 			updateUI();
-			//simulationPanel.validate();
-			//simulationPanel.updateUI();
+			// simulationPanel.validate();
+			// simulationPanel.updateUI();
 		}
 
-		public void setEnabled(boolean enabled){
+		public void setEnabled(boolean enabled) {
 			super.setEnabled(enabled);
-			for(RuleLinePanel rlp : ruleLinePanels){
+			for (RuleLinePanel rlp : ruleLinePanels) {
 				rlp.setEnabled(enabled);
 			}
 		}
@@ -320,21 +320,21 @@ public class StateSimulationPanel extends JPanel {
 		private StateTransition trans;
 		private StateNode node;
 
-		RuleLinePanel(StateTransition trans){
+		RuleLinePanel(StateTransition trans) {
 			this.trans = trans;
 			this.node = trans.to;
-			while(node.dummy){
+			while (node.dummy) {
 				node = node.getToNode();
 			}
 
 			setLayout(new BorderLayout());
-			setMaximumSize(new Dimension(10000,28));
+			setMaximumSize(new Dimension(10000, 28));
 
 			state = new JTextField(node.toString());
 			state.setBackground(Color.white);
 			add(state, BorderLayout.CENTER);
 
-			btn = new JButton("Apply ("+trans.getRuleNameString()+")");
+			btn = new JButton("Apply (" + trans.getRuleNameString() + ")");
 			btn.addActionListener(this);
 			add(btn, BorderLayout.WEST);
 		}
@@ -342,18 +342,18 @@ public class StateSimulationPanel extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
 
-			if(src==btn){
-				applyNode(node,trans);
+			if (src == btn) {
+				applyNode(node, trans);
 			}
 		}
 
-		public void setEnabled(boolean enabled){
+		public void setEnabled(boolean enabled) {
 			super.setEnabled(enabled);
 			btn.setEnabled(enabled);
 		}
 
-		public void doClick(){
-			applyNode(node,trans);
+		public void doClick() {
+			applyNode(node, trans);
 		}
 	}
 
@@ -362,7 +362,7 @@ public class StateSimulationPanel extends JPanel {
 		private JScrollPane jsp;
 		private JTextPane log;
 
-		OutputPanel(){
+		OutputPanel() {
 			doc = new DefaultStyledDocument();
 			log = new JTextPane(doc);
 			log.setEditable(false);
@@ -370,34 +370,36 @@ public class StateSimulationPanel extends JPanel {
 			jsp.getVerticalScrollBar().setUnitIncrement(15);
 
 			setLayout(new BorderLayout());
-			add(jsp,BorderLayout.CENTER);
+			add(jsp, BorderLayout.CENTER);
 		}
 
-		public void println(String str){
+		public void println(String str) {
 			SimpleAttributeSet attribute = new SimpleAttributeSet();
 			attribute.addAttribute(StyleConstants.Foreground, Color.BLACK);
-			println(str,attribute);
+			println(str, attribute);
 		}
 
-		public void errPrintln(String str){
+		public void errPrintln(String str) {
 			SimpleAttributeSet attribute = new SimpleAttributeSet();
 			attribute.addAttribute(StyleConstants.Foreground, Color.RED);
-			println(str,attribute);
+			println(str, attribute);
 		}
 
-		//スレッドセーフ
-		public void println(final String str,final SimpleAttributeSet attribute){
-			javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-				try {
-					doc.insertString(doc.getLength(),str+"\n", attribute);
-					log.setCaretPosition(doc.getLength());
-				} catch (BadLocationException e) {
-					e.printStackTrace();
+		// スレッドセーフ
+		public void println(final String str, final SimpleAttributeSet attribute) {
+			javax.swing.SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					try {
+						doc.insertString(doc.getLength(), str + "\n", attribute);
+						log.setCaretPosition(doc.getLength());
+					} catch (BadLocationException e) {
+						e.printStackTrace();
+					}
 				}
-			}});
+			});
 		}
 
-		public void clear(){
+		public void clear() {
 			log.setText("");
 		}
 	}
@@ -407,53 +409,53 @@ public class StateSimulationPanel extends JPanel {
 		private boolean active;
 		long sleepTime = 0;
 
-		AutoRunMover(int interval){
+		AutoRunMover(int interval) {
 			this.interval = interval;
 		}
 
-		public void setInterval(int interval){
+		public void setInterval(int interval) {
 			this.interval = interval;
 		}
 
-		public void setActive(boolean active){
+		public void setActive(boolean active) {
 			this.active = active;
-			sleepTime=System.currentTimeMillis();
+			sleepTime = System.currentTimeMillis();
 		}
 
-		public boolean isActive(){
+		public boolean isActive() {
 			return active;
 		}
 
-		public void resetClock(){
-			sleepTime=System.currentTimeMillis();
+		public void resetClock() {
+			sleepTime = System.currentTimeMillis();
 		}
 
-		public void run(){
-			while(true){
-				try{
-					if(active){
+		public void run() {
+			while (true) {
+				try {
+					if (active) {
 						selectRule();
 					}
-					while(System.currentTimeMillis()<sleepTime+interval){
+					while (System.currentTimeMillis() < sleepTime + interval) {
 						sleep(50);
 					}
-					sleepTime=System.currentTimeMillis();
+					sleepTime = System.currentTimeMillis();
 				} catch (Exception e) {
 				}
 			}
 
 		}
 
-		void selectRule(){
-			for(StateRule rule : priorityRules){
-				for(RuleLinePanel rlp : rulePanel.ruleLinePanels){
-					if(rlp.trans.getRules().contains(rule)){
+		void selectRule() {
+			for (StateRule rule : priorityRules) {
+				for (RuleLinePanel rlp : rulePanel.ruleLinePanels) {
+					if (rlp.trans.getRules().contains(rule)) {
 						rlp.doClick();
 						return;
 					}
 				}
 			}
-			for(RuleLinePanel rlp : rulePanel.ruleLinePanels){
+			for (RuleLinePanel rlp : rulePanel.ruleLinePanels) {
 				rlp.doClick();
 				return;
 			}
@@ -470,55 +472,54 @@ public class StateSimulationPanel extends JPanel {
 		private JButton ok;
 		private JButton cancel;
 
-		public NumberingStateTransitionRuleFrame(){
+		public NumberingStateTransitionRuleFrame() {
 
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			setTitle("Rules");
-	        setIconImages(Env.getApplicationIcons());
-	        setAlwaysOnTop(true);
-	        setResizable(false);
+			setIconImages(Env.getApplicationIcons());
+			setAlwaysOnTop(true);
+			setResizable(false);
 
-	        panel = new JPanel();
-	        panel.setLayout(new BorderLayout());
+			panel = new JPanel();
+			panel.setLayout(new BorderLayout());
 
-	        rulePanel = new SelectPanel();
-	        panel.add(rulePanel, BorderLayout.CENTER);
+			rulePanel = new SelectPanel();
+			panel.add(rulePanel, BorderLayout.CENTER);
 
+			btnPanel = new JPanel();
+			btnPanel.setLayout(new GridLayout(1, 2));
 
-	        btnPanel =  new JPanel();
-	        btnPanel.setLayout(new GridLayout(1,2));
+			ok = new JButton(Env.getMsg(MsgID.text_ok));
+			ok.addActionListener(this);
+			btnPanel.add(ok);
 
-	        ok = new JButton(Env.getMsg(MsgID.text_ok));
-	        ok.addActionListener(this);
-	        btnPanel.add(ok);
+			cancel = new JButton(Env.getMsg(MsgID.text_cancel));
+			cancel.addActionListener(this);
+			btnPanel.add(cancel);
 
-	        cancel = new JButton(Env.getMsg(MsgID.text_cancel));
-	        cancel.addActionListener(this);
-	        btnPanel.add(cancel);
+			panel.add(btnPanel, BorderLayout.SOUTH);
 
-	        panel.add(btnPanel, BorderLayout.SOUTH);
+			add(panel);
 
-	        add(panel);
+			addWindowListener(new ChildWindowListener(this));
 
-	        addWindowListener(new ChildWindowListener(this));
-
-	        pack();
-	        setLocationRelativeTo(FrontEnd.mainFrame);
-	        setVisible(true);
+			pack();
+			setLocationRelativeTo(FrontEnd.mainFrame);
+			setVisible(true);
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
-			if(src==ok){
+			if (src == ok) {
 				priorityRules = rulePanel.getSortedRules();
-				if(ruleWindow!=null){
+				if (ruleWindow != null) {
 					ruleWindow.dispose();
-					ruleWindow=null;
+					ruleWindow = null;
 				}
-			}else if(src==cancel){
-				if(ruleWindow!=null){
+			} else if (src == cancel) {
+				if (ruleWindow != null) {
 					ruleWindow.dispose();
-					ruleWindow=null;
+					ruleWindow = null;
 				}
 			}
 		}
@@ -526,39 +527,39 @@ public class StateSimulationPanel extends JPanel {
 		private class SelectPanel extends JPanel {
 			ArrayList<RuleLine> ruleLines;
 
-			SelectPanel(){
+			SelectPanel() {
 				ruleLines = new ArrayList<RuleLine>();
 				Set<StateRule> rules = statePanel.stateGraphPanel.getDrawNodes().getRules();
-				setLayout(new GridLayout(rules.size(),1));
-				for(StateRule r : rules){
-					RuleLine rl = new RuleLine(r,rules.size());
+				setLayout(new GridLayout(rules.size(), 1));
+				for (StateRule r : rules) {
+					RuleLine rl = new RuleLine(r, rules.size());
 					ruleLines.add(rl);
 					add(rl);
 				}
-				for(int i=0;i<priorityRules.size();++i){
-					for(RuleLine rl : ruleLines){
-						if(priorityRules.get(i)==rl.rule){
-							rl.setRank(priorityRules.size()-i);
+				for (int i = 0; i < priorityRules.size(); ++i) {
+					for (RuleLine rl : ruleLines) {
+						if (priorityRules.get(i) == rl.rule) {
+							rl.setRank(priorityRules.size() - i);
 						}
 					}
 				}
 			}
 
-			ArrayList<StateRule> getSortedRules(){
+			ArrayList<StateRule> getSortedRules() {
 				Collections.sort(ruleLines, new Comparator<RuleLine>() {
 					public int compare(RuleLine t1, RuleLine t2) {
-						if(t1.getRank()<t2.getRank()){
+						if (t1.getRank() < t2.getRank()) {
 							return 1;
-						}else if(t1.getRank()>t2.getRank()){
+						} else if (t1.getRank() > t2.getRank()) {
 							return -1;
-						}else{
+						} else {
 							return 0;
 						}
 					}
 				});
 				ArrayList<StateRule> sortedRules = new ArrayList<StateRule>();
-				for(RuleLine rl : ruleLines){
-					if(rl.getRank()>0){
+				for (RuleLine rl : ruleLines) {
+					if (rl.getRank() > 0) {
 						sortedRules.add(rl.rule);
 					}
 				}
@@ -567,30 +568,30 @@ public class StateSimulationPanel extends JPanel {
 
 		}
 
-		private class RuleLine extends JPanel{
+		private class RuleLine extends JPanel {
 			StateRule rule;
 			JComboBox box = new JComboBox();
 
-			RuleLine(StateRule rule, int ruleCount){
+			RuleLine(StateRule rule, int ruleCount) {
 				this.rule = rule;
 
-				setLayout(new GridLayout(1,2));
+				setLayout(new GridLayout(1, 2));
 
 				JLabel label = new JLabel(rule.getName());
 				add(label);
 
 				box = new JComboBox();
-				for(int i=0;i<ruleCount;++i){
-					box.addItem(""+i);
+				for (int i = 0; i < ruleCount; ++i) {
+					box.addItem("" + i);
 				}
 				add(box);
 			}
 
-			void setRank(int r){
-				box.setSelectedItem(""+r);
+			void setRank(int r) {
+				box.setSelectedItem("" + r);
 			}
 
-			int getRank(){
+			int getRank() {
 				return Integer.parseInt(box.getSelectedItem().toString());
 			}
 		}

@@ -56,161 +56,154 @@ public class State3DDynamicMover extends Thread {
 	private long interval;
 	private int maxSpeed;
 
-	public State3DDynamicMover(State3DPanel panel){
+	public State3DDynamicMover(State3DPanel panel) {
 		this.panel = panel;
 		this.active = false;
 	}
 
-	public void setInnerSpring(int k){
-		this.k = (double)k/100.0;
+	public void setInnerSpring(int k) {
+		this.k = (double) k / 100.0;
 	}
 
-	public void setInnerNodeRepulsion(int nc){
-		this.nc = (double)nc*10.0;
+	public void setInnerNodeRepulsion(int nc) {
+		this.nc = (double) nc * 10.0;
 	}
 
-	public void setInnerDummyRepulsion(int dc){
-		this.dc = (double)dc*10.0;
+	public void setInnerDummyRepulsion(int dc) {
+		this.dc = (double) dc * 10.0;
 	}
 
-	public void setInnerInterval(int interval){
+	public void setInnerInterval(int interval) {
 		this.interval = interval;
 	}
 
-	public void setInnerMaxSpeed(int maxSpeed){
-		this.maxSpeed = maxSpeed*10;
+	public void setInnerMaxSpeed(int maxSpeed) {
+		this.maxSpeed = maxSpeed * 10;
 	}
 
-	public void setPhysicsMode(boolean physicsMode){
+	public void setPhysicsMode(boolean physicsMode) {
 		this.physicsMode = physicsMode;
 	}
 
-	public void run(){
+	public void run() {
 		long sleepTime = 0;
-		while(true){
-			try{
+		while (true) {
+			try {
 
-				if(active){
-					for(State3DNode node : panel.getAllNode()){
+				if (active) {
+					for (State3DNode node : panel.getAllNode()) {
 						node.setDDY(0);
 						node.setDDZ(0);
 					}
 
 					double springLength = 30;
 
-					if(panel.getDepth()>=2){
+					if (panel.getDepth() >= 2) {
 						springLength = panel.getDepthNode().get(1).get(0).getX() - panel.getDepthNode().get(0).get(0).getX();
 					}
 
-					//ばね
-					for(State3DNode node : panel.getAllNode()){
-						for(State3DNode to : node.getToNodes()){
+					// ばね
+					for (State3DNode node : panel.getAllNode()) {
+						for (State3DNode to : node.getToNodes()) {
 							double l = node.distance(to);
-							if(l==0){ continue; }
-							double f = -1.0 * (l-springLength)*k;
-							double rateY = (node.getY()-to.getY())/l;
-							node.addDDY(f*rateY);
-							double rateZ = (node.getZ()-to.getZ())/l;
-							node.addDDZ(f*rateZ);
-						}
-						for(State3DNode from : node.getFromNodes()){
-							double l = node.distance(from);
-							if(l==0){ continue; }
-							double f = -1.0 * (l-springLength)*k;
-							double rateY = (node.getY()-from.getY())/l;
-							node.addDDY(f*rateY);
-							double rateZ = (node.getZ()-from.getZ())/l;
-							node.addDDZ(f*rateZ);
-						}
-					}
-
-					//斥力
-					/*
-					int d = 10;
-					for(ArrayList<State3DNode> nodes : panel.getDepthNode()){
-						for(State3DNode node : nodes){
-							for(State3DNode n : nodes){
-								if(node.getID()==n.getID()) continue;
-								double l = node.distance(n);
-								if(l==0){ continue; }
-								double ry = (node.getY()-n.getY())/l;
-								if(ry!=0){
-									if(0<ry&&ry<d){ ry=d; }
-									if(-d<ry&&ry<0){ ry=-d; }
-									double f;
-									if(ry>0){
-										f = ((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(ry*ry);
-									}else{
-										f = -((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(ry*ry);
-									}
-									node.addDDY(f);
-								}
-								double rz = (node.getZ()-n.getZ())/l;
-								if(rz!=0){
-									if(0<rz&&rz<d){ rz=d; }
-									if(-d<rz&&rz<0){ rz=-d; }
-									double f;
-									if(rz>0){
-										f = ((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(rz*rz);
-									}else{
-										f = -((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(rz*rz);
-									}
-									node.addDDZ(f);
-								}
+							if (l == 0) {
+								continue;
 							}
+							double f = -1.0 * (l - springLength) * k;
+							double rateY = (node.getY() - to.getY()) / l;
+							node.addDDY(f * rateY);
+							double rateZ = (node.getZ() - to.getZ()) / l;
+							node.addDDZ(f * rateZ);
+						}
+						for (State3DNode from : node.getFromNodes()) {
+							double l = node.distance(from);
+							if (l == 0) {
+								continue;
+							}
+							double f = -1.0 * (l - springLength) * k;
+							double rateY = (node.getY() - from.getY()) / l;
+							node.addDDY(f * rateY);
+							double rateZ = (node.getZ() - from.getZ()) / l;
+							node.addDDZ(f * rateZ);
 						}
 					}
-					*/
+
+					// 斥力
+					/*
+					 * int d = 10; for(ArrayList<State3DNode> nodes : panel.getDepthNode()){
+					 * for(State3DNode node : nodes){ for(State3DNode n : nodes){
+					 * if(node.getID()==n.getID()) continue; double l = node.distance(n); if(l==0){
+					 * continue; } double ry = (node.getY()-n.getY())/l; if(ry!=0){ if(0<ry&&ry<d){
+					 * ry=d; } if(-d<ry&&ry<0){ ry=-d; } double f; if(ry>0){ f =
+					 * ((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(ry*ry); }else{ f =
+					 * -((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(ry*ry); } node.addDDY(f); }
+					 * double rz = (node.getZ()-n.getZ())/l; if(rz!=0){ if(0<rz&&rz<d){ rz=d; }
+					 * if(-d<rz&&rz<0){ rz=-d; } double f; if(rz>0){ f =
+					 * ((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(rz*rz); }else{ f =
+					 * -((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(rz*rz); } node.addDDZ(f); } }
+					 * } }
+					 */
 
 					int d = 10;
-					for(State3DNode node : panel.getAllNode()){
-						for(State3DNode n : panel.getAllNode()){
-							if(node.getID()==n.getID()) continue;
+					for (State3DNode node : panel.getAllNode()) {
+						for (State3DNode n : panel.getAllNode()) {
+							if (node.getID() == n.getID())
+								continue;
 							double l = node.distance(n);
-							if(l==0){ continue; }
-							double ry = (node.getY()-n.getY())/l;
-							if(ry!=0){
-								if(0<ry&&ry<d){ ry=d; }
-								if(-d<ry&&ry<0){ ry=-d; }
+							if (l == 0) {
+								continue;
+							}
+							double ry = (node.getY() - n.getY()) / l;
+							if (ry != 0) {
+								if (0 < ry && ry < d) {
+									ry = d;
+								}
+								if (-d < ry && ry < 0) {
+									ry = -d;
+								}
 								double f;
-								if(ry>0){
-									f = ((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(ry*ry);
-								}else{
-									f = -((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(ry*ry);
+								if (ry > 0) {
+									f = ((node.isDummy() ? dc : nc) + (n.isDummy() ? dc : nc)) / (ry * ry);
+								} else {
+									f = -((node.isDummy() ? dc : nc) + (n.isDummy() ? dc : nc)) / (ry * ry);
 								}
 								node.addDDY(f);
 							}
-							double rz = (node.getZ()-n.getZ())/l;
-							if(rz!=0){
-								if(0<rz&&rz<d){ rz=d; }
-								if(-d<rz&&rz<0){ rz=-d; }
+							double rz = (node.getZ() - n.getZ()) / l;
+							if (rz != 0) {
+								if (0 < rz && rz < d) {
+									rz = d;
+								}
+								if (-d < rz && rz < 0) {
+									rz = -d;
+								}
 								double f;
-								if(rz>0){
-									f = ((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(rz*rz);
-								}else{
-									f = -((node.isDummy()?dc:nc)+(n.isDummy()?dc:nc))/(rz*rz);
+								if (rz > 0) {
+									f = ((node.isDummy() ? dc : nc) + (n.isDummy() ? dc : nc)) / (rz * rz);
+								} else {
+									f = -((node.isDummy() ? dc : nc) + (n.isDummy() ? dc : nc)) / (rz * rz);
 								}
 								node.addDDZ(f);
 							}
 						}
 					}
 
-					//摩擦力
-					for(State3DNode node : panel.getAllNode()){
-						node.addDDY(-0.7 * (node.getDY()+node.getDDY()));
-						node.addDDZ(-0.7 * (node.getDZ()+node.getDDZ()));
+					// 摩擦力
+					for (State3DNode node : panel.getAllNode()) {
+						node.addDDY(-0.7 * (node.getDY() + node.getDDY()));
+						node.addDDZ(-0.7 * (node.getDZ() + node.getDDZ()));
 					}
 
-					//移動
-					for(State3DNode node : panel.getAllNode()){
+					// 移動
+					for (State3DNode node : panel.getAllNode()) {
 						node.move(maxSpeed);
 					}
 					panel.statePanel.stateGraphPanel.repaint();
-					while(System.currentTimeMillis()<sleepTime+interval){
+					while (System.currentTimeMillis() < sleepTime + interval) {
 						sleep(1);
 					}
-					sleepTime=System.currentTimeMillis();
-				}else{
+					sleepTime = System.currentTimeMillis();
+				} else {
 					sleep(300);
 				}
 			} catch (Exception e) {
@@ -220,11 +213,11 @@ public class State3DDynamicMover extends Thread {
 
 	}
 
-	public void setActive(boolean active){
+	public void setActive(boolean active) {
 		this.active = active;
 	}
 
-	public boolean isActive(){
+	public boolean isActive() {
 		return active;
 	}
 

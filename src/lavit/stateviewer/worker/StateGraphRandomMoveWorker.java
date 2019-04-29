@@ -64,18 +64,18 @@ import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
 
-public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
+public class StateGraphRandomMoveWorker extends SwingWorker<Object, Double> {
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
 
 	private ProgressFrame frame;
 
-	public StateGraphRandomMoveWorker(StateGraphPanel panel){
+	public StateGraphRandomMoveWorker(StateGraphPanel panel) {
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
 	}
 
-	public void ready(){
+	public void ready() {
 		panel.setActive(false);
 		frame = new ProgressFrame();
 	}
@@ -87,17 +87,17 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 	}
 
 	@Override
-	protected Object doInBackground(){
+	protected Object doInBackground() {
 
 		int size = 10;
 		ArrayList<StatePositionSet> sets = new ArrayList<StatePositionSet>(size);
 		StatePositionSet best = new StatePositionSet(drawNodes);
 		publish(best.getFromBestLength());
 
-		while(!isCancelled()){
+		while (!isCancelled()) {
 			sets.clear();
 			sets.add(best);
-			for(int i=1;i<size;++i){
+			for (int i = 1; i < size; ++i) {
 				best = new StatePositionSet(best);
 				best.mutation2();
 				best.randomMove();
@@ -109,31 +109,39 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 
 		drawNodes.updatePosition(best);
 
-		double w = (double)panel.getWidth();
-		double h = (double)panel.getHeight();
-		double xInterval = w/(drawNodes.getDepth()+1);
-		double yInterval = h/(drawNodes.getHeight()+1);
-		if(xInterval>30){ xInterval=30; }else if(xInterval<10){ xInterval=10; }
-		if(yInterval>30){ yInterval=30; }else if(yInterval<10){ yInterval=10; }
-
-		//等間隔x配置
-		for(StateNode node : drawNodes.getAllNode()){
-			node.setX((node.depth+1)*xInterval);
+		double w = (double) panel.getWidth();
+		double h = (double) panel.getHeight();
+		double xInterval = w / (drawNodes.getDepth() + 1);
+		double yInterval = h / (drawNodes.getHeight() + 1);
+		if (xInterval > 30) {
+			xInterval = 30;
+		} else if (xInterval < 10) {
+			xInterval = 10;
+		}
+		if (yInterval > 30) {
+			yInterval = 30;
+		} else if (yInterval < 10) {
+			yInterval = 10;
 		}
 
-		while(true){
+		// 等間隔x配置
+		for (StateNode node : drawNodes.getAllNode()) {
+			node.setX((node.depth + 1) * xInterval);
+		}
+
+		while (true) {
 			Rectangle2D.Double d = drawNodes.getNodesDimension();
-			if(d.getHeight()<drawNodes.getHeight()*yInterval){
+			if (d.getHeight() < drawNodes.getHeight() * yInterval) {
 				drawNodes.allScaleCenterMove(1, 1.1);
-			}else{
+			} else {
 				break;
 			}
 		}
-		while(true){
+		while (true) {
 			Rectangle2D.Double d = drawNodes.getNodesDimension();
-			if(d.getHeight()>drawNodes.getHeight()*yInterval){
+			if (d.getHeight() > drawNodes.getHeight() * yInterval) {
 				drawNodes.allScaleCenterMove(1, 0.9);
-			}else{
+			} else {
 				break;
 			}
 		}
@@ -144,16 +152,16 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 		return null;
 	}
 
-	private StatePositionSet sortSets(ArrayList<StatePositionSet> sets){
+	private StatePositionSet sortSets(ArrayList<StatePositionSet> sets) {
 		Collections.sort(sets, new Comparator<StatePositionSet>() {
 			public int compare(StatePositionSet n1, StatePositionSet n2) {
 				double tl1 = n1.getFromBestLength();
 				double tl2 = n2.getFromBestLength();
-				if(tl1<tl2){
+				if (tl1 < tl2) {
 					return -1;
-				}else if(tl1>tl2){
+				} else if (tl1 > tl2) {
 					return 1;
-				}else{
+				} else {
 					return 0;
 				}
 			}
@@ -162,11 +170,11 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 	}
 
 	@Override
-    protected void process(List<Double> chunks) {
-        for (double number : chunks) {
-            frame.setParam(number);
-        }
-    }
+	protected void process(List<Double> chunks) {
+		for (double number : chunks) {
+			frame.setParam(number);
+		}
+	}
 
 	private class ProgressFrame extends JDialog implements ActionListener {
 		private JPanel panel;
@@ -179,7 +187,7 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 		private double lastParam = -1;
 		private ArrayList<Double> params = new ArrayList<Double>();
 
-		private ProgressFrame(){
+		private ProgressFrame() {
 			panel = new JPanel();
 
 			panel.setLayout(new BorderLayout());
@@ -203,32 +211,32 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 			setAlwaysOnTop(true);
 			setResizable(false);
 
-	        pack();
-	        setLocationRelativeTo(panel);
-	        addWindowListener(new ChildWindowListener(this));
-	        setVisible(true);
+			pack();
+			setLocationRelativeTo(panel);
+			addWindowListener(new ChildWindowListener(this));
+			setVisible(true);
 
-	        painter = new GraphPainter();
-	        painter.start();
+			painter = new GraphPainter();
+			painter.start();
 		}
 
-		public void end(){
-			if(painter!=null){
+		public void end() {
+			if (painter != null) {
 				painter.interrupt();
 				painter = null;
 			}
 		}
 
-		public void setParam(double param){
+		public void setParam(double param) {
 			paramNum++;
 			lastParam = param;
-			label.setText(paramNum+" : "+(new DecimalFormat("#.###")).format(param));
+			label.setText(paramNum + " : " + (new DecimalFormat("#.###")).format(param));
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
-			if(src==end){
-				if(!isDone()){
+			if (src == end) {
+				if (!isDone()) {
 					cancel(false);
 				}
 			}
@@ -236,29 +244,34 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 
 		private class GraphPanel extends JPanel {
 
-			private GraphPanel(){
+			private GraphPanel() {
 				setPreferredSize(new Dimension(300, 100));
 			}
 
-			public void paintComponent(Graphics g){
-				Graphics2D g2 = (Graphics2D)g;
+			public void paintComponent(Graphics g) {
+				Graphics2D g2 = (Graphics2D) g;
 
-				//フレームの初期化
+				// フレームの初期化
 				g2.setColor(Color.white);
 				g2.fillRect(0, 0, getWidth(), getHeight());
 
 				g2.setColor(Color.black);
-				if(params.size()>=2){
+				if (params.size() >= 2) {
 					double pw = params.size();
 					double base = params.get(0);
-					double ph = Math.abs(params.get(params.size()-1)-params.get(0));
+					double ph = Math.abs(params.get(params.size() - 1) - params.get(0));
 					double h = 1.0;
 					double w = 20.0;
 					int margin = 5;
-					while(w<pw) w *= 1.5;
-					while(h<ph) h *= 1.5;
-					for(int x=0;x<params.size()-1;++x){
-						g2.drawLine((int)(x*(getWidth()-margin*2)/w)+margin, (int)(Math.abs(params.get(x)-base)*(getHeight()-margin*2)/h)+margin, (int)((x+1)*(getWidth()-margin*2)/w)+margin, (int)(Math.abs(params.get(x+1)-base)*(getHeight()-margin*2)/h)+margin);
+					while (w < pw)
+						w *= 1.5;
+					while (h < ph)
+						h *= 1.5;
+					for (int x = 0; x < params.size() - 1; ++x) {
+						g2.drawLine((int) (x * (getWidth() - margin * 2) / w) + margin,
+								(int) (Math.abs(params.get(x) - base) * (getHeight() - margin * 2) / h) + margin,
+								(int) ((x + 1) * (getWidth() - margin * 2) / w) + margin,
+								(int) (Math.abs(params.get(x + 1) - base) * (getHeight() - margin * 2) / h) + margin);
 					}
 				}
 			}
@@ -266,9 +279,9 @@ public class StateGraphRandomMoveWorker extends SwingWorker<Object,Double>{
 		}
 
 		private class GraphPainter extends Thread {
-			public void run(){
-				while(true){
-					if(lastParam>=0){
+			public void run() {
+				while (true) {
+					if (lastParam >= 0) {
 						params.add(lastParam);
 					}
 					repaint();

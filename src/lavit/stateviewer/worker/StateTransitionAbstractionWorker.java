@@ -62,7 +62,7 @@ import lavit.stateviewer.StateNodeSet;
 import lavit.stateviewer.StateRule;
 import lavit.stateviewer.StateTransition;
 
-public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>{
+public class StateTransitionAbstractionWorker extends SwingWorker<Object, Object> {
 	private StateGraphPanel panel;
 	private boolean endFlag;
 	private boolean changeActive;
@@ -73,45 +73,47 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 	private Collection<StateRule> rules;
 	private Collection<StateTransition> trans;
 
-	public StateTransitionAbstractionWorker(StateGraphPanel panel){
+	public StateTransitionAbstractionWorker(StateGraphPanel panel) {
 		this.panel = panel;
 		this.endFlag = false;
 		this.changeActive = true;
 	}
 
-	public void waitExecute(Collection<StateRule> rules){
+	public void waitExecute(Collection<StateRule> rules) {
 		this.changeActive = false;
 		selectExecute(rules);
-		while(!endFlag){
+		while (!endFlag) {
 			try {
 				Thread.sleep(100);
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 
-	public void selectExecute(Collection<StateRule> rules){
-		if(panel.getDrawNodes().size()<1000){
+	public void selectExecute(Collection<StateRule> rules) {
+		if (panel.getDrawNodes().size() < 1000) {
 			atomic(rules);
-		}else{
+		} else {
 			ready(rules);
 			execute();
 		}
 	}
 
-	public void atomic(Collection<StateRule> rules){
+	public void atomic(Collection<StateRule> rules) {
 		ready(rules, false);
 		doInBackground();
 		done();
 	}
 
-	public void ready(Collection<StateRule> rules){
+	public void ready(Collection<StateRule> rules) {
 		ready(rules, true);
 	}
 
-	public void ready(Collection<StateRule> rules, boolean open){
-		if(changeActive) panel.setActive(false);
+	public void ready(Collection<StateRule> rules, boolean open) {
+		if (changeActive)
+			panel.setActive(false);
 
-		if(open){
+		if (open) {
 			frame = new ProgressFrame();
 			addPropertyChangeListener(frame);
 		}
@@ -120,10 +122,10 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 		this.rules = rules;
 		this.trans = new LinkedHashSet<StateTransition>();
 
-		//ダミーが含まれるため再構築
-		for(StateTransition t : panel.getDrawNodes().getAllTransition()){
-			rule: for(StateRule r : t.getRules()){
-				if(rules.contains(r)){
+		// ダミーが含まれるため再構築
+		for (StateTransition t : panel.getDrawNodes().getAllTransition()) {
+			rule: for (StateRule r : t.getRules()) {
+				if (rules.contains(r)) {
 					trans.add(t);
 					break rule;
 				}
@@ -133,24 +135,26 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 
 	public void end() {
 		maker.end();
-		if(changeActive) panel.setActive(true);
-		if(frame!=null) frame.dispose();
+		if (changeActive)
+			panel.setActive(true);
+		if (frame != null)
+			frame.dispose();
 		this.endFlag = true;
 	}
 
 	@Override
-	protected Object doInBackground(){
+	protected Object doInBackground() {
 
 		StateNodeSet drawNodes = panel.getDrawNodes();
 
 		drawNodes.allNodeUnMark();
 		LinkedHashSet<StateNode> nodes = new LinkedHashSet<StateNode>();
-		for(StateTransition t : trans){
-			if(!t.from.isMarked()){
+		for (StateTransition t : trans) {
+			if (!t.from.isMarked()) {
 				nodes.add(t.from);
 				t.from.mark();
 			}
-			if(!t.to.isMarked()){
+			if (!t.to.isMarked()) {
 				nodes.add(t.to);
 				t.to.mark();
 			}
@@ -159,18 +163,18 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 		int allNum = nodes.size();
 		drawNodes.allNodeUnMark();
 
-		while(true){
+		while (true) {
 
 			StopWatch.startWatch("Worker[1]");
 
 			LinkedHashSet<StateNode> transitionGroup = new LinkedHashSet<StateNode>();
-			while(nodes.size()>0){
+			while (nodes.size() > 0) {
 
 				transitionGroup.clear();
 				LinkedList<StateNode> queue = new LinkedList<StateNode>();
 
 				StateNode firstNode = null;
-				for(StateNode node : nodes){
+				for (StateNode node : nodes) {
 					firstNode = node;
 					break;
 				}
@@ -180,7 +184,7 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 				firstNode.mark();
 				nodes.remove(firstNode);
 
-				while(!queue.isEmpty()){
+				while (!queue.isEmpty()) {
 
 					StateNode node = queue.remove();
 
@@ -188,8 +192,10 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 					Collection<StateNode> ns = node.getRuleNameGroupNodes(rules);
 					StopWatch.stopWatch("Worker[1-1]");
 
-					for(StateNode n : ns){
-						if(n.isMarked()){continue;}
+					for (StateNode n : ns) {
+						if (n.isMarked()) {
+							continue;
+						}
 						queue.add(n);
 						transitionGroup.add(n);
 						n.mark();
@@ -197,12 +203,14 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 					}
 				}
 
-				if(transitionGroup.size()>=2){
+				if (transitionGroup.size() >= 2) {
 					break;
 				}
 			}
 
-			if(transitionGroup.size()<=1){ break; }
+			if (transitionGroup.size() <= 1) {
+				break;
+			}
 
 			StopWatch.stopWatch("Worker[1]");
 			StopWatch.startWatch("Worker[2]");
@@ -211,34 +219,38 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 
 			StopWatch.stopWatch("Worker[2]");
 
-			setProgress((int)(100*(1-((double)nodes.size())/((double)allNum))));
-			if(isCancelled()){ end();return null; }
+			setProgress((int) (100 * (1 - ((double) nodes.size()) / ((double) allNum))));
+			if (isCancelled()) {
+				end();
+				return null;
+			}
 
 		}
 
-		if(frame!=null) frame.end();
+		if (frame != null)
+			frame.end();
 		end();
 		return null;
 	}
 
-	StateTransition getInTransition(ArrayList<StateTransition> toes,StateNode toNode){
-		for(StateTransition trans : toes){
-			if(trans.to==toNode){
+	StateTransition getInTransition(ArrayList<StateTransition> toes, StateNode toNode) {
+		for (StateTransition trans : toes) {
+			if (trans.to == toNode) {
 				return trans;
 			}
 		}
 		return null;
 	}
 
-	private class ProgressFrame extends JDialog implements PropertyChangeListener,ActionListener {
+	private class ProgressFrame extends JDialog implements PropertyChangeListener, ActionListener {
 		private JPanel panel;
 		private JProgressBar bar;
 		private JButton cancel;
 
-		private ProgressFrame(){
+		private ProgressFrame() {
 			panel = new JPanel();
 
-			bar = new JProgressBar(0,100);
+			bar = new JProgressBar(0, 100);
 			bar.setStringPainted(true);
 			panel.add(bar);
 
@@ -254,31 +266,30 @@ public class StateTransitionAbstractionWorker extends SwingWorker<Object,Object>
 			setAlwaysOnTop(true);
 			setResizable(false);
 
-	        pack();
-	        setLocationRelativeTo(panel);
-	        addWindowListener(new ChildWindowListener(this));
-	        setVisible(true);
+			pack();
+			setLocationRelativeTo(panel);
+			addWindowListener(new ChildWindowListener(this));
+			setVisible(true);
 		}
 
-		public void end(){
+		public void end() {
 			bar.setValue(100);
 		}
 
 		public void propertyChange(PropertyChangeEvent evt) {
 			if ("progress".equals(evt.getPropertyName())) {
-				bar.setValue((Integer)evt.getNewValue());
+				bar.setValue((Integer) evt.getNewValue());
 			}
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
-			if(src==cancel){
-				if(!isDone()){
+			if (src == cancel) {
+				if (!isDone()) {
 					cancel(false);
 				}
 			}
 		}
 	}
-
 
 }

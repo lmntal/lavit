@@ -70,32 +70,32 @@ public class State3DNode {
 	public TransformGroup tg = null;
 	public Sphere sphere = null;
 
-	public double z,dz,ddz;
+	public double z, dz, ddz;
 	public State3DNode startNode;
 
-	public State3DNode(StateNode node, StatePanel panel){
+	public State3DNode(StateNode node, StatePanel panel) {
 		this.panel = panel;
 		this.node = node;
 		this.z = 0;
 	}
 
-	public void updateShape(){
+	public void updateShape() {
 
 		tg = new TransformGroup();
 
-		//removeAllChildren();
+		// removeAllChildren();
 
 		// 色の設定
 		Appearance ap = new Appearance();
 		Material ma = new Material();
 		boolean searchMode = panel.stateGraphPanel.getDraw().isSearchMode();
 		boolean cycleMode = panel.stateGraphPanel.getDraw().isCycleMode();
-		if(searchMode&&node.weak||!searchMode&&cycleMode&&!node.cycle){
+		if (searchMode && node.weak || !searchMode && cycleMode && !node.cycle) {
 			ma.setDiffuseColor(new Color3f(Color.GRAY));
-		}else{
+		} else {
 			Color color = node.getColor();
 			ma.setDiffuseColor(new Color3f(color));
-			ma.setEmissiveColor(new Color3f(color)); //発光
+			ma.setEmissiveColor(new Color3f(color)); // 発光
 		}
 		ap.setMaterial(ma);
 
@@ -109,191 +109,198 @@ public class State3DNode {
 		tg.setTransform(transform);
 	}
 
-	public Sphere getSphere(){
+	public Sphere getSphere() {
 		return sphere;
 	}
 
-	public void setStartNode(State3DNode startNode){
+	public void setStartNode(State3DNode startNode) {
 		this.startNode = startNode;
 	}
 
-	public TransformGroup getTransformGroup(){
+	public TransformGroup getTransformGroup() {
 		return tg;
 	}
 
-	public Collection<State3DNode> getToNodes(){
+	public Collection<State3DNode> getToNodes() {
 		ArrayList<State3DNode> toNodes = new ArrayList<State3DNode>();
-		for(State3DTransition t : toes){
+		for (State3DTransition t : toes) {
 			toNodes.add(t.to);
 		}
 		return toNodes;
 	}
 
-	public Collection<State3DNode> getFromNodes(){
+	public Collection<State3DNode> getFromNodes() {
 		ArrayList<State3DNode> fromNodes = new ArrayList<State3DNode>();
-		for(State3DTransition t : froms){
+		for (State3DTransition t : froms) {
 			fromNodes.add(t.from);
 		}
 		return fromNodes;
 	}
 
-	public Collection<State3DNode> getToNextNodes(){
+	public Collection<State3DNode> getToNextNodes() {
 		ArrayList<State3DNode> toNodes = new ArrayList<State3DNode>();
-		for(State3DTransition t : toes){
-			if(t.to.node.depth!=node.depth+1){ continue; }
+		for (State3DTransition t : toes) {
+			if (t.to.node.depth != node.depth + 1) {
+				continue;
+			}
 			toNodes.add(t.to);
 		}
 		return toNodes;
 	}
 
-	public Collection<State3DNode> getFromBackNodes(){
+	public Collection<State3DNode> getFromBackNodes() {
 		ArrayList<State3DNode> fromNodes = new ArrayList<State3DNode>();
-		for(State3DTransition t : froms){
-			if(t.from.node.depth!=node.depth-1){ continue; }
+		for (State3DTransition t : froms) {
+			if (t.from.node.depth != node.depth - 1) {
+				continue;
+			}
 			fromNodes.add(t.from);
 		}
 		return fromNodes;
 	}
 
-	public long getID(){
+	public long getID() {
 		return node.id;
 	}
 
-	public boolean isDummy(){
+	public boolean isDummy() {
 		return node.dummy;
 	}
 
-	public double distance(State3DNode node){
+	public double distance(State3DNode node) {
 		return getPoint().distance(node.getPoint());
 	}
 
-	public double getX(){
+	public double getX() {
 		return this.node.getX();
 	}
 
-	public double getY(){
+	public double getY() {
 		return this.node.getY();
 	}
 
-	public double getZ(){
+	public double getZ() {
 		return this.z;
 	}
 
-	public void setX(double x){
+	public void setX(double x) {
 		this.node.setX(conv(x));
 	}
 
-	public void addX(double dx){
-		setX(getX()+dx);
+	public void addX(double dx) {
+		setX(getX() + dx);
 	}
 
-	public void setY(double y){
+	public void setY(double y) {
 		this.node.setY(conv(y));
 	}
 
-	public void addY(double dy){
-		setY(getY()+dy);
+	public void addY(double dy) {
+		setY(getY() + dy);
 	}
 
-	public void setZ(double z){
+	public void setZ(double z) {
 		this.z = conv(z);
 	}
 
-	public void addZ(double dz){
-		setZ(getZ()+dz);
+	public void addZ(double dz) {
+		setZ(getZ() + dz);
 	}
 
-	public double getDY(){
+	public double getDY() {
 		return this.node.dy;
 	}
 
-	public double getDZ(){
+	public double getDZ() {
 		return this.dz;
 	}
 
-	public void setDY(double dy){
+	public void setDY(double dy) {
 		this.node.dy = conv(dy);
 	}
 
-	public void addDY(double ddy){
-		setDY(getDY()+ddy);
+	public void addDY(double ddy) {
+		setDY(getDY() + ddy);
 	}
 
-	public void setDZ(double dz){
+	public void setDZ(double dz) {
 		this.dz = conv(dz);
 	}
 
-	public void addDZ(double ddz){
-		setDZ(getDZ()+ddz);
+	public void addDZ(double ddz) {
+		setDZ(getDZ() + ddz);
 	}
 
-	public double getDDY(){
+	public double getDDY() {
 		return this.node.ddy;
 	}
 
-	public void addDDY(double dddy){
-		setDDY(getDDY()+dddy);
+	public void addDDY(double dddy) {
+		setDDY(getDDY() + dddy);
 	}
 
-	public double getDDZ(){
+	public double getDDZ() {
 		return this.ddz;
 	}
 
-	public void addDDZ(double dddz){
-		setDDZ(getDDZ()+dddz);
+	public void addDDZ(double dddz) {
+		setDDZ(getDDZ() + dddz);
 	}
 
-	public void setDDY(double ddy){
+	public void setDDY(double ddy) {
 		this.node.ddy = conv(ddy);
 	}
 
-	public void setDDZ(double ddz){
+	public void setDDZ(double ddz) {
 		this.ddz = conv(ddz);
 	}
 
-	private double conv(double x){
-		if(!(-1000000000<x&&x<1000000000)){ return 0; }
+	private double conv(double x) {
+		if (!(-1000000000 < x && x < 1000000000)) {
+			return 0;
+		}
 		return x;
 	}
 
-	public void setPosition(double x, double y, double z){
+	public void setPosition(double x, double y, double z) {
 		setX(x);
 		setY(y);
 		setZ(z);
 	}
 
-	public double getSpeed(){
-		return Math.sqrt(getDY()*getDY()+getDZ()*getDZ());
+	public double getSpeed() {
+		return Math.sqrt(getDY() * getDY() + getDZ() * getDZ());
 	}
 
-	public void move(int maxSpeed){
+	public void move(int maxSpeed) {
 		addDY(getDDY());
 		addDZ(getDDZ());
 		double speed = getSpeed();
-		if(speed>maxSpeed){
-			setDY(getDY()*maxSpeed/speed);
-			setDZ(getDZ()*maxSpeed/speed);
+		if (speed > maxSpeed) {
+			setDY(getDY() * maxSpeed / speed);
+			setDZ(getDZ() * maxSpeed / speed);
 		}
 		addY(getDY());
 		addZ(getDZ());
-		//System.out.println("id:"+getID()+",y:"+getY()+",dy:"+getDY()+",ddy:"+getDDY());
+		// System.out.println("id:"+getID()+",y:"+getY()+",dy:"+getDY()+",ddy:"+getDDY());
 	}
 
-	public double getDistance(State3DNode n){
+	public double getDistance(State3DNode n) {
 		return n.getPoint().distance(getPoint());
 	}
 
-	public Point3d getPoint(){
-		return new Point3d(getX(),getY(),getZ());
+	public Point3d getPoint() {
+		return new Point3d(getX(), getY(), getZ());
 	}
 
-	public Point3d getGraphPoint(){
-		double x = getX()-startNode.getX();
-		double y = getY()-startNode.getY();
-		double z = getZ()-startNode.getZ();
-		Point3d p = new Point3d(x*Env.getInt("SV3D_X_SCALE")/300, y*Env.getInt("SV3D_Y_SCALE")/300, z*Env.getInt("SV3D_Z_SCALE")/300);
-		//System.out.println(p);
-		//(node.getX()-startNode.getX())*(node.getY()-startNode.getY())/1000
+	public Point3d getGraphPoint() {
+		double x = getX() - startNode.getX();
+		double y = getY() - startNode.getY();
+		double z = getZ() - startNode.getZ();
+		Point3d p = new Point3d(x * Env.getInt("SV3D_X_SCALE") / 300, y * Env.getInt("SV3D_Y_SCALE") / 300,
+				z * Env.getInt("SV3D_Z_SCALE") / 300);
+		// System.out.println(p);
+		// (node.getX()-startNode.getX())*(node.getY()-startNode.getY())/1000
 		return p;
 	}
 

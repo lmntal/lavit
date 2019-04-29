@@ -53,7 +53,7 @@ import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateNodeSet;
 
-public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
+public class StateGraphDummySmoothingWorker extends SwingWorker<Object, Object> {
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
 	private boolean endFlag;
@@ -61,85 +61,92 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 
 	private ProgressFrame frame;
 
-	public StateGraphDummySmoothingWorker(StateGraphPanel panel){
+	public StateGraphDummySmoothingWorker(StateGraphPanel panel) {
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
 		this.endFlag = false;
 		this.changeActive = true;
 	}
 
-	public void waitExecute(){
+	public void waitExecute() {
 		this.changeActive = false;
 		selectExecute();
-		while(!endFlag){
+		while (!endFlag) {
 			try {
 				Thread.sleep(100);
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 
-	public void selectExecute(){
-		if(drawNodes.size()<1000){
+	public void selectExecute() {
+		if (drawNodes.size() < 1000) {
 			atomic();
-		}else{
+		} else {
 			ready();
 			execute();
 		}
 	}
 
-	public void atomic(){
+	public void atomic() {
 		ready(false);
 		doInBackground();
 		done();
 	}
 
-	public void ready(){
+	public void ready() {
 		ready(true);
 	}
 
-	public void ready(boolean open){
-		if(changeActive) panel.setActive(false);
-		if(open){
+	public void ready(boolean open) {
+		if (changeActive)
+			panel.setActive(false);
+		if (open) {
 			frame = new ProgressFrame();
 		}
 	}
 
 	public void end() {
 		panel.autoCentering();
-		if(changeActive) panel.setActive(true);
-		if(frame!=null) frame.dispose();
+		if (changeActive)
+			panel.setActive(true);
+		if (frame != null)
+			frame.dispose();
 		this.endFlag = true;
 	}
 
 	@Override
-	protected Object doInBackground(){
+	protected Object doInBackground() {
 
 		boolean move = true;
-		while(move){
+		while (move) {
 			move = false;
 			List<List<StateNode>> depthNode = drawNodes.getDepthNode();
-			for(List<StateNode> nodes : depthNode){
-				for(StateNode node : nodes){
-					if(node.dummy){
+			for (List<StateNode> nodes : depthNode) {
+				for (StateNode node : nodes) {
+					if (node.dummy) {
 						double y = node.getY();
-						double ay = (node.getFromNodes().get(0).getY()+node.getToNodes().get(0).getY())/2;
+						double ay = (node.getFromNodes().get(0).getY() + node.getToNodes().get(0).getY()) / 2;
 						node.setY(ay);
-						if(rideOtherNode(nodes,node)){
-							if(ay>y){
-								ay = y+1;
-							}else{
-								ay = y-1;
+						if (rideOtherNode(nodes, node)) {
+							if (ay > y) {
+								ay = y + 1;
+							} else {
+								ay = y - 1;
 							}
 							node.setY(ay);
-							if(rideOtherNode(nodes,node)){
+							if (rideOtherNode(nodes, node)) {
 								node.setY(y);
 							}
 						}
-						if(Math.abs(node.getY()-y)>0.9){
+						if (Math.abs(node.getY() - y) > 0.9) {
 							move = true;
 						}
 					}
-					if(isCancelled()){ end(); return null; }
+					if (isCancelled()) {
+						end();
+						return null;
+					}
 				}
 			}
 		}
@@ -148,13 +155,16 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 		return null;
 	}
 
-	boolean rideOtherNode(List<StateNode> nodes,StateNode node){
-		for(StateNode n : nodes){
-			if(n==node) continue;
-			double dy = node.getY()-n.getY();
-			if(dy<0){ dy *= -1; }
-			double r = node.getRadius()+n.getRadius()+7;
-			if(dy<r){
+	boolean rideOtherNode(List<StateNode> nodes, StateNode node) {
+		for (StateNode n : nodes) {
+			if (n == node)
+				continue;
+			double dy = node.getY() - n.getY();
+			if (dy < 0) {
+				dy *= -1;
+			}
+			double r = node.getRadius() + n.getRadius() + 7;
+			if (dy < r) {
 				return true;
 			}
 		}
@@ -166,10 +176,10 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 		private JProgressBar bar;
 		private JButton cancel;
 
-		private ProgressFrame(){
+		private ProgressFrame() {
 			panel = new JPanel();
 
-			bar = new JProgressBar(0,100);
+			bar = new JProgressBar(0, 100);
 			bar.setIndeterminate(true);
 			panel.add(bar);
 
@@ -185,21 +195,20 @@ public class StateGraphDummySmoothingWorker extends SwingWorker<Object,Object>{
 			setAlwaysOnTop(true);
 			setResizable(false);
 
-	        pack();
-	        setLocationRelativeTo(panel);
-	        addWindowListener(new ChildWindowListener(this));
-	        setVisible(true);
+			pack();
+			setLocationRelativeTo(panel);
+			addWindowListener(new ChildWindowListener(this));
+			setVisible(true);
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
-			if(src==cancel){
-				if(!isDone()){
+			if (src == cancel) {
+				if (!isDone()) {
 					cancel(false);
 				}
 			}
 		}
 	}
-
 
 }

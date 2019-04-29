@@ -59,13 +59,13 @@ public class State3DNodeLabel extends JPanel implements CommonFontUser {
 
 	private JTextField stateTextField;
 
-	public State3DNodeLabel(){
+	public State3DNodeLabel() {
 
 		setLayout(new BorderLayout());
 		setOpaque(false);
 
 		stateStatus = new JPanel();
-		stateStatus.setLayout(new GridLayout(1,2));
+		stateStatus.setLayout(new GridLayout(1, 2));
 		stateStatus.setOpaque(false);
 		stateNodenum = new JLabel();
 		stateNodenum.setOpaque(false);
@@ -85,29 +85,29 @@ public class State3DNodeLabel extends JPanel implements CommonFontUser {
 
 	}
 
-	public void loadFont(){
+	public void loadFont() {
 		Font font = Env.getEditorFont();
 		stateTextField.setFont(font);
 		revalidate();
 	}
 
-	public void setNode(State3DNode node3d){
-		if(node3d!=null){
+	public void setNode(State3DNode node3d) {
+		if (node3d != null) {
 			StateNode node = node3d.node;
-			if(node.hasSubset()){
-				stateNodenum.setText("Node: "+node.getChildSet().size());
-			}else{
+			if (node.hasSubset()) {
+				stateNodenum.setText("Node: " + node.getChildSet().size());
+			} else {
 				stateNodenum.setText("");
 			}
-			if(node.label.length()>0){
-				stateLabel.setText("Label: "+node.label);
-			}else{
+			if (node.label.length() > 0) {
+				stateLabel.setText("Label: " + node.label);
+			} else {
 				stateLabel.setText("");
 			}
 			stateTextField.setText(node.toString());
 			stateTextField.setVisible(true);
 			setVisible(true);
-		}else{
+		} else {
 			setVisible(false);
 		}
 

@@ -47,7 +47,7 @@ public class StateAbstractionMaker {
 	private StateGraphPanel graphPanel;
 	StateNodeSet drawNodes;
 
-	public StateAbstractionMaker(StateGraphPanel graphPanel){
+	public StateAbstractionMaker(StateGraphPanel graphPanel) {
 		this.graphPanel = graphPanel;
 		this.drawNodes = graphPanel.getDrawNodes();
 
@@ -55,7 +55,7 @@ public class StateAbstractionMaker {
 		graphPanel.selectClear();
 	}
 
-	public void makeNode(Collection<StateNode> groupNodes){
+	public void makeNode(Collection<StateNode> groupNodes) {
 
 		long id = drawNodes.publishNodeId();
 		StateNode newNode = new StateNode(id, drawNodes);
@@ -63,17 +63,25 @@ public class StateAbstractionMaker {
 		LinkedHashSet<StateTransition> allTrans = new LinkedHashSet<StateTransition>();
 		LinkedHashSet<StateTransition> outTrans = new LinkedHashSet<StateTransition>();
 
-		for(StateNode node : groupNodes){
-			if(node.dummy){ continue; }
+		for (StateNode node : groupNodes) {
+			if (node.dummy) {
+				continue;
+			}
 
-			if(node.accept){ newNode.accept = true; }
-			if(node.cycle){ newNode.cycle = true; }
-			if(newNode.depth>node.depth){ newNode.depth = node.depth; }
+			if (node.accept) {
+				newNode.accept = true;
+			}
+			if (node.cycle) {
+				newNode.cycle = true;
+			}
+			if (newNode.depth > node.depth) {
+				newNode.depth = node.depth;
+			}
 
-			for(StateTransition t : new LinkedList<StateTransition>(node.getToTransitions())){
-				if(!groupNodes.contains(t.to)){
-					//グループ外への遷移
-					if(!newNode.isToNode(t.to)){
+			for (StateTransition t : new LinkedList<StateTransition>(node.getToTransitions())) {
+				if (!groupNodes.contains(t.to)) {
+					// グループ外への遷移
+					if (!newNode.isToNode(t.to)) {
 						StateTransition newTrans = new StateTransition(newNode, t.to, t.cycle, t.weak);
 						newTrans.addRules(t.getRules());
 						newTrans.from.addToTransition(newTrans);
@@ -85,17 +93,17 @@ public class StateAbstractionMaker {
 					t.to.removeFromTransition(t);
 					drawNodes.removeTransition(t);
 					outTrans.add(t);
-				}else{
-					//グループ内への遷移
+				} else {
+					// グループ内への遷移
 					drawNodes.removeTransition(t);
 					allTrans.add(t);
 				}
 			}
 
-			for(StateTransition t : new LinkedList<StateTransition>(node.getFromTransitions())){
-				if(!groupNodes.contains(t.from)){
-					//グループ外への遷移
-					if(!newNode.isFromNode(t.from)){
+			for (StateTransition t : new LinkedList<StateTransition>(node.getFromTransitions())) {
+				if (!groupNodes.contains(t.from)) {
+					// グループ外への遷移
+					if (!newNode.isFromNode(t.from)) {
 						StateTransition newTrans = new StateTransition(t.from, newNode, t.cycle, t.weak);
 						newTrans.addRules(t.getRules());
 						newTrans.from.addToTransition(newTrans);
@@ -107,8 +115,8 @@ public class StateAbstractionMaker {
 					t.to.removeFromTransition(t);
 					drawNodes.removeTransition(t);
 					outTrans.add(t);
-				}else{
-					//グループ内への遷移
+				} else {
+					// グループ内への遷移
 					drawNodes.removeTransition(t);
 					allTrans.add(t);
 				}
@@ -116,21 +124,21 @@ public class StateAbstractionMaker {
 			drawNodes.removeInnerNodeData(node);
 		}
 
-		//サイクル系もちゃんと処理する
+		// サイクル系もちゃんと処理する
 
-		//新しい位置の決定
-		double x=0,y=0;
-		for(StateNode node : groupNodes){
-			x+=node.getX();
-			y+=node.getY();
+		// 新しい位置の決定
+		double x = 0, y = 0;
+		for (StateNode node : groupNodes) {
+			x += node.getX();
+			y += node.getY();
 		}
-		x/=(double)(groupNodes.size());
-		y/=(double)(groupNodes.size());
+		x /= (double) (groupNodes.size());
+		y /= (double) (groupNodes.size());
 		double minD = Double.MAX_VALUE;
 		double bestX = 0;
-		for(StateNode node : groupNodes){
-			double d = Math.abs(node.getX()-x);
-			if(d<minD){
+		for (StateNode node : groupNodes) {
+			double d = Math.abs(node.getX() - x);
+			if (d < minD) {
 				bestX = node.getX();
 				minD = d;
 			}
@@ -142,141 +150,95 @@ public class StateAbstractionMaker {
 		newNode.setPosition(bestX, y);
 
 		drawNodes.addNode(newNode);
-		//if(newNode.getFromNodes().size()==0){ drawNodes.setStartNode(newNode); }
-		if(newNode.depth==0){ drawNodes.setStartNode(newNode); }
-		if(newNode.getToNodes().size()==0){ drawNodes.addEndNode(newNode); }
+		// if(newNode.getFromNodes().size()==0){ drawNodes.setStartNode(newNode); }
+		if (newNode.depth == 0) {
+			drawNodes.setStartNode(newNode);
+		}
+		if (newNode.getToNodes().size() == 0) {
+			drawNodes.addEndNode(newNode);
+		}
 	}
 
 	/*
-	public void makeNode(Collection<StateNode> groupNodes){
+	 * public void makeNode(Collection<StateNode> groupNodes){
+	 * 
+	 * boolean accept = false; boolean inCycle = false; boolean start = false;
+	 * LinkedHashSet<StateTransition> toes = new LinkedHashSet<StateTransition>();
+	 * LinkedHashSet<StateTransition> froms = new LinkedHashSet<StateTransition>();
+	 * //LinkedHashSet<StateNode> fromNodes = new LinkedHashSet<StateNode>();
+	 * LinkedHashSet<StateTransition> removeTrans = new
+	 * LinkedHashSet<StateTransition>();
+	 * 
+	 * StateNode newNode = new StateNode(id, drawNodes); for(StateNode node :
+	 * groupNodes){ if(node.dummy){ continue; }
+	 * 
+	 * if(node.accept){ accept = true; } if(node.inCycle){ inCycle = true; }
+	 * if(node.depth==0){ start = true; } LinkedList<StateNode> removeToes = new
+	 * LinkedList<StateNode>(); LinkedList<StateNode> removeFroms = new
+	 * LinkedList<StateNode>();
+	 * 
+	 * Env.startWatch("Worker[2-1]");
+	 * 
+	 * for(StateTransition t : node.getToTransition()){
+	 * if(!groupNodes.contains(t.to)){
+	 * 
+	 * //新しいtransを追加 StateTransition existTrans = getInToTransition(toes, t.to);
+	 * if(existTrans==null){ StateTransition newTrans = new StateTransition(newNode,
+	 * t.to, t.em); newTrans.addRules(t.getRules()); toes.add(newTrans);
+	 * drawNodes.addTransition(newTrans); }else{ if(t.em){ existTrans.em = true; }
+	 * for(String r : t.getRules()){ if(!existTrans.getRules().contains(r)){
+	 * existTrans.getRules().add(r); } } } t.to.addFromNode(newNode); //削除
+	 * removeToes.add(t.to); t.to.removeFromNode(node); } removeTrans.add(t); }
+	 * 
+	 * Env.stopWatch("Worker[2-1]"); Env.startWatch("Worker[2-2]");
+	 * 
+	 * for(StateNode f : node.getFromNodes()){
+	 * 
+	 * StateTransition t = f.getToTransition(node); if(!groupNodes.contains(f)){
+	 * //新しいfromを追加 if(!fromNodes.contains(f)){ fromNodes.add(f); }
+	 * drawNodes.addTransition(f.addToNode(newNode, t.getRules(), t.em)); //削除
+	 * removeFroms.add(f); f.removeToNode(node); } removeTrans.add(t); }
+	 * 
+	 * Env.stopWatch("Worker[2-2]"); Env.startWatch("Worker[2-3]");
+	 * 
+	 * for(StateNode to : removeToes){ node.removeToNode(to); } for(StateNode from :
+	 * removeFroms){ node.removeFromNode(from); }
+	 * drawNodes.removeInnerNodeData(node);
+	 * 
+	 * Env.stopWatch("Worker[2-3]"); }
+	 * 
+	 * drawNodes.removeTransitions(removeTrans);
+	 * 
+	 * newNode.init("","", accept, inCycle);
+	 * 
+	 * //新しい位置の決定 double x=0,y=0; for(StateNode node : groupNodes){ x+=node.getX();
+	 * y+=node.getY(); } x/=(double)(groupNodes.size());
+	 * y/=(double)(groupNodes.size()); double minD = Double.MAX_VALUE; double bestX
+	 * = 0; for(StateNode node : groupNodes){ double d = Math.abs(node.getX()-x);
+	 * if(d<minD){ bestX = node.getX(); minD = d; } }
+	 * 
+	 * StateNodeSet child = new StateNodeSet(newNode); child.setSubNode(groupNodes,
+	 * removeTrans); newNode.setChildSet(child);
+	 * 
+	 * newNode.setPosition(bestX, y); newNode.setToTransition(toes);
+	 * newNode.setFromNode(fromNodes);
+	 * 
+	 * drawNodes.addNode(newNode); if(start){ drawNodes.setStartNode(newNode); }
+	 * if(newNode.getToNodes().size()==0){ drawNodes.addEndNode(newNode); } }
+	 */
 
-		boolean accept = false;
-		boolean inCycle = false;
-		boolean start = false;
-		LinkedHashSet<StateTransition> toes = new LinkedHashSet<StateTransition>();
-		LinkedHashSet<StateTransition> froms = new LinkedHashSet<StateTransition>();
-		//LinkedHashSet<StateNode> fromNodes = new LinkedHashSet<StateNode>();
-		LinkedHashSet<StateTransition> removeTrans = new LinkedHashSet<StateTransition>();
-
-		StateNode newNode = new StateNode(id, drawNodes);
-		for(StateNode node : groupNodes){
-			if(node.dummy){ continue; }
-
-			if(node.accept){ accept = true; }
-			if(node.inCycle){ inCycle = true; }
-			if(node.depth==0){ start = true; }
-			LinkedList<StateNode> removeToes = new LinkedList<StateNode>();
-			LinkedList<StateNode> removeFroms = new LinkedList<StateNode>();
-
-			Env.startWatch("Worker[2-1]");
-
-			for(StateTransition t : node.getToTransition()){
-				if(!groupNodes.contains(t.to)){
-
-					//新しいtransを追加
-					StateTransition existTrans = getInToTransition(toes, t.to);
-					if(existTrans==null){
-						StateTransition newTrans = new StateTransition(newNode, t.to, t.em);
-						newTrans.addRules(t.getRules());
-						toes.add(newTrans);
-						drawNodes.addTransition(newTrans);
-					}else{
-						if(t.em){ existTrans.em = true; }
-						for(String r : t.getRules()){
-							if(!existTrans.getRules().contains(r)){
-								existTrans.getRules().add(r);
-							}
-						}
-					}
-					t.to.addFromNode(newNode);
-					//削除
-					removeToes.add(t.to);
-					t.to.removeFromNode(node);
-				}
-				removeTrans.add(t);
-			}
-
-			Env.stopWatch("Worker[2-1]");
-			Env.startWatch("Worker[2-2]");
-
-			for(StateNode f : node.getFromNodes()){
-
-				StateTransition t =  f.getToTransition(node);
-				if(!groupNodes.contains(f)){
-					//新しいfromを追加
-					if(!fromNodes.contains(f)){
-						fromNodes.add(f);
-					}
-					drawNodes.addTransition(f.addToNode(newNode, t.getRules(), t.em));
-					//削除
-					removeFroms.add(f);
-					f.removeToNode(node);
-				}
-				removeTrans.add(t);
-			}
-
-			Env.stopWatch("Worker[2-2]");
-			Env.startWatch("Worker[2-3]");
-
-			for(StateNode to : removeToes){
-				node.removeToNode(to);
-			}
-			for(StateNode from : removeFroms){
-				node.removeFromNode(from);
-			}
-			drawNodes.removeInnerNodeData(node);
-
-			Env.stopWatch("Worker[2-3]");
-		}
-
-		drawNodes.removeTransitions(removeTrans);
-
-		newNode.init("","", accept, inCycle);
-
-		//新しい位置の決定
-		double x=0,y=0;
-		for(StateNode node : groupNodes){
-			x+=node.getX();
-			y+=node.getY();
-		}
-		x/=(double)(groupNodes.size());
-		y/=(double)(groupNodes.size());
-		double minD = Double.MAX_VALUE;
-		double bestX = 0;
-		for(StateNode node : groupNodes){
-			double d = Math.abs(node.getX()-x);
-			if(d<minD){
-				bestX = node.getX();
-				minD = d;
-			}
-		}
-
-		StateNodeSet child = new StateNodeSet(newNode);
-		child.setSubNode(groupNodes, removeTrans);
-		newNode.setChildSet(child);
-
-		newNode.setPosition(bestX, y);
-		newNode.setToTransition(toes);
-		newNode.setFromNode(fromNodes);
-
-		drawNodes.addNode(newNode);
-		if(start){ drawNodes.setStartNode(newNode); }
-		if(newNode.getToNodes().size()==0){ drawNodes.addEndNode(newNode); }
-	}
-	*/
-
-	public void end(){
+	public void end() {
 		drawNodes.setTreeDepth();
 		drawNodes.resetOrder();
 
-		if(Env.is("SV_STARTUP_SET_BACKDUMMY")){
+		if (Env.is("SV_STARTUP_SET_BACKDUMMY")) {
 			drawNodes.setBackDummy();
 		}
 		drawNodes.updateNodeLooks();
 
-		if(graphPanel.statePanel.isLtl()){
-			for(StateTransition t : graphPanel.getDrawNodes().getAllTransition()){
-				if(t.from.cycle&&t.to.cycle){
+		if (graphPanel.statePanel.isLtl()) {
+			for (StateTransition t : graphPanel.getDrawNodes().getAllTransition()) {
+				if (t.from.cycle && t.to.cycle) {
 					t.cycle = true;
 				}
 			}
@@ -286,18 +248,18 @@ public class StateAbstractionMaker {
 		graphPanel.update();
 	}
 
-	StateTransition getInToTransition(LinkedHashSet<StateTransition> toes,StateNode toNode){
-		for(StateTransition trans : toes){
-			if(trans.to==toNode){
+	StateTransition getInToTransition(LinkedHashSet<StateTransition> toes, StateNode toNode) {
+		for (StateTransition trans : toes) {
+			if (trans.to == toNode) {
 				return trans;
 			}
 		}
 		return null;
 	}
 
-	StateTransition getInFromTransition(LinkedHashSet<StateTransition> froms,StateNode fromNode){
-		for(StateTransition trans : froms){
-			if(trans.from==fromNode){
+	StateTransition getInFromTransition(LinkedHashSet<StateTransition> froms, StateNode fromNode) {
+		for (StateTransition trans : froms) {
+			if (trans.from == fromNode) {
 				return trans;
 			}
 		}

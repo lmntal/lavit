@@ -71,6 +71,7 @@ SV_STARTUP_RESET_TYPE=node
 SV_STARTUP_RESET_LIMIT=1000
 SV_STARTUP_ABSTRACTION=false
 SV_ANTIALIAS=true
+UI_FONT_SIZE_DIFF=0
 LTL_OPTION=--hide-ruleset --show-transition --hl
 options.lmntal=-O1 -O2 -O3 --hl-opt --slimcode --compileonly --type-verbose
 options.unyo=-t -O1 -O2 -O3 -s1 -s2 -s3 --hideruleset --hiderule

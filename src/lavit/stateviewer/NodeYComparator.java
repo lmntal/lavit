@@ -37,29 +37,23 @@ package lavit.stateviewer;
 
 import java.util.Comparator;
 
-public class NodeYComparator implements Comparator<StateNode>
-{
+public class NodeYComparator implements Comparator<StateNode> {
 	private static NodeYComparator instance;
 
-	private NodeYComparator() { }
+	private NodeYComparator() {
+	}
 
-	public int compare(StateNode n1, StateNode n2)
-	{
+	public int compare(StateNode n1, StateNode n2) {
 		int c = Double.compare(n1.getY(), n2.getY());
-		if (c != 0)
-		{
+		if (c != 0) {
 			return c;
-		}
-		else
-		{
+		} else {
 			return n1.id == n2.id ? 0 : (n1.id < n2.id ? -1 : 1);
 		}
 	}
 
-	public synchronized static NodeYComparator getInstance()
-	{
-		if (instance == null)
-		{
+	public synchronized static NodeYComparator getInstance() {
+		if (instance == null) {
 			instance = new NodeYComparator();
 		}
 		return instance;

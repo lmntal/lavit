@@ -35,33 +35,33 @@
 
 package lavit.visualeditor;
 
-import lavit.*;
+import lavit.FrontEnd;
 
 public class VisualDrawPainter extends Thread {
 	private VisualDrawPanel drawPanel;
 	private boolean active;
 	private boolean update;
 
-	public VisualDrawPainter(VisualDrawPanel drawPanel){
+	public VisualDrawPainter(VisualDrawPanel drawPanel) {
 		this.drawPanel = drawPanel;
 		this.active = false;
 		this.update = false;
 	}
 
-	public void run(){
-		while(true){
-			if(active){
-				if(update){
+	public void run() {
+		while (true) {
+			if (active) {
+				if (update) {
 					update = false;
 					drawPanel.repaint();
-				}else{
+				} else {
 					try {
 						sleep(100);
 					} catch (InterruptedException e) {
 						FrontEnd.printException(e);
 					}
 				}
-			}else{
+			} else {
 				try {
 					sleep(1000);
 				} catch (InterruptedException e) {
@@ -71,15 +71,15 @@ public class VisualDrawPainter extends Thread {
 		}
 	}
 
-	public void update(){
+	public void update() {
 		this.update = true;
 	}
 
-	public void setActive(boolean active){
+	public void setActive(boolean active) {
 		this.active = active;
 	}
 
-	public boolean isActive(){
+	public boolean isActive() {
 		return active;
 	}
 

@@ -35,19 +35,14 @@
 
 package lavit.runner;
 
-import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import lavit.*;
-import lavit.system.OutputPanel;
+import lavit.Env;
+import lavit.FrontEnd;
 import lavit.util.OuterRunner;
 
 public class LmntalRunner implements OuterRunner {
@@ -62,11 +57,11 @@ public class LmntalRunner implements OuterRunner {
 
 	private long time;
 
-	public LmntalRunner(String option){
-		this(option,FrontEnd.mainFrame.editorPanel.getFile());
+	public LmntalRunner(String option) {
+		this(option, FrontEnd.mainFrame.editorPanel.getFile());
 	}
 
-	public LmntalRunner(String option,File targetFile){
+	public LmntalRunner(String option, File targetFile) {
 		this.option = option;
 		this.targetFile = targetFile;
 		runner = new ThreadRunner();
@@ -79,44 +74,45 @@ public class LmntalRunner implements OuterRunner {
 		runner.start();
 	}
 
-	public void setOutputGetter(RunnerOutputGetter output){
+	public void setOutputGetter(RunnerOutputGetter output) {
 		this.output = output;
 	}
 
-	public void setBuffering(boolean b){
-		if(b){
+	public void setBuffering(boolean b) {
+		if (b) {
 			buffer = new StringBuffer();
-		}else{
+		} else {
 			buffer = null;
 		}
 	}
 
-	public String getBufferString(){
+	public String getBufferString() {
 		return buffer.toString();
 	}
 
 	public boolean isRunning() {
-		if(runner==null) return false;
+		if (runner == null)
+			return false;
 		return true;
 	}
 
-	public long getTime(){
+	public long getTime() {
 		return time;
 	}
 
 	public void kill() {
-		if (runner!=null) {
+		if (runner != null) {
 			runner.kill();
 			runner.interrupt();
-			runner=null;
+			runner = null;
 		}
 	}
 
-	public void exit(){
-		runner=null;
+	public void exit() {
+		runner = null;
 	}
 
-	public boolean isSucceeded(){
+	public boolean isSucceeded() {
 		return success;
 	}
 
@@ -127,37 +123,37 @@ public class LmntalRunner implements OuterRunner {
 		public void run() {
 			try {
 
-				//計測開始
+				// 計測開始
 				long startTimeMillis = System.currentTimeMillis();
 
-				//オプション
-				String cmd = Env.getLmntalCmd()+option+" "+Env.getSpaceEscape(targetFile.getAbsolutePath());
+				// オプション
+				String cmd = Env.getLmntalCmd() + option + " " + Env.getSpaceEscape(targetFile.getAbsolutePath());
 
-				FrontEnd.println("(LMNtal) "+cmd);
+				FrontEnd.println("(LMNtal) " + cmd);
 
 				ProcessBuilder pb = new ProcessBuilder(strList(cmd));
 				Env.setProcessEnvironment(pb.environment());
-				//pb.redirectErrorStream(true);
+				// pb.redirectErrorStream(true);
 				p = pb.start();
 				BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				ErrorStreamPrinter err = new ErrorStreamPrinter(p.getErrorStream());
 
-				if(buffer==null){
-					if(output==null){
+				if (buffer == null) {
+					if (output == null) {
 						output = FrontEnd.mainFrame.toolTab.systemPanel.outputPanel;
 					}
 					output.outputStart("lmntal", option, targetFile);
 					err.start();
 					String str;
-					while ((str=in.readLine())!=null) {
+					while ((str = in.readLine()) != null) {
 						output.outputLine(str);
 					}
 					err.join();
 					output.outputEnd();
-				}else{
+				} else {
 					String str;
-					while ((str=in.readLine())!=null) {
-						buffer.append(str+"\n");
+					while ((str = in.readLine()) != null) {
+						buffer.append(str + "\n");
 					}
 				}
 
@@ -167,21 +163,21 @@ public class LmntalRunner implements OuterRunner {
 				time = System.currentTimeMillis() - startTimeMillis;
 				success = true;
 
-			}catch(Exception e){
+			} catch (Exception e) {
 				FrontEnd.printException(e);
 
-			}finally{
+			} finally {
 				exit();
 			}
 		}
 
-		ArrayList<String> strList(String str){
+		ArrayList<String> strList(String str) {
 			ArrayList<String> cmdList = new ArrayList<String>();
 			StringTokenizer st = new StringTokenizer(str);
-			while(st.hasMoreTokens()){
+			while (st.hasMoreTokens()) {
 				String s = st.nextToken();
-				if(s.length()>=2&&s.charAt(0)=='"'&&s.charAt(s.length()-1)=='"'){
-					s = s.substring(1,s.length()-1);
+				if (s.length() >= 2 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
+					s = s.substring(1, s.length() - 1);
 				}
 				cmdList.add(s);
 			}
@@ -189,7 +185,7 @@ public class LmntalRunner implements OuterRunner {
 		}
 
 		private void kill() {
-			if(p!=null){
+			if (p != null) {
 				p.destroy();
 			}
 		}

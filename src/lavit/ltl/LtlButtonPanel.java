@@ -54,15 +54,14 @@ import lavit.runner.SlimRunner;
 import lavit.util.FixFlowLayout;
 
 @SuppressWarnings("serial")
-class LtlButtonPanel extends JPanel implements ActionListener
-{
+class LtlButtonPanel extends JPanel implements ActionListener {
 	public LtlPanel ltlPanel;
 
 	private SlimRunner slimRunner;
 
 	private JLabel label;
-	private JComboBox combo;
-	private String fileNumberList[] = {"0","1","2","3","4","5","6","7","8","9"};
+	private JComboBox<String> combo;
+	private String fileNumberList[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 	private JButton saveButton;
 	private JButton loadButton;
 
@@ -71,8 +70,7 @@ class LtlButtonPanel extends JPanel implements ActionListener
 	private JButton ltlndButton;
 	private JButton ltlsvButton;
 
-	public LtlButtonPanel(LtlPanel ltlPanel)
-	{
+	public LtlButtonPanel(LtlPanel ltlPanel) {
 		this.ltlPanel = ltlPanel;
 
 		setLayout(new FixFlowLayout());
@@ -82,9 +80,9 @@ class LtlButtonPanel extends JPanel implements ActionListener
 
 		label = new JLabel("File No.");
 		filePanel.add(label);
-		combo = new JComboBox(fileNumberList);
+		combo = new JComboBox<String>(fileNumberList);
 		Dimension dim = combo.getPreferredSize();
-		combo.setPreferredSize(new Dimension(dim.width+10, dim.height));
+		combo.setPreferredSize(new Dimension(dim.width + 10, dim.height));
 		filePanel.add(combo);
 
 		loadButton = new JButton("Load");
@@ -96,9 +94,8 @@ class LtlButtonPanel extends JPanel implements ActionListener
 		filePanel.add(saveButton);
 		add(filePanel);
 
-
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.setLayout(new BoxLayout(buttonPanel,BoxLayout.X_AXIS));
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 		buttonPanel.setBorder(new TitledBorder("LTL Model Check"));
 
 		ltlButton = new JButton("slim --ltl");
@@ -110,9 +107,8 @@ class LtlButtonPanel extends JPanel implements ActionListener
 		buttonPanel.add(ltlallButton);
 
 		/*
-		ltlndButton = new JButton("slim --ltl_nd");
-		ltlndButton.addActionListener(this);
-		buttonPanel.add(ltlndButton);
+		 * ltlndButton = new JButton("slim --ltl_nd");
+		 * ltlndButton.addActionListener(this); buttonPanel.add(ltlndButton);
 		 */
 
 		ltlsvButton = new JButton("LTL StateViewer");
@@ -124,55 +120,44 @@ class LtlButtonPanel extends JPanel implements ActionListener
 		add(buttonPanel);
 	}
 
-	public void setAllEnable(boolean enable)
-	{
+	public void setAllEnable(boolean enable) {
 		ltlButton.setEnabled(enable);
 		ltlallButton.setEnabled(enable);
-		//ltlndButton.setEnabled(enable);
+		// ltlndButton.setEnabled(enable);
 		ltlsvButton.setEnabled(enable);
 	}
 
-	private void setButtonEnable(boolean enable)
-	{
+	private void setButtonEnable(boolean enable) {
 		setAllEnable(enable);
 		FrontEnd.mainFrame.editorPanel.buttonPanel.setAllEnable(enable);
 	}
 
-	public void setSelected(String no)
-	{
+	public void setSelected(String no) {
 		combo.setSelectedItem(no);
 	}
 
-	public String getSelectedNo()
-	{
-		return (String)combo.getSelectedItem();
+	public String getSelectedNo() {
+		return (String) combo.getSelectedItem();
 	}
 
-	public void actionPerformed(ActionEvent e)
-	{
+	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
-		if (src == loadButton)
-		{
-			//ltlPanel.loadFile(getSelectedNo());
+		if (src == loadButton) {
+			// ltlPanel.loadFile(getSelectedNo());
 			ltlPanel.setSelectedSuffix(getSelectedNo());
 			ltlPanel.loadFiles();
-		}
-		else if(src == saveButton)
-		{
-			//ltlPanel.saveFile(getSelectedNo());
+		} else if (src == saveButton) {
+			// ltlPanel.saveFile(getSelectedNo());
 			ltlPanel.setSelectedSuffix(getSelectedNo());
 			ltlPanel.saveFiles();
-		}
-		else if (src == ltlButton || src == ltlallButton || src == ltlndButton)
-		{
+		} else if (src == ltlButton || src == ltlallButton || src == ltlndButton) {
 			EditorPanel editorPanel = FrontEnd.mainFrame.editorPanel;
 
-			if (editorPanel.isChanged())
-			{
+			if (editorPanel.isChanged()) {
 				editorPanel.fileSave();
 			}
 
-			//ltlPanel.saveFile(getSelectedNo());
+			// ltlPanel.saveFile(getSelectedNo());
 			ltlPanel.setSelectedSuffix(getSelectedNo());
 			ltlPanel.saveFiles();
 
@@ -183,70 +168,51 @@ class LtlButtonPanel extends JPanel implements ActionListener
 			FrontEnd.println("(SLIM) Doing...");
 
 			String option = "";
-			if (Env.is("SLIM2"))
-			{
-				if (src == ltlButton)
-				{
-					option = "--ltl "+Env.get("LTL_OPTION");
+			if (Env.is("SLIM2")) {
+				if (src == ltlButton) {
+					option = "--ltl " + Env.get("LTL_OPTION");
+				} else if (src == ltlallButton) {
+					option = "--ltl-all " + Env.get("LTL_OPTION");
 				}
-				else if (src == ltlallButton)
-				{
-					option = "--ltl-all "+Env.get("LTL_OPTION");
-				}
-			}
-			else
-			{
-				if (src == ltlButton)
-				{
-					option = "--ltl "+Env.get("LTL_OPTION");
-				}
-				else if (src == ltlallButton)
-				{
-					option = "--ltl_all "+Env.get("LTL_OPTION");
-				}
-				else if (src == ltlndButton)
-				{
-					option = "--ltl_nd "+Env.get("LTL_OPTION");
+			} else {
+				if (src == ltlButton) {
+					option = "--ltl " + Env.get("LTL_OPTION");
+				} else if (src == ltlallButton) {
+					option = "--ltl_all " + Env.get("LTL_OPTION");
+				} else if (src == ltlndButton) {
+					option = "--ltl_nd " + Env.get("LTL_OPTION");
 				}
 			}
 
 			slimRunner = new SlimRunner(option);
-			//slimRunner.setSymbolFile(ltlPanel.getSymbolFile(getSelectedNo()));
-			//slimRunner.setNcFile(ltlPanel.getNcFile(getSelectedNo()));
+			// slimRunner.setSymbolFile(ltlPanel.getSymbolFile(getSelectedNo()));
+			// slimRunner.setNcFile(ltlPanel.getNcFile(getSelectedNo()));
 			ltlPanel.setSelectedSuffix(getSelectedNo());
 			slimRunner.setSymbolFile(ltlPanel.getTargetPSymFile());
 			slimRunner.setNcFile(ltlPanel.getTargetNCFile());
 			slimRunner.run();
-			new Thread()
-			{
-				public void run()
-				{
-					while (slimRunner.isRunning())
-					{
+			new Thread() {
+				public void run() {
+					while (slimRunner.isRunning()) {
 						FrontEnd.sleep(200);
 					}
 					FrontEnd.println("(SLIM) Done!");
 					slimRunner = null;
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
 							setButtonEnable(true);
 						}
 					});
 				}
 			}.start();
-		}
-		else if (src == ltlsvButton)
-		{
+		} else if (src == ltlsvButton) {
 			EditorPanel editorPanel = FrontEnd.mainFrame.editorPanel;
 
-			if (editorPanel.isChanged())
-			{
+			if (editorPanel.isChanged()) {
 				editorPanel.fileSave();
 			}
 
-			//ltlPanel.saveFile(getSelectedNo());
+			// ltlPanel.saveFile(getSelectedNo());
 			ltlPanel.setSelectedSuffix(getSelectedNo());
 			ltlPanel.saveFiles();
 
@@ -256,38 +222,29 @@ class LtlButtonPanel extends JPanel implements ActionListener
 
 			FrontEnd.println("(StateViewer) Doing...");
 
-			if (Env.is("SLIM2"))
-			{
-				slimRunner = new SlimRunner("--ltl-all -t --dump-lavit "+Env.get("LTL_OPTION"));
+			if (Env.is("SLIM2")) {
+				slimRunner = new SlimRunner("--ltl-all -t --dump-lavit " + Env.get("LTL_OPTION"));
+			} else {
+				slimRunner = new SlimRunner("--ltl_nd " + Env.get("LTL_OPTION"));
 			}
-			else
-			{
-				slimRunner = new SlimRunner("--ltl_nd "+Env.get("LTL_OPTION"));
-			}
-			//slimRunner.setSymbolFile(ltlPanel.getSymbolFile(getSelectedNo()));
-			//slimRunner.setNcFile(ltlPanel.getNcFile(getSelectedNo()));
+			// slimRunner.setSymbolFile(ltlPanel.getSymbolFile(getSelectedNo()));
+			// slimRunner.setNcFile(ltlPanel.getNcFile(getSelectedNo()));
 			ltlPanel.setSelectedSuffix(getSelectedNo());
 			slimRunner.setSymbolFile(ltlPanel.getTargetPSymFile());
 			slimRunner.setNcFile(ltlPanel.getTargetNCFile());
 			slimRunner.setBuffering(true);
 			slimRunner.run();
-			new Thread()
-			{
-				public void run()
-				{
-					while (slimRunner.isRunning())
-					{
+			new Thread() {
+				public void run() {
+					while (slimRunner.isRunning()) {
 						FrontEnd.sleep(200);
 					}
-					if (slimRunner.isSucceeded())
-					{
+					if (slimRunner.isSucceeded()) {
 						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), true);
 					}
 					slimRunner = null;
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
 							setButtonEnable(true);
 						}
 					});
@@ -296,8 +253,8 @@ class LtlButtonPanel extends JPanel implements ActionListener
 		}
 	}
 
-	public void runnerKill()
-	{
-		if (slimRunner != null) slimRunner.kill();
+	public void runnerKill() {
+		if (slimRunner != null)
+			slimRunner.kill();
 	}
 }

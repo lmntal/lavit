@@ -38,20 +38,19 @@ package lavit.stateviewer;
 public class StateRule {
 	public String name;
 
-	public StateRule(String name){
+	public StateRule(String name) {
 		this.name = name;
 	}
 
-	public boolean equals(String name){
+	public boolean equals(String name) {
 		return this.name.equals(name);
 	}
 
-	public String getName(){
+	public String getName() {
 		return name;
 	}
 
-	public String toString(){
+	public String toString() {
 		return name;
 	}
-
 }

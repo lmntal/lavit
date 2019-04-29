@@ -36,24 +36,17 @@
 package lavit.visualeditor;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 
-import lavit.stateviewer.StateGraphPanel;
-import lavit.stateviewer.StateNodeSet;
-import lavit.stateviewer.controller.StateControlPanel;
-
+@SuppressWarnings("serial")
 public class VisualPanel extends JPanel {
 
 	public VisualToolBar toolBar;
 	public VisualDrawPanel drawPanel;
 	public VisualControlPanel controlPanel;
 
-	public VisualPanel(){
+	public VisualPanel() {
 		setLayout(new BorderLayout());
 
 		toolBar = new VisualToolBar(this);

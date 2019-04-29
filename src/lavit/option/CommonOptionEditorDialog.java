@@ -67,30 +67,22 @@ import lavit.util.StringUtils;
 
 /**
  * タブ中に並べるオプションスイッチをとりあえず編集する用
+ *
  * @author Yuuki.S
  */
 @SuppressWarnings("serial")
-class CommonOptionEditorDialog extends JDialog
-{
-	private static String[] visibleOptionKeys =
-	{
-		"options.lmntal",
-		"options.unyo",
-		"options.lmntal_slim",
-		"options.slim",
-		"options.stateviewer",
-		"options.ltl",
-	};
+class CommonOptionEditorDialog extends JDialog {
+	private static String[] visibleOptionKeys = { "options.lmntal", "options.unyo", "options.lmntal_slim", "options.slim",
+			"options.stateviewer", "options.ltl", };
 
-	private JComboBox comboKeys;
+	private JComboBox<String> comboKeys;
 	private JTextArea edit;
 	private JButton buttonApply;
 	private JButton buttonClose;
 	private CheckBoxPanel checkBoxPanel;
 	private Map<String, String> optionSettings = new HashMap<String, String>();
 
-	public CommonOptionEditorDialog()
-	{
+	public CommonOptionEditorDialog() {
 		setTitle("Displaying Options");
 		setLayout(new BorderLayout());
 
@@ -109,24 +101,19 @@ class CommonOptionEditorDialog extends JDialog
 		pack();
 	}
 
-	private void initContentPanel()
-	{
+	private void initContentPanel() {
 		JPanel p = new JPanel();
 
-		comboKeys = new JComboBox();
-		for (String key : visibleOptionKeys)
-		{
+		comboKeys = new JComboBox<String>();
+		for (String key : visibleOptionKeys) {
 			comboKeys.addItem(key);
 		}
 		comboKeys.setEditable(false);
-		comboKeys.addItemListener(new ItemListener()
-		{
-			public void itemStateChanged(ItemEvent e)
-			{
-				switch (e.getStateChange())
-				{
+		comboKeys.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				switch (e.getStateChange()) {
 				case ItemEvent.DESELECTED:
-					update((String)e.getItem());
+					update((String) e.getItem());
 					break;
 				case ItemEvent.SELECTED:
 					load();
@@ -151,47 +138,33 @@ class CommonOptionEditorDialog extends JDialog
 		GroupLayout gl = new GroupLayout(p);
 		gl.setAutoCreateContainerGaps(true);
 		gl.setAutoCreateGaps(true);
-		gl.setHorizontalGroup(gl.createParallelGroup(Alignment.LEADING)
-			.addComponent(comboKeys)
-			.addComponent(editJsp)
-			.addComponent(checkBoxPanel)
-		);
+		gl.setHorizontalGroup(gl.createParallelGroup(Alignment.LEADING).addComponent(comboKeys).addComponent(editJsp)
+				.addComponent(checkBoxPanel));
 		gl.setVerticalGroup(gl.createSequentialGroup()
-			.addComponent(comboKeys, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-			.addComponent(editJsp)
-			.addComponent(checkBoxPanel)
-		);
+				.addComponent(comboKeys, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				.addComponent(editJsp).addComponent(checkBoxPanel));
 		p.setLayout(gl);
 
 		add(p, BorderLayout.CENTER);
 	}
 
-	private void initButtonPanel()
-	{
+	private void initButtonPanel() {
 		JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		p.setBorder(BorderFactory.createCompoundBorder(
-			BorderFactory.createEmptyBorder(5, 5, 5, 5),
-			BorderFactory.createCompoundBorder(
-				BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY),
-				BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE)
-			)
-		));
+		p.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
+				BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY),
+						BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE))));
 
 		buttonApply = new JButton("Apply");
-		buttonApply.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		buttonApply.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				saveEnvironment();
 			}
 		});
 		p.add(buttonApply);
 
 		buttonClose = new JButton("Close");
-		buttonClose.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		buttonClose.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				close();
 			}
 		});
@@ -206,27 +179,22 @@ class CommonOptionEditorDialog extends JDialog
 		add(p, BorderLayout.SOUTH);
 	}
 
-	private void load()
-	{
-		String key = (String)comboKeys.getSelectedItem();
+	private void load() {
+		String key = (String) comboKeys.getSelectedItem();
 		edit.setText(optionSettings.get(key).replaceAll("\\s+", "\n"));
 		edit.setCaretPosition(0);
 	}
 
-	private void update()
-	{
-		update((String)comboKeys.getSelectedItem());
+	private void update() {
+		update((String) comboKeys.getSelectedItem());
 	}
 
-	private void update(String key)
-	{
+	private void update(String key) {
 		optionSettings.put(key, edit.getText().replaceAll("\\s+", " "));
 	}
 
-	private void loadEnvironment()
-	{
-		for (String key : visibleOptionKeys)
-		{
+	private void loadEnvironment() {
+		for (String key : visibleOptionKeys) {
 			optionSettings.put(key, Env.get(key, ""));
 		}
 
@@ -234,48 +202,38 @@ class CommonOptionEditorDialog extends JDialog
 		checkBoxPanel.setSelectedKeys(StringUtils.splitToSet(values, "\\s+"));
 	}
 
-	private void saveEnvironment()
-	{
+	private void saveEnvironment() {
 		update();
 
-		for (Map.Entry<String, String> entry : optionSettings.entrySet())
-		{
+		for (Map.Entry<String, String> entry : optionSettings.entrySet()) {
 			Env.set(entry.getKey(), entry.getValue());
 		}
 
 		Set<String> openOptions = new LinkedHashSet<String>();
-		for (String key : checkBoxPanel.getSelectedKeys())
-		{
+		for (String key : checkBoxPanel.getSelectedKeys()) {
 			openOptions.add(key);
 		}
 		Env.set("window.controls.switches.expanded", StringUtils.join(openOptions, " "));
 
-		JOptionPane.showMessageDialog(this,
-			"Please restart LaViT to apply the changes.",
-			"Apply Changes",
-			JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Please restart LaViT to apply the changes.", "Apply Changes",
+				JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	private void close()
-	{
+	private void close() {
 		dispose();
 	}
 }
 
 @SuppressWarnings("serial")
-class CheckBoxPanel extends JPanel
-{
+class CheckBoxPanel extends JPanel {
 	private Map<String, JCheckBox> checks = new HashMap<String, JCheckBox>();
 
-	public CheckBoxPanel()
-	{
+	public CheckBoxPanel() {
 		setLayout(new GridLayout(0, 3));
 	}
 
-	public void addItem(String key, String text)
-	{
-		if (checks.containsKey(key))
-		{
+	public void addItem(String key, String text) {
+		if (checks.containsKey(key)) {
 			throw new RuntimeException("key " + key + " already exists");
 		}
 		JCheckBox checkBox = new JCheckBox(text);
@@ -283,21 +241,16 @@ class CheckBoxPanel extends JPanel
 		add(checkBox);
 	}
 
-	public void setSelectedKeys(Set<String> keys)
-	{
-		for (Map.Entry<String, JCheckBox> entry : checks.entrySet())
-		{
+	public void setSelectedKeys(Set<String> keys) {
+		for (Map.Entry<String, JCheckBox> entry : checks.entrySet()) {
 			entry.getValue().setSelected(keys.contains(entry.getKey()));
 		}
 	}
 
-	public Set<String> getSelectedKeys()
-	{
+	public Set<String> getSelectedKeys() {
 		Set<String> keys = new LinkedHashSet<String>();
-		for (Map.Entry<String, JCheckBox> entry : checks.entrySet())
-		{
-			if (entry.getValue().isSelected())
-			{
+		for (Map.Entry<String, JCheckBox> entry : checks.entrySet()) {
+			if (entry.getValue().isSelected()) {
 				keys.add(entry.getKey());
 			}
 		}

@@ -41,10 +41,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
 
-import lavit.*;
+import lavit.Env;
 import lavit.util.OuterRunner;
 
 public class Ltl2baRunner implements OuterRunner {
@@ -55,7 +53,7 @@ public class Ltl2baRunner implements OuterRunner {
 	private String ltl;
 	private boolean success;
 
-	public Ltl2baRunner(String ltl){
+	public Ltl2baRunner(String ltl) {
 		this.ltl = ltl.trim();
 		this.runner = new ThreadRunner();
 		this.buffer = new StringBuffer();
@@ -66,27 +64,28 @@ public class Ltl2baRunner implements OuterRunner {
 		runner.start();
 	}
 
-	public String getOutput(){
+	public String getOutput() {
 		return buffer.toString();
 	}
 
 	public boolean isRunning() {
-		if(runner==null) return false;
+		if (runner == null)
+			return false;
 		return true;
 	}
 
-	public void exit(){
-		runner=null;
+	public void exit() {
+		runner = null;
 	}
 
-	public boolean isSucceeded(){
+	public boolean isSucceeded() {
 		return success;
 	}
 
 	public void kill() {
-		if (runner!=null) {
+		if (runner != null) {
 			runner.interrupt();
-			runner=null;
+			runner = null;
 		}
 	}
 
@@ -98,9 +97,10 @@ public class Ltl2baRunner implements OuterRunner {
 			try {
 
 				ArrayList<String> cmdlist = new ArrayList<String>();
-				cmdlist.add(Env.LMNTAL_LIBRARY_DIR+File.separator+Env.getDirNameOfLtl2ba()+File.separator+Env.getLtl2baBinaryName());
+				cmdlist.add(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfLtl2ba() + File.separator
+						+ Env.getLtl2baBinaryName());
 				cmdlist.add("-f");
-				cmdlist.add("!("+ltl+")");
+				cmdlist.add("!(" + ltl + ")");
 
 				ProcessBuilder pb = new ProcessBuilder(cmdlist);
 				Env.setProcessEnvironment(pb.environment());
@@ -109,8 +109,8 @@ public class Ltl2baRunner implements OuterRunner {
 				BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 				String str;
-				while ((str=in.readLine())!=null) {
-					buffer.append(str+"\n");
+				while ((str = in.readLine()) != null) {
+					buffer.append(str + "\n");
 				}
 
 				in.close();
@@ -118,13 +118,13 @@ public class Ltl2baRunner implements OuterRunner {
 
 				success = true;
 
-			}catch(Exception e){
+			} catch (Exception e) {
 
 				StringWriter sw = new StringWriter();
-			    e.printStackTrace(new PrintWriter(sw));
-			    buffer.append(sw.toString());
+				e.printStackTrace(new PrintWriter(sw));
+				buffer.append(sw.toString());
 
-			}finally{
+			} finally {
 				exit();
 			}
 		}

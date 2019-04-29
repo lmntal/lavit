@@ -35,16 +35,15 @@
 
 package lavit.visualeditor;
 
-import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
+@SuppressWarnings("serial")
 public class VisualToolBar extends JToolBar implements ActionListener {
 	VisualPanel visualPanel;
 
@@ -58,7 +57,7 @@ public class VisualToolBar extends JToolBar implements ActionListener {
 	JToggleButton memButton;
 	JToggleButton ruleButton;
 
-	VisualToolBar(VisualPanel visualPanel){
+	VisualToolBar(VisualPanel visualPanel) {
 		this.visualPanel = visualPanel;
 
 		buttons = new ArrayList<JToggleButton>();
@@ -105,7 +104,7 @@ public class VisualToolBar extends JToolBar implements ActionListener {
 
 	}
 
-	public void allButtonSetEnabled(boolean enabled){
+	public void allButtonSetEnabled(boolean enabled) {
 		selectButton.setEnabled(enabled);
 		atomButton.setEnabled(enabled);
 		linkButton.setEnabled(enabled);
@@ -118,14 +117,16 @@ public class VisualToolBar extends JToolBar implements ActionListener {
 		Object src = e.getSource();
 
 		int select = 0;
-		for(JToggleButton b : buttons){
-			if(b.isSelected()){ ++select; }
+		for (JToggleButton b : buttons) {
+			if (b.isSelected()) {
+				++select;
+			}
 			b.setSelected(false);
 		}
-		if(select==0){
+		if (select == 0) {
 			selected.setSelected(true);
-		}else{
-			JToggleButton btn = (JToggleButton)src;
+		} else {
+			JToggleButton btn = (JToggleButton) src;
 			btn.setSelected(true);
 			selected = btn;
 		}

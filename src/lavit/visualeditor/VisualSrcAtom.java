@@ -36,32 +36,25 @@
 package lavit.visualeditor;
 
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 
 public class VisualSrcAtom {
 	ArrayList<VisualSrcLink> links;
 
-	int x,y;
+	int x, y;
 	String str = "a";
 
-	VisualSrcAtom(int x,int y){
+	VisualSrcAtom(int x, int y) {
 		links = new ArrayList<VisualSrcLink>();
 		this.x = x;
 		this.y = y;
 	}
 
-	Point getPoint(){
-		return new Point(x,y);
+	Point getPoint() {
+		return new Point(x, y);
 	}
 
-	void move(int dx,int dy){
+	void move(int dx, int dy) {
 		x += dx;
 		y += dy;
 	}

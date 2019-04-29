@@ -35,12 +35,8 @@
 
 package lavit.stateviewer;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
-import lavit.Env;
-import lavit.stateviewer.worker.StateGraphStretchMoveWorker;
 import lavit.stateviewer.worker.StateTransitionAbstractionWorker;
 
 public class StateTransitionAbstraction implements StateTransitionCatcher {
@@ -53,15 +49,13 @@ public class StateTransitionAbstraction implements StateTransitionCatcher {
 
 	@Override
 	public void transitionCatch(Collection<StateRule> rules, Collection<StateTransition> trans) {
-
 		StateTransitionAbstractionWorker worker = new StateTransitionAbstractionWorker(graphPanel);
+
 		if (trans.size() < 500) {
 			worker.atomic(rules);
 		} else {
 			worker.ready(rules);
 			worker.execute();
 		}
-
 	}
-
 }

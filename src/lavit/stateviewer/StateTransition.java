@@ -36,19 +36,13 @@
 package lavit.stateviewer;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 
-import lavit.Env;
 import lavit.util.UtilTextDialog;
 
 public class StateTransition {
@@ -159,24 +153,24 @@ public class StateTransition {
 		}
 		/*
 		 * StateNodeSet nodeSet = graphPanel.getDrawNodes();
-		 * 
+		 *
 		 * long id = nodeSet.publishNodeId(); double x = ((from.getX()+to.getX())/2);
 		 * double y = ((from.getY()+to.getY())/2); StateNode dummy = new StateNode(id,
 		 * nodeSet); dummy.setPosition(x, y); dummy.dummy = true;
 		 * if(from.depth>to.depth){ dummy.backDummy = true; } dummy.depth = to.depth;
 		 * nodeSet.addNode(dummy); dummy.updateLooks();
-		 * 
+		 *
 		 * StateTransition t1 = new StateTransition(from, dummy, cycle, weak);
 		 * t1.addRules(getRules()); t1.from.addToTransition(t1);
 		 * t1.to.addFromTransition(t1); nodeSet.addTransition(t1);
-		 * 
+		 *
 		 * StateTransition t2 = new StateTransition(dummy, to, cycle, weak);
 		 * t2.addRules(getRules()); t2.from.addToTransition(t2);
 		 * t2.to.addFromTransition(t2); nodeSet.addTransition(t2);
-		 * 
+		 *
 		 * from.removeToTransition(this); to.removeFromTransition(this);
 		 * nodeSet.removeTransition(this);
-		 * 
+		 *
 		 * nodeSet.setTreeDepth();
 		 */
 	}

@@ -36,7 +36,6 @@
 package lavit.stateviewer;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -48,15 +47,13 @@ import java.io.OutputStreamWriter;
 
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JSplitPane;
 
-import lavit.*;
+import lavit.Env;
+import lavit.FrontEnd;
 import lavit.stateviewer.controller.StateControlPanel;
 import lavit.stateviewer.s3d.State3DPanel;
 
 public class StatePanel extends JPanel {
-
 	public StateGraphPanel stateGraphPanel;
 	public State3DPanel state3DPanel = null;
 	public boolean view3D = false;
@@ -80,14 +77,14 @@ public class StatePanel extends JPanel {
 
 		/*
 		 * setLayout(new BorderLayout());
-		 * 
+		 *
 		 * stateGraphPanel = new StateGraphPanel(this); stateControlPanel = new
 		 * StateControlPanel(this);
-		 * 
+		 *
 		 * JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, stateGraphPanel,
 		 * stateControlPanel); jsp.setOneTouchExpandable(true);
 		 * jsp.setResizeWeight(0.5); jsp.setDividerLocation(0.9);
-		 * 
+		 *
 		 * add(jsp, BorderLayout.CENTER);
 		 */
 	}

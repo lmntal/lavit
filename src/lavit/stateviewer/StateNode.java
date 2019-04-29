@@ -53,9 +53,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.TreeSet;
 
-import lavit.Env;
 import lavit.FrontEnd;
-import lavit.runner.LmntalRunner;
 import lavit.stateviewer.draw.StateDraw;
 import lavit.util.UtilTextDialog;
 
@@ -124,19 +122,19 @@ public class StateNode implements Shape {
 	 * void init(String state,String label,boolean accept,boolean inCycle){
 	 * this.depth = 0; this.nth = 0; this.state = state; this.label = label;
 	 * this.accept = accept; this.cycle = inCycle;
-	 * 
+	 *
 	 * this.dummy = false; this.weak = false;
-	 * 
+	 *
 	 * this.toes = new LinkedHashSet<StateTransition>(); this.froms = new
 	 * LinkedHashSet<StateTransition>();
-	 * 
+	 *
 	 * this.childSet = null;
-	 * 
+	 *
 	 * //this.toNodes = new ArrayList<StateNode>(); //this.fromNodes = new
 	 * LinkedHashSet<StateNode>(); //this.emToNodes = new ArrayList<StateNode>();
-	 * 
+	 *
 	 * this.marked = false; this.shape = new RoundRectangle2D.Double(0,0,0,0,0,0);
-	 * 
+	 *
 	 * updateLooks(); }
 	 */
 
@@ -182,7 +180,7 @@ public class StateNode implements Shape {
 	/*
 	 * StateTransition addToNode(StateNode toNode,ArrayList<String> rules,boolean
 	 * em){ if(isToNode(toNode)) return null;
-	 * 
+	 *
 	 * StateTransition t = new StateTransition(this,toNode,em); t.addRules(rules);
 	 * toes.add(t); return t; }
 	 */
@@ -415,20 +413,20 @@ public class StateNode implements Shape {
 	/*
 	 * void addFromNode(StateNode fromNode){ if(!getFromNodes().contains(fromNode)){
 	 * fromNodes.add(fromNode); } }
-	 * 
+	 *
 	 * void removeFromNode(StateNode fromNode){ fromNodes.remove(fromNode); }
-	 * 
+	 *
 	 * boolean isFromNode(StateNode fromNode){ return
 	 * getFromNodes().contains(fromNode); }
-	 * 
+	 *
 	 * public Collection<StateNode> getFromNodes(){ return fromNodes; }
-	 * 
+	 *
 	 * public StateNode getFromNode(){ for(StateNode from : fromNodes){ return from;
 	 * } return null; }
-	 * 
+	 *
 	 * void setFromNode(LinkedHashSet<StateNode> fromNodes){ this.fromNodes =
 	 * fromNodes; }
-	 * 
+	 *
 	 * public ArrayList<StateNode> getFromNoWeakNodes(){ ArrayList<StateNode> fNodes
 	 * = new ArrayList<StateNode>(); for(StateNode from : fromNodes){
 	 * if(!from.weak&&from.getToTransition(this).em){ fNodes.add(from); } } return
@@ -532,13 +530,13 @@ public class StateNode implements Shape {
 	/*
 	 * void addEmToNode(StateNode toNode){ StateTransition t =
 	 * getTransition(toNode); if(t!=null){ t.em = true; } }
-	 * 
+	 *
 	 * void removeEmToNode(StateNode toNode){ StateTransition t =
 	 * getTransition(toNode); if(t!=null){ t.em = false; } }
-	 * 
+	 *
 	 * boolean isEmToNode(StateNode toNode){ StateTransition t =
 	 * getToTransition(toNode); if(t!=null){ return t.cycle; } return false; }
-	 * 
+	 *
 	 * void resetEmToNode(){ for(StateTransition t : toes){ t.cycle = false; } }
 	 */
 
@@ -775,10 +773,10 @@ public class StateNode implements Shape {
 	 * fp.write("sVr_nomatch,"+state+"\n"); fp.write("sVr_nomatch,"+head+" :- ");
 	 * if(!guard.equals("")){ fp.write(guard+" | "); } fp.write(head+".");
 	 * fp.close(); } catch (IOException e) { FrontEnd.printException(e); }
-	 * 
+	 *
 	 * final LmntalRunner lr = new LmntalRunner("",f); lr.setBuffering(true);
 	 * lr.run();
-	 * 
+	 *
 	 * while(lr.isRunning()){ FrontEnd.sleep(200); } if(lr.isSuccess()){ String str
 	 * = lr.getBufferString(); if(str.indexOf("sVr_nomatch")==-1){ return true; } }
 	 * return false; }
@@ -786,21 +784,21 @@ public class StateNode implements Shape {
 
 	/*
 	 * private class TextDialog extends JDialog{
-	 * 
+	 *
 	 * TextDialog(String title,String state){
-	 * 
+	 *
 	 * super(FrontEnd.mainFrame);
-	 * 
+	 *
 	 * setTitle(title);
-	 * 
+	 *
 	 * JTextArea text = new JTextArea(state); text.setLineWrap(true);
 	 * text.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN,
 	 * Env.getInt("EDITER_FONT_SIZE")));
-	 * 
+	 *
 	 * add(text);
-	 * 
+	 *
 	 * setVisible(true);
-	 * 
+	 *
 	 * } }
 	 */
 

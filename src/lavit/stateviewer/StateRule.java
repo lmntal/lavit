@@ -53,5 +53,4 @@ public class StateRule {
 	public String toString() {
 		return name;
 	}
-
 }

@@ -74,14 +74,14 @@ public class MainFrame extends JFrame
 
 	public MainFrame()
 	{
-		int uiFontDiffSize = Env.getInt("UI_FONT_SIZE_DIFF", 0);
+		int uiFontSizeDiff = Env.getInt("UI_FONT_SIZE_DIFF", 0);
 		for (Map.Entry<Object, Object> entry : UIManager.getDefaults().entrySet())
 		{
 			String key = entry.getKey().toString();
 			if (key.toLowerCase().endsWith("font"))
 			{
 				Font font = UIManager.getFont(key);
-				float size = font.getSize() + uiFontDiffSize;
+				float size = font.getSize() + uiFontSizeDiff;
 				if (size > 0)
 				{
 					UIManager.put(key, new FontUIResource(font.deriveFont(size)));

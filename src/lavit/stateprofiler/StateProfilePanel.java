@@ -74,7 +74,7 @@ public class StateProfilePanel extends JPanel implements RunnerOutputGetter
 		add(label, BorderLayout.SOUTH);
 
 		lastState = new JTextField();
-		lastState.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, 9));
+		lastState.setFont(new Font(Env.get("EDITOR_FONT_FAMILY"), Font.PLAIN, 9));
 		add(lastState, BorderLayout.NORTH);
 	}
 

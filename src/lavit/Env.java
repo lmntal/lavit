@@ -298,8 +298,8 @@ public final class Env
 
 	public static Font getEditorFont()
 	{
-		String fontFamily = get("EDITER_FONT_FAMILY", Font.MONOSPACED);
-		int fontSize = FontSizeUtils.getActualFontSize(getInt("EDITER_FONT_SIZE", 12));
+		String fontFamily = get("EDITOR_FONT_FAMILY", Font.MONOSPACED);
+		int fontSize = FontSizeUtils.getActualFontSize(getInt("EDITOR_FONT_SIZE", 12));
 		return new Font(fontFamily, Font.PLAIN, fontSize);
 	}
 

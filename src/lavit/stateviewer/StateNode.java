@@ -877,7 +877,7 @@ public class StateNode implements Shape {
 
 			JTextArea text = new JTextArea(state);
 			text.setLineWrap(true);
-			text.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE")));
+			text.setFont(new Font(Env.get("EDITOR_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITOR_FONT_SIZE")));
 
 		    add(text);
 

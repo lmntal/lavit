@@ -28,3 +28,6 @@ gtags.conf
 #win
 Thumbs.db
 
+#idea
+.idea/
+LaViT.iml

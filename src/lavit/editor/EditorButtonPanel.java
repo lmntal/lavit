@@ -221,11 +221,14 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 
 		final String sep = File.separator;
 		ProcessTask task;
-		if (Env.get("path.lmntalcompiler").contains(".jar"))
+		String compiler_path = Env.get("path.lmntalcompiler");
+		if (compiler_path.contains(".jar"))
 		{
-		    task = ProcessTask.createJarProcessTask(Env.get("path.lmntalcompiler"), javaArgs, args);
-		} else {
-		    task = ProcessTask.createProcessTask("/Users/tsunekawa/lmntal/lmntal-compiler/bin/lmntal", args);
+		    task = ProcessTask.createJarProcessTask(compiler_path, javaArgs, args);
+		}
+		else
+		{
+		    task = ProcessTask.createProcessTask(compiler_path, args);
 		}
 		Env.setProcessEnvironment(task.getEnvironment());
 

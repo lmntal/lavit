@@ -78,6 +78,7 @@ options.lmntal_slim=--interpret --slimcode --hl-opt --optimize-slimoptimizer
 options.slim=-t --nd --hl --use-builtin-rule --dump-lmn --dump-inc --mem-enc --delta-mem --show-proxy --hide-ruleset --show-transition --show-ends 
 options.stateviewer=--hl --use-builtin-rule --mem-enc  --hide-ruleset --show-transition
 options.ltl=-t --hl --use-builtin-rule --dump-lavit --mem-enc --hide-ruleset --show-transition
+path.lmntalcompiler=lmntal/bin/lmntal.jar
 updatecheck.enabled=true
 updatecheck.url=http\://www.ueda.info.waseda.ac.jp/~shinobu/lavit/update
 editor.antialias=LCD-H-RGB

@@ -413,17 +413,17 @@ public class StateGraphPanel extends JPanel
 	/*
 	 * void oldPositionReset(){ double w = (double)getWidth(); double h =
 	 * (double)getHeight();
-	 * 
+	 *
 	 * setCenterZoom(1.0); xPosInterval = w/(drawNodes.getDepth()+1); yPosInterval =
 	 * new double[drawNodes.getDepth()]; for(int i=0;i<drawNodes.getDepth();++i){
 	 * yPosInterval[i] = h/(drawNodes.getSameDepthSize(i)+1); }
-	 * 
+	 *
 	 * for(StateNode node : drawNodes.getAllNode()){
 	 * node.resetLocation(xPosInterval,yPosInterval); } update(); }
-	 * 
+	 *
 	 * void oldLengthReset(){ double w = (double)getWidth(); double h =
 	 * (double)getHeight();
-	 * 
+	 *
 	 * double minLength = w/(drawNodes.getDepth()+1); for(int
 	 * i=0;i<drawNodes.getDepth();++i){ double d =
 	 * h/(drawNodes.getSameDepthSize(i)+1); if(d<minLength) minLength = d; }
@@ -431,7 +431,7 @@ public class StateGraphPanel extends JPanel
 	 * xPosInterval /= getZoom(); yPosInterval = new double[drawNodes.getDepth()];
 	 * for(int i=0;i<drawNodes.getDepth();++i){ yPosInterval[i] =
 	 * h/(drawNodes.getSameDepthSize(i)+1); yPosInterval[i] /= getZoom(); }
-	 * 
+	 *
 	 * for(StateNode node : drawNodes.getAllNode()){
 	 * node.resetLocation(xPosInterval,yPosInterval); } update(); }
 	 */
@@ -552,10 +552,10 @@ public class StateGraphPanel extends JPanel
 	 * drawNodes.getDepthNode(); for(ArrayList<StateNode> nodes : depthNode){
 	 * ArrayList<StateNode> ns = new ArrayList<StateNode>(); StateNode startNode =
 	 * null;
-	 * 
+	 *
 	 * nodes = new ArrayList<StateNode>(nodes); Collections.sort(nodes, new
 	 * NodeYComparator());
-	 * 
+	 *
 	 * for(StateNode node : nodes){ if(node.dummy){ ns.add(node); }else{
 	 * if(ns.size()>0){ if(startNode==null){ double startY =
 	 * node.getY()-node.getRadius(); double intarval = 15; for(int
@@ -565,11 +565,11 @@ public class StateGraphPanel extends JPanel
 	 * (endY-startY)/(double)(ns.size()+1); for(int i=0;i<ns.size();++i){
 	 * ns.get(i).setY(startY+intarval*(i+1)); } } ns.clear(); } startNode = node; }
 	 * }
-	 * 
+	 *
 	 * if(startNode!=null){ double startY = startNode.getY()+startNode.getRadius();
 	 * double intarval = 15; for(int i=0;i<ns.size();++i){
 	 * ns.get(i).setY(startY+intarval*(i+1)); } }
-	 * 
+	 *
 	 * } update(); }
 	 */
 
@@ -687,8 +687,8 @@ public class StateGraphPanel extends JPanel
 
 	/*
 	 * public void searchShortCycle(){
-	 * 
-	 * 
+	 *
+	 *
 	 * ArrayList<StateNode> cycles = new ArrayList<StateNode>(); StateNode node =
 	 * drawNodes.getStartNodeOne(); for(StateNode sn : drawNodes.getStartNode()){
 	 * if(sn.cycle){ node = sn; break; } } StateNode cyclestart = null; boolean loop
@@ -696,13 +696,13 @@ public class StateGraphPanel extends JPanel
 	 * loop = true; break; } if(node.cycle){ cycles.add(node); } node =
 	 * node.getEmToNode(); } if(cycles.size()==0){ return; } if(cyclestart==null){
 	 * cyclestart = cycles.get(cycles.size()-1); }
-	 * 
+	 *
 	 * //ループしているノードの探索 ArrayList<StateNode> loopNodes = new ArrayList<StateNode>();
 	 * if(loop){ node = cyclestart.getEmToNode(); while(node != cyclestart){
 	 * loopNodes.add(node); node = node.getEmToNode(); } }
 	 * loopNodes.add(cyclestart);
-	 * 
-	 * 
+	 *
+	 *
 	 * if(loop){ //ループを縮小 while(true){ ArrayList<StateNode> newLoopNodes = new
 	 * ArrayList<StateNode>(); for(StateNode n : loopNodes){ newLoopNodes.add(n); }
 	 * m : for(int i=0;i<newLoopNodes.size();++i){ StateNode n =
@@ -714,26 +714,26 @@ public class StateGraphPanel extends JPanel
 	 * break m; } j = (j+1)%size; } } if(loopNodes.size()==newLoopNodes.size()){
 	 * break; } boolean hit = false; for(StateNode n : newLoopNodes){ if(n.accept){
 	 * hit = true; break; } } if(hit){ loopNodes = newLoopNodes; }else{ break; } }
-	 * 
+	 *
 	 * //ループ内の強調を更新 for(int i=0;i<loopNodes.size();++i){ StateNode n =
 	 * loopNodes.get(i); StateNode t = loopNodes.get((i+1)%loopNodes.size());
 	 * n.resetEmToNode(); n.setCycleToNode(t,true); }
-	 * 
+	 *
 	 * //ループの入り口を更新 for(StateNode n : loopNodes){ if(n.depth<cyclestart.depth){
 	 * cyclestart = n; } } }
-	 * 
+	 *
 	 * //ループ中以外は不受理化 for(StateNode n : new
 	 * LinkedList<StateNode>(drawNodes.getAllNode())){ if(loopNodes.contains(n)){
 	 * n.cycle = true; n.weak = false; drawNodes.setLastOrder(n); }else{ n.cycle =
 	 * false; n.weak = true; n.resetEmToNode(); } n.updateLooks(); }
-	 * 
+	 *
 	 * //ループの入口から初期状態まで最短で受理化 StateNode tn = cyclestart; node =
 	 * cyclestart.getOneFromNode(); while(node!=null){ node.cycle = true; node.weak
 	 * = false; node.setCycleToNode(tn,true); node.updateLooks();
 	 * drawNodes.setLastOrder(node); tn = node; node = node.getOneFromNode(); }
-	 * 
+	 *
 	 * update();
-	 * 
+	 *
 	 * }
 	 */
 

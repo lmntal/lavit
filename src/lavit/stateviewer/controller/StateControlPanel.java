@@ -35,42 +35,17 @@
 
 package lavit.stateviewer.controller;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import lavit.*;
-import lavit.stateviewer.StateGraphPanel;
+import lavit.Env;
 import lavit.stateviewer.StatePanel;
-import lavit.util.CommonFontUser;
-import lavit.util.FixFlowLayout;
 
 public class StateControlPanel extends JPanel implements ChangeListener, MouseListener {
 
@@ -87,7 +62,7 @@ public class StateControlPanel extends JPanel implements ChangeListener, MouseLi
 
 		stateControllerTab = new StateControlTab(statePanel);
 		stateControllerTab.setVisible(Env.is("SV_CONTROLLER"));
-		// stateControllerTab.addMouseListener(this);
+		stateControllerTab.addMouseListener(this);
 		add(stateControllerTab);
 
 		zoomSlider.addChangeListener(this);

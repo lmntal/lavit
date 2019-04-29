@@ -51,8 +51,7 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.util.OuterRunner;
 
-public class SlimRunner implements OuterRunner
-{
+public class SlimRunner implements OuterRunner {
 	private ThreadRunner runner;
 	private RunnerOutputGetter output;
 	private StringBuffer buffer;
@@ -68,23 +67,19 @@ public class SlimRunner implements OuterRunner
 
 	private long time;
 
-	public SlimRunner(String option)
-	{
+	public SlimRunner(String option) {
 		this(option, false);
 	}
 
-	public SlimRunner(String option, File targetFile)
-	{
+	public SlimRunner(String option, File targetFile) {
 		this(option, false, targetFile);
 	}
 
-	public SlimRunner(String option, boolean runOnlySlim)
-	{
+	public SlimRunner(String option, boolean runOnlySlim) {
 		this(option, runOnlySlim, FrontEnd.mainFrame.editorPanel.getFile());
 	}
 
-	public SlimRunner(String option, boolean runOnlySlim, File targetFile)
-	{
+	public SlimRunner(String option, boolean runOnlySlim, File targetFile) {
 		this.runner = new ThreadRunner(runOnlySlim);
 		this.output = null;
 		this.buffer = null;
@@ -98,146 +93,126 @@ public class SlimRunner implements OuterRunner
 		this.time = 0;
 	}
 
-	public void run()
-	{
+	public void run() {
 		runner.start();
 	}
 
-	public void setOutputGetter(RunnerOutputGetter output)
-	{
+	public void setOutputGetter(RunnerOutputGetter output) {
 		this.output = output;
 	}
 
-	public void setBuffering(boolean b)
-	{
-		if (b)
-		{
+	public void setBuffering(boolean b) {
+		if (b) {
 			buffer = new StringBuffer();
-		}
-		else
-		{
+		} else {
 			buffer = null;
 		}
 	}
 
-	public void setSymbolFile(File symbolFile)
-	{
+	public void setSymbolFile(File symbolFile) {
 		this.symbolFile = symbolFile;
 	}
 
-	public void setNcFile(File ncFile)
-	{
+	public void setNcFile(File ncFile) {
 		this.ncFile = ncFile;
 	}
 
-	public void setQuiet(boolean quiet)
-	{
+	public void setQuiet(boolean quiet) {
 		this.quiet = quiet;
 	}
 
-	public String getBufferString()
-	{
+	public String getBufferString() {
 		return buffer.toString();
 	}
 
-	public boolean isRunning()
-	{
+	public boolean isRunning() {
 		return runner != null;
 	}
 
-	public long getTime()
-	{
+	public long getTime() {
 		return time;
 	}
 
-	public void kill()
-	{
-		if (runner != null)
-		{
+	public void kill() {
+		if (runner != null) {
 			runner.kill();
 			runner.interrupt();
 			runner = null;
 		}
 	}
 
-	public void exit()
-	{
+	public void exit() {
 		runner = null;
 	}
 
-	public boolean isSucceeded()
-	{
+	public boolean isSucceeded() {
 		return success;
 	}
 
-	private class ThreadRunner extends Thread
-	{
+	private class ThreadRunner extends Thread {
 		private Process p1;
 		private Process p2;
 		private String slim_path;
 		private boolean runOnlySlim;
 
-		ThreadRunner(boolean runOnlySlim)
-		{
+		ThreadRunner(boolean runOnlySlim) {
 			this.runOnlySlim = runOnlySlim;
 			slim_path = Env.get("SLIM_EXE_PATH");
-			if (slim_path == null || slim_path.equals(""))
-			{
+			if (slim_path == null || slim_path.equals("")) {
 				slim_path = Env.LMNTAL_LIBRARY_DIR + File.separator + "bin" + File.separator + Env.getSlimBinaryName();
 			}
 		}
 
-		public void run()
-		{
-			try
-			{
-				//計測開始
+		public void run() {
+			try {
+				// 計測開始
 				long startTimeMillis = System.currentTimeMillis();
 
 				ProcessBuilder pb;
 				BufferedInputStream in1;
 				ErrorStreamPrinter err1;
 				// LMNtal起動
-				if (!this.runOnlySlim)
-				{
-					String cmd1 = Env.getLmntalCmd() + " " + Env.get("LMNTAL_OPTION") + " " + Env.getSpaceEscape(targetFile.getAbsolutePath());
+				if (!this.runOnlySlim) {
+					String cmd1 = Env.getLmntalCmd() + " " + Env.get("LMNTAL_OPTION") + " "
+							+ Env.getSpaceEscape(targetFile.getAbsolutePath());
 
-					if (!quiet) FrontEnd.println("(SLIM) " + cmd1);
+					if (!quiet)
+						FrontEnd.println("(SLIM) " + cmd1);
 
 					pb = new ProcessBuilder(strList(cmd1));
 					pb.directory(new File("."));
 					Env.setProcessEnvironment(pb.environment());
-					//pb.redirectErrorStream(redirectErrorStream);
+					// pb.redirectErrorStream(redirectErrorStream);
 					p1 = pb.start();
 					in1 = new BufferedInputStream(p1.getInputStream());
 					err1 = new ErrorStreamPrinter(p1.getErrorStream());
 					err1.start();
-				}
-				else {
+				} else {
 					in1 = new BufferedInputStream(new FileInputStream(targetFile));
 					err1 = new ErrorStreamPrinter(null);
 				}
 
 				// SLIM起動
-				//String cmd2 = slim_path+" -Ilmntal"+File.separator+Env.getDirNameOfSlim()+File.separator+"lib"+File.separator+" "+option;
-				//if(Env.is("SLIM_USE_LIBRARY")){
-				//	cmd2 += " -I"+Env.getSlimInstallLibraryPath();
-				//}
+				// String cmd2 = slim_path+"
+				// -Ilmntal"+File.separator+Env.getDirNameOfSlim()+File.separator+"lib"+File.separator+"
+				// "+option;
+				// if(Env.is("SLIM_USE_LIBRARY")){
+				// cmd2 += " -I"+Env.getSlimInstallLibraryPath();
+				// }
 				String cmd2 = slim_path + " " + option;
 				String view_option = option;
 
-				if (symbolFile != null)
-				{
+				if (symbolFile != null) {
 					cmd2 += " --psym " + Env.getSpaceEscape(Env.getLinuxStylePath(symbolFile.getAbsolutePath())) + " ";
 					view_option += " --psym " + symbolFile.getName();
 				}
-				if (ncFile != null)
-				{
+				if (ncFile != null) {
 					cmd2 += " --nc " + Env.getSpaceEscape(Env.getLinuxStylePath(ncFile.getAbsolutePath())) + " ";
-					view_option += " --nc "+ncFile.getName();
+					view_option += " --nc " + ncFile.getName();
 				}
 				cmd2 += " -";
-				if (!quiet) FrontEnd.println("(SLIM) " + cmd2);
+				if (!quiet)
+					FrontEnd.println("(SLIM) " + cmd2);
 
 				pb = new ProcessBuilder(strList(cmd2));
 				pb.directory(new File("."));
@@ -249,55 +224,44 @@ public class SlimRunner implements OuterRunner
 
 				// SLIMへ流し込む
 				int b;
-				while ((b = in1.read()) != -1)
-				{
+				while ((b = in1.read()) != -1) {
 					out2.write(b);
 				}
-				try
-				{
+				try {
 					out2.flush();
-				}
-				catch (Exception e)
-				{
-					 //標準入力を待たずにSLIMが終了した場合
-					if (!quiet) FrontEnd.printException(e);
+				} catch (Exception e) {
+					// 標準入力を待たずにSLIMが終了した場合
+					if (!quiet)
+						FrontEnd.printException(e);
 				}
 
 				out2.close();
 				in1.close();
 				err1.join();
-				if (!this.runOnlySlim)
-				{
+				if (!this.runOnlySlim) {
 					p1.waitFor();
 				}
 
 				// SLIMの出力を得る
-				if (buffer == null)
-				{
-					if (output == null)
-					{
+				if (buffer == null) {
+					if (output == null) {
 						output = FrontEnd.mainFrame.toolTab.systemPanel.outputPanel;
 					}
 					output.outputStart("slim", view_option, targetFile);
 					err2.start();
 					String str;
-					while ((str = in2.readLine()) != null)
-					{
+					while ((str = in2.readLine()) != null) {
 						output.outputLine(str);
 					}
 					err2.join();
 					output.outputEnd();
-				}
-				else
-				{
-					if (output == null)
-					{
+				} else {
+					if (output == null) {
 						output = FrontEnd.mainFrame.toolTab.systemPanel.outputPanel;
 					}
 					err2.start();
 					String str;
-					while ((str = in2.readLine()) != null)
-					{
+					while ((str = in2.readLine()) != null) {
 						buffer.append(str);
 						buffer.append('\n');
 					}
@@ -310,97 +274,67 @@ public class SlimRunner implements OuterRunner
 				time = System.currentTimeMillis() - startTimeMillis;
 				success = true;
 
-				//System.out.println("SLIM_END  ="+System.currentTimeMillis());
+				// System.out.println("SLIM_END ="+System.currentTimeMillis());
 
 				/*
-				InputStream in2 = p2.getInputStream();
-				output = FrontEnd.mainFrame.toolTab.systemPanel.outputPanel;
-				output.outputStart("slim", option, targetFile);
-				int str = 0;
-				//while ((str=in2.read())!=-1) {
-				//	output.outputLine(String.valueOf(str));
-				//}
-				while(true){
-					output.outputLine(String.valueOf(in2.available()));
-					if(str++>100){ break; }
-					Thread.sleep(250);
-				}
-				output.outputEnd();
-				*/
-
+				 * InputStream in2 = p2.getInputStream(); output =
+				 * FrontEnd.mainFrame.toolTab.systemPanel.outputPanel;
+				 * output.outputStart("slim", option, targetFile); int str = 0; //while
+				 * ((str=in2.read())!=-1) { // output.outputLine(String.valueOf(str)); //}
+				 * while(true){ output.outputLine(String.valueOf(in2.available()));
+				 * if(str++>100){ break; } Thread.sleep(250); } output.outputEnd();
+				 */
 
 				/*
-				String cmd1 = "java -DLMNTAL_HOME=lmntal -classpath lmntal"+File.separator+"bin"+File.separator+"lmntal.jar runtime.FrontEnd -O2 --interpret --slimcode \""+targetFile.getAbsolutePath()+"\"";
-				FrontEnd.println("(SLIM) "+cmd1);
+				 * String cmd1 =
+				 * "java -DLMNTAL_HOME=lmntal -classpath lmntal"+File.separator+"bin"+File.
+				 * separator+"lmntal.jar runtime.FrontEnd -O2 --interpret --slimcode \""
+				 * +targetFile.getAbsolutePath()+"\""; FrontEnd.println("(SLIM) "+cmd1);
+				 * 
+				 * ProcessBuilder pb = new ProcessBuilder(strList(cmd1));
+				 * pb.redirectErrorStream(true); p1 = pb.start(); BufferedInputStream in1 = new
+				 * BufferedInputStream(p1.getInputStream());
+				 * 
+				 * FileOutputStream fos = new
+				 * FileOutputStream(targetFile.getAbsolutePath()+".slimcode"); int b = -1; while
+				 * ((b = in1.read()) != -1) { fos.write(b); } fos.flush(); fos.close();
+				 * in1.close(); p1.waitFor();
+				 * 
+				 * String cmd2 =
+				 * Env.get("SLIM_EXE_PATH")+" "+option+" \""+targetFile.getAbsolutePath()+
+				 * ".slimcode\""; FrontEnd.println("(SLIM) "+cmd2);
+				 * 
+				 * pb = new ProcessBuilder(strList(cmd2)); pb.redirectErrorStream(true); p2 =
+				 * pb.start();
+				 * 
+				 * BufferedReader in2 = new BufferedReader(new
+				 * InputStreamReader(p2.getInputStream())); if(buffer==null){ if(output==null){
+				 * output = FrontEnd.mainFrame.toolTab.systemPanel.outputPanel; }
+				 * output.outputStart("slim", option, targetFile); String str; while
+				 * ((str=in2.readLine())!=null) { output.outputLine(str); } output.outputEnd();
+				 * }else{ String str; while ((str=in2.readLine())!=null) {
+				 * buffer.append(str+"\n"); } }
+				 * 
+				 * in2.close(); p2.waitFor();
+				 * 
+				 * exit(); success = true;
+				 * 
+				 */
 
-				ProcessBuilder pb = new ProcessBuilder(strList(cmd1));
-				pb.redirectErrorStream(true);
-				p1 = pb.start();
-				BufferedInputStream in1 = new BufferedInputStream(p1.getInputStream());
-
-				FileOutputStream fos = new FileOutputStream(targetFile.getAbsolutePath()+".slimcode");
-				int b = -1;
-				while ((b = in1.read()) != -1) {
-					fos.write(b);
-				}
-				fos.flush();
-				fos.close();
-				in1.close();
-				p1.waitFor();
-
-				String cmd2 = Env.get("SLIM_EXE_PATH")+" "+option+" \""+targetFile.getAbsolutePath()+".slimcode\"";
-				FrontEnd.println("(SLIM) "+cmd2);
-
-				pb = new ProcessBuilder(strList(cmd2));
-				pb.redirectErrorStream(true);
-				p2 = pb.start();
-
-				BufferedReader in2 = new BufferedReader(new InputStreamReader(p2.getInputStream()));
-				if(buffer==null){
-					if(output==null){
-						output = FrontEnd.mainFrame.toolTab.systemPanel.outputPanel;
-					}
-					output.outputStart("slim", option, targetFile);
-					String str;
-					while ((str=in2.readLine())!=null) {
-						output.outputLine(str);
-					}
-					output.outputEnd();
-				}else{
-					String str;
-					while ((str=in2.readLine())!=null) {
-						buffer.append(str+"\n");
-					}
-				}
-
-				in2.close();
-				p2.waitFor();
-
-				exit();
-				success = true;
-
-				*/
-
-			}
-			catch (Exception e)
-			{
-				if (!quiet) FrontEnd.printException(e);
-			}
-			finally
-			{
+			} catch (Exception e) {
+				if (!quiet)
+					FrontEnd.printException(e);
+			} finally {
 				exit();
 			}
 		}
 
-		private List<String> strList(String str)
-		{
+		private List<String> strList(String str) {
 			List<String> cmdList = new ArrayList<String>();
 			StringTokenizer st = new StringTokenizer(str);
-			while (st.hasMoreTokens())
-			{
+			while (st.hasMoreTokens()) {
 				String s = st.nextToken();
-				if (s.length() >= 2 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"')
-				{
+				if (s.length() >= 2 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
 					s = s.substring(1, s.length() - 1);
 				}
 				cmdList.add(s);
@@ -408,24 +342,21 @@ public class SlimRunner implements OuterRunner
 			return cmdList;
 		}
 
-		private void kill()
-		{
-			if (p1 != null) p1.destroy();
-			if (p2 != null) p2.destroy();
+		private void kill() {
+			if (p1 != null)
+				p1.destroy();
+			if (p2 != null)
+				p2.destroy();
 		}
 	}
 
-	public static boolean checkRun()
-	{
+	public static boolean checkRun() {
 		File f = new File("temp.lmn");
-		try
-		{
+		try {
 			FileWriter fp = new FileWriter(f);
 			fp.write("slimruncheckatom.");
-            fp.close();
-		}
-		catch (IOException e)
-		{
+			fp.close();
+		} catch (IOException e) {
 		}
 
 		final SlimRunner slimRunner = new SlimRunner("", f);
@@ -434,11 +365,9 @@ public class SlimRunner implements OuterRunner
 		slimRunner.run();
 
 		int count = 0;
-		while (slimRunner.isRunning())
-		{
+		while (slimRunner.isRunning()) {
 			FrontEnd.sleep(200);
-			if (count++ > 10)
-			{
+			if (count++ > 10) {
 				slimRunner.kill();
 				return false;
 			}

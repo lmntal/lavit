@@ -314,7 +314,7 @@ public class StateGraphPanel extends JPanel implements MouseInputListener, Mouse
 
 	public void loadFont()
 	{
-		font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE") - 4);
+		font = new Font(Env.get("EDITOR_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITOR_FONT_SIZE") - 4);
 		update();
 		revalidate();
 	}

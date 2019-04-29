@@ -159,7 +159,7 @@ public class VisualDrawPanel extends JPanel implements MouseInputListener,MouseW
 	}
 
 	public void loadFont(){
-		Font font = new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITER_FONT_SIZE"));
+		Font font = new Font(Env.get("EDITOR_FONT_FAMILY"), Font.PLAIN, Env.getInt("EDITOR_FONT_SIZE"));
 
 		revalidate();
 	}

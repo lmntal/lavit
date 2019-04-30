@@ -321,7 +321,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		setting.add(iCygwinPath);
 		iCygwinPath.addActionListener(this);
 
-		iLMNtalCompilerPath = new JMenuItem("LMNtal Compiler Path...");
+		iLMNtalCompilerPath = new JMenuItem(Env.getMsg(MsgID.menu_compiler_path));
 		setting.add(iLMNtalCompilerPath);
 		iLMNtalCompilerPath.addActionListener(this);
 

@@ -34,6 +34,7 @@ menu_item_filesystem       = ファイルシステム
 menu_setting               = 設定
 menu_cygwin_path           = Cygwinパス
 menu_slim_path             = SLIMパス
+menu_compiler_path	   = Compilerパス
 menu_lang                  = Language
 menu_general_setting       = 一般設定...
 
@@ -77,6 +78,7 @@ text_install_slim          = SLIMをインストール
 text_included_slim         = LaViTに同梱されたSLIMを使用
 text_input_slim_path       = SLIMパスを入力
 text_need_slim_path        = LaViTはSLIMのパスが必要です。
+text_need_compiler_path	   = 使用したいコンパイラのパスを設定してください。
 text_install_completed     = インストールは正常に終了しました。
 text_install_failed        = インストールに失敗しました。
 text_ltl2ba_not_found      = LTL2BAが見つかりません。 

@@ -34,6 +34,7 @@ menu_item_filesystem       = File System
 menu_setting               = Setting
 menu_cygwin_path           = Cygwin PATH
 menu_slim_path             = SLIM PATH
+menu_compiler_path	   = Compiler PATH
 menu_lang                  = Language
 menu_general_setting       = General Setting
 
@@ -77,6 +78,7 @@ text_install_slim          = Install SLIM.
 text_included_slim         = Use SLIM included in LaViT.
 text_input_slim_path       = Input SLIM path.
 text_need_slim_path        = LaViT need SLIM path.
+text_need_compiler_path	   = Set the location of the LMNtal Compiler you'd like to use.
 text_install_completed     = Installation completed.
 text_install_failed        = Installation failed.
 text_ltl2ba_not_found      = LTL2BA is not found. 

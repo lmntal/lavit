@@ -56,7 +56,7 @@ public final class LMNtalCompilerPathSetting
 		ModalSettingDialog dialog = ModalSettingDialog.createDialog(owner, panel);
 		dialog.setDialogTitle("LMNtal Compiler");
 		dialog.setHeadLineText("LMNtal Compiler Location");
-		dialog.setDescriptionText("Set the location of the LMNtal Compiler you'd like to use.");
+		dialog.setDescriptionText(Env.getMsg(MsgID.text_need_compiler_path));
 		dialog.setDialogIconImages(Env.getApplicationIcons());
 
 		boolean approved = dialog.showDialog();

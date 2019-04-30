@@ -37,12 +37,17 @@ package lavit;
 
 import java.awt.Window;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Properties;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -120,10 +125,31 @@ public class FrontEnd
 		}
 	}
 
+       private static Properties createProperties(String properties_path) {
+	        Properties properties = new Properties();
+		try {
+		    InputStream is = new FileInputStream(properties_path);
+		    properties.load(is);
+		} catch (IOException e) {
+
+		}
+		return properties;
+        }
+
 	public static void executeGraphene(File file)
 	{
 		println("(Graphene) executing...");
 
+		String properties_path = "lmntal" + File.separator + Env.getDirNameOfGraphene() + File.separator + "LMNtal.properties";
+		Properties properties = createProperties(properties_path);
+		properties.setProperty("additional_options", Env.get("SLIM_OPTION"));
+		try {
+		    FileOutputStream fos = new FileOutputStream(properties_path);
+		    properties.store(fos, "from lavit");
+		    fos.close();
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
 		final List<String> args = Arrays.asList("--lmntal.file", file.getAbsolutePath());
 		final ProcessTask grapheneTask = ProcessTask.createJarProcessTask("graphene.jar", args);
 		grapheneTask.setDirectory(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfGraphene());

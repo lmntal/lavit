@@ -321,11 +321,9 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		setting.add(iCygwinPath);
 		iCygwinPath.addActionListener(this);
 
-		//TODO: LMNtalコンパイラを指定可能に（LMNTAL_HOMEとの関係も考慮して正式に実装する）
 		iLMNtalCompilerPath = new JMenuItem("LMNtal Compiler Path...");
 		setting.add(iLMNtalCompilerPath);
 		iLMNtalCompilerPath.addActionListener(this);
-
 
 		iSlimPath = new JMenuItem(Env.getMsg(MsgID.menu_slim_path));
 		setting.add(iSlimPath);

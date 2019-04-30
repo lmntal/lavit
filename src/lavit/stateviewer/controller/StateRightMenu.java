@@ -54,7 +54,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener {
 
 	private JMenu nodeSubmenu = new JMenu("Node");
 	private JMenuItem remove = new JMenuItem("Remove");
-	private JMenuItem unyo3 = new JMenuItem("Unyo(3G)");
+	private JMenuItem unyo3 = new JMenuItem("Unyo");
 	private JMenuItem graphene = new JMenuItem("Graphene");
 	private JMenuItem add = new JMenuItem("add Editor");
 

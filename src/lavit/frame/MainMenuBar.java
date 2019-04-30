@@ -255,7 +255,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		iLMNtal.addActionListener(this);
 		iLMNtal.setMnemonic(KeyEvent.VK_L);
 
-		iUNYO = new JMenuItem(Env.getMsg(MsgID.button_unyo_3g));
+		iUNYO = new JMenuItem(Env.getMsg(MsgID.button_unyo));
 		run.add(iUNYO);
 		iUNYO.addActionListener(this);
 		iUNYO.setMnemonic(KeyEvent.VK_U);

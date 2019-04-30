@@ -89,9 +89,9 @@ public final class LMNtalCompilerPathSetting
 			});
 			pathInput = new PathInputField(chooser, Env.getMsg(MsgID.button_browse), 20);
 			if (System.getenv("LMNTAL_HOME") == null) {
-			    pathInput.setPathText(Env.get("path.lmntalcompiler", "lmntal/bin/lmntal.jar"));
+			    pathInput.setPathText("lmntal/bin/lmntal.jar");
 			} else {
-			    pathInput.setPathText(Env.get("path.lmntalcompiler", System.getenv("LMNTAL_HOME") + "/bin/lmntal"));
+			    pathInput.setPathText(System.getenv("LMNTAL_HOME") + "/bin/lmntal");
 			}
 
 			add(pathInput);

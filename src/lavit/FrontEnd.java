@@ -143,6 +143,8 @@ public class FrontEnd
 		String properties_path = "lmntal" + File.separator + Env.getDirNameOfGraphene() + File.separator + "LMNtal.properties";
 		Properties properties = createProperties(properties_path);
 		properties.setProperty("additional_options", Env.get("SLIM_OPTION"));
+		properties.setProperty("slim_path", Env.get("path.slim.exe"));
+		properties.setProperty("lmntal_home", System.getenv("LMNTAL_HOME"));
 		try {
 		    FileOutputStream fos = new FileOutputStream(properties_path);
 		    properties.store(fos, "from lavit");
@@ -452,6 +454,9 @@ public class FrontEnd
 		else
 		{
 			println(s);
+		}
+		if (label.equals("Graphene") && exitCode == 3) {
+		    errPrintln("SLIM NOT FOUND!");
 		}
 		if (exitCode != 0)
 		{

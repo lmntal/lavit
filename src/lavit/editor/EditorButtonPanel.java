@@ -93,7 +93,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 		lmntalButton.addActionListener(this);
 		buttonPanel.add(lmntalButton);
 
-		unyoButton = new JButton(Env.getMsg(MsgID.button_unyo_3g));
+		unyoButton = new JButton(Env.getMsg(MsgID.button_unyo));
 		unyoButton.addActionListener(this);
 		buttonPanel.add(unyoButton);
 
@@ -276,43 +276,30 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 
+		if (editorPanel.isChanged()) {
+			if (!editorPanel.fileSave()) {
+				return;
+			}
+		}
 		if (src == lmntalButton) {
 			File file = editorPanel.getFile();
 			if (file != null && file.getName().endsWith(".lmn")) {
 				compileLMNtal();
 			}
 		} else if (src == unyoButton) {
-			if (editorPanel.isChanged()) {
-				editorPanel.fileSave();
-			}
 			FrontEnd.mainFrame.toolTab.setTab("System");
 			FrontEnd.executeUnyo(FrontEnd.mainFrame.editorPanel.getFile());
 		} else if (src == grapheneButton) {
-			if (editorPanel.isChanged()) {
-				editorPanel.fileSave();
-			}
 			FrontEnd.mainFrame.toolTab.setTab("System");
 			FrontEnd.executeGraphene(FrontEnd.mainFrame.editorPanel.getFile());
 		} else if (src == slimButton) {
 			File file = editorPanel.getFile();
-			if (file == null) {
-				return;
-			}
 			if (file.getName().endsWith(".il")) {
-				if (editorPanel.isChanged()) {
-					if (!editorPanel.fileSave()) {
-						return;
-					}
-				}
 				FrontEnd.executeILFileInSLIM(file);
 			} else {
 				runSlim();
 			}
 		} else if (src == sviewerButton) {
-			if (editorPanel.isChanged()) {
-				editorPanel.fileSave();
-			}
-
 			setButtonEnable(false);
 
 			FrontEnd.mainFrame.toolTab.setTab("System");
@@ -369,6 +356,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 			// FrontEnd.println(SlimRunner.checkRun()?"ok":"ng");
 			// FrontEnd.reboot();
 
+
 			/*
 			 * }else if (src == sviewerlButton) {
 			 * 
@@ -389,10 +377,6 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 			 */
 
 		} else if (src == stateProfilerButton) {
-			if (editorPanel.isChanged()) {
-				editorPanel.fileSave();
-			}
-
 			setButtonEnable(false);
 
 			FrontEnd.mainFrame.toolTab.setTab("StateProfiler");

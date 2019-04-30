@@ -89,6 +89,7 @@ public class GeneralSettingDialog extends JDialog {
 
 	private EditorColorPanel panelEditor;
 	private FontSettingPanel panelFont;
+	private UIFontSizeSettingPanel panelUIFont;
 
 	private PropertyEditorDialog propertyDialog;
 
@@ -107,7 +108,7 @@ public class GeneralSettingDialog extends JDialog {
 		panelFont = new FontSettingPanel();
 		JPanel panelEncoding = new EncodingSettingPanel();
 		JPanel panelView = new ViewSettingPanel();
-		JPanel panelUIFont = new UIFontSizeSettingPanel();
+		panelUIFont = new UIFontSizeSettingPanel();
 
 		JButton buttonEditProperty = new JButton("Edit properties (env.txt)");
 		buttonEditProperty.addActionListener(new ActionListener() {
@@ -463,7 +464,7 @@ public class GeneralSettingDialog extends JDialog {
 			langComboBox.addItem(new Item("en", "English (en)"));
 			String langCode = Env.get("LANG");
 			for (int i = 0; i < langComboBox.getItemCount(); i++) {
-				Item item = (Item) langComboBox.getItemAt(i);
+				Item item = langComboBox.getItemAt(i);
 				if (item.id.equals(langCode)) {
 					langComboBox.setSelectedItem(item);
 				}
@@ -563,6 +564,9 @@ public class GeneralSettingDialog extends JDialog {
 		}
 
 		private void addToFontSizeAll(int a) {
+			// update env
+			Env.set("UI_FONT_SIZE_DIFF", Env.getInt("UI_FONT_SIZE_DIFF", 0) + a);
+
 			// set all
 			for (Map.Entry<Object, Object> entry : UIManager.getDefaults().entrySet()) {
 				String key = entry.getKey().toString();

@@ -34,6 +34,7 @@
 	<target name="javac" depends="mkdir" description="compile all">
 		<javac srcdir="${src};${gen}" destdir="${bin}" encoding="${java.encoding}"
 			target="${java.target}" source="${java.source}" includeantruntime="false">
+			<compilerarg value="-Xlint" />
 			<classpath refid="classpath" />
 		</javac>
 		<!-- copy resources -->

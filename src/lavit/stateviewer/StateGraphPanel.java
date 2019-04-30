@@ -893,8 +893,8 @@ public class StateGraphPanel extends JPanel
 
 		// 選択時の四角の表示
 		if (selectSquare && lastPoint != null && startPoint != null) {
-			Point p1 = new Point((int) ((double) lastPoint.getX() / zoom), (int) ((double) lastPoint.getY() / zoom));
-			Point p2 = new Point((int) ((double) startPoint.getX() / zoom), (int) ((double) startPoint.getY() / zoom));
+			Point p1 = new Point((int) (lastPoint.getX() / zoom), (int) (lastPoint.getY() / zoom));
+			Point p2 = new Point((int) (startPoint.getX() / zoom), (int) (startPoint.getY() / zoom));
 
 			g2.setColor(Color.RED);
 			g2.drawRect(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.max(p1.x, p2.x) - Math.min(p1.x, p2.x),
@@ -1127,8 +1127,8 @@ public class StateGraphPanel extends JPanel
 
 			} else if (e.isShiftDown()) {
 				selectSquare = true;
-				Point p1 = new Point((int) ((double) lastPoint.getX() / zoom), (int) ((double) lastPoint.getY() / zoom));
-				Point p2 = new Point((int) ((double) startPoint.getX() / zoom), (int) ((double) startPoint.getY() / zoom));
+				Point p1 = new Point((int) (lastPoint.getX() / zoom), (int) (lastPoint.getY() / zoom));
+				Point p2 = new Point((int) (startPoint.getX() / zoom), (int) (startPoint.getY() / zoom));
 
 				double minX = Math.min(p1.x, p2.x);
 				double minY = Math.min(p1.y, p2.y);

@@ -465,9 +465,9 @@ public class StateNode implements Shape {
 			}
 		}
 
-		this.sameLayerYs = (Double[]) sameYs.toArray(new Double[0]);
-		this.nextLayerYs = (Double[]) nextYs.toArray(new Double[0]);
-		this.backLayerYs = (Double[]) backYs.toArray(new Double[0]);
+		this.sameLayerYs = sameYs.toArray(new Double[0]);
+		this.nextLayerYs = nextYs.toArray(new Double[0]);
+		this.backLayerYs = backYs.toArray(new Double[0]);
 	}
 
 	public Double[] getSameLayerYs() {

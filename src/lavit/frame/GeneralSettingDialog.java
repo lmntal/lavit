@@ -463,7 +463,7 @@ public class GeneralSettingDialog extends JDialog {
 			langComboBox.addItem(new Item("en", "English (en)"));
 			String langCode = Env.get("LANG");
 			for (int i = 0; i < langComboBox.getItemCount(); i++) {
-				Item item = (Item) langComboBox.getItemAt(i);
+				Item item = langComboBox.getItemAt(i);
 				if (item.id.equals(langCode)) {
 					langComboBox.setSelectedItem(item);
 				}

@@ -466,7 +466,7 @@ public class StateGraphAtomcolorDraw extends StateDraw {
 		 * // 遷移元の表示 g2.setColor(Color.BLUE); //for(StateNode from :
 		 * node.getFromNodes()){ //
 		 * drawTransition(g2,from.getTransition(node),Color.BLUE); //}
-		 * 
+		 *
 		 * for(StateNode from : node.getFromNodes()){ StateNode to = node; if(from==to){
 		 * continue; } if(from.dummy){ while(from.dummy){ to = from; from =
 		 * from.getFromNodes().get(0); } while(to.dummy){
@@ -475,11 +475,11 @@ public class StateGraphAtomcolorDraw extends StateDraw {
 		 * drawNodeArrow(g2,from.getX(),from.getY(),from.getRadius(),to.getX(),to.getY()
 		 * ,to.getRadius(),5); }else{
 		 * drawLine(g2,from.getX(),from.getY(),to.getX(),to.getY()); } }
-		 * 
-		 * 
+		 *
+		 *
 		 * // 遷移先の表示 g2.setColor(Color.RED); //for(StateTransition t :
 		 * node.getTransition()){ // drawTransition(g2,t,Color.RED); //}
-		 * 
+		 *
 		 * for(StateNode to : node.getToNodes()){ StateNode from = node; if(to.dummy){
 		 * while(to.dummy){
 		 * drawNodeLine(g2,from.getX(),from.getY(),from.getRadius(),to.getX(),to.getY(),
@@ -492,9 +492,9 @@ public class StateGraphAtomcolorDraw extends StateDraw {
 		 * drawNodeArrow(g2,to.getX(),to.getY(),to.getRadius(),from.getX(),from.getY(),
 		 * from.getRadius(),5); }else{
 		 * drawLine(g2,to.getX(),to.getY(),from.getX(),from.getY()); } break; } } }
-		 * 
+		 *
 		 * }
-		 * 
+		 *
 		 * g2.setColor(node.getColor()); g2.fill(node); g2.setColor(Color.RED);
 		 * g2.draw(node);
 		 */
@@ -517,7 +517,7 @@ public class StateGraphAtomcolorDraw extends StateDraw {
 	}
 
 	private void drawNodeArrow(double x1, double y1, double r1, double x2, double y2, double r2, double a) {
-		double theta = Math.atan2((double) (y2 - y1), (double) (x2 - x1));
+		double theta = Math.atan2(y2 - y1, x2 - x1);
 
 		double cos = Math.cos(theta);
 		double sin = Math.sin(theta);
@@ -535,7 +535,7 @@ public class StateGraphAtomcolorDraw extends StateDraw {
 	}
 
 	private void drawNodeLine(double x1, double y1, double r1, double x2, double y2, double r2) {
-		double theta = Math.atan2((double) (y2 - y1), (double) (x2 - x1));
+		double theta = Math.atan2(y2 - y1, x2 - x1);
 
 		double cos = Math.cos(theta);
 		double sin = Math.sin(theta);

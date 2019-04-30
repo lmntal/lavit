@@ -194,7 +194,7 @@ public class StateGraphBasicDraw extends StateDraw {
 
 	/*
 	 * private void drawArrow(Graphics2D g2,StateNode node){
-	 * 
+	 *
 	 * //遷移先への矢印を表示 for(StateNode to : node.getToNodes()){
 	 * if(hideBackEdgeMode&&to.depth<node.depth){ continue; }
 	 * if(!node.isInFrame()&&!to.isInFrame()){ continue; } if(node.weak||to.weak){
@@ -205,7 +205,7 @@ public class StateGraphBasicDraw extends StateDraw {
 	 * drawLine(g2,node.getX(),node.getY(),to.getX(),to.getY()); }else{
 	 * drawNodeArrow(g2,node.getX(),node.getY(),node.getRadius(),to.getX(),to.getY()
 	 * ,to.getRadius(),5); } }else{ drawSelfArrow(g2,node); }
-	 * 
+	 *
 	 * if((showRuleMode||showNoNameRuleMode)&&!node.dummy){ String str =
 	 * node.getToRuleName(to); if(str.length()>0){ if((!str.substring(0,
 	 * 1).equals("_")&&showRuleMode)||(str.substring(0,
@@ -213,7 +213,7 @@ public class StateGraphBasicDraw extends StateDraw {
 	 * int h = 0; if(node.depth>to.depth){ h = fm.getHeight(); }
 	 * g2.drawString(str,(int)((node.getX()+to.getX())/2)-fm.stringWidth(str)/2,(int
 	 * )((node.getY()+to.getY())/2)+h); } } }
-	 * 
+	 *
 	 * }else{ if(to!=node){
 	 * drawLine(g2,node.getX(),node.getY(),to.getX(),to.getY()); } } } }
 	 */
@@ -313,13 +313,13 @@ public class StateGraphBasicDraw extends StateDraw {
 			 * if(searchMode&&n1.weak||!searchMode&&cycleMode&&!n1.cycle){ color =
 			 * Color.lightGray; }else{ color = Color.black; } } dummyGroup.remove(n1);
 			 * dummyGroup.remove(n2);
-			 * 
+			 *
 			 * GeneralPath p = new GeneralPath(); p.moveTo(sN.getX(), sN.getY());
-			 * 
+			 *
 			 * while(dummyGroup.size()>=1){ p.quadTo(n1.getX(), n1.getY(), n2.getX(),
 			 * n2.getY()); n1 = dummyGroup.get(0); n2 = n1.getFromNodes().get(0);
 			 * dummyGroup.remove(n1); dummyGroup.remove(n2); }
-			 * 
+			 *
 			 * if(!n2.dummy){ p.quadTo(n1.getX(), n1.getY(), n2.getX(), n2.getY()); }else{
 			 * StateNode n3 = n2.getFromNodes().get(0); p.curveTo(n1.getX(), n1.getY(),
 			 * n2.getX(), n2.getY(), n3.getX(), n3.getY()); } g2.draw(p);
@@ -332,7 +332,7 @@ public class StateGraphBasicDraw extends StateDraw {
 			 * points.add(new Point2D.Double(node.getX(),node.getY())); n = node; }
 			 * StateNode nN = n.getFromNodes().get(0); points.add(new
 			 * Point2D.Double((n.getX()+nN.getX())/2,(n.getY()+nN.getY())/2));
-			 * 
+			 *
 			 * GeneralPath p = new GeneralPath(); p.moveTo(n0.getX(), n0.getY());
 			 * p.lineTo(points.get(0).getX(), points.get(0).getY()); for(int
 			 * i=1;(i+1)<points.size();i+=2){ p.quadTo(points.get(i).getX(),
@@ -553,7 +553,7 @@ public class StateGraphBasicDraw extends StateDraw {
 		 * // 遷移元の表示 g2.setColor(Color.BLUE); //for(StateNode from :
 		 * node.getFromNodes()){ //
 		 * drawTransition(g2,from.getTransition(node),Color.BLUE); //}
-		 * 
+		 *
 		 * for(StateNode from : node.getFromNodes()){ StateNode to = node; if(from==to){
 		 * continue; } if(from.dummy){ while(from.dummy){ to = from; from =
 		 * from.getFromNodes().get(0); } while(to.dummy){
@@ -562,11 +562,11 @@ public class StateGraphBasicDraw extends StateDraw {
 		 * drawNodeArrow(g2,from.getX(),from.getY(),from.getRadius(),to.getX(),to.getY()
 		 * ,to.getRadius(),5); }else{
 		 * drawLine(g2,from.getX(),from.getY(),to.getX(),to.getY()); } }
-		 * 
-		 * 
+		 *
+		 *
 		 * // 遷移先の表示 g2.setColor(Color.RED); //for(StateTransition t :
 		 * node.getTransition()){ // drawTransition(g2,t,Color.RED); //}
-		 * 
+		 *
 		 * for(StateNode to : node.getToNodes()){ StateNode from = node; if(to.dummy){
 		 * while(to.dummy){
 		 * drawNodeLine(g2,from.getX(),from.getY(),from.getRadius(),to.getX(),to.getY(),
@@ -579,9 +579,9 @@ public class StateGraphBasicDraw extends StateDraw {
 		 * drawNodeArrow(g2,to.getX(),to.getY(),to.getRadius(),from.getX(),from.getY(),
 		 * from.getRadius(),5); }else{
 		 * drawLine(g2,to.getX(),to.getY(),from.getX(),from.getY()); } break; } } }
-		 * 
+		 *
 		 * }
-		 * 
+		 *
 		 * g2.setColor(node.getColor()); g2.fill(node); g2.setColor(Color.RED);
 		 * g2.draw(node);
 		 */
@@ -604,7 +604,7 @@ public class StateGraphBasicDraw extends StateDraw {
 	}
 
 	private void drawNodeArrow(double x1, double y1, double r1, double x2, double y2, double r2, double a) {
-		double theta = Math.atan2((double) (y2 - y1), (double) (x2 - x1));
+		double theta = Math.atan2(y2 - y1, x2 - x1);
 
 		double cos = Math.cos(theta);
 		double sin = Math.sin(theta);
@@ -622,7 +622,7 @@ public class StateGraphBasicDraw extends StateDraw {
 	}
 
 	private void drawNodeLine(double x1, double y1, double r1, double x2, double y2, double r2) {
-		double theta = Math.atan2((double) (y2 - y1), (double) (x2 - x1));
+		double theta = Math.atan2(y2 - y1, x2 - x1);
 
 		double cos = Math.cos(theta);
 		double sin = Math.sin(theta);

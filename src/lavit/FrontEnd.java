@@ -57,10 +57,7 @@ import lavit.frame.LaViTSplashWindow;
 import lavit.frame.LanguageSetting;
 import lavit.frame.MainFrame;
 import lavit.frame.SlimPathSetting;
-import lavit.runner.PrintLineListener;
-import lavit.runner.ProcessFinishListener;
-import lavit.runner.ProcessTask;
-import lavit.runner.RebootRunner;
+import lavit.runner.*;
 import lavit.system.versioncheck.UpdateChecker;
 import lavit.util.CommonFontUser;
 import lavit.util.LookAndFeelEntry;
@@ -219,7 +216,11 @@ public class FrontEnd
 	/**
 	 * 中間命令列ファイルをSLIMで実行
 	 */
-	public static void executeILFileInSLIM(File file)
+	public static void executeILFileInSLIM(File file) {
+		executeILFileInSLIM(file, null);
+	}
+
+	public static void executeILFileInSLIM(File file, SlimCallback callbackOnProcessFinish)
 	{
 		println("(SLIM) executing...");
 		mainFrame.toolTab.setTab("System");
@@ -255,6 +256,7 @@ public class FrontEnd
 			{
 				printTerminationMessage("SLIM", id, slimTask.getElapsedSeconds(), exitCode, isAborted);
 				mainFrame.toolTab.systemPanel.outputPanel.outputEnd();
+				if(callbackOnProcessFinish != null) callbackOnProcessFinish.apply();
 			}
 		});
 

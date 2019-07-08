@@ -257,9 +257,11 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 							FrontEnd.executeILFileInSLIM(outputFile, callbackOnProcessFinish);
 						} else {
 							logError("(compile[" + id + "]) output file does not exists.");
+							setButtonEnable(true);
 						}
 					} else {
 						logError("(compile[" + id + "]) failed.");
+						setButtonEnable(true);
 					}
 					logInfo("compile finished. [" + id + "]");
 				}

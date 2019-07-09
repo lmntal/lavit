@@ -218,7 +218,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 
 		/*
 		 * edit.addSeparator();
-		 * 
+		 *
 		 * iTemplate = new JMenuItem("Insert template...");
 		 * iTemplate.setMnemonic(KeyEvent.VK_T); iTemplate.addActionListener(new
 		 * ActionListener() { public void actionPerformed(ActionEvent e) {
@@ -365,6 +365,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		setAccelerator(iGraphene, KeyEvent.VK_F3, 0);
 		setAccelerator(iSLIM, KeyEvent.VK_F4, 0);
 		setAccelerator(iSViewer, KeyEvent.VK_F5, 0);
+		setAccelerator(iStateProfiler, KeyEvent.VK_F7, 0);
 		setAccelerator(iKill, KeyEvent.VK_ESCAPE, 0);
 	}
 
@@ -412,6 +413,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 			FrontEnd.mainFrame.editorPanel.buttonPanel.slimButton.doClick();
 		} else if (src == iSViewer) {
 			FrontEnd.mainFrame.editorPanel.buttonPanel.sviewerButton.doClick();
+		} else if (src == iStateProfiler) {
+			FrontEnd.mainFrame.editorPanel.buttonPanel.stateProfilerButton.doClick();
 		} else if (src == iKill) {
 			FrontEnd.mainFrame.editorPanel.buttonPanel.killButton.doClick();
 		} else if (src == iReboot) {

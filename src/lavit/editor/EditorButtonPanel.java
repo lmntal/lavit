@@ -55,11 +55,7 @@ import javax.swing.SwingUtilities;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.localizedtext.MsgID;
-import lavit.runner.LmntalRunner;
-import lavit.runner.PrintLineListener;
-import lavit.runner.ProcessFinishListener;
-import lavit.runner.ProcessTask;
-import lavit.runner.SlimRunner;
+import lavit.runner.*;
 import lavit.util.FileUtils;
 import lavit.util.StringUtils;
 
@@ -243,7 +239,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 		return new File(dir + File.separator + name);
 	}
 
-	private void runSlim() {
+	private void runSlim(SlimCallback callbackOnProcessFinish) {
 		if (editorPanel.isChanged()) {
 			if (!editorPanel.fileSave()) {
 				return;
@@ -258,12 +254,14 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 				public void processFinished(int id, int exitCode, boolean isAborted) {
 					if (exitCode == 0) {
 						if (outputFile.exists()) {
-							FrontEnd.executeILFileInSLIM(outputFile);
+							FrontEnd.executeILFileInSLIM(outputFile, callbackOnProcessFinish);
 						} else {
 							logError("(compile[" + id + "]) output file does not exists.");
+							setButtonEnable(true);
 						}
 					} else {
 						logError("(compile[" + id + "]) failed.");
+						setButtonEnable(true);
 					}
 					logInfo("compile finished. [" + id + "]");
 				}
@@ -293,11 +291,19 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 			FrontEnd.mainFrame.toolTab.setTab("System");
 			FrontEnd.executeGraphene(FrontEnd.mainFrame.editorPanel.getFile());
 		} else if (src == slimButton) {
+			setButtonEnable(false);
+			SlimCallback callback = new SlimCallback() {
+				@Override
+				public void apply() {
+					setButtonEnable(true);
+				}
+			};
+
 			File file = editorPanel.getFile();
 			if (file.getName().endsWith(".il")) {
-				FrontEnd.executeILFileInSLIM(file);
+				FrontEnd.executeILFileInSLIM(file, callback);
 			} else {
-				runSlim();
+				runSlim(callback);
 			}
 		} else if (src == sviewerButton) {
 			setButtonEnable(false);
@@ -413,6 +419,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 			FrontEnd.mainFrame.toolTab.ltlPanel.killLtlSlimRunner();
 			FrontEnd.abortAllProcessTasks();
 			FrontEnd.errPrintln("Kill");
+			setButtonEnable(true);
 		}
 	}
 

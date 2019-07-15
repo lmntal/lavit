@@ -35,7 +35,7 @@
 
 package lavit.stateviewer.worker;
 
-import lavit.*;
+import lavit.FrontEnd;
 import lavit.stateviewer.StateGraphPanel;
 
 public class StatePainter extends Thread {
@@ -43,26 +43,26 @@ public class StatePainter extends Thread {
 	private boolean active;
 	private boolean update;
 
-	public StatePainter(StateGraphPanel stateGraphPanel){
+	public StatePainter(StateGraphPanel stateGraphPanel) {
 		this.graphPanel = stateGraphPanel;
 		this.active = false;
 		this.update = false;
 	}
 
-	public void run(){
-		while(true){
-			if(active){
-				if(update){
+	public void run() {
+		while (true) {
+			if (active) {
+				if (update) {
 					update = false;
 					graphPanel.repaint();
-				}else{
+				} else {
 					try {
 						sleep(100);
 					} catch (InterruptedException e) {
 						FrontEnd.printException(e);
 					}
 				}
-			}else{
+			} else {
 				try {
 					sleep(100);
 				} catch (InterruptedException e) {
@@ -72,15 +72,15 @@ public class StatePainter extends Thread {
 		}
 	}
 
-	public void update(){
+	public void update() {
 		this.update = true;
 	}
 
-	public void setActive(boolean active){
+	public void setActive(boolean active) {
 		this.active = active;
 	}
 
-	public boolean isActive(){
+	public boolean isActive() {
 		return active;
 	}
 

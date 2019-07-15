@@ -37,12 +37,17 @@ package lavit;
 
 import java.awt.Window;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Properties;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -52,10 +57,7 @@ import lavit.frame.LaViTSplashWindow;
 import lavit.frame.LanguageSetting;
 import lavit.frame.MainFrame;
 import lavit.frame.SlimPathSetting;
-import lavit.runner.PrintLineListener;
-import lavit.runner.ProcessFinishListener;
-import lavit.runner.ProcessTask;
-import lavit.runner.RebootRunner;
+import lavit.runner.*;
 import lavit.system.versioncheck.UpdateChecker;
 import lavit.util.CommonFontUser;
 import lavit.util.LookAndFeelEntry;
@@ -120,10 +122,33 @@ public class FrontEnd
 		}
 	}
 
+       private static Properties createProperties(String properties_path) {
+	        Properties properties = new Properties();
+		try {
+		    InputStream is = new FileInputStream(properties_path);
+		    properties.load(is);
+		} catch (IOException e) {
+
+		}
+		return properties;
+        }
+
 	public static void executeGraphene(File file)
 	{
 		println("(Graphene) executing...");
 
+		String properties_path = "lmntal" + File.separator + Env.getDirNameOfGraphene() + File.separator + "LMNtal.properties";
+		Properties properties = createProperties(properties_path);
+		properties.setProperty("additional_options", Env.get("SLIM_OPTION"));
+		properties.setProperty("slim_path", Env.get("path.slim.exe"));
+		properties.setProperty("lmntal_home", System.getenv("LMNTAL_HOME"));
+		try {
+		    FileOutputStream fos = new FileOutputStream(properties_path);
+		    properties.store(fos, "from lavit");
+		    fos.close();
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
 		final List<String> args = Arrays.asList("--lmntal.file", file.getAbsolutePath());
 		final ProcessTask grapheneTask = ProcessTask.createJarProcessTask("graphene.jar", args);
 		grapheneTask.setDirectory(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfGraphene());
@@ -191,7 +216,11 @@ public class FrontEnd
 	/**
 	 * 中間命令列ファイルをSLIMで実行
 	 */
-	public static void executeILFileInSLIM(File file)
+	public static void executeILFileInSLIM(File file) {
+		executeILFileInSLIM(file, null);
+	}
+
+	public static void executeILFileInSLIM(File file, SlimCallback callbackOnProcessFinish)
 	{
 		println("(SLIM) executing...");
 		mainFrame.toolTab.setTab("System");
@@ -227,6 +256,7 @@ public class FrontEnd
 			{
 				printTerminationMessage("SLIM", id, slimTask.getElapsedSeconds(), exitCode, isAborted);
 				mainFrame.toolTab.systemPanel.outputPanel.outputEnd();
+				if(callbackOnProcessFinish != null) callbackOnProcessFinish.apply();
 			}
 		});
 
@@ -426,6 +456,9 @@ public class FrontEnd
 		else
 		{
 			println(s);
+		}
+		if (label.equals("Graphene") && exitCode == 3) {
+		    errPrintln("SLIM NOT FOUND!");
 		}
 		if (exitCode != 0)
 		{

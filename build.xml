@@ -8,16 +8,13 @@
 	<property name="bin" location="bin" />
 
 	<property name="java.encoding" value="UTF-8" />
-	<property name="java.target" value="1.6" />
-	<property name="java.source" value="1.6" />
+	<property name="java.target" value="1.8" />
+	<property name="java.source" value="1.8" />
 
 	<property name="target-jar" value="LaViT.jar" />
 
 	<!-- Class Path -->
 	<path id="classpath">
-		<pathelement path="${dir.lib.java3d}/j3dcore.jar" />
-		<pathelement path="${dir.lib.java3d}/j3dutils.jar" />
-		<pathelement path="${dir.lib.java3d}/vecmath.jar" />
 	</path>
 
 	<!-- Create Output Directory -->
@@ -37,6 +34,7 @@
 	<target name="javac" depends="mkdir" description="compile all">
 		<javac srcdir="${src};${gen}" destdir="${bin}" encoding="${java.encoding}"
 			target="${java.target}" source="${java.source}" includeantruntime="false">
+			<compilerarg value="-Xlint" />
 			<classpath refid="classpath" />
 		</javac>
 		<!-- copy resources -->

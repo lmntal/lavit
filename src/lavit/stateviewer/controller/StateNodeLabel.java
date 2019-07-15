@@ -40,7 +40,6 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -48,10 +47,9 @@ import javax.swing.JTextField;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.stateviewer.StateNode;
-import lavit.stateviewer.s3d.State3DNode;
 import lavit.util.CommonFontUser;
-import lavit.util.FixFlowLayout;
 
+@SuppressWarnings("serial")
 public class StateNodeLabel extends JPanel implements CommonFontUser {
 	private JPanel stateStatus;
 	private JLabel stateNodenum;
@@ -59,13 +57,13 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 
 	private JTextField stateTextField;
 
-	public StateNodeLabel(){
+	public StateNodeLabel() {
 
 		setLayout(new BorderLayout());
 		setOpaque(false);
 
 		stateStatus = new JPanel();
-		stateStatus.setLayout(new GridLayout(1,2));
+		stateStatus.setLayout(new GridLayout(1, 2));
 		stateStatus.setOpaque(false);
 		stateNodenum = new JLabel();
 		stateNodenum.setOpaque(false);
@@ -85,35 +83,35 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 
 	}
 
-	public void loadFont(){
+	public void loadFont() {
 		Font font = Env.getEditorFont();
 		stateTextField.setFont(font);
 		revalidate();
 	}
 
-	public void setNode(ArrayList<StateNode> nodes){
-		if(nodes.size()==1){
+	public void setNode(ArrayList<StateNode> nodes) {
+		if (nodes.size() == 1) {
 			StateNode node = nodes.get(0);
-			if(node.hasSubset()){
-				stateNodenum.setText("Node: "+node.getChildSet().size());
-			}else{
+			if (node.hasSubset()) {
+				stateNodenum.setText("Node: " + node.getChildSet().size());
+			} else {
 				stateNodenum.setText("");
 			}
-			if(node.label.length()>0){
-				stateLabel.setText("Label: "+node.label);
-			}else{
+			if (node.label.length() > 0) {
+				stateLabel.setText("Label: " + node.label);
+			} else {
 				stateLabel.setText("");
 			}
 			stateTextField.setText(node.toString());
 			stateTextField.setVisible(true);
 			setVisible(true);
-		}else if(nodes.size()>1){
-			stateNodenum.setText("Node: "+nodes.size());
+		} else if (nodes.size() > 1) {
+			stateNodenum.setText("Node: " + nodes.size());
 			stateLabel.setText("");
 			stateTextField.setText("");
 			stateTextField.setVisible(false);
 			setVisible(true);
-		}else{
+		} else {
 			setVisible(false);
 		}
 	}

@@ -42,69 +42,70 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-public class MCProfileStatusPanel extends JPanel{
-	
+@SuppressWarnings("serial")
+public class MCProfileStatusPanel extends JPanel {
+
 	MCProfileGraphPanel graphPanel;
-	
+
 	JPanel left = new JPanel();
 	JPanel right = new JPanel();
-	
+
 	private JLabel lState;
 	private JLabel lHashSize;
 	private JLabel lHashConflict;
-	
-	MCProfileStatusPanel(MCProfileGraphPanel p){
+
+	MCProfileStatusPanel(MCProfileGraphPanel p) {
 		graphPanel = p;
-		
-		setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
+
+		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		setBorder(new TitledBorder("Status"));
-		
-		left.setLayout(new GridLayout(3,1));
-		right.setLayout(new GridLayout(3,1));
+
+		left.setLayout(new GridLayout(3, 1));
+		right.setLayout(new GridLayout(3, 1));
 		JLabel l;
-		
+
 		l = new JLabel("State : ");
 		l.setHorizontalAlignment(JLabel.RIGHT);
 		left.add(l);
-		
+
 		l = new JLabel("Hash Size : ");
 		l.setHorizontalAlignment(JLabel.RIGHT);
 		left.add(l);
-		
+
 		l = new JLabel("Hash Conflict : ");
 		l.setHorizontalAlignment(JLabel.RIGHT);
 		left.add(l);
-		
+
 		lState = new JLabel("0");
 		lState.setHorizontalAlignment(JLabel.RIGHT);
 		lState.setForeground(graphPanel.cState);
 		right.add(lState);
-		
+
 		lHashSize = new JLabel("0");
 		lHashSize.setHorizontalAlignment(JLabel.RIGHT);
 		lHashSize.setForeground(graphPanel.cHashSize);
 		right.add(lHashSize);
-		
+
 		lHashConflict = new JLabel("0");
 		lHashConflict.setHorizontalAlignment(JLabel.RIGHT);
 		lHashConflict.setForeground(graphPanel.cHashConflict);
 		right.add(lHashConflict);
-		
+
 		add(left);
 		add(right);
-		
-		setBackgroundColor(new Color(255,255,255,200));
+
+		setBackgroundColor(new Color(255, 255, 255, 200));
 	}
-	
-	public void setBackgroundColor(Color bg){
+
+	public void setBackgroundColor(Color bg) {
 		setBackground(bg);
 		left.setBackground(bg);
 		right.setBackground(bg);
 	}
-	
-	public void paintComponent(Graphics g){
-		lState.setText(""+graphPanel.profile.allState.size());
-		lHashSize.setText(""+graphPanel.profile.hashes.size());
-		lHashConflict.setText(""+graphPanel.profile.hashConflict);
+
+	public void paintComponent(Graphics g) {
+		lState.setText("" + graphPanel.profile.allState.size());
+		lHashSize.setText("" + graphPanel.profile.hashes.size());
+		lHashConflict.setText("" + graphPanel.profile.hashConflict);
 	}
 }

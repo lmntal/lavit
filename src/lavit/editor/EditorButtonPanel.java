@@ -55,17 +55,12 @@ import javax.swing.SwingUtilities;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.localizedtext.MsgID;
-import lavit.runner.LmntalRunner;
-import lavit.runner.PrintLineListener;
-import lavit.runner.ProcessFinishListener;
-import lavit.runner.ProcessTask;
-import lavit.runner.SlimRunner;
+import lavit.runner.*;
 import lavit.util.FileUtils;
 import lavit.util.StringUtils;
 
 @SuppressWarnings("serial")
-public class EditorButtonPanel extends JPanel implements ActionListener
-{
+public class EditorButtonPanel extends JPanel implements ActionListener {
 	private EditorPanel editorPanel;
 
 	private LmntalRunner lmntalRunner;
@@ -82,20 +77,19 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 	public JButton nullButton;
 	public JButton killButton;
 
-	public EditorButtonPanel(EditorPanel editorPanel)
-	{
+	public EditorButtonPanel(EditorPanel editorPanel) {
 		this.editorPanel = editorPanel;
 
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-		//ボタン列
-		buttonPanel = new JPanel(new GridLayout(2,4));
+		// ボタン列
+		buttonPanel = new JPanel(new GridLayout(2, 4));
 
 		lmntalButton = new JButton("Compile");
 		lmntalButton.addActionListener(this);
 		buttonPanel.add(lmntalButton);
 
-		unyoButton = new JButton(Env.getMsg(MsgID.button_unyo_3g));
+		unyoButton = new JButton(Env.getMsg(MsgID.button_unyo));
 		unyoButton.addActionListener(this);
 		buttonPanel.add(unyoButton);
 
@@ -115,18 +109,17 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		sviewerButton.addActionListener(this);
 		buttonPanel.add(sviewerButton);
 
-		//svporButton = new JButton("(POR)"+Lang.m[15]);
+		// svporButton = new JButton("(POR)"+Lang.m[15]);
 		svporButton = new JButton("");
 		svporButton.addActionListener(this);
 		buttonPanel.add(svporButton);
 
 		/*
-		sviewerlButton = new JButton("(LTL)"+Lang.m[15]);
-		sviewerlButton.addActionListener(this);
-		buttonPanel.add(sviewerlButton);
-		*/
-		//nullButton = new JButton();
-		//buttonPanel.add(nullButton);
+		 * sviewerlButton = new JButton("(LTL)"+Lang.m[15]);
+		 * sviewerlButton.addActionListener(this); buttonPanel.add(sviewerlButton);
+		 */
+		// nullButton = new JButton();
+		// buttonPanel.add(nullButton);
 
 		killButton = new JButton(Env.getMsg(MsgID.button_kill));
 		killButton.addActionListener(this);
@@ -136,9 +129,8 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		add(buttonPanel);
 	}
 
-	public void setAllEnable(boolean enable)
-	{
-		//nullButton.setEnabled(enable);
+	public void setAllEnable(boolean enable) {
+		// nullButton.setEnabled(enable);
 
 		lmntalButton.setEnabled(enable);
 		unyoButton.setEnabled(enable);
@@ -151,8 +143,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		killButton.setEnabled(!enable);
 	}
 
-	private void setButtonEnable(boolean enable)
-	{
+	private void setButtonEnable(boolean enable) {
 		setAllEnable(enable);
 		FrontEnd.mainFrame.toolTab.ltlPanel.setButtonsEnabled(enable);
 	}
@@ -160,45 +151,31 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 	/**
 	 * LMNtalソースコードをコンパイルし、中間命令列を開く
 	 */
-	private void compileLMNtal()
-	{
-		if (editorPanel.isChanged())
-		{
-			if (!editorPanel.fileSave())
-			{
+	private void compileLMNtal() {
+		if (editorPanel.isChanged()) {
+			if (!editorPanel.fileSave()) {
 				return;
 			}
 		}
 
 		File file = editorPanel.getFile();
 		final File outputFile = createILCodeFile(file);
-		try
-		{
-			compile(file, outputFile, new ProcessFinishListener()
-			{
-				public void processFinished(int id, int exitCode, boolean isAborted)
-				{
-					if (exitCode == 0)
-					{
-						if (outputFile.exists())
-						{
+		try {
+			compile(file, outputFile, new ProcessFinishListener() {
+				public void processFinished(int id, int exitCode, boolean isAborted) {
+					if (exitCode == 0) {
+						if (outputFile.exists()) {
 							editorPanel.openFile(outputFile);
-						}
-						else
-						{
+						} else {
 							logError("(compile[" + id + "]) output file does not exists.");
 						}
-					}
-					else
-					{
+					} else {
 						logError("(compile[" + id + "]) failed.");
 					}
 					logInfo("compile finished. [" + id + "]");
 				}
 			});
-		}
-		catch (FileNotFoundException e)
-		{
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
@@ -206,8 +183,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 	/**
 	 * {@code file}をコンパイルし、生成された中間命令列ファイルを開く
 	 */
-	private void compile(File file, File outputFile, ProcessFinishListener onFinished) throws FileNotFoundException
-	{
+	private void compile(File file, File outputFile, ProcessFinishListener onFinished) throws FileNotFoundException {
 		final PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(outputFile)));
 
 		List<String> javaArgs = new ArrayList<String>();
@@ -220,30 +196,33 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		args.add(Env.getSpaceEscape(file.getAbsolutePath()));
 
 		final String sep = File.separator;
-		ProcessTask task = ProcessTask.createJarProcessTask(Env.LMNTAL_LIBRARY_DIR + sep + "bin" + sep + "lmntal.jar", javaArgs, args);
+		ProcessTask task;
+		String compiler_path = Env.get("path.lmntalcompiler");
+		if (compiler_path.contains(".jar"))
+		{
+		    task = ProcessTask.createJarProcessTask(compiler_path, javaArgs, args);
+		}
+		else
+		{
+		    task = ProcessTask.createProcessTask(compiler_path, args);
+		}
 		Env.setProcessEnvironment(task.getEnvironment());
 
 		FrontEnd.mainFrame.toolTab.setTab("System");
 		FrontEnd.println("(compile[" + task.getTaskID() + "]) " + task.getCommand());
 
-		task.setStandardErrorListener(new PrintLineListener()
-		{
-			public void println(String line)
-			{
+		task.setStandardErrorListener(new PrintLineListener() {
+			public void println(String line) {
 				FrontEnd.mainFrame.toolTab.systemPanel.outputPanel.errPrintln(line);
 			}
 		});
-		task.setStandardOutputListener(new PrintLineListener()
-		{
-			public void println(String line)
-			{
+		task.setStandardOutputListener(new PrintLineListener() {
+			public void println(String line) {
 				writer.println(line);
 			}
 		});
-		task.addProcessFinishListener(new ProcessFinishListener()
-		{
-			public void processFinished(int id, int exitCode, boolean isAborted)
-			{
+		task.addProcessFinishListener(new ProcessFinishListener() {
+			public void processFinished(int id, int exitCode, boolean isAborted) {
 				writer.close();
 			}
 		});
@@ -252,22 +231,17 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 	}
 
 	/**
-	 * LMNtalソースコードのファイル名から中間命令列のファイル名を生成する。
-	 * 典型的には、拡張子を.ilにしたものを返す。
+	 * LMNtalソースコードのファイル名から中間命令列のファイル名を生成する。 典型的には、拡張子を.ilにしたものを返す。
 	 */
-	private File createILCodeFile(File lmntalFile)
-	{
+	private File createILCodeFile(File lmntalFile) {
 		String dir = lmntalFile.getParent();
 		String name = FileUtils.removeExtension(lmntalFile.getName()) + ".il";
 		return new File(dir + File.separator + name);
 	}
 
-	private void runSlim()
-	{
-		if (editorPanel.isChanged())
-		{
-			if (!editorPanel.fileSave())
-			{
+	private void runSlim(SlimCallback callbackOnProcessFinish) {
+		if (editorPanel.isChanged()) {
+			if (!editorPanel.fileSave()) {
 				return;
 			}
 		}
@@ -275,267 +249,185 @@ public class EditorButtonPanel extends JPanel implements ActionListener
 		File file = editorPanel.getFile();
 		final File outputFile = createILCodeFile(file);
 
-		try
-		{
-			compile(file, outputFile, new ProcessFinishListener()
-			{
-				public void processFinished(int id, int exitCode, boolean isAborted)
-				{
-					if (exitCode == 0)
-					{
-						if (outputFile.exists())
-						{
-							FrontEnd.executeILFileInSLIM(outputFile);
-						}
-						else
-						{
+		try {
+			compile(file, outputFile, new ProcessFinishListener() {
+				public void processFinished(int id, int exitCode, boolean isAborted) {
+					if (exitCode == 0) {
+						if (outputFile.exists()) {
+							FrontEnd.executeILFileInSLIM(outputFile, callbackOnProcessFinish);
+						} else {
 							logError("(compile[" + id + "]) output file does not exists.");
+							setButtonEnable(true);
 						}
-					}
-					else
-					{
+					} else {
 						logError("(compile[" + id + "]) failed.");
+						setButtonEnable(true);
 					}
 					logInfo("compile finished. [" + id + "]");
 				}
 			});
-		}
-		catch (FileNotFoundException e)
-		{
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void actionPerformed(ActionEvent e)
-	{
+	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 
-		if (src == lmntalButton)
-		{
-			File file = editorPanel.getFile();
-			if (file != null && file.getName().endsWith(".lmn"))
-			{
-				compileLMNtal();
-			}
-		}
-		else if (src == unyoButton)
-		{
-			if (editorPanel.isChanged())
-			{
-				editorPanel.fileSave();
-			}
-			FrontEnd.mainFrame.toolTab.setTab("System");
-			FrontEnd.executeUnyo(FrontEnd.mainFrame.editorPanel.getFile());
-		}
-		else if (src == grapheneButton)
-		{
-			if (editorPanel.isChanged())
-			{
-				editorPanel.fileSave();
-			}
-			FrontEnd.mainFrame.toolTab.setTab("System");
-			FrontEnd.executeGraphene(FrontEnd.mainFrame.editorPanel.getFile());
-		}
-		else if (src == slimButton)
-		{
-			File file = editorPanel.getFile();
-			if (file == null)
-			{
+		if (editorPanel.isChanged()) {
+			if (!editorPanel.fileSave()) {
 				return;
 			}
-			if (file.getName().endsWith(".il"))
-			{
-				if (editorPanel.isChanged())
-				{
-					if (!editorPanel.fileSave())
-					{
-						return;
-					}
-				}
-				FrontEnd.executeILFileInSLIM(file);
-			}
-			else
-			{
-				runSlim();
-			}
 		}
-		else if (src == sviewerButton)
-		{
-			if (editorPanel.isChanged())
-			{
-				editorPanel.fileSave();
+		if (src == lmntalButton) {
+			File file = editorPanel.getFile();
+			if (file != null && file.getName().endsWith(".lmn")) {
+				compileLMNtal();
 			}
+		} else if (src == unyoButton) {
+			FrontEnd.mainFrame.toolTab.setTab("System");
+			FrontEnd.executeUnyo(FrontEnd.mainFrame.editorPanel.getFile());
+		} else if (src == grapheneButton) {
+			FrontEnd.mainFrame.toolTab.setTab("System");
+			FrontEnd.executeGraphene(FrontEnd.mainFrame.editorPanel.getFile());
+		} else if (src == slimButton) {
+			setButtonEnable(false);
+			SlimCallback callback = new SlimCallback() {
+				@Override
+				public void apply() {
+					setButtonEnable(true);
+				}
+			};
 
+			File file = editorPanel.getFile();
+			if (file.getName().endsWith(".il")) {
+				FrontEnd.executeILFileInSLIM(file, callback);
+			} else {
+				runSlim(callback);
+			}
+		} else if (src == sviewerButton) {
 			setButtonEnable(false);
 
 			FrontEnd.mainFrame.toolTab.setTab("System");
 
 			FrontEnd.println("(StateViewer) Doing...");
 			String opt = "";
-			if (Env.is("SLIM2"))
-			{
+			if (Env.is("SLIM2")) {
 				opt = "--nd -t --dump-lavit " + Env.get("SV_OPTION");
-			}
-			else
-			{
+			} else {
 				opt = "--nd " + Env.get("SV_OPTION");
-				if (!Env.get("SV_DEPTH_LIMIT").equals("unset"))
-				{
+				if (!Env.get("SV_DEPTH_LIMIT").equals("unset")) {
 					opt += " --bfs_depth " + Env.get("SV_DEPTH_LIMIT");
 				}
 			}
-			slimRunner = new SlimRunner(opt);
+			boolean runOnlySlim = editorPanel.getFileName().endsWith(".il");
+			slimRunner = new SlimRunner(opt, runOnlySlim);
 			slimRunner.setBuffering(true);
 			slimRunner.run();
-			new Thread()
-			{
-				public void run()
-				{
-					while (slimRunner.isRunning())
-					{
+			new Thread() {
+				public void run() {
+					while (slimRunner.isRunning()) {
 						FrontEnd.sleep(200);
 					}
-					FrontEnd.println("(SLIM) Done! ["+(slimRunner.getTime()/1000.0)+"s]");
-					if (slimRunner.isSucceeded())
-					{
-						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(),false);
+					FrontEnd.println("(SLIM) Done! [" + (slimRunner.getTime() / 1000.0) + "s]");
+					if (slimRunner.isSucceeded()) {
+						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), false);
 					}
 					slimRunner = null;
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
 							setButtonEnable(true);
 						}
 					});
 				}
 			}.start();
-		}
-		else if (src == svporButton)
-		{
+		} else if (src == svporButton) {
 			/*
-			if(editorPanel.isChanged()){
-				editorPanel.fileSave();
-			}
+			 * if(editorPanel.isChanged()){ editorPanel.fileSave(); }
+			 * 
+			 * setButtonEnable(false);
+			 * 
+			 * FrontEnd.mainFrame.toolTab.setTab("System");
+			 * 
+			 * FrontEnd.println("(StateViewer) Doing..."); slimRunner = new
+			 * SlimRunner("--por "+Env.get("SV_OPTION")); slimRunner.setBuffering(true);
+			 * slimRunner.run(); (new Thread(new Runnable() { public void run() {
+			 * while(slimRunner.isRunning()){ FrontEnd.sleep(200); }
+			 * if(slimRunner.isSuccess()){
+			 * FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(),
+			 * false); } slimRunner = null; javax.swing.SwingUtilities.invokeLater(new
+			 * Runnable(){public void run() { setButtonEnable(true); }}); }})).start();
+			 */
 
-			setButtonEnable(false);
-
-			FrontEnd.mainFrame.toolTab.setTab("System");
-
-			FrontEnd.println("(StateViewer) Doing...");
-			slimRunner = new SlimRunner("--por "+Env.get("SV_OPTION"));
-			slimRunner.setBuffering(true);
-			slimRunner.run();
-			(new Thread(new Runnable() { public void run() {
-				while(slimRunner.isRunning()){
-					FrontEnd.sleep(200);
-				}
-				if(slimRunner.isSuccess()){
-					FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(),false);
-				}
-				slimRunner = null;
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-					setButtonEnable(true);
-				}});
-			}})).start();
-			*/
+			// FrontEnd.println(SlimRunner.checkRun()?"ok":"ng");
+			// FrontEnd.reboot();
 
 
-			//FrontEnd.println(SlimRunner.checkRun()?"ok":"ng");
-			//FrontEnd.reboot();
+			/*
+			 * }else if (src == sviewerlButton) {
+			 * 
+			 * if(editorPanel.isChanged()){ editorPanel.fileSave(); }
+			 * 
+			 * setButtonEnable(false);
+			 * 
+			 * FrontEnd.mainFrame.toolTab.setTab("System");
+			 * 
+			 * FrontEnd.println("(StateViewer) Doing..."); slimRunner = new
+			 * SlimRunner("--ltl_nd --hideruleset"); slimRunner.setBuffering(true);
+			 * slimRunner.run(); (new Thread(new Runnable() { public void run() {
+			 * while(slimRunner.isRunning()){ FrontEnd.sleep(200); }
+			 * if(slimRunner.isSuccess()){
+			 * FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString()); }
+			 * slimRunner = null; javax.swing.SwingUtilities.invokeLater(new
+			 * Runnable(){public void run() { setButtonEnable(true); }}); }})).start();
+			 */
 
-
-/*
-		}else if (src == sviewerlButton) {
-
-			if(editorPanel.isChanged()){
-				editorPanel.fileSave();
-			}
-
-			setButtonEnable(false);
-
-			FrontEnd.mainFrame.toolTab.setTab("System");
-
-			FrontEnd.println("(StateViewer) Doing...");
-			slimRunner = new SlimRunner("--ltl_nd --hideruleset");
-			slimRunner.setBuffering(true);
-			slimRunner.run();
-			(new Thread(new Runnable() { public void run() {
-				while(slimRunner.isRunning()){
-					FrontEnd.sleep(200);
-				}
-				if(slimRunner.isSuccess()){
-					FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString());
-				}
-				slimRunner = null;
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-					setButtonEnable(true);
-				}});
-			}})).start();
-*/
-
-		}
-		else if (src == stateProfilerButton)
-		{
-			if (editorPanel.isChanged())
-			{
-				editorPanel.fileSave();
-			}
-
+		} else if (src == stateProfilerButton) {
 			setButtonEnable(false);
 
 			FrontEnd.mainFrame.toolTab.setTab("StateProfiler");
 
 			FrontEnd.println("(StateProfiler) Doing...");
-			if (Env.is("SLIM2"))
-			{
+			if (Env.is("SLIM2")) {
 				slimRunner = new SlimRunner("--nd --dump-inc --dump-lavit");
-			}
-			else
-			{
+			} else {
 				slimRunner = new SlimRunner("--nd_dump --hideruleset");
 			}
 			slimRunner.setOutputGetter(FrontEnd.mainFrame.toolTab.stateProfilePanel);
 
 			slimRunner.run();
-			new Thread()
-			{
-				public void run()
-				{
-					while (slimRunner.isRunning())
-					{
+			new Thread() {
+				public void run() {
+					while (slimRunner.isRunning()) {
 						FrontEnd.sleep(200);
 					}
 					FrontEnd.println("(StateProfiler) Done!");
 					slimRunner = null;
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
 							setButtonEnable(true);
 						}
 					});
 				}
 			}.start();
-		}
-		else if (src == killButton)
-		{
-			if (lmntalRunner != null) lmntalRunner.kill();
-			if (slimRunner != null) slimRunner.kill();
+		} else if (src == killButton) {
+			if (lmntalRunner != null)
+				lmntalRunner.kill();
+			if (slimRunner != null)
+				slimRunner.kill();
 			FrontEnd.mainFrame.killILRunner();
 			FrontEnd.mainFrame.toolTab.ltlPanel.killLtlSlimRunner();
 			FrontEnd.abortAllProcessTasks();
 			FrontEnd.errPrintln("Kill");
+			setButtonEnable(true);
 		}
 	}
 
-	private static void logInfo(String message)
-	{
+	private static void logInfo(String message) {
 		FrontEnd.println(message);
 	}
 
-	private static void logError(String message)
-	{
+	private static void logError(String message) {
 		FrontEnd.errPrintln(message);
 	}
 }

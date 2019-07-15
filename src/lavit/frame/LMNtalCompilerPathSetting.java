@@ -56,7 +56,7 @@ public final class LMNtalCompilerPathSetting
 		ModalSettingDialog dialog = ModalSettingDialog.createDialog(owner, panel);
 		dialog.setDialogTitle("LMNtal Compiler");
 		dialog.setHeadLineText("LMNtal Compiler Location");
-		dialog.setDescriptionText("Set the location of the LMNtal Compiler you'd like to use.");
+		dialog.setDescriptionText(Env.getMsg(MsgID.text_need_compiler_path));
 		dialog.setDialogIconImages(Env.getApplicationIcons());
 
 		boolean approved = dialog.showDialog();
@@ -84,11 +84,15 @@ public final class LMNtalCompilerPathSetting
 
 				public boolean accept(File file)
 				{
-					return file.isDirectory() || file.getName().equals("lmntal.jar");
+				        return file.isDirectory() || file.getName().equals("lmntal.jar") || file.getName().equals("lmntal");
 				}
 			});
 			pathInput = new PathInputField(chooser, Env.getMsg(MsgID.button_browse), 20);
-			pathInput.setPathText(Env.get("path.lmntalcompiler", "lmntal/bin/lmntal.jar"));
+			if (System.getenv("LMNTAL_HOME") == null) {
+			    pathInput.setPathText("lmntal/bin/lmntal.jar");
+			} else {
+			    pathInput.setPathText(System.getenv("LMNTAL_HOME") + "/bin/lmntal");
+			}
 
 			add(pathInput);
 		}

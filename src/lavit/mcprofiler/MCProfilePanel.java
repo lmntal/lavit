@@ -44,7 +44,8 @@ import javax.swing.JPanel;
 
 import lavit.runner.RunnerOutputGetter;
 
-public class MCProfilePanel extends JPanel implements RunnerOutputGetter{
+@SuppressWarnings("serial")
+public class MCProfilePanel extends JPanel implements RunnerOutputGetter {
 
 	private MCProfileGraphPanel graphPanel;
 	private MCProfileLabelPanel label;
@@ -52,56 +53,58 @@ public class MCProfilePanel extends JPanel implements RunnerOutputGetter{
 
 	int hashConflict;
 	ArrayList<State> allState;
-	TreeMap<Long,ArrayList<State>> hashes;
-	TreeMap<Integer,ArrayList<State>> suces;
+	TreeMap<Long, ArrayList<State>> hashes;
+	TreeMap<Integer, ArrayList<State>> suces;
 
 	ArrayList<Integer[]> timeLine;
 
-	public MCProfilePanel(){
+	public MCProfilePanel() {
 		setLayout(new BorderLayout());
 
 		allState = new ArrayList<State>();
-		hashes = new TreeMap<Long,ArrayList<State>>();
-		suces = new TreeMap<Integer,ArrayList<State>>();
+		hashes = new TreeMap<Long, ArrayList<State>>();
+		suces = new TreeMap<Integer, ArrayList<State>>();
 
 		timeLine = new ArrayList<Integer[]>();
 
 		graphPanel = new MCProfileGraphPanel(this);
-		add(graphPanel,BorderLayout.CENTER);
+		add(graphPanel, BorderLayout.CENTER);
 
 		label = new MCProfileLabelPanel(this);
-		add(label,BorderLayout.SOUTH);
+		add(label, BorderLayout.SOUTH);
 	}
 
-	void line(String str){
-		String ss[] = str.split(":",4);
-		if(ss.length<4){ return; }
+	void line(String str) {
+		String ss[] = str.split(":", 4);
+		if (ss.length < 4) {
+			return;
+		}
 
 		long id = Long.parseLong(ss[0]);
 		long hash = Long.parseLong(ss[1]);
 		int successor = Integer.parseInt(ss[2]);
-		//String s = ss[3];
+		// String s = ss[3];
 
-		State state = new State(id,hash,successor,null);
+		State state = new State(id, hash, successor, null);
 		allState.add(state);
 
-		//ハッシュ
-		if(hashes.containsKey(hash)){
+		// ハッシュ
+		if (hashes.containsKey(hash)) {
 			hashConflict++;
 			hashes.get(hash).add(state);
-		}else{
+		} else {
 			ArrayList<State> l = new ArrayList<State>();
 			l.add(state);
-			hashes.put(hash,l);
+			hashes.put(hash, l);
 		}
 
-		//遷移先数
-		if(suces.containsKey(successor)){
+		// 遷移先数
+		if (suces.containsKey(successor)) {
 			suces.get(successor).add(state);
-		}else{
+		} else {
 			ArrayList<State> l = new ArrayList<State>();
 			l.add(state);
-			suces.put(successor,l);
+			suces.put(successor, l);
 		}
 	}
 
@@ -112,7 +115,7 @@ public class MCProfilePanel extends JPanel implements RunnerOutputGetter{
 		suces.clear();
 
 		timeLine.clear();
-		timeLine.add(new Integer[]{0,0,0});
+		timeLine.add(new Integer[] { 0, 0, 0 });
 
 		graphPanel.start();
 		label.update();
@@ -127,20 +130,20 @@ public class MCProfilePanel extends JPanel implements RunnerOutputGetter{
 	}
 
 	public void outputEnd() {
-		timeLine.add(new Integer[]{allState.size(),hashes.size(),hashConflict});
+		timeLine.add(new Integer[] { allState.size(), hashes.size(), hashConflict });
 		clock.cancel();
 		label.update();
 		graphPanel.end();
 		repaint();
 	}
 
-	class State{
+	class State {
 		long id;
 		long hash;
 		int successor;
 		String str;
 
-		State(long id,long hash,int successor,String str){
+		State(long id, long hash, int successor, String str) {
 			this.id = id;
 			this.hash = hash;
 			this.successor = successor;
@@ -148,9 +151,9 @@ public class MCProfilePanel extends JPanel implements RunnerOutputGetter{
 		}
 	}
 
-	class Clock extends TimerTask{
-		public void run(){
-			timeLine.add(new Integer[]{allState.size(),hashes.size(),hashConflict});
+	class Clock extends TimerTask {
+		public void run() {
+			timeLine.add(new Integer[] { allState.size(), hashes.size(), hashConflict });
 			label.update();
 			repaint();
 		}

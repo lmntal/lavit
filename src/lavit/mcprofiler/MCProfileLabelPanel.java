@@ -33,14 +33,14 @@
  *
  */package lavit.mcprofiler;
 
-import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.text.DecimalFormat;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class MCProfileLabelPanel extends JPanel{
+@SuppressWarnings("serial")
+public class MCProfileLabelPanel extends JPanel {
 
 	MCProfilePanel profile;
 	private JLabel speed;
@@ -48,10 +48,10 @@ public class MCProfileLabelPanel extends JPanel{
 	private JLabel end;
 	private JLabel clock;
 
-	MCProfileLabelPanel(MCProfilePanel p){
+	MCProfileLabelPanel(MCProfilePanel p) {
 		profile = p;
 
-		setLayout(new GridLayout(1,4));
+		setLayout(new GridLayout(1, 4));
 
 		speed = new JLabel();
 		speed.setHorizontalAlignment(JLabel.RIGHT);
@@ -73,31 +73,33 @@ public class MCProfileLabelPanel extends JPanel{
 
 	}
 
-	//スレッドセーフ
-	public void update(){
-		javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run() {
-			int r1 = 0;
-			if(profile.timeLine.size()>1){
-				r1 = profile.allState.size()/profile.timeLine.size();
+	// スレッドセーフ
+	public void update() {
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				int r1 = 0;
+				if (profile.timeLine.size() > 1) {
+					r1 = profile.allState.size() / profile.timeLine.size();
+				}
+				double r2 = 0;
+				final DecimalFormat f2 = new DecimalFormat("###.#");
+				if (profile.allState.size() > 0) {
+					r2 = profile.hashConflict * 100 / (double) profile.allState.size();
+				}
+				int r3 = 0;
+				if (profile.suces.get(0) != null) {
+					r3 = profile.suces.get(0).size();
+				}
+				int r4 = 0;
+				if (profile.timeLine.size() > 1) {
+					r4 = profile.timeLine.size() - 1;
+				}
+				speed.setText(" Speed : " + r1 + " state/sec ");
+				par.setText(" Conflict : " + f2.format(r2) + " % ");
+				end.setText(" End State : " + r3 + " ");
+				clock.setText(" Clock : " + r4 + " sec ");
 			}
-			double r2 = 0;
-			final DecimalFormat f2 = new DecimalFormat("###.#");
-			if(profile.allState.size()>0){
-				r2 = profile.hashConflict*100/(double)profile.allState.size();
-			}
-			int r3 = 0;
-			if(profile.suces.get(0)!=null){
-				r3 = profile.suces.get(0).size();
-			}
-			int r4 = 0;
-			if(profile.timeLine.size()>1){
-				r4 = profile.timeLine.size()-1;
-			}
-			speed.setText(" Speed : "+r1+" state/sec ");
-			par.setText(" Conflict : "+f2.format(r2)+" % ");
-			end.setText(" End State : "+r3+" ");
-			clock.setText(" Clock : "+r4+" sec ");
-		}});
+		});
 	}
 
 }

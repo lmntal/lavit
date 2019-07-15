@@ -36,7 +36,6 @@
 package lavit.stateviewer;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -48,19 +47,14 @@ import java.io.OutputStreamWriter;
 
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JSplitPane;
 
-import lavit.*;
+import lavit.Env;
+import lavit.FrontEnd;
 import lavit.stateviewer.controller.StateControlPanel;
-import lavit.stateviewer.s3d.State3DPanel;
 
-public class StatePanel extends JPanel{
-
+@SuppressWarnings("serial")
+public class StatePanel extends JPanel {
 	public StateGraphPanel stateGraphPanel;
-	public State3DPanel state3DPanel = null;
-	public boolean view3D = false;
-	public boolean created3D = false;
 
 	public StateControlPanel stateControlPanel;
 
@@ -68,8 +62,7 @@ public class StatePanel extends JPanel{
 	private boolean ltlMode;
 	private StateNodeSet drawNodes;
 
-
-	public StatePanel(){
+	public StatePanel() {
 
 		setLayout(new BorderLayout());
 
@@ -80,21 +73,20 @@ public class StatePanel extends JPanel{
 		add(stateControlPanel, BorderLayout.SOUTH);
 
 		/*
-		setLayout(new BorderLayout());
-
-		stateGraphPanel = new StateGraphPanel(this);
-		stateControlPanel = new StateControlPanel(this);
-
-		JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, stateGraphPanel, stateControlPanel);
-		jsp.setOneTouchExpandable(true);
-		jsp.setResizeWeight(0.5);
-		jsp.setDividerLocation(0.9);
-
-		add(jsp, BorderLayout.CENTER);
+		 * setLayout(new BorderLayout());
+		 *
+		 * stateGraphPanel = new StateGraphPanel(this); stateControlPanel = new
+		 * StateControlPanel(this);
+		 *
+		 * JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, stateGraphPanel,
+		 * stateControlPanel); jsp.setOneTouchExpandable(true);
+		 * jsp.setResizeWeight(0.5); jsp.setDividerLocation(0.9);
+		 *
+		 * add(jsp, BorderLayout.CENTER);
 		 */
 	}
 
-	public void start(String str, boolean ltlMode){
+	public void start(String str, boolean ltlMode) {
 
 		this.originalString = str;
 		this.ltlMode = ltlMode;
@@ -102,47 +94,41 @@ public class StatePanel extends JPanel{
 
 		FrontEnd.println("(StateViewer) parsing.");
 		boolean res = false;
-		try{
+		try {
 			res = drawNodes.setSlimResult(str, ltlMode);
-		}catch(NumberFormatException e){
+		} catch (NumberFormatException e) {
 			FrontEnd.printException(e);
 		}
 
-		if(res){
-			FrontEnd.println("(StateViewer) start! (state = "+drawNodes.size()+")");
+		if (res) {
+			FrontEnd.println("(StateViewer) start! (state = " + drawNodes.size() + ")");
 			stateGraphPanel.init(drawNodes);
 			stateGraphPanel.getDraw().setCycleMode(ltlMode);
 			FrontEnd.mainFrame.toolTab.setTab("StateViewer");
-
-			created3D = false;
-			if(Env.is("SV3D")){
-				start3D();
-				stateControlPanel.stateControllerTab.setTab("3D");
-			}
-		}else{
+		} else {
 			FrontEnd.println("(StateViewer) error.");
 		}
 
 	}
 
-	public void reset(){
+	public void reset() {
 		start(originalString, ltlMode);
 	}
 
-	public void savaFile(File file){
+	public void savaFile(File file) {
 		try {
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsolutePath())));
 			writer.write(originalString);
 			writer.close();
-			FrontEnd.println("(StateViewer) save [ "+file.getName()+" ]");
+			FrontEnd.println("(StateViewer) save [ " + file.getName() + " ]");
 		} catch (IOException e) {
 			FrontEnd.printException(e);
 		}
 	}
 
-	public void loadFile(File file){
+	public void loadFile(File file) {
 		try {
-			FrontEnd.println("(StateViewer) load [ "+file.getName()+" ]");
+			FrontEnd.println("(StateViewer) load [ " + file.getName() + " ]");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			StringBuffer buf = new StringBuffer("");
 			String strLine;
@@ -152,9 +138,9 @@ public class StatePanel extends JPanel{
 			reader.close();
 
 			String str = buf.toString();
-			if(str.indexOf("no cycles found")>=0){
+			if (str.indexOf("no cycles found") >= 0) {
 				start(str, true);
-			}else{
+			} else {
 				start(str, false);
 			}
 		} catch (Exception ex) {
@@ -162,21 +148,23 @@ public class StatePanel extends JPanel{
 		}
 	}
 
-	public void loadFile(){
+	public void loadFile() {
 		final File file = chooseOpenFile();
-		if(file!=null){
-			(new Thread(new Runnable() { public void run() {
-				loadFile(file);
-			}})).start();
+		if (file != null) {
+			(new Thread(new Runnable() {
+				public void run() {
+					loadFile(file);
+				}
+			})).start();
 		}
 	}
 
-	private File chooseOpenFile(){
+	private File chooseOpenFile() {
 		String chooser_dir = Env.get("SV_FILE_LAST_CHOOSER_DIR");
-		if(chooser_dir==null){
-			chooser_dir=new File("demo").getAbsolutePath();
-		}else if(!new File(chooser_dir).exists()&&new File("demo").exists()){
-			chooser_dir=new File("demo").getAbsolutePath();
+		if (chooser_dir == null) {
+			chooser_dir = new File("demo").getAbsolutePath();
+		} else if (!new File(chooser_dir).exists() && new File("demo").exists()) {
+			chooser_dir = new File("demo").getAbsolutePath();
 		}
 		JFileChooser jfc = new JFileChooser(chooser_dir);
 		int r = jfc.showOpenDialog(FrontEnd.mainFrame);
@@ -184,44 +172,11 @@ public class StatePanel extends JPanel{
 			return null;
 		}
 		File file = jfc.getSelectedFile();
-		Env.set("SV_FILE_LAST_CHOOSER_DIR",file.getParent());
+		Env.set("SV_FILE_LAST_CHOOSER_DIR", file.getParent());
 		return file;
 	}
 
-	public boolean isLtl(){
+	public boolean isLtl() {
 		return ltlMode;
 	}
-
-	public void toggle3D(){
-		if(view3D){
-			stop3D();
-		}else{
-			start3D();
-		}
-	}
-
-	public void start3D(){
-		if(state3DPanel==null){
-			state3DPanel = new State3DPanel(this);
-		}
-		if(!created3D){
-			state3DPanel.createGraph();
-			created3D = true;
-		}
-
-		remove(stateGraphPanel);
-		add(state3DPanel, BorderLayout.CENTER);
-		revalidate();
-
-		view3D = true;
-	}
-
-	public void stop3D(){
-		remove(state3DPanel);
-		add(stateGraphPanel, BorderLayout.CENTER);
-		revalidate();
-
-		view3D = false;
-	}
-
 }

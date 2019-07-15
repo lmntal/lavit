@@ -1,3 +1,7 @@
+|version2.9.0 | 2019/07/15 | StateViewerから.ilファイルを読めるようになった。StateViewerから直接Grapheneを呼べるようになった。SLIMのデフォルトオプションに --use-builtin-rule を追加。UI Font Sizeをenv.txtに記憶するよう変更。コンパイラのパスを指定する機能を追加。実行前にunsavedファイルを自動保存するよう変更。GrapheneにSLIMオプションを渡すよう変更。SLIMの実行時にKILL以外のボタンをグレーアウトするよ
+う変更。レガシーな機能（UNYO(2G)・StateViewerの3D表示・wtの例題）を削除。StateProfiler・エディタ関連のバグを修正。その他リファクタリング。バンドル版のSLIMとlmntalコンパイラをアップデート。 |
+||||
+|version2.8.9 | 2017/06/14 | slimとlmntalをアップデート。 |
 |version2.8.8 | 2015/10/31 | SLIMインストーラのバグを修正。 |
 |version2.8.7 | 2015/04/06 | Grapheneの組み込み。 |
 |version2.8.6 | 2014/03/31 ||

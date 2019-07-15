@@ -39,19 +39,16 @@ import lavit.Env;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNodeSet;
 
-public class StateGraphSimpleMixAdjustWorker extends Thread
-{
+public class StateGraphSimpleMixAdjustWorker extends Thread {
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
 
-	public StateGraphSimpleMixAdjustWorker(StateGraphPanel panel)
-	{
+	public StateGraphSimpleMixAdjustWorker(StateGraphPanel panel) {
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
 	}
 
-	public void run()
-	{
+	public void run() {
 		panel.setActive(false);
 
 		boolean crossreduction_dummyonly = Env.is("SV_CROSSREDUCTION_DUMMYONLY");
@@ -66,8 +63,7 @@ public class StateGraphSimpleMixAdjustWorker extends Thread
 		new StateGraphAdjust2Worker(panel).waitExecute();
 		new StateGraphExchangeWorker(panel).waitExecute();
 
-		if (panel.statePanel.isLtl())
-		{
+		if (panel.statePanel.isLtl()) {
 			panel.searchShortCycle();
 		}
 

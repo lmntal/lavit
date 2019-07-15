@@ -42,32 +42,33 @@ import java.awt.FlowLayout;
 
 //http://d.hatena.ne.jp/ruby-U/20080618/1213757977を参考
 
+@SuppressWarnings("serial")
 public class FixFlowLayout extends FlowLayout {
 	public Dimension preferredLayoutSize(Container target) {
 		synchronized (target.getTreeLock()) {
 
 			int hgap = getHgap();
 			int vgap = getVgap();
-			int seprWidth   = target.getParent().getWidth();
-			int tempWidth   = 0;
-			int tempHeight  = 0;
+			int seprWidth = target.getParent().getWidth();
+			int tempWidth = 0;
+			int tempHeight = 0;
 			int totalHeight = 0;
-			int lineCount   = 1;
+			int lineCount = 1;
 
 			for (int i = 0, i_n = target.getComponentCount(); i < i_n; i++) {
 				Component m = target.getComponent(i);
 				Dimension d = m.getPreferredSize();
 				tempWidth += hgap;
-				if(tempWidth + d.width > seprWidth){
+				if (tempWidth + d.width > seprWidth) {
 					totalHeight += tempHeight;
 					tempHeight = 0;
-					tempWidth  = 0;
+					tempWidth = 0;
 					lineCount++;
 				}
 				tempHeight = Math.max(tempHeight, d.height);
 				tempWidth += d.width;
 			}
-			totalHeight += tempHeight + (lineCount+1)*vgap;
+			totalHeight += tempHeight + (lineCount + 1) * vgap;
 			return new Dimension(seprWidth, totalHeight);
 		}
 	}

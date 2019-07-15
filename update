@@ -1,6 +1,0 @@
-app-name: LaViT
-version: 2.8.5
-release-date: 2014/04/14
-download-url: http://www.ueda.info.waseda.ac.jp/~shinobu/lavit/releases/LaViT-2.8.5.jar
-description: Fixed several problems of the find/replace dialog and redesign the dialog.
-description-ja: 検索・置換ダイアログの再設計、および処理の不具合の修正。

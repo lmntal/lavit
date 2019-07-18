@@ -64,6 +64,9 @@ public class MainFrame extends JFrame
 	public EditorPanel editorPanel;
 	public ToolTab toolTab;
 
+	public JFrame stateFrame;
+	public JTabbedPane stateTab;
+
 	private JSplitPane editorSplit;
 
 	private Set<Window> childFrames = new HashSet<Window>();
@@ -171,6 +174,13 @@ public class MainFrame extends JFrame
 			}
 		});
 		setContentPane(editorSplit);
+
+		stateFrame = new JFrame("StateViewer");
+		stateFrame.setSize(new Dimension(1200, 800));
+		stateTab = new JTabbedPane();
+		stateFrame.add(stateTab);
+		stateFrame.setVisible(true);
+
 
 		addWindowListener(new MainWindowListener(this));
 	}

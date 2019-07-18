@@ -49,7 +49,10 @@ public class StateUnderInfoPanel extends JPanel {
 	public StatePanel statePanel;
 
 	private JLabel zoomNum = new JLabel();
+	private JLabel stateLabel = new JLabel();
 	private JLabel stateNum = new JLabel();
+
+	public static String stateText = "";
 
 	StateUnderInfoPanel(StatePanel statePanel) {
 		this.statePanel = statePanel;
@@ -58,6 +61,9 @@ public class StateUnderInfoPanel extends JPanel {
 
 		zoomNum.setHorizontalAlignment(JLabel.LEFT);
 		add(zoomNum);
+
+		stateLabel.setHorizontalAlignment(JLabel.CENTER);
+		add(stateLabel);
 
 		stateNum.setHorizontalAlignment(JLabel.RIGHT);
 		add(stateNum);
@@ -69,6 +75,7 @@ public class StateUnderInfoPanel extends JPanel {
 	public void updateInfo() {
 		StateGraphPanel p = statePanel.stateGraphPanel;
 		setDrawInfo(p.getZoom(), p.getDrawTime());
+		setStateNode(stateText);
 		setStateInfo(p.getDepth() - 1, p.getAllNum(), p.getEndNum());
 	}
 
@@ -78,6 +85,10 @@ public class StateUnderInfoPanel extends JPanel {
 			z = "" + (((int) (zoom * 10000)) / 100.0);
 		}
 		zoomNum.setText(" Zoom : " + z + "%, DrawTime : " + (drawTime / 1000) + "s");
+	}
+
+	private void setStateNode (String str) {
+		stateLabel.setText(str);
 	}
 
 	private void setStateInfo(int depth, int num, int end) {

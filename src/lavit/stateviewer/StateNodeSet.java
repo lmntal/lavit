@@ -629,8 +629,8 @@ public class StateNodeSet {
 	}
 
 	public void positionReset() {
-		double w = FrontEnd.mainFrame.toolTab.statePanel.stateGraphPanel.getWidth();
-		double h = FrontEnd.mainFrame.toolTab.statePanel.stateGraphPanel.getHeight();
+		double w = panel.getWidth();
+		double h = panel.getHeight();
 		double z;
 		double minLength = w / (getDepth() + 1);
 		for (int i = 0; i < getDepth(); ++i) {

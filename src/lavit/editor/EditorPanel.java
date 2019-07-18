@@ -730,7 +730,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		return !page.hasFile() || page.isModified();
 	}
 
-	String getFileName()
+	public String getFileName()
 	{
 		if (tabView.getTabCount() == 0)
 		{

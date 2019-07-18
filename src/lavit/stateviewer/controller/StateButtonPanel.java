@@ -38,12 +38,14 @@ package lavit.stateviewer.controller;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
 import lavit.Env;
@@ -54,6 +56,8 @@ import lavit.stateviewer.StateTransitionAbstraction;
 @SuppressWarnings("serial")
 public class StateButtonPanel extends JPanel implements ActionListener {
 	private StatePanel statePanel;
+
+	//private JScrollPane scrollPane = new JScrollPane();
 
 	private JPanel resetPanel = new JPanel();
 	private JButton posReset = new JButton("Position Reset");
@@ -94,19 +98,25 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		// setLayout(new GridLayout(5,1));
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-		resetPanel.setLayout(new GridLayout(2, 3));
+		resetPanel.setLayout(new GridLayout(1, 6));
 		resetPanel.setBorder(new TitledBorder("Transformation"));
 		posReset.addActionListener(this);
+		posReset.setToolTipText("Position Reset");
 		resetPanel.add(posReset);
 		adjustReset.addActionListener(this);
+		adjustReset.setToolTipText("Adjust Reset");
 		resetPanel.add(adjustReset);
 		adjust2Reset.addActionListener(this);
+		adjust2Reset.setToolTipText("Adjust(Backedge) Reset");
 		resetPanel.add(adjust2Reset);
 		adjust3Reset.addActionListener(this);
+		adjust3Reset.setToolTipText("Adjust(Find) Reset");
 		resetPanel.add(adjust3Reset);
 		simpleMixAdjust.addActionListener(this);
+		simpleMixAdjust.setToolTipText("Simple Mix Reset");
 		resetPanel.add(simpleMixAdjust);
 		dummyMixAdjust.addActionListener(this);
+		dummyMixAdjust.setToolTipText("Dummy Mix Reset");
 		resetPanel.add(dummyMixAdjust);
 		add(resetPanel);
 
@@ -152,6 +162,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		basicPanel.add(allReset);
 		add(basicPanel);
 
+		//add(scrollPane);
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -217,5 +228,4 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 			statePanel.stateGraphPanel.selectNodeAbstraction();
 		}
 	}
-
 }

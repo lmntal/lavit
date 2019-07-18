@@ -3,5 +3,5 @@
 % Numbers are unary atoms whose links are
 % connected to the atom 'n'. 
 
-n(1), n(2), n(3), n(4), n(5), n(6).
+n(1), n(2), n(3), n(4), n(5).
 n(A), n(B) :- n(A*B).

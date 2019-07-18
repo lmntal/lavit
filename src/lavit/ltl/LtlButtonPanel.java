@@ -42,6 +42,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -51,6 +52,7 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.editor.EditorPanel;
 import lavit.runner.SlimRunner;
+import lavit.stateviewer.StatePanel;
 import lavit.util.FixFlowLayout;
 
 @SuppressWarnings("serial")
@@ -241,6 +243,13 @@ class LtlButtonPanel extends JPanel implements ActionListener {
 					}
 					if (slimRunner.isSucceeded()) {
 						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), true);
+
+						StatePanel statePanel = new StatePanel();
+						JFrame stateFrame = new JFrame("StateViewer - " + editorPanel.getFileName());
+						stateFrame.setSize(new Dimension(1200, 800));
+						stateFrame.add(statePanel);
+						stateFrame.setVisible(true);
+						statePanel.start(slimRunner.getBufferString(), false);
 					}
 					slimRunner = null;
 					SwingUtilities.invokeLater(new Runnable() {

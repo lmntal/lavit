@@ -35,6 +35,7 @@
 
 package lavit.editor;
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,17 +50,20 @@ import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.frame.MainFrame;
 import lavit.localizedtext.MsgID;
 import lavit.runner.LmntalRunner;
 import lavit.runner.PrintLineListener;
 import lavit.runner.ProcessFinishListener;
 import lavit.runner.ProcessTask;
 import lavit.runner.SlimRunner;
+import lavit.stateviewer.StatePanel;
 import lavit.util.FileUtils;
 import lavit.util.StringUtils;
 
@@ -202,13 +206,10 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 		final String sep = File.separator;
 		ProcessTask task;
 		String compiler_path = Env.get("path.lmntalcompiler");
-		if (compiler_path.contains(".jar"))
-		{
-		    task = ProcessTask.createJarProcessTask(compiler_path, javaArgs, args);
-		}
-		else
-		{
-		    task = ProcessTask.createProcessTask(compiler_path, args);
+		if (compiler_path.contains(".jar")) {
+			task = ProcessTask.createJarProcessTask(compiler_path, javaArgs, args);
+		} else {
+			task = ProcessTask.createProcessTask(compiler_path, args);
 		}
 		Env.setProcessEnvironment(task.getEnvironment());
 
@@ -325,7 +326,14 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 					}
 					FrontEnd.println("(SLIM) Done! [" + (slimRunner.getTime() / 1000.0) + "s]");
 					if (slimRunner.isSucceeded()) {
-						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), false);
+						//FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), false);
+						StatePanel statePanel = new StatePanel();
+						//JFrame stateFrame = new JFrame("StateViewer - " + editorPanel.getFileName());
+						// stateFrame.setSize(new Dimension(1200, 800));
+						// stateFrame.add(statePanel);
+						// stateFrame.setVisible(true);
+						FrontEnd.mainFrame.stateTab.addTab(editorPanel.getFileName(), statePanel);
+						statePanel.start(slimRunner.getBufferString(), false);
 					}
 					slimRunner = null;
 					SwingUtilities.invokeLater(new Runnable() {

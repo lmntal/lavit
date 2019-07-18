@@ -47,13 +47,14 @@ import java.io.OutputStreamWriter;
 
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.stateviewer.controller.StateControlPanel;
 
 @SuppressWarnings("serial")
-public class StatePanel extends JPanel {
+public class StatePanel extends JSplitPane {
 	public StateGraphPanel stateGraphPanel;
 
 	public StateControlPanel stateControlPanel;
@@ -64,13 +65,18 @@ public class StatePanel extends JPanel {
 
 	public StatePanel() {
 
-		setLayout(new BorderLayout());
+		//setLayout(new BorderLayout());
+		setOrientation(JSplitPane.VERTICAL_SPLIT);
 
 		stateGraphPanel = new StateGraphPanel(this);
-		add(stateGraphPanel, BorderLayout.CENTER);
+		//add(stateGraphPanel, BorderLayout.CENTER);
+		setTopComponent(stateGraphPanel);
 
 		stateControlPanel = new StateControlPanel(this);
-		add(stateControlPanel, BorderLayout.SOUTH);
+		//add(stateControlPanel, BorderLayout.SOUTH);
+		setBottomComponent(stateControlPanel);
+
+		setDividerLocation(350);
 
 		/*
 		 * setLayout(new BorderLayout());
@@ -104,7 +110,7 @@ public class StatePanel extends JPanel {
 			FrontEnd.println("(StateViewer) start! (state = " + drawNodes.size() + ")");
 			stateGraphPanel.init(drawNodes);
 			stateGraphPanel.getDraw().setCycleMode(ltlMode);
-			FrontEnd.mainFrame.toolTab.setTab("StateViewer");
+			//FrontEnd.mainFrame.toolTab.setTab("StateViewer");
 		} else {
 			FrontEnd.println("(StateViewer) error.");
 		}

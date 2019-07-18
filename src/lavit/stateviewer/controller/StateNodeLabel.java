@@ -55,7 +55,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 	private JLabel stateNodenum;
 	private JLabel stateLabel;
 
-	private JTextField stateTextField;
+	private JTextField stateTextField; // TextField for Display State Text
 
 	public StateNodeLabel() {
 
@@ -102,9 +102,10 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			} else {
 				stateLabel.setText("");
 			}
-			stateTextField.setText(node.toString());
-			stateTextField.setVisible(true);
-			setVisible(true);
+			// stateTextField.setText(node.toString());
+			// stateTextField.setVisible(true);
+			// setVisible(true);
+			StateUnderInfoPanel.stateText = node.toString();
 		} else if (nodes.size() > 1) {
 			stateNodenum.setText("Node: " + nodes.size());
 			stateLabel.setText("");

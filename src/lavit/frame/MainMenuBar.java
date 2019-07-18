@@ -233,9 +233,17 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 				FrontEnd.mainFrame.setFileViewVisible(itemShowFileView.isSelected());
 			}
 		});
+		final JCheckBoxMenuItem itemShowControlButton = new JCheckBoxMenuItem("StateViewer Tab");
+		itemShowControlButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//hide StateViewer Tab
+				FrontEnd.mainFrame.toolTab.setTabVisible("StateViewer", itemShowControlButton.isSelected());
+			}
+		});
 		menuView.addMenuListener(new MenuListener() {
 			public void menuSelected(MenuEvent e) {
 				itemShowFileView.setSelected(FrontEnd.mainFrame.isFileViewVisible());
+				itemShowControlButton.setSelected(FrontEnd.mainFrame.toolTab.isTabVisible("StateViewer"));			
 			}
 
 			public void menuDeselected(MenuEvent e) {
@@ -245,6 +253,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 			}
 		});
 		menuView.add(itemShowFileView);
+		menuView.add(itemShowControlButton);
 
 		run = new JMenu(Env.getMsg(MsgID.menu_run));
 		add(run);

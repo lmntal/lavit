@@ -745,6 +745,7 @@ public class StateGraphPanel extends JPanel
 	}
 
 	public void emBackNodes(ArrayList<StateNode> nodes) {
+		searchReset();
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 		drawNodes.allNodeUnMark();
 
@@ -774,6 +775,7 @@ public class StateGraphPanel extends JPanel
 	}
 
 	public void emFromNodes(ArrayList<StateNode> nodes) {
+		searchReset();
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 		drawNodes.allNodeUnMark();
 
@@ -803,6 +805,7 @@ public class StateGraphPanel extends JPanel
 	}
 
 	public void emNextNodes(ArrayList<StateNode> nodes) {
+		searchReset();
 		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
 		drawNodes.allNodeUnMark();
 

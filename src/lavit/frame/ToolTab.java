@@ -37,6 +37,7 @@ package lavit.frame;
 
 import java.awt.Dimension;
 
+import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
 import lavit.ltl.LtlPanel;
@@ -71,7 +72,11 @@ public class ToolTab extends JTabbedPane
 		addTab("LTL Model Check", ltlPanel);
 
 		statePanel = new StatePanel();
-		addTab("StateViewer", statePanel);
+		//addTab("StateViewer", statePanel);
+		// JFrame stateFrame = new JFrame("StateViewer");
+		// stateFrame.setSize(new Dimension(1200, 800));
+		// stateFrame.add(statePanel);
+		// stateFrame.setVisible(true);
 
 		stateProfilePanel = new StateProfilePanel();
 		addTab("StateProfiler", stateProfilePanel);
@@ -94,5 +99,24 @@ public class ToolTab extends JTabbedPane
 		{
 			setSelectedComponent(stateProfilePanel);
 		}
+	}
+
+	public void setTabVisible (String tab, boolean visible) {
+		if (tab.equals("StateViewer")) {
+			//setEnabledAt(2, visible);
+			if (visible) {
+				addTab("StateViewer", statePanel);
+			} else {
+				remove(statePanel);
+			}
+		}
+	}
+
+	public boolean isTabVisible (String tab) {
+		if (tab.equals("StateViewer")) {
+			for (int i=0; i<getTabCount(); i++) if(getTabComponentAt(i).getName().equals("StateViewr")) return true;
+			return false;
+		}
+		return false;
 	}
 }

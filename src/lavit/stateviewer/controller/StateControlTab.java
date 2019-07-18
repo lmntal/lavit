@@ -35,7 +35,11 @@
 
 package lavit.stateviewer.controller;
 
+import java.awt.Dimension;
+
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.ScrollPaneConstants;
 
 import lavit.stateviewer.StatePanel;
 
@@ -45,29 +49,40 @@ public class StateControlTab extends JTabbedPane {
 	public StatePanel statePanel;
 
 	public StateButtonPanel buttonPanel;
+	public JScrollPane buttonScroll;
 	public StateSimulationPanel simulationPanel;
+	public JScrollPane simulationScroll;
 	public StateSearchPanel searchPanel;
+	public JScrollPane searchScroll;
 	public StateDynamicControlPanel dynamicPanel;
+	public JScrollPane dynamicScroll;
 	public StateOtherPanel otherPanel;
+	public JScrollPane otherScroll;
 	public StateBetaPanel betaPanel;
+	public JScrollPane betaScroll;
 
 	StateControlTab(StatePanel statePanel) {
 		this.statePanel = statePanel;
 
 		buttonPanel = new StateButtonPanel(statePanel);
-		addTab("Control Button", buttonPanel);
+		buttonScroll = new JScrollPane(buttonPanel);
+		addTab("Control Button", buttonScroll);
 
 		simulationPanel = new StateSimulationPanel(statePanel);
-		addTab("Simulation", simulationPanel);
+		simulationScroll = new JScrollPane(simulationPanel);
+		addTab("Simulation", simulationScroll);
 
 		searchPanel = new StateSearchPanel(statePanel);
-		addTab("Search", searchPanel);
+		searchScroll = new JScrollPane(searchPanel);
+		addTab("Search", searchScroll);
 
 		dynamicPanel = new StateDynamicControlPanel(statePanel);
-		addTab("Dynamic", dynamicPanel);
+		dynamicScroll = new JScrollPane(dynamicPanel);
+		addTab("Dynamic", dynamicScroll);
 
 		otherPanel = new StateOtherPanel(statePanel);
-		addTab("Other", otherPanel);
+		otherScroll = new JScrollPane(otherPanel);
+		addTab("Other", otherScroll);
 
 		betaPanel = new StateBetaPanel(statePanel);
 		addTab("Beta", betaPanel);

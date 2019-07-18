@@ -1,0 +1,2 @@
+n = integer.set(2,50).
+n(A),n(B) :- A mod B =:= 0 | n(B).

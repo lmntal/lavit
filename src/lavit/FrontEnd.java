@@ -41,6 +41,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -140,7 +141,7 @@ public class FrontEnd
 		String properties_path = "lmntal" + File.separator + Env.getDirNameOfGraphene() + File.separator + "LMNtal.properties";
 		Properties properties = createProperties(properties_path);
 		properties.setProperty("additional_options", Env.get("SLIM_OPTION"));
-		properties.setProperty("slim_path", Env.get("path.slim.exe"));
+		properties.setProperty("slim_path", Paths.get(Env.get("path.slim.exe")).toAbsolutePath().toString());
 		properties.setProperty("lmntal_home", System.getenv("LMNTAL_HOME"));
 		try {
 		    FileOutputStream fos = new FileOutputStream(properties_path);

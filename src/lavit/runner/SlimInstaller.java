@@ -376,7 +376,7 @@ public class SlimInstaller implements OuterRunner
 		{
 			String shCmd = Env.getBinaryAbsolutePath("sh") + " configure --prefix=" + getLinuxStyleSlimInstallPathName() + " " + Env.get("SLIM_CONFIGURE_OPTION");
 			String makeCleanCmd = Env.getBinaryAbsolutePath("make") + " clean";
-			String makeCmd = Env.getBinaryAbsolutePath("make");
+			String makeCmd = Env.getBinaryAbsolutePath("make") + " -j";
 			String makeInstallCmd = Env.getBinaryAbsolutePath("make") + " install";
 			boolean succeeded = true;
 			int ret;

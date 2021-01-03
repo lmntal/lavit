@@ -290,6 +290,7 @@ public class MainFrame extends JFrame
 		Env.set("window.fileview.visible", editorPanel.isFileViewVisible());
 		Env.set("window.fileview.divider", editorPanel.getFileViewDividerLocation());
 		Env.set("window.fileview.filter", editorPanel.getFileViewExtensionFilterText());
+  Env.save();
 	}
 
 	private void loadLTLFile(File lmntalFile)

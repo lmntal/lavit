@@ -174,12 +174,12 @@ public class MainFrame extends JFrame
 
 		addWindowListener(new MainWindowListener(this));
 
-  // command-Qなどでアプリケーションを閉じるときもenv.txtを保存するようhook登録
-  Runtime.getRuntime().addShutdownHook(new Thread(){
-    public void run(){
-      exit();
-    }
-  });
+		// command-Qなどでアプリケーションを閉じるときもenv.txtを保存するようhook登録
+		Runtime.getRuntime().addShutdownHook(new Thread(){
+				public void run(){
+					exit();
+				}
+		});
 	}
 
 	public void addChildWindow(Window window)
@@ -297,7 +297,7 @@ public class MainFrame extends JFrame
 		Env.set("window.fileview.visible", editorPanel.isFileViewVisible());
 		Env.set("window.fileview.divider", editorPanel.getFileViewDividerLocation());
 		Env.set("window.fileview.filter", editorPanel.getFileViewExtensionFilterText());
-  Env.save();
+		Env.save();
 	}
 
 	private void loadLTLFile(File lmntalFile)

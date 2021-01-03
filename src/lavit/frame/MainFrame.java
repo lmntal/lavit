@@ -173,6 +173,13 @@ public class MainFrame extends JFrame
 		setContentPane(editorSplit);
 
 		addWindowListener(new MainWindowListener(this));
+
+  // command-Qなどでアプリケーションを閉じるときもenv.txtを保存するようhook登録
+  Runtime.getRuntime().addShutdownHook(new Thread(){
+    public void run(){
+      exit();
+    }
+  });
 	}
 
 	public void addChildWindow(Window window)

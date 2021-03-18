@@ -1,0 +1,39 @@
+/* 
+ * Fibonacci(topdown) in LMNtal(lmn-mem)
+ * Author: Seiji OGAWA, 2011-03-31
+ *
+ * Examples are taken from:
+ *   http://dtai.cs.kuleuven.be/CHR/examples.shtml
+ *
+ * If you'd like to change parameter N, 
+ * please change the 1st argument of start("N").
+ *
+ */
+
+{
+
+  start(6).
+  start(S) :- int(S) | fib(L, M), n{+L, n(S)}, v{+M, +R}, result(R), '$callback'(gettime, s).
+
+  fib0 @@ 
+  fib(L1, M1), n{+L1, $n1, n(N1)}, v{+M1, $v1},
+  fib(L2, M2), n{+L2, $n2, n(N2)}, v{+M2, $v2} :-
+    N1 =:= N2 |
+    fib(L1, M1), fib(L, M), n{+L1, $n1, $n2, n(N1), +L}, v{+M1, $v1, $v2, +M}.
+
+  fib1 @@ fib(L,M), n{+L, $p, n(0)}, v{+M, $q} :- n{$p, n(0)}, v{$q, v(1)}.
+  fib2 @@ fib(L,M), n{+L, $p, n(1)}, v{+M, $q} :- n{$p, n(1)}, v{$q, v(1)}.
+
+  add @@ v{+H, $r} = v{$p, v(X)} + v{$q, v(Y)}  :- Z = X + Y | 
+    v{$p, v(X)}, v{$q, v(Y)}, v{+H, $r, v(Z)}.
+  last @@ result = v{v(V)} :- int(V) | result(V).
+
+  fib3 @@ fib(L, M), n{+L, $p, n(N)}, v{+M, $q} :- 
+    N > 1, N1 = N-1, N2 = N-2 |
+    fib(L1, M1), n{+L1, n(N1)}, v{+M1, +_M1}, fib(L2, M2), n{+L2, n(N2)}, v{+M2, +_M2}, 
+    n{$p, n(N)}, v{$q} = _M1 + _M2.
+
+}.
+{s(S), result(R), $p[], @p}/ :- float(S), int(R) | start(S), result(R), '$callback'(gettime, end).
+end(E), start(S) :- T = E-.S | time(T).
+

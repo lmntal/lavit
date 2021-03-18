@@ -1,0 +1,50 @@
+/* 
+ * Union-Find algorithm in LMNtal(lmn-mem)
+ * Author: Seiji OGAWA, 2011-03-31
+ * 
+ * Examples are taken from:
+ *   http://dtai.cs.kuleuven.be/CHR/examples.shtml
+ *
+ * If you'd like to change parameter N, 
+ * please change the 1st argument of start("N").
+ *
+ */
+{
+
+  linkEq   @@ link(A1,A2), {+A1, +A2, v(V), $p} :- int(V) | {v(V), $p}.   
+  linkLeft @@ link(A1,B1), root(A2,NA), root(B2,NB), {+A1,+A2,v(VA),$p}, {+B1,+B2,v(VB),$q} :- 
+      int(VA), int(VB), NA>=NB, NB1 = NB+1 | 
+      '~>'(B3,A3), NA1 = max(NA,NB1), root(A4,NA1), {+A3,+A4,v(VA),$p}, {+B3,v(VB),$q}.
+  linkRight@@ link(B1,A1), root(A2,NA), root(B2,NB), {+A1,+A2,v(VA),$p}, {+B1,+B2,v(VB),$q} :- 
+      int(VA), int(VB), NA>=NB, NB1 = NB+1 |
+      '~>'(B3,A3), NA1 = max(NA,NB1), root(A4,NA1), {+A3,+A4,v(VA),$p}, {+B3,v(VB),$q}.
+  max1 @@ H = max(A,B) :- A =< B | H = B.
+  max2 @@ H = max(A,B) :- A > B  | H = A.
+
+  findNode @@ '~>'(A1,B), find(A2,link(find(X))), {+A1,+A2,v(VA),$p}, {+B,v(VB),$q}, {+X,v(VX),$r} :- 
+      int(VA), int(VB), int(VX) | find(B1,link(find(X1))), '~>'(A3,X2), 
+      {+A3,v(VA),$p}, {+B1,v(VB),$q}, {+X1,+X2,v(VX),$r}.
+  findNode1 @@ '~>'(A1,B), find(A2,link(find(X))), {+A1,+A2,+X,v(VA),$p}, {+B,v(VB),$q} :- 
+      int(VA), int(VB) | find(B1,link(find(X1))), 
+      '~>'(A3,X2), {+A3,+X1,+X2,v(VA),$p}, {+B1,v(VB),$q}.
+  findRoot @@ root(B1,R), find(B2,X), {+B1,+B2,v(VB),$p} :- 
+      int(VB) | root(B1,R), {+B1,+B3,v(VB),$p}, X=B3.
+
+  union @@ union(A,B), {+A,v(VA),$p}, {+B,v(VB),$q} :- 
+      int(VA), int(VB) | find(A1,X), find(B1,Y), link(X,Y), {+A1,v(VA),$p}, {+B1,v(VB),$q}.
+  make   @@ make(A) :- root(A,0).
+
+  s{
+    start(200).
+
+    list = [].
+    start(S), list = H :- S > 1, S1 = S-1 | start(S1), list = [S|H].
+    start(1) :- s(X), {+X, v(1)}.
+    s({$p}), list = [X|H] :- int(X) | s({$p, +R}), list = H, root(R1, 0), union(R2, R), {+R1, +R2, v(X)}.
+    list = [], s(L), {+L, $p} :- root(L1, 0), {+L1, $p}.
+  }.
+  s{$p, @p}/ :- $p, '$callback'(gettime, start).
+
+}.
+{start(S), $p[], @p}/ :- float(S) | start(S), '$callback'(gettime, end).
+end(E), start(S) :- T = E-.S | time(T).

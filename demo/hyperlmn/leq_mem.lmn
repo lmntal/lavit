@@ -1,0 +1,46 @@
+/* 
+ * Inequality constraint solver in LMNtal(lmn-mem)
+ * Author: Seiji OGAWA, 2011-03-31
+ * 
+ * Examples are taken from:
+ *   http://dtai.cs.kuleuven.be/CHR/examples.shtml
+ *
+ * If you'd like to change parameter N, 
+ * please change the 1st argument of i("N", 0).
+ *
+ */
+
+{
+
+refl@@ leq(X1,X2), {+X1,+X2,v($v),$p} :-
+    int($v) | {$p}.
+anti@@ leq(X1,Y1), leq(Y2,X2),
+  {+X1,+X2,v($vx),$p}, {+Y1,+Y2,v($vy),$q} :-
+    int($vx), int($vy) | {$p,$q,v($vx)}.
+idem@@ leq(X1,Y1) \ leq(X2,Y2),
+  {+X1,+X2,v($vx),$p}, {+Y1,+Y2,v($vy),$q} :-
+    int($vx), int($vy) |
+    {+X1,v($vx),$p}, {+Y1,v($vy),$q}.
+tran0@@ leq(X1,Y1), leq(Y2,Z2), {+Y1,+Y2,v($y),$q} \
+  {+X1,v($x),$p}, {+Z2,v($z),$r} :-
+    uniq($x,$z), int($y) |
+    leq(Z3,X3),
+    {+X1,+X3,v($x),$p}, {+Z2,+Z3,v($z),$r}.
+tran1@@ leq(X1,Y1), leq(Y2,Z2), {+Y1,+Y2,v($y),$q} \
+  {+X1,+Z2,v($x),$p} :-
+    uniq($x),int($y) |
+    leq(Z3,X3), {+X1,+X3,+Z2,+Z3,v($x),$p}.
+
+  s{
+    i(10, 0). 
+    list = [].
+    i(M, I), list = H :- M > I, I1 = I+1 | i(M, I1), list = [X|H], {+X,v(I)}.
+    i(M1,M2), list = [X|R], {+X,$p} :- M1 =:= M2 | l(X1, [X2|R]), {+X1,+X2,$p}.
+    l(H, [X,Y|R]), {+X,$x}, {+Y,$y} :- l(H, [Y1|R]), leq(X2, Y2), {+X2,$x}, {+Y1,+Y2,$y}.
+    l(X, [Y]), {+X,$x}, {+Y,$y} :- leq(Y1, X1), {+X1,$x}, {+Y1,$y}
+  }.
+  s{$p, @p}/ :- $p, '$callback'(gettime, start).
+
+}.
+{start(S), $p[], @p}/ :- float(S) | start(S), '$callback'(gettime, end).
+end(E), start(S) :- T = E-.S | time(T).

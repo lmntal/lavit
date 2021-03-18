@@ -1,0 +1,12 @@
+//100.ナイトの到達範囲(A Knight's Reach)
+//無限に広いチェス盤の上でナイトがn手分動いたとき、ナイトが到達可能なマスはいくつか
+//（ナイトの動きはL字型である。すなわち、上下左右のいずれかの方向に2マス動いた後、
+//垂直な方向に1マス動く）。
+//Anamy Levitin, Maria Levitin, Kurokawa Hiroshi and Matsuzaki kiminori, アルゴリズムパズル プログラマのための数学パズル入門:オライリージャパン,2014, p.67. 
+
+n(10)=knight(0,0),
+v(-1,-2),v(-1,2),v(1,-2),v(1,2),
+v(-2,-1),v(-2,1),v(2,-1),v(2,1).
+
+n(N)=knight(X,Y),v(Xv,Yv):-
+N>0,N1=N-1,Xaft=X+Xv,Yaft=Y+Yv|n(N1)=knight(Xaft,Yaft),v(Xv,Yv).

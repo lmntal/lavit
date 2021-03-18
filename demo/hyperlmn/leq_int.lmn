@@ -1,0 +1,36 @@
+/* 
+ * Inequality constraint solver in LMNtal(lmn-int)
+ * Author: Seiji OGAWA, 2011-03-31
+ * 
+ * Examples are taken from:
+ *   http://dtai.cs.kuleuven.be/CHR/examples.shtml
+ *
+ * If you'd like to change parameter N, 
+ * please change the 1st argument of i("N", 0).
+ *
+ */
+
+{
+
+  refl@@ leq($x1,$x2) :- $x1=:=$x2 | .
+  anti@@ leq($x1,$y1), leq($y2,$x2) :-
+            $x1=:=$x2, $y1=:=$y2 | .
+  idem@@ leq($x1,$y1) \ leq($x2,$y2) :-
+            $x1=:=$x2, $y1=:=$y2 | .
+  tran@@ leq($x1,$y1), leq($y2,$z2) \ :-
+            $y1=:=$y2, uniq($x1,$z2) | leq($x1,$z2).
+
+  {
+    i(10, 0). 
+
+    list = [].
+    i(M, I), list = H :- M > I, I1 = I+1 | i(M, I1), list = [I|H].
+    i(M1,M2), list = [X,Y|R] :- M1 =:= M2, ground(X) | l(X, [X,Y|R]).
+    l(H, [X,Y|R]) :- ground(Y) | l(H, [Y|R]), leq(X, Y). 
+    l(X, [Y]) :- leq(Y, X).
+  }.
+  {$p, @p}/ :- $p, '$callback'(gettime, start).
+
+}.
+{start(S), $p[], @p}/ :- float(S) | '$callback'(gettime, end).
+end(E), start(S) :- T = E-.S | time(T).

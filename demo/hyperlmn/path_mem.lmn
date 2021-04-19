@@ -1,0 +1,48 @@
+/* 
+ * Closed path search in LMNtal(lmn-mem)
+ * Author: Seiji OGAWA, 2011-03-31
+ * 
+ * Examples are taken from:
+ *   http://dtai.cs.kuleuven.be/CHR/examples.shtml
+ *
+ * If you'd like to change parameter N, 
+ * please change the 1st argument of i("N", 0).
+ *
+ */
+
+% ノード番号I(I<N)毎に, I, I+1, I+2の3頂点からなるedge群を初期グラフとして与える
+% N = 5 のときの初期グラフは
+%   edge(1,2), edge(2,3), edge(3,1).
+%   edge(2,3), edge(3,4), edge(4,2).
+%   edge(3,4), edge(4,5), edge(5,3).
+%   edge(4,5), edge(5,1), edge(1,4).
+
+{
+
+  s{
+    i(3, 0).
+    
+    list = [].
+    i(M, I), list = H :- I < M, I1 = I+1 | i(M, I1), list = [X | H], {+X, n(I1)}.
+    i(M1, M2) :- M1 =:= M2 | j.
+    j, list = [X, Y, Z | R], {+X, $x}, {+Y, $y}, {+Z, $z} :- 
+        list = [Y, Z | R], {+HX1, +HX2, +HX, $x}, {+Y, +HY1, +HY2, $y}, {+Z, +HZ1, +HZ2, $z},
+        edge(HX1, HY1), edge(HY2, HZ1), edge(HZ2, HX2), f(HX).
+    list = [X, Y, Z | R], {+X, $x}, {+Y, $y}, {+Z, $z} :- 
+        list = [Y, Z | R], {+HX1, +HX2, $x}, {+Y, +HY1, +HY2, $y}, {+Z, +HZ1, +HZ2, $z},
+        edge(HX1, HY1), edge(HY2, HZ1), edge(HZ2, HX2).
+    list = [Y, Z], f(X), {+X, $x}, {+Y, $y}, {+Z, $z} :- 
+        {+HX1, +HX2, $x}, {+HY1, +HY2, $y}, {+HZ1, +HZ2, $z},
+        edge(HX1, HY1), edge(HY2, HZ1), edge(HZ2, HX2).
+
+  }.
+  s{$p, @p}/ :- $p, '$callback'(gettime, start).
+
+  findcycle @@ edge(HX1, HY1), edge(HY2, HZ1), edge(HZ2, HX2), 
+        {+HX1, +HX2, n(N1), $x}, {+HY1, +HY2, n(N2), $y}, {+HZ1, +HZ2, n(N3), $z} :- 
+            int(N1), int(N2), int(N3) | 
+            {n(N1), $x}, {n(N2), $y}, {n(N3), $z}, cycle(N1, N2, N3).
+
+  }.
+{start(S), $p[], @p}/ :- float(S) | start(S), '$callback'(gettime, end).
+end(E), start(S) :- T = E-.S | time(T).

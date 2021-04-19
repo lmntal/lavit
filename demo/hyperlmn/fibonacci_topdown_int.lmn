@@ -1,0 +1,31 @@
+/* 
+ * Fibonacci(topdown) in LMNtal(lmn-int)
+ * Author: Seiji OGAWA, 2011-03-31
+ *
+ * Examples are taken from:
+ *   http://dtai.cs.kuleuven.be/CHR/examples.shtml
+ *
+ * If you'd like to change parameter N, 
+ * please change the 1st argument of start("N").
+ *
+ */
+
+{
+
+  unify @@ fib(N1,M1) \ fib(N2,M2) :- N1 =:= N2, int(M2) | .
+  fib1  @@ fib(0,M) :- M = 1.
+  fib2  @@ fib(1,M) :- M = 1.
+  fib3  @@ fib(N,M) :-
+             N > 1, N1 = N-1, N2 = N-2 | 
+             fib(N1,M1), fib(N2,M2), M = M1+M2.
+  H = X+Y :- Z = X+Y | H = Z.
+
+  {
+    start(13).
+  }.
+  {start(S)} :- int(S) | fib(S, result), '$callback'(gettime, start).
+
+}.
+{start(S), result(R), $p[], @p}/ :- float(S), int(R) | start(S), result(R), '$callback'(gettime, end).
+end(E), start(S) :- T = E-.S | time(T).
+

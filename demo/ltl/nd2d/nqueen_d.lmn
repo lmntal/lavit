@@ -1,0 +1,22 @@
+// nqueen の非決定実行を通常実行で再現
+
+{
+    solve(8).
+
+    start@@ solve(N) 
+        :- int(N), N2=N*2, Nd=1-N, Nu=N-1 
+        | c(1,N), init(r,1,N), init(u,2,N2), init(d,Nd,Nu).
+    init@@ init(U,N,M) :- unary(U), N =< M, NN=N+1 | U = N, init(U,NN,M).
+    init_fin@@ init(U,N,M) :- unary(U), N > M |.
+    id@@ :-uniq | id(!ID).
+
+}.
+
+nd@@ {c(C,N), r(R), u(U), d(D), id(!ID), $p[], @r} 
+    :-  int(N), U=:=R+C, D=:=R-C, C1=C+1, uniq(C,R,!ID) 
+    | {queen(C,R), c(C1,N), id(!New), $p[], @r},{c(C,N), r(R), u(U), d(D),id(!ID), $p[], @r}.
+
+// 出力整形用
+format1@@ {c(C,N), $p[], @r}/ :- C =< N |.
+format2@@ {c(C,N),u(A), $p[], @r}/ :-int(A), C > N |{c(C,N), $p[], @r}.
+format3@@ {c(C,N),d(A), $p[], @r}/ :-int(A), C > N |{c(C,N), $p[], @r}.

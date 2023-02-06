@@ -1,0 +1,30 @@
+// 真夜中の橋渡し問題
+// 最もコストが少なくなるような経路を表示する
+// （元の ltl 式は、コストが 17 以下になるようなものを表示するものだった）
+
+{
+    x(1), x(2), x(5), x(10), light(0),total(0).
+    route([begin]).
+    :- uniq | id(!ID).
+    
+}.    
+
+min@@
+{total(T), $p[], @r}, {total(S), $p1[], @r1}
+    :- \+($p=(x(A),$pp)), T<S
+    | {total(T), $p[], @r}.
+
+go@@
+{x(T1), x(T2), total(S), light(0), id(!ID), route(L), $p[L], @r}
+    :- T1>=T2, S2=S+T1, uniq(T1,T2,S,!ID), 
+    | {y(T1), y(T2), total(S2), light(1), id(!New), route([go(T1,T2)|L]), $p[L], @r},
+        {x(T1), x(T2), total(S), light(0), id(!ID), route(L), $p[L], @r}.
+
+back@@
+{y(T), total(S), light(1),id(!ID), route(L), $p[L], @r}
+    :- S2=S+T, uniq(T,S,!ID)
+    | {x(T), total(S2), light(0), id(!New), route([back(T)|L]), $p[L], @r},
+        {y(T), total(S), light(1),id(!ID), route(L), $p[L], @r}.
+
+// データ整形用
+{x(N), $p[], @r} :- int(N) | .

@@ -1,0 +1,23 @@
+// 何を求めたいかによって拡張する必要がある
+// 例：最も少ないコスト（とそれに至る道筋）など
+
+{
+    x(0,1), x(0,2), x(0,5), x(0,10), light(0),total(0).
+
+    :- uniq | id(!ID).
+
+}.    
+go@@
+{x(0,T1), x(0,T2), total(S), light(0), id(!ID), $p[], @r}
+    :- T1>=T2, S2=S+T1, uniq(T1,T2,S,!ID), 
+    | {x(1,T1), x(1,T2), total(S2), light(1), id(!New), $p[], @r},
+        {x(0,T1), x(0,T2), total(S), light(0), id(!ID), $p[], @r}.
+
+back@@
+{x(1,T), total(S), light(1),id(!ID), $p[], @r}
+    :- S2=S+T, uniq(T,S,!ID)
+    | {x(0,T), total(S2), light(0), id(!New), $p[], @r},
+        {x(1,T), total(S), light(1),id(!ID), $p[], @r}.
+
+// データ整形用
+{x(0,N), $p[], @r} :- int(N) | .

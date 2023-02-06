@@ -1,0 +1,18 @@
+// imagawa 
+// 4queen 問題の初期状態をルールで生成するように変更（Nqueen）
+
+solve(8).
+
+{
+  '$callback'(zerostep).
+
+  start@@ solve(N) 
+        :- int(N), N2=N*2, Nd=1-N, Nu=N-1 
+        | c(1), init(r,1,N), init(u,2,N2), init(d,Nd,Nu).
+  init@@ init(U,N,M) :- unary(U), N =< M, NN=N+1 | U = N, init(U,NN,M).
+  init_fin@@ init(U,N,M) :- unary(U), N > M |.
+
+}.
+
+c(C), r(R), u(U), d(D) :-
+  U=:=R+C, D=:=R-C, C1=C+1 | queen(C,R), c(C1).

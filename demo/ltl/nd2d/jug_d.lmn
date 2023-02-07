@@ -1,0 +1,38 @@
+/*
+ jug_nd.lmn を通常実行で再現
+ この問題のように，経路があるかないかを調べたいときは
+ 通常実行はあまり向かないと考えられる．
+ また，無限ループを含むような問題は，
+ uniq で意味的に同じマッチングの制御をしなければいけない
+*/
+
+{
+    jug(0,350). jug(0,500).
+}.
+
+empty@@
+    {jug(X,Xmax), jug(Y,Ymax), $p[], @r}
+        :- X>0, uniq(X,Xmax,Y,Ymax) 
+        | {jug(X,Xmax), jug(Y,Ymax), $p[], @r}, {jug(0,Xmax), jug(Y,Ymax), $p[], @r}.
+
+fillup@@
+    {jug(X,Xmax), jug(Y,Ymax), $p[], @r}
+        :- X<Xmax, uniq(X,Xmax,Y,Ymax) 
+        | {jug(X,Xmax), jug(Y,Ymax), $p[], @r}, {jug(Xmax,Xmax), jug(Y,Ymax), $p[], @r}.
+
+moveAndFill@@
+    {jug(X0,Xmax), jug(Y,Ymax), $p[], @r}
+        :- X0>0, Y<Ymax, X=X0-(Ymax-Y), X>0, uniq(X0,Xmax,Y,Ymax) 
+        | {jug(X0,Xmax), jug(Y,Ymax), $p[], @r}, {jug(X,Xmax), jug(Ymax,Ymax), $p[], @r}.
+
+moveAndEmpty@@
+    {jug(X,Xmax), jug(Y0,Ymax), $p[], @r}
+        :- X>0, Y0<Ymax, Y=X+Y0, Y<Ymax, uniq(X,Xmax,Y0,Ymax) 
+        | {jug(X,Xmax), jug(Y0,Ymax), $p[], @r}, {jug(0,Xmax), jug(Y,Ymax), $p[], @r}.
+
+//データ整形: 作れる全ての組み合わせを表示するように
+format@@ 
+    {jug(X,Xmax), jug(Y,Ymax)}, {jug(X1,Xmax1), jug(Y1,Ymax1)}
+        :- X=:=X1, Y=:=Y1, Xmax=:=Xmax1, Ymax=:=Ymax1 
+        | {jug(X,Xmax), jug(Y,Ymax)}.
+

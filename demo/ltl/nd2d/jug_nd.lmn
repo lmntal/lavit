@@ -1,0 +1,21 @@
+/* Water jug problem
+   Try changing the capacities or adding more jugs.
+*/
+
+jug(0,350). jug(0,500).
+
+empty@@
+  jug(X,Xmax) :- X>0    | jug(0,Xmax).
+  
+fillUp@@
+  jug(X,Xmax) :- X<Xmax | jug(Xmax,Xmax).
+  
+moveAndFill@@
+  jug(X0,Xmax), jug(Y,Ymax) :-
+     X0>0, Y<Ymax, X=X0-(Ymax-Y), X>0 |
+     jug(X,Xmax), jug(Ymax,Ymax).
+     
+moveAndEmpty@@
+  jug(X,Xmax), jug(Y0,Ymax) :-
+     X>0, Y0<Ymax, Y=X+Y0, Y<Ymax |
+     jug(0,Xmax), jug(Y,Ymax).

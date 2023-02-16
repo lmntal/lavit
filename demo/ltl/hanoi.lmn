@@ -1,7 +1,4 @@
-/*
- * Tower of Hanoi puzzle
- * 2007/06/09(Sat) by okabe
- */
+
 
 poles(p([1,2,3,4,99]),p([99]),p([99])).
 

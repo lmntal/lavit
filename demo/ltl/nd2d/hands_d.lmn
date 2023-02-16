@@ -1,0 +1,18 @@
+//誰とも手を繋いでいない子供がいないことを確かめる
+
+{
+    kid(!A,!B), kid(!C,!D),
+    kid(!E,!F). //kid(!G,!H),
+    % kid(!I,!J), kid(!K,!L).
+    hand(!A),hand(!B),hand(!C),hand(!D),hand(!E),hand(!F).
+    % hand(!G),hand(!H),hand(!I),hand(!J),hand(!K),hand(!L).
+}.
+
+hand@@
+{kid(!A,!B),hand(!B),hand(!C),kid(!C,!D), $p[], @r} 
+    :- uniq(!A,!B,!C,!D)
+    | {kid(!A,!B),hand(!B),hand(!C),kid(!C,!D), $p[], @r}, {kid(!A,!X),kid(!X,!D),$p[], @r}.
+
+
+//データ整形
+{kid(!A,!B),hand(!A),hand(!B), $p[], @r} :- .

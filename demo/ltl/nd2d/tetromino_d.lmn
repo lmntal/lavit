@@ -1,0 +1,60 @@
+// 指定したテトロミノで 4x4 のチェス盤を敷き詰められるか？
+{
+    size(N):- int(N), uniq | board(N,N,N).
+    board(I,J,N) :- J>0, JJ = J-1, int(I) | f(I,J), board(I,JJ,N).
+    board(I,J,N) :- I>1, J=:=0, II=I-1, int(N) | board(II,N,N).
+    board(1,0,N) :- int(N) | . 
+    :- uniq | id(!ID).
+
+size(4).
+st,st,st,st.
+% sq,sq,sq,sq.
+% l,l,l,l.
+% t,t,t,t.
+% z,z,z,z.
+% z,z.
+}.
+
+// 敷き詰められたら終わる（SLIM の上から実行を利用 さらに膜で囲んで終了検出をするルールにするなど，これ以外の方法も考えられる．）
+// このプログラムでは，敷き詰められるかどうかだけを判定する．
+finish@@ {$p[], @r}/ :- \+($p=(f(I,J),$pp)) | true.
+format@@ true, {$p[], @r} :- true.
+
+// 直線テトロミノ
+Straight1@@ {st, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}/ 
+    :- I1=:=I2, I2=:=I3, I3=:=I4, J1=:=J2+1, J2=:=J3+1, J3=:=J4+1, uniq(I1,J1,I2,J2,I3,J3,I4,J4,!ID) 
+    | {st, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}, {id(!New), $p[], @r}.
+Straight2@@ {st, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}/ 
+    :- J1=:=J2, J2=:=J3, J3=:=J4, I1=:=I2+1, I2=:=I3+1, I3=:=I4+1, uniq(I1,J1,I2,J2,I3,J3,I4,J4,!ID) 
+    | {st, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}, {id(!New), $p[], @r}.
+
+// 正方形
+Square@@ {sq, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}/ 
+    :- I1=:=I2, I3=:=I4, I1=:=I3+1, J1=:=J3, J2=:=J4, J1=:=J2+1, uniq(I1,J1,I2,J2,I3,J3,I4,J4,!ID)  
+    | {sq, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}, {id(!New), $p[], @r}.
+
+// L字
+L1@@ {l, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}/  
+    :- (J2-J1)*(J2-J1)=:=1, I3*2=:=I2+I4, I1=:=I2, J2=:=J3, J3=:=J4, uniq(I1,J1,I2,J2,I3,J3,I4,J4,!ID)  
+    | {l, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}, {id(!New), $p[], @r}.
+L2@@ {l, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}/  
+    :- (I2-I1)*(I2-I1)=:=1, J3*2=:=J2+J4, J1=:=J2, I2=:=I3, I3=:=I4, uniq(I1,J1,I2,J2,I3,J3,I4,J4,!ID)  
+    | {l, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}, {id(!New), $p[], @r}.
+
+// T字
+T1@@ {t, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}/  
+    :- (J3-J1)*(J3-J1)=:=1, I3*2=:=I2+I4, I1=:=I3, J2=:=J3, J3=:=J4, uniq(I1,J1,I2,J2,I3,J3,I4,J4,!ID)  
+    | {t, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}, {id(!New), $p[], @r}.
+T1@@ {t, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}/  
+    :- (I3-I1)*(I3-I1)=:=1, J3*2=:=J2+J4, J1=:=J3, I2=:=I3, I3=:=I4, uniq(I1,J1,I2,J2,I3,J3,I4,J4,!ID)  
+    | {t, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}, {id(!New), $p[], @r}.
+
+// Z字
+Z1@@ {z, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}/
+    :- (I3-I2)*(I3-I2)=:=1, J2=:=J3, (J2-J1)*(J2-J1)=:=1, I1=:=I2, (J3-J4)*(J3-J4)=:=1, I3=:=I4, J4-J1=\=0, uniq(I1,J1,I2,J2,I3,J3,I4,J4,!ID)  
+    | {z, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}, {id(!New), $p[], @r}.
+Z2@@ {z, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}/ 
+    :- (J3-J2)*(J3-J2)=:=1, I2=:=I3, (I2-I1)*(I2-I1)=:=1, J1=:=J2, (I3-I4)*(I3-I4)=:=1, J3=:=J4, I4-I1=\=0, uniq(I1,J1,I2,J2,I3,J3,I4,J4,!ID)  
+    | {z, f(I1,J1), f(I2,J2), f(I3,J3), f(I4,J4), id(!ID), $p[], @r}, {id(!New), $p[], @r}.
+
+

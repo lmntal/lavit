@@ -1,0 +1,28 @@
+/*
+    fe: ferryman, wo: wolf, go: goat, ca: cabbage
+    ヤギとキャベツが食べられないように川を渡る経路を1つ出力する
+*/
+{
+fe(0), wo(0), go(0), ca(0).
+:- uniq | path = [s].
+fe(F),wo(W),go(G) :- F=\=W, W=:=G | false.
+fe(F),go(G),ca(C) :- F=\=G, G=:=C | false.
+fe(F), wo(1), go(1), ca(1)\ :- F=:=1, uniq(F) | true.
+}.
+
+false@@ {false, $p[], @r} :- .
+w@@ {wo(W), fe(F), go(G), ca(C), path(H), @r}/ 
+        :- W=:=F, W2=1-W, ground(H), uniq(F,W,G,C) 
+        | {wo(W), fe(F), go(G), ca(C), path(H), @r}, {wo(W2), fe(W2), go(G), ca(C), path([w|H]), @r}.
+g@@ {wo(W), fe(F), go(G), ca(C), path(H), @r}/ 
+        :- G=:=F, G2=1-G, ground(H), uniq(F,W,G,C) 
+        | {wo(W), fe(F), go(G), ca(C), path(H), @r}, {wo(W), fe(G2), go(G2), ca(C), path([g|H]), @r}.
+c@@ {wo(W), fe(F), go(G), ca(C), path(H), @r}/ 
+        :- C=:=F, C2=1-C, ground(H), uniq(F,W,G,C) 
+        | {wo(W), fe(F), go(G), ca(C), path(H), @r}, {wo(W), fe(C2), go(G), ca(C2), path([c|H]), @r}.
+f@@ {wo(W), fe(F), go(G), ca(C), path(H), @r}/ 
+        :- F2=1-F, ground(H), uniq(F,W,G,C) 
+        | {wo(W), fe(F), go(G), ca(C), path(H), @r}, {wo(W), fe(F2), go(G), ca(C), path([f|H]), @r}.
+
+// データ整形
+format@@ {$p[], @r} :- \+($p=(true,$pp)) | .

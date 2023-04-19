@@ -106,29 +106,27 @@ public final class Env {
 	}
 
 	public static boolean loadEnvironment() {
-		File envFile = new File(ENV_FILE);
-		try {
-			if (!envFile.exists()) {
+		var envFile = new File(ENV_FILE);
+		try
+		{
+			if (!envFile.exists())
+			{
 				System.err.println("creating " + ENV_FILE);
 				envFile.createNewFile();
 			}
-		} catch (IOException e) {
-			System.err.println("Error: failed to create " + envFile);
-			return false;
-		}
-		try {
-			InputStream in = getInputStreamOfFile(ENV_FILE);
+			var in = getInputStreamOfFile(ENV_FILE);
 			prop.load(in);
 			in.close();
-		} catch (IOException e) {
+			return true;
+		} catch (IOException e)
+		{
 			System.err.println("Error: failed to read file " + ENV_FILE);
-			return false;
 		}
-		loadDefault();
-		return true;
+
+		return loadDefault();
 	}
 
-	private static void loadDefault() {
+	private static boolean loadDefault() {
 		// バージョンアップの処理（設定値がない場合はその値を入れる）
 		Properties default_prop = new Properties();
 		try {
@@ -146,8 +144,10 @@ public final class Env {
 			}
 		} catch (IOException e) {
 			System.err.println("read error. check " + ENV_DEFAULT_FILE);
+			return false;
 		}
 		ConfigUpdater.update(prop);
+		return true;
 	}
 
 	public static void save() {

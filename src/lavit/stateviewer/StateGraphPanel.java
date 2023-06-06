@@ -88,6 +88,7 @@ import lavit.stateviewer.worker.StateGraphSimpleMixAdjustWorker;
 import lavit.stateviewer.worker.StateGraphStretchMoveWorker;
 import lavit.stateviewer.worker.StatePainter;
 import lavit.util.CommonFontUser;
+import lavit.util.UtilTextDialog;
 
 @SuppressWarnings("serial")
 public class StateGraphPanel extends JPanel
@@ -1267,6 +1268,21 @@ public class StateGraphPanel extends JPanel
 				} else {
 					drawNodes.allMove(-d / zoom, 0);
 				}
+			} else if (selectNodes.size() == 1 && e.isAltDown()){
+				// fromTransitionsは左側
+				StateNode node = selectNodes.get(0);
+				if (node.getFromTransitions().size() >= 1){
+					for (StateTransition t : node.getFromTransitions()){
+						if (t.to == node){
+							selectTransition = t;
+							break;
+						}
+					}
+					selectTransitions.add(selectTransition);
+					selectNodes.clear();
+					nodeSelected = false;
+					//update();
+				}
 			} else {
 				for (StateNode node : selectNodes) {
 					node.move(-d / zoom, 0);
@@ -1280,6 +1296,21 @@ public class StateGraphPanel extends JPanel
 					drawNodes.allScaleCenterMove(s, 1);
 				} else {
 					drawNodes.allMove(d / zoom, 0);
+				}
+			} else if (selectNodes.size() == 1 && e.isAltDown()){
+				// toTransitionsは右側
+				StateNode node = selectNodes.get(0);
+				if (node.getToTransitions().size() >= 1){
+					for (StateTransition t : node.getToTransitions()){
+						if (t.from == node){
+							selectTransition = t;
+							break;
+						}
+					}
+					selectTransitions.add(selectTransition);
+					selectNodes.clear();
+					nodeSelected = false;
+					//update();
 				}
 			} else {
 				for (StateNode node : selectNodes) {

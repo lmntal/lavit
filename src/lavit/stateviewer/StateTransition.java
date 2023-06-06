@@ -153,7 +153,7 @@ public class StateTransition {
         return result.toArray(new String[0]);
     }
 
-		public String struct_diff_unpack(StateNodeLabel nodeLabel) {
+	public String struct_diff_unpack(StateNodeLabel nodeLabel) {
 		String diff_from = "";
 		String diff_to = "";
 		// from.stateとto.stateの差分を取得

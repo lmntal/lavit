@@ -130,8 +130,11 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			//} else {
 			//	stateLabel.setText("");
 			//}
+			String s = "";
 			//String s = transition.unpack(this);
-			String s = transition.diff_unpack(this);
+			if (transition != null){
+				s = transition.diff_unpack(this);
+			}
 			stateTextField.setText(s); // this code is important!
 			// stateTextField.setText(transition.toString());
 			stateTextField.setVisible(true);

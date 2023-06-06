@@ -88,7 +88,6 @@ import lavit.stateviewer.worker.StateGraphSimpleMixAdjustWorker;
 import lavit.stateviewer.worker.StateGraphStretchMoveWorker;
 import lavit.stateviewer.worker.StatePainter;
 import lavit.util.CommonFontUser;
-import lavit.util.UtilTextDialog;
 
 @SuppressWarnings("serial")
 public class StateGraphPanel extends JPanel
@@ -391,13 +390,13 @@ public class StateGraphPanel extends JPanel
 	}
 
 	public ArrayList<StateNode> getWeakNodes(){
-		selectClear();
+		ArrayList<StateNode> tmpNodes = new ArrayList<StateNode>();
 		for(StateNode node : drawNodes.getAllNode()){
 			if(node.weak){
-				selectNodes.add(node);
+				tmpNodes.add(node);
 			}
 		}
-		return selectNodes;
+		return tmpNodes;
 	}
 
 	public StateTransition getSelectTransition() {
@@ -422,9 +421,7 @@ public class StateGraphPanel extends JPanel
 
 	public void updateNodeLabel() {
 		// nodeLabelにトランザクションの情報、か、ノードの情報を表示する
-		if (selectNodes.size() > 0) {
-			nodeLabel.setNode(selectNodes);
-		} else if (selectTransitions.size() > 0) {
+		if (selectTransitions.size() > 0) {
 			nodeLabel.setTransition(selectTransitions);
 		} else {
 			nodeLabel.setNode(selectNodes);
@@ -1260,91 +1257,38 @@ public class StateGraphPanel extends JPanel
 			s += 1.0;
 		}
 
+		double scaleX = 1;
+		double scaleY = 1;
+		double dx = 0;
+		double dy = 0;
+		boolean ctrl_down = false;
+		boolean alt_down = false;
+
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:
-			if (selectNodes.size() == 0) {
-				if (e.isControlDown()) {
-					drawNodes.allScaleCenterMove(1.0 / s, 1);
-				} else {
-					drawNodes.allMove(-d / zoom, 0);
-				}
-			} else if (selectNodes.size() == 1 && e.isAltDown()){
-				// fromTransitionsは左側
-				StateNode node = selectNodes.get(0);
-				if (node.getFromTransitions().size() >= 1){
-					for (StateTransition t : node.getFromTransitions()){
-						if (t.to == node){
-							selectTransition = t;
-							break;
-						}
-					}
-					selectTransitions.add(selectTransition);
-					selectNodes.clear();
-					nodeSelected = false;
-					//update();
-				}
-			} else {
-				for (StateNode node : selectNodes) {
-					node.move(-d / zoom, 0);
-				}
-			}
+			scaleX = 1.0 / s;
+			dx = -d / zoom;
+			ctrl_down = e.isControlDown();
+			alt_down = e.isAltDown();
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_RIGHT:
-			if (selectNodes.size() == 0) {
-				if (e.isControlDown()) {
-					drawNodes.allScaleCenterMove(s, 1);
-				} else {
-					drawNodes.allMove(d / zoom, 0);
-				}
-			} else if (selectNodes.size() == 1 && e.isAltDown()){
-				// toTransitionsは右側
-				StateNode node = selectNodes.get(0);
-				if (node.getToTransitions().size() >= 1){
-					for (StateTransition t : node.getToTransitions()){
-						if (t.from == node){
-							selectTransition = t;
-							break;
-						}
-					}
-					selectTransitions.add(selectTransition);
-					selectNodes.clear();
-					nodeSelected = false;
-					//update();
-				}
-			} else {
-				for (StateNode node : selectNodes) {
-					node.move(d / zoom, 0);
-				}
-			}
+			scaleX = s;
+			dx = d / zoom;
+			ctrl_down = e.isControlDown();
+			alt_down = e.isAltDown();
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_DOWN:
-			if (selectNodes.size() == 0) {
-				if (e.isControlDown()) {
-					drawNodes.allScaleCenterMove(1, s);
-				} else {
-					drawNodes.allMove(0, d / zoom);
-				}
-			} else {
-				for (StateNode node : selectNodes) {
-					node.move(0, d / zoom);
-				}
-			}
+			scaleY = s;
+			dy = d / zoom;
+			ctrl_down = e.isControlDown();
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_UP:
-			if (selectNodes.size() == 0) {
-				if (e.isControlDown()) {
-					drawNodes.allScaleCenterMove(1, 1 / s);
-				} else {
-					drawNodes.allMove(0, -d / zoom);
-				}
-			} else {
-				for (StateNode node : selectNodes) {
-					node.move(0, -d / zoom);
-				}
-			}
+			scaleY = 1 / s;
+			dy = -d / zoom;
+			ctrl_down = e.isControlDown();
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_DELETE:
@@ -1380,6 +1324,45 @@ public class StateGraphPanel extends JPanel
 			}
 			break;
 		}
+
+		if (selectNodes.size() == 0) {
+			if (ctrl_down) {
+				drawNodes.allScaleCenterMove(scaleX, scaleY);
+			} else {
+				drawNodes.allMove(dx, dy);
+			}
+		} else if (selectNodes.size() == 1 && alt_down){
+			// fromTransitionsは左側
+			StateNode node = selectNodes.get(0);
+			if (dx > 0 && node.getToTransition() != null){
+				for (StateTransition t : node.getToTransitions()){
+					if (t.from == node){
+						selectTransition = t;
+						break;
+					}
+				}
+				selectTransitions.add(selectTransition);
+				selectNodes.clear();
+				nodeSelected = false;
+				//update();
+			} else if (dx < 0 && node.getFromTransition() != null){
+				for (StateTransition t : node.getFromTransitions()){
+					if (t.to == node){
+						selectTransition = t;
+						break;
+					}
+				}
+				selectTransitions.add(selectTransition);
+				selectNodes.clear();
+				nodeSelected = false;
+				//update();
+			}
+		} else {
+			for (StateNode node : selectNodes) {
+				node.move(dx, dy);
+			}
+		}
+
 		if (isUpdate)
 			update();
 	}

@@ -145,6 +145,9 @@ public class StateRightMenu extends JPopupMenu implements ActionListener {
 			}
 		} else if (src == backNs) {
 			graphPanel.emBackNodes(graphPanel.getSelectNodes());
+			graphPanel.getDrawNodes().remove(graphPanel.getWeakNodes());
+			graphPanel.getSelectNodes().clear();
+			graphPanel.repaint();
 		} else if (src == nextNs) {
 			graphPanel.emNextNodes(graphPanel.getSelectNodes());
 		} else if (src == fromNs) {

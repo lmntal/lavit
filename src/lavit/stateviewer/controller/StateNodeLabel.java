@@ -47,6 +47,7 @@ import javax.swing.JTextField;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.stateviewer.StateNode;
+import lavit.stateviewer.StateTransition;
 import lavit.util.CommonFontUser;
 
 @SuppressWarnings("serial")
@@ -102,7 +103,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			} else {
 				stateLabel.setText("");
 			}
-			stateTextField.setText(node.toString());
+			stateTextField.setText(node.toString()); // this code is important!
 			stateTextField.setVisible(true);
 			setVisible(true);
 		} else if (nodes.size() > 1) {
@@ -111,6 +112,36 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			stateTextField.setText("");
 			stateTextField.setVisible(false);
 			setVisible(true);
+		} else {
+			setVisible(false);
+		}
+	}
+
+	public void setTransition(ArrayList<StateTransition> transitions) {
+		if (transitions.size() == 1) {
+			StateTransition transition = transitions.get(0);
+			//if (transition.hasSubset()) {
+			//	stateNodenum.setText("Node: " + transition.getChildSet().size());
+			//} else {
+			//	stateNodenum.setText("");
+			//}
+			//if (transition.label.length() > 0) {
+			//	stateLabel.setText("Label: " + transition.label);
+			//} else {
+			//	stateLabel.setText("");
+			//}
+			//String s = transition.unpack(this);
+			String s = transition.diff_unpack(this);
+			stateTextField.setText(s); // this code is important!
+			// stateTextField.setText(transition.toString());
+			stateTextField.setVisible(true);
+			setVisible(true);
+		//} else if (transitions.size() > 1) {
+		//	stateNodenum.setText("Node: " + transitions.size());
+		//	stateLabel.setText("");
+		//	stateTextField.setText("");
+		//	stateTextField.setVisible(false);
+		//	setVisible(true);
 		} else {
 			setVisible(false);
 		}

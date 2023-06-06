@@ -104,6 +104,7 @@ public class StateGraphPanel extends JPanel
 	private double drawTime;
 
 	private ArrayList<StateNode> selectNodes;
+	private ArrayList<StateTransition> selectTransitions;
 	private boolean nodeSelected;
 	private StateTransition selectTransition;
 
@@ -132,6 +133,7 @@ public class StateGraphPanel extends JPanel
 		add(nodeLabel, BorderLayout.SOUTH);
 
 		selectNodes = new ArrayList<StateNode>();
+		selectTransitions = new ArrayList<StateTransition>();
 
 		draw = new StateGraphBasicDraw(this);
 
@@ -157,6 +159,7 @@ public class StateGraphPanel extends JPanel
 		this.drawTime = 0.0;
 
 		this.selectNodes.clear();
+		this.selectTransitions.clear();
 		this.nodeSelected = false;
 		this.selectTransition = null;
 
@@ -386,6 +389,16 @@ public class StateGraphPanel extends JPanel
 		selectTransition = null;
 	}
 
+	public ArrayList<StateNode> getWeakNodes(){
+		selectClear();
+		for(StateNode node : drawNodes.getAllNode()){
+			if(node.weak){
+				selectNodes.add(node);
+			}
+		}
+		return selectNodes;
+	}
+
 	public StateTransition getSelectTransition() {
 		return this.selectTransition;
 	}
@@ -407,7 +420,14 @@ public class StateGraphPanel extends JPanel
 	}
 
 	public void updateNodeLabel() {
-		nodeLabel.setNode(selectNodes);
+		// nodeLabelにトランザクションの情報、か、ノードの情報を表示する
+		if (selectNodes.size() > 0) {
+			nodeLabel.setNode(selectNodes);
+		} else if (selectTransitions.size() > 0) {
+			nodeLabel.setTransition(selectTransitions);
+		} else {
+			nodeLabel.setNode(selectNodes);
+		}
 	}
 
 	/*
@@ -1014,8 +1034,15 @@ public class StateGraphPanel extends JPanel
 		if (selectNode == null && selectNodes.size() == 0) {
 			if (zoom > 0.3) {
 				selectTransition = drawNodes.pickATransition(p);
-				if (selectTransition != null && e.getClickCount() == 2) {
-					selectTransition.doubleClick(this);
+				if (selectTransition != null){
+					if(!selectTransitions.contains(selectTransition)){
+						selectTransitions.clear();
+						selectTransitions.add(selectTransition);
+					} else if (e.getClickCount() == 2) {
+						selectTransition.doubleClick(this);
+					}
+				} else {
+					selectTransitions.clear();
 				}
 			} else {
 				selectTransition = null;

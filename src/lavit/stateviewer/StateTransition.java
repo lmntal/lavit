@@ -42,8 +42,11 @@ import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import lavit.util.UtilTextDialog;
+import lavit.stateviewer.controller.StateNodeLabel;
 
 public class StateTransition {
 	public StateNode from;
@@ -113,6 +116,69 @@ public class StateTransition {
 	void doubleClick(StateGraphPanel graphPanel) {
 		UtilTextDialog.showDialog(from.id + " -> " + to.id,
 				from.state + "\n\n-> (" + getRuleNameString() + ")\n\n" + to.state);
+	}
+
+	public String unpack(StateNodeLabel nodeLabel) {
+		return "【" + from.id + "】" + from.state + "->"+ "(" + getRuleNameString() + ")【"  + to.id + "】" + to.state ;
+	}
+
+	public String diff_unpack(StateNodeLabel nodeLabel) {
+		String diff_from = "";
+		String diff_to = "";
+		// from.stateとto.stateの差分を取得
+		String[] from_state = from.state.split(" ");
+		String[] to_state = to.state.split(" ");
+		// 差分を取得(順番は関係ないので、2重ループで全探索)
+		for (int i = 0; i < from_state.length; i++) {
+			for (int j = 0; j < to_state.length; j++) {
+				if (from_state[i].equals(to_state[j])) {
+					// 一致した場合は、to_stateから削除
+					to_state = remove(to_state, j);
+					break;
+				} else if (j == to_state.length - 1) {
+					diff_from += from_state[i] ;
+				}
+			}
+		}
+		diff_to = String.join(".", to_state);
+		return "【" + from.id + "】" + diff_from + "->"+ "(" + getRuleNameString() + ")【"  + to.id + "】" + diff_to ;
+	}
+	private static String[] remove(String[] arr, int index) {
+        if (arr == null || index < 0 || index >= arr.length) {
+            return arr;
+        }
+
+        List<String> result = new ArrayList<>(Arrays.asList(arr));
+        result.remove(index);
+        return result.toArray(new String[0]);
+    }
+
+		public String struct_diff_unpack(StateNodeLabel nodeLabel) {
+		String diff_from = "";
+		String diff_to = "";
+		// from.stateとto.stateの差分を取得
+		String[] from_state = from.state.split(" ");
+		String[] to_state = to.state.split(" ");
+		// 差分を取得(順番は関係ないので、2重ループで全探索)
+		for (int i = 0; i < from_state.length; i++) {
+			for (int j = 0; j < to_state.length; j++) {
+				if (from_state[i].equals(to_state[j])) {
+					// 一致した場合は、to_stateから削除
+					to_state = remove(to_state, j);
+					break;
+				} else if (j == to_state.length - 1) {
+					// from_stateとto_stateは一致しないが、その中身の構造を比較
+					//String diff_struct = "";
+					//String from_struct = from_state[i].split("\\(")[0];
+					//String to_struct = to_state[j].split("\\(")[0];
+					//if (from_struct.equals(to_struct)) {
+					//	diff_struct = from_struct + "(";
+					diff_from += from_state[i] + " ";
+				}
+			}
+		}
+		diff_to = String.join(" ", to_state);
+		return "【" + from.id + "】" + diff_from + "->"+ "(" + getRuleNameString() + ")【"  + to.id + "】" + diff_to ;
 	}
 
 	public String toString() {

@@ -1325,41 +1325,43 @@ public class StateGraphPanel extends JPanel
 			break;
 		}
 
-		if (selectNodes.size() == 0) {
-			if (ctrl_down) {
-				drawNodes.allScaleCenterMove(scaleX, scaleY);
+		if (dx != 0 || dy != 0){
+			if (selectNodes.size() == 0) {
+				if (ctrl_down) {
+					drawNodes.allScaleCenterMove(scaleX, scaleY);
+				} else {
+					drawNodes.allMove(dx, dy);
+				}
+			} else if (dx != 0 && selectNodes.size() == 1 && alt_down){
+				// fromTransitionsは左側
+				StateNode node = selectNodes.get(0);
+				if (dx > 0 && node.getToTransition() != null){
+					for (StateTransition t : node.getToTransitions()){
+						if (t.from == node){
+							selectTransition = t;
+							break;
+						}
+					}
+					selectTransitions.add(selectTransition);
+					selectNodes.clear();
+					nodeSelected = false;
+					//update();
+				} else if (dx < 0 && node.getFromTransition() != null){
+					for (StateTransition t : node.getFromTransitions()){
+						if (t.to == node){
+							selectTransition = t;
+							break;
+						}
+					}
+					selectTransitions.add(selectTransition);
+					selectNodes.clear();
+					nodeSelected = false;
+					//update();
+				}
 			} else {
-				drawNodes.allMove(dx, dy);
-			}
-		} else if (selectNodes.size() == 1 && alt_down){
-			// fromTransitionsは左側
-			StateNode node = selectNodes.get(0);
-			if (dx > 0 && node.getToTransition() != null){
-				for (StateTransition t : node.getToTransitions()){
-					if (t.from == node){
-						selectTransition = t;
-						break;
-					}
+				for (StateNode node : selectNodes) {
+					node.move(dx, dy);
 				}
-				selectTransitions.add(selectTransition);
-				selectNodes.clear();
-				nodeSelected = false;
-				//update();
-			} else if (dx < 0 && node.getFromTransition() != null){
-				for (StateTransition t : node.getFromTransitions()){
-					if (t.to == node){
-						selectTransition = t;
-						break;
-					}
-				}
-				selectTransitions.add(selectTransition);
-				selectNodes.clear();
-				nodeSelected = false;
-				//update();
-			}
-		} else {
-			for (StateNode node : selectNodes) {
-				node.move(dx, dy);
 			}
 		}
 

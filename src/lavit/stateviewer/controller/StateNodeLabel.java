@@ -46,6 +46,7 @@ import javax.swing.JTextField;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
 import lavit.stateviewer.StateTransition;
 import lavit.util.CommonFontUser;
@@ -117,35 +118,22 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 		}
 	}
 
-	public void setTransition(ArrayList<StateTransition> transitions) {
+	public void setTransition(ArrayList<StateTransition> transitions,StateGraphPanel graphPanel) {
 		if (transitions.size() == 1) {
 			StateTransition transition = transitions.get(0);
-			//if (transition.hasSubset()) {
-			//	stateNodenum.setText("Node: " + transition.getChildSet().size());
-			//} else {
-			//	stateNodenum.setText("");
-			//}
-			//if (transition.label.length() > 0) {
-			//	stateLabel.setText("Label: " + transition.label);
-			//} else {
-			//	stateLabel.setText("");
-			//}
 			String s = "";
 			if (transition != null){
-				s = transition.diff_unpack();
+				s = transition.diff_unpack(graphPanel);
 			}
 			stateTextField.setText(s); // this code is important!
 			stateTextField.setVisible(true);
 			setVisible(true);
-		//} else if (transitions.size() > 1) {
-		//	stateNodenum.setText("Node: " + transitions.size());
-		//	stateLabel.setText("");
-		//	stateTextField.setText("");
-		//	stateTextField.setVisible(false);
-		//	setVisible(true);
 		} else {
 			setVisible(false);
 		}
 	}
 
+	public void setNull() {
+		setVisible(false);
+	}
 }

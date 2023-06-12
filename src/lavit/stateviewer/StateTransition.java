@@ -116,25 +116,50 @@ public class StateTransition {
 	}
 
 
-	public String diff_unpack() {
+	public String diff_unpack(StateGraphPanel graphPanel) {
 		String diff_from = "";
 		String diff_to = "";
 		// from.stateとto.stateの差分を取得
-		String[] from_state = from.state.split(" ");
-		String[] to_state = to.state.split(" ");
+		// form.id、to.idを持つnodeを取得
+		StateNode from_node = null;
+		StateNode to_node = null;
+		StateNodeSet drawNodes = graphPanel.getDrawNodes();
+		for (StateNode node : new ArrayList<StateNode>(drawNodes.getAllNode())) {
+			if (from_node != null && to_node != null) break;
+			if (node.id == from.id) from_node = node;
+			if (node.id == to.id) to_node = node;
+		}
+
+		String[] from_tokens = null;
+		String[] to_tokens = null;
+		// nodeに子がある場合
+		if (from_node != null && from_node.childSet != null && from_node.childSet.size() > 0) {
+			from_tokens = from_node.childSet.getRepresentationNode().toString().split(" ");
+		}
+		if (to_node != null && to_node.childSet != null && to_node.childSet.size() > 0) {
+			to_tokens = to_node.childSet.getStartNodeOne().toString().split(" ");
+		}
+		// nodeに子がない場合
+		if (from_tokens == null) {
+			from_tokens = from.state.split(" ");
+		}
+		if (to_tokens == null) {
+			to_tokens = to.state.split(" ");
+		}
+
 		// 差分を取得(順番は関係ないので、2重ループで全探索)
-		for (int i = 0; i < from_state.length; i++) {
-			for (int j = 0; j < to_state.length; j++) {
-				if (from_state[i].equals(to_state[j])) {
-					// 一致した場合は、to_stateから削除
-					to_state = remove(to_state, j);
+		for (int i = 0; i < from_tokens.length; i++) {
+			for (int j = 0; j < to_tokens.length; j++) {
+				if (from_tokens[i].equals(to_tokens[j])) {
+					// 一致した場合は、to_tokensから削除
+					to_tokens = remove(to_tokens, j);
 					break;
-				} else if (j == to_state.length - 1) {
-					diff_from += from_state[i] + " ";
+				} else if (j == to_tokens.length - 1) {
+					diff_from += from_tokens[i] + " ";
 				}
 			}
 		}
-		diff_to = String.join(" ", to_state);
+		diff_to = String.join(" ", to_tokens);
 		return "【" + from.id + "】" + diff_from + "-> (" + getRuleNameString() + ") 【"  + to.id + "】" + diff_to ;
 	}
 	private static String[] remove(String[] arr, int index) {

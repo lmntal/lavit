@@ -421,8 +421,10 @@ public class StateGraphPanel extends JPanel
 
 	public void updateNodeLabel() {
 		// nodeLabelにトランザクションの情報、か、ノードの情報を表示する
-		if (selectTransitions.size() > 0) {
-			nodeLabel.setTransition(selectTransitions);
+		if (selectTransitions.size() > 0 && selectNodes.size() > 0){
+			nodeLabel.setNull();
+		} else if (selectTransitions.size() == 1) {
+			nodeLabel.setTransition(selectTransitions,this);
 		} else {
 			nodeLabel.setNode(selectNodes);
 		}

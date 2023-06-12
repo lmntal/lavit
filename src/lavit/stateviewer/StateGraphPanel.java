@@ -1332,7 +1332,7 @@ public class StateGraphPanel extends JPanel
 				} else {
 					drawNodes.allMove(dx, dy);
 				}
-			} else if (dx != 0 && selectNodes.size() == 1 && alt_down){
+			} else if (dx != 0 && selectNodes.size() == 1 && alt_down){ // alt_downは変更するかも
 				// fromTransitionsは左側
 				StateNode node = selectNodes.get(0);
 				if (dx > 0 && node.getToTransition() != null){
@@ -1345,7 +1345,6 @@ public class StateGraphPanel extends JPanel
 					selectTransitions.add(selectTransition);
 					selectNodes.clear();
 					nodeSelected = false;
-					//update();
 				} else if (dx < 0 && node.getFromTransition() != null){
 					for (StateTransition t : node.getFromTransitions()){
 						if (t.to == node){
@@ -1356,7 +1355,6 @@ public class StateGraphPanel extends JPanel
 					selectTransitions.add(selectTransition);
 					selectNodes.clear();
 					nodeSelected = false;
-					//update();
 				}
 			} else {
 				for (StateNode node : selectNodes) {

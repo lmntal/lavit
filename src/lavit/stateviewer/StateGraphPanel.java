@@ -1017,7 +1017,7 @@ public class StateGraphPanel extends JPanel
 					selectNodes.clear();
 					selectNodes.add(selectNode);
 				} else if (e.getClickCount() == 2) {
-					if (e.isShiftDown()) {
+					if (e.isAltDown()) {
 						selectNode.debugFrame(this);
 					} else {
 						selectNode.doubleClick(this);
@@ -1045,9 +1045,11 @@ public class StateGraphPanel extends JPanel
 					selectTransitions.clear();
 				}
 			} else {
+				selectTransitions.clear();
 				selectTransition = null;
 			}
 		} else {
+			selectTransitions.clear();
 			selectTransition = null;
 		}
 

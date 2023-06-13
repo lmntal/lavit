@@ -123,7 +123,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			StateTransition transition = transitions.get(0);
 			String s = "";
 			if (transition != null){
-				s = transition.diff_unpack(graphPanel);
+				s = transition.diff_unpack(graphPanel); // transitonのfromとtoの差分
 			}
 			stateTextField.setText(s); // this code is important!
 			stateTextField.setVisible(true);

@@ -186,7 +186,14 @@ public class StateRightMenu extends JPopupMenu implements ActionListener {
 			graphene.setEnabled(false);
 			add.setEnabled(false);
 		}
-
+		if (graphPanel.getSelectNodes().size() == 1) {
+			StateNode node = graphPanel.getSelectNodes().get(0);
+			if (node.childSet != null && node.childSet.size() > 0) {
+				unyo3.setEnabled(false);
+				graphene.setEnabled(false);
+				add.setEnabled(false);
+			}
+		}
 	}
 
 }

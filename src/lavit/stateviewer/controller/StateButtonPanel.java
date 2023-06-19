@@ -78,6 +78,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 	private JPanel abstractionPanel = new JPanel();
 	private JButton transitionAbstraction = new JButton("Transition Abstraction");
 	private JButton selectAbstraction = new JButton("Select Abstraction");
+	private JButton sccAbstraction = new JButton("SCC Abstraction");
 
 	private JPanel basicPanel = new JPanel();
 	private JButton autoCentering = new JButton("Auto Centering");
@@ -86,7 +87,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 
 	private JComponent comps[] = { posReset, adjustReset, adjust2Reset, adjust3Reset, simpleMixAdjust, dummyMixAdjust,
 			geneticAlgorithm, exchangeReset, exchangeDummyOnly, setBackDummy, setVerticalDummy, removeDummy, dummyCentering,
-			dummySmoothing, transitionAbstraction, selectAbstraction, autoCentering, fitCentering, allReset };
+			dummySmoothing, transitionAbstraction, selectAbstraction,sccAbstraction, autoCentering, fitCentering, allReset };
 
 	StateButtonPanel(StatePanel statePanel) {
 		this.statePanel = statePanel;
@@ -135,12 +136,14 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		dummyPanel.add(dummySmoothing);
 		add(dummyPanel);
 
-		abstractionPanel.setLayout(new GridLayout(1, 2));
+		abstractionPanel.setLayout(new GridLayout(1, 3));
 		abstractionPanel.setBorder(new TitledBorder("Abstraction"));
 		transitionAbstraction.addActionListener(this);
 		abstractionPanel.add(transitionAbstraction);
 		selectAbstraction.addActionListener(this);
 		abstractionPanel.add(selectAbstraction);
+		sccAbstraction.addActionListener(this);
+		abstractionPanel.add(sccAbstraction);
 		add(abstractionPanel);
 
 		basicPanel.setLayout(new GridLayout(1, 3));
@@ -215,6 +218,8 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 			new SelectStateTransitionRuleFrame(p, new StateTransitionAbstraction(p));
 		} else if (src == selectAbstraction) {
 			statePanel.stateGraphPanel.selectNodeAbstraction();
+		} else if (src == sccAbstraction) {
+			statePanel.stateGraphPanel.sccAbstraction();
 		}
 	}
 

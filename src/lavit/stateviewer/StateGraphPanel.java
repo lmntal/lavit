@@ -52,16 +52,22 @@ import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.Stack;
 import java.util.Set;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
+import javax.swing.plaf.nimbus.State;
 
 import lavit.Env;
 import lavit.FrontEnd;
@@ -964,6 +970,135 @@ public class StateGraphPanel extends JPanel
 		StateAbstractionMaker maker = new StateAbstractionMaker(this);
 		maker.makeNode(groupNodes);
 		maker.end();
+	}
+
+	public void sccAbstraction() {
+		// dummyNodeを削除
+		statePanel.stateGraphPanel.getDrawNodes().removeDummy();
+		statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
+		statePanel.stateGraphPanel.selectClear();
+		statePanel.stateGraphPanel.update();
+
+		ArrayList<StateNode> allNodes = new ArrayList<StateNode>(drawNodes.getAllNode());
+		// allNodesからdummyを除く
+		for (int i = 0; i < allNodes.size(); i++) {
+			if (allNodes.get(i).dummy) {
+				allNodes.remove(i);
+				i--;
+			}
+		}
+		// nodeを番号付け　dictionaryを作成
+		HashMap<StateNode, Integer> dictionary = new HashMap<StateNode, Integer>();
+		for (int i = 0; i < allNodes.size(); i++) {
+			dictionary.put(allNodes.get(i), 0);
+		}
+
+		Integer count = 0;
+		while (allNodes.size() > 0) {
+			StateNode node = allNodes.get(0);
+			allNodes.remove(node);
+			Stack<StateNode> stack = new Stack<StateNode>();
+			stack.push(node);
+			while (stack.size() > 0) {
+				node = stack.peek();
+				Boolean flag = true;
+				ArrayList<StateNode> toNodes = new ArrayList<StateNode>();
+				// 深さ優先探索
+				while (flag == true) {
+					// nodeのtoを全て取る
+					for (StateNode n : node.getToNodes()) {
+						toNodes.add(n);
+					}
+					// toNodesのうち、allNodesに含まれているものを1つ取り出す
+					while (true) {
+						if (toNodes.size() == 0) {
+							flag = false;
+							break;
+						}
+						node = toNodes.get(0);
+						if (allNodes.contains(node)) {
+							allNodes.remove(node);
+							stack.push(node);
+							toNodes.clear();
+							break;
+						} else {
+							toNodes.remove(node);
+						}
+					}
+				}
+				// stackの中身を1つ取り出して、番号を振る
+				node = stack.pop();
+				count++;
+				dictionary.put(node, count);
+			}
+		}
+		// dictionaryをprint
+		//for (StateNode node : dictionary.keySet()) { System.out.println(node.id +
+		 //" " + dictionary.get(node)); }
+		
+		while (dictionary.size() > 0) {
+			// dictionaryのvalueが大きいkeyを取り出す
+			StateNode maxNode = getKeyWithMaxValue(dictionary);
+			// maxNodeを含む強連結成分を取り出す
+			ArrayList<StateNode> sccNodes = new ArrayList<StateNode>();
+			Boolean flag2 = true;
+			// fromを辿って、強連結成分を取り出す
+			while (flag2 == true) {
+				dictionary.remove(maxNode);
+				sccNodes.add(maxNode);
+				// maxNodeのfromを全て取る
+				ArrayList<StateNode> fromNodes = new ArrayList<StateNode>();
+				for (StateNode n : maxNode.getFromNodes()) {
+					fromNodes.add(n);
+				}
+				// fromNodesのうち、dictionaryに含まれているものを1つ取り出す
+				StateNode tmpNode = null;
+				while (true) {
+					if (fromNodes.size() == 0) {
+						flag2 = false;
+						break;
+					}
+					tmpNode = fromNodes.get(0);
+					if (dictionary.containsKey(tmpNode)) {
+						fromNodes.clear();
+						break;
+					} else {
+						fromNodes.remove(tmpNode);
+					}
+				}
+				if (flag2 == true) {
+					maxNode = tmpNode;
+				}
+			}
+			if (sccNodes.size() > 2) {
+				// sccNodesをgroupNodesに入れて、Abstractionを作成
+				List<StateNode> groupNodes = new ArrayList<StateNode>();
+				for (StateNode node : sccNodes) {
+					if (!node.dummy) {
+						groupNodes.add(node);
+					}
+				}
+				StateAbstractionMaker maker = new StateAbstractionMaker(this);
+				maker.makeNode(groupNodes);
+				maker.end();
+
+				// dummyNodeを削除
+				statePanel.stateGraphPanel.getDrawNodes().removeDummy();
+				statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
+				statePanel.stateGraphPanel.selectClear();
+				statePanel.stateGraphPanel.update();
+			}
+		}
+	}
+
+	public static StateNode getKeyWithMaxValue( HashMap<StateNode, Integer> map ) {
+	    Integer max_value = Collections.max( map.values() );
+		for (StateNode node : map.keySet()) {
+			if (map.get(node) == max_value) {
+				return node;
+			}
+		}
+		return null;
 	}
 
 	public boolean isDragg() {

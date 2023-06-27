@@ -52,14 +52,12 @@ import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.Set;
@@ -67,7 +65,6 @@ import java.util.Set;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
-import javax.swing.plaf.nimbus.State;
 
 import lavit.Env;
 import lavit.FrontEnd;
@@ -1091,10 +1088,11 @@ public class StateGraphPanel extends JPanel
 		}
 	}
 
+	// this function is used in sccAbstraction
 	public static StateNode getKeyWithMaxValue( HashMap<StateNode, Integer> map ) {
-	    Integer max_value = Collections.max( map.values() );
+	    Integer maxValue = Collections.max( map.values() );
 		for (StateNode node : map.keySet()) {
-			if (map.get(node) == max_value) {
+			if (map.get(node) == maxValue) {
 				return node;
 			}
 		}
@@ -1400,34 +1398,34 @@ public class StateGraphPanel extends JPanel
 		double scaleY = 1;
 		double dx = 0;
 		double dy = 0;
-		boolean ctrl_down = false;
-		boolean alt_down = false;
+		boolean ctrlDown = false;
+		boolean altDown = false;
 
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:
 			scaleX = 1.0 / s;
 			dx = -d / zoom;
-			ctrl_down = e.isControlDown();
-			alt_down = e.isAltDown();
+			ctrlDown = e.isControlDown();
+			altDown = e.isAltDown();
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_RIGHT:
 			scaleX = s;
 			dx = d / zoom;
-			ctrl_down = e.isControlDown();
-			alt_down = e.isAltDown();
+			ctrlDown = e.isControlDown();
+			altDown = e.isAltDown();
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_DOWN:
 			scaleY = s;
 			dy = d / zoom;
-			ctrl_down = e.isControlDown();
+			ctrlDown = e.isControlDown();
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_UP:
 			scaleY = 1 / s;
 			dy = -d / zoom;
-			ctrl_down = e.isControlDown();
+			ctrlDown = e.isControlDown();
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_DELETE:
@@ -1466,12 +1464,12 @@ public class StateGraphPanel extends JPanel
 
 		if (dx != 0 || dy != 0){
 			if (selectNodes.size() == 0) {
-				if (ctrl_down) {
+				if (ctrlDown) {
 					drawNodes.allScaleCenterMove(scaleX, scaleY);
 				} else {
 					drawNodes.allMove(dx, dy);
 				}
-			} else if (dx != 0 && selectNodes.size() == 1 && alt_down){ // alt_downは変更するかも
+			} else if (dx != 0 && selectNodes.size() == 1 && altDown){ // altDownは変更するかも
 				// fromTransitionsは左側
 				StateNode node = selectNodes.get(0);
 				if (dx > 0 && node.getToTransition() != null){

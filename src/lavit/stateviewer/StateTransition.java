@@ -132,14 +132,15 @@ public class StateTransition {
 
 		String[] from_tokens = null;
 		String[] to_tokens = null;
-		// nodeに子がある場合
-		if (from_node != null && from_node.childSet != null && from_node.childSet.size() > 0) {
-			from_tokens = from_node.childSet.getRepresentationNode().toString().split(" ");
-		}
-		if (to_node != null && to_node.childSet != null && to_node.childSet.size() > 0) {
-			to_tokens = to_node.childSet.getStartNodeOne().toString().split(" ");
-		}
-		// nodeに子がない場合
+		// nodeの端がtransitionのfrom/toとは限らない
+		//// nodeに子がある場合
+		//if (from_node != null && from_node.childSet != null && from_node.childSet.size() > 0) {
+		//	from_tokens = from_node.childSet.getRepresentationNode().toString().split(" ");
+		//}
+		//if (to_node != null && to_node.childSet != null && to_node.childSet.size() > 0) {
+		//	to_tokens = to_node.childSet.getStartNodeOne().toString().split(" ");
+		//}
+		//// nodeに子がない場合
 		if (from_tokens == null) {
 			from_tokens = from.state.split(" ");
 		}

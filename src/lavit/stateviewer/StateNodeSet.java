@@ -1433,6 +1433,19 @@ public class StateNodeSet {
 
 	StateTransition pickATransition(Point p) {
 		StateTransition pick = null;
+		//for (StateTransition trans : getAllOutTransition()){
+		//	if (trans == null) {
+		//		continue;
+		//	}
+		//	if (trans.contains(p)) {
+		//		pick = trans;
+		//	}
+		//	// System.out.print(trans.from);
+		//	// System.out.println(trans.to);
+		//}
+		// if (pick == null) {
+		// 	System.out.println("null");
+		// }
 		for (StateTransition trans : getAllTransition()) {
 			if (trans == null) {
 				continue;

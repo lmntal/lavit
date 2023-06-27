@@ -163,6 +163,8 @@ public class StateTransition {
 		diff_to = String.join(" ", to_tokens);
 		return "【" + from.id + "】" + diff_from + "-> (" + getRuleNameString() + ") 【"  + to.id + "】" + diff_to ;
 	}
+
+	// this function is used in diff_unpack()
 	private static String[] remove(String[] arr, int index) {
         if (arr == null || index < 0 || index >= arr.length) {
             return arr;

@@ -44,6 +44,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Set;
 
 import javax.swing.BoxLayout;
@@ -153,13 +154,14 @@ public class StateSimulationPanel extends JPanel {
 		JButton startButton = new JButton("Start");
 		JButton endButton = new JButton("End");
 		JCheckBox autoRun = new JCheckBox("Auto Run");
+		JButton abstractButton = new JButton("Abstract");
 		JSlider intervalSlider = new JSlider(10, 190);
 		JButton ruleWindowButton = new JButton("Rule Priority");
 
 		ButtonPanel() {
 
 			// setLayout(new FlowLayout(FlowLayout.LEFT));
-			setLayout(new GridLayout(1, 5));
+			setLayout(new GridLayout(1, 6));
 
 			startButton.addActionListener(this);
 			add(startButton);
@@ -169,6 +171,9 @@ public class StateSimulationPanel extends JPanel {
 
 			autoRun.addActionListener(this);
 			add(autoRun);
+
+			abstractButton.addActionListener(this);
+			add(abstractButton);
 
 			intervalSlider.addChangeListener(this);
 			add(intervalSlider);
@@ -208,6 +213,8 @@ public class StateSimulationPanel extends JPanel {
 				buttonPanel.endButton.setEnabled(false);
 			} else if (src == autoRun) {
 				updateMover();
+			} else if (src == abstractButton) {
+				simulatAbstract();
 			} else if (src == ruleWindowButton) {
 				if (ruleWindow == null) {
 					ruleWindow = new NumberingStateTransitionRuleFrame();
@@ -223,6 +230,117 @@ public class StateSimulationPanel extends JPanel {
 				rulePanel.setEnabled(true);
 				mover.setActive(false);
 			}
+		}
+
+		public void simulatAbstract() {
+			String log = outputPanel.getText();
+			String[] steps = log.split("\n");
+			for (int i = 0; i < steps.length; ++i) {
+				// もしstepが[End]なら
+				if (steps[i].equals("[End]")) {
+					break;
+				}
+				// stepの最初の[数字]を取り除く
+				steps[i] = steps[i].substring(steps[i].indexOf("]") + 2);
+				// stepの最後の(ルール名)を取り除く　ルール名がない場合は何もしない
+				if (! steps[i].endsWith(".")){
+					steps[i] = steps[i].substring(0, steps[i].lastIndexOf("(") - 1);
+				}
+			}
+			// step[i]がz(0.1). z(0.1). z(0.1) で、step[i+1]がz(0.2). z(0.1). だったら
+			// (z(0.1). z(0.1).) z(0.1). にする
+			// 最終的に step[0]が((z(0.1). z(0.1)) z(0.1).) z(0.1). のようになり、これだけを表示する
+			// 後ろから見ていって、このルールに従う
+			// for文でstepsの有効なindexを取得
+			int index = 0;
+			for (int i = steps.length - 1; i >= 0; i--) {
+				if (!steps[i].equals("[End]")) {
+					index = i;
+					break;
+				}
+			}
+			outputPanel.clear();
+			//String[] stateStep2 = steps[index].split(" ");
+			String[] abstract_results = new String[index + 1];
+			for (int i = index; i > 0; i--) {
+				String[] stateStep2 = steps[i].split(" ");
+				String[] stateStep1 = steps[i - 1].split(" ");
+				// stateStep2とstateStep1のdiffをとる
+				// 差分を取得(順番は関係ないので、2重ループで全探索)
+				int j = 0;
+				while (true) {
+					for (int k = 0; k < stateStep1.length; k++) {
+						if (stateStep2[j].equals(stateStep1[k])) {
+							stateStep2 = remove(stateStep2, j);
+							stateStep1 = remove(stateStep1, k);
+							j--;
+							break;
+						}
+					}
+					j++;
+					if (j >= stateStep2.length) {
+						break;
+					}
+				}
+				System.out.println("check point 3" + i);
+				String[] stateStep2_tmp = steps[i].split(" ");
+				// stateStep2_tmpの要素と、true,falseを持つ構造体にする
+				HashMap<String, Boolean> stateStep2_tmp_map = new HashMap<String, Boolean>();
+				for (int k = 0; k < stateStep2_tmp.length; k++) {
+					stateStep2_tmp_map.put(stateStep2_tmp[k], false);
+				}
+
+				// stateStep2に残ったものが、stateStep1にないもの
+				// これをsteps[i]において()で囲む
+				// 2重ループで全探索
+				for (int k = 0; k < stateStep2_tmp.length; k++) {
+					for (int l = 0; l < stateStep2.length; l++) {
+						if (stateStep2_tmp[k].equals(stateStep2[l])) {
+							// mapを更新
+							stateStep2_tmp_map.put(stateStep2_tmp[k], true);
+						}
+					}
+				}
+				System.out.println("check point 4");
+				// mapを見て、bolleanがtrueのものを取り出す
+				String stateStep2_tmp_true = "";
+				String stateStep2_tmp_false = "";
+				for (int k = 0; k < stateStep2_tmp.length; k++) {
+					if (stateStep2_tmp_map.get(stateStep2_tmp[k])) {
+						stateStep2_tmp_true += stateStep2_tmp[k] + " ";
+					} else {
+						stateStep2_tmp_false += stateStep2_tmp[k] + " ";
+					}
+				}
+				// abstract_result stateStep2_tmp_trueを()で囲む
+				abstract_results[i] = "(" + stateStep2_tmp_true + ")";
+				// abstract_resultにstateStep2_tmp_falseを足す
+				abstract_results[i] += stateStep2_tmp_false;
+				outputPanel.println(abstract_results[i]);
+				//stateStep2 = abstract_result.split(" ");
+				System.out.println("check point 5");
+
+			}
+			System.out.println("check point 6");
+			
+			//outputPanel.clear();
+			//for (int i = 0; i < steps.length; ++i) {
+			//	outputPanel.println(abstract_results[i]);
+			//}
+		}
+
+		// this fuction is used in simulatAbstract()
+		private static String[] remove(String[] arr, int index) {
+			if (arr == null || index < 0 || index >= arr.length) {
+				return arr;
+			}
+			ArrayList<String> result = new ArrayList<>();
+			for (int i = 0; i < arr.length; i++) {
+				if (i != index) {
+					result.add(arr[i]);
+				}
+			}
+			return result.toArray(new String[0]);
 		}
 
 		@Override
@@ -398,6 +516,11 @@ public class StateSimulationPanel extends JPanel {
 					}
 				}
 			});
+		}
+
+		// logのテキストを取得
+		public String getText() {
+			return log.getText();
 		}
 
 		public void clear() {

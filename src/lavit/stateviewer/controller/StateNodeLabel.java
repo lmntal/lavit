@@ -116,6 +116,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 		} else if (nodes.size() > 1) {
 			stateNodenum.setText("Node: " + nodes.size());
 			stateLabel.setText("");
+			stateShortest.setText("");
 			stateTextField.setText("");
 			stateTextField.setVisible(false);
 			setVisible(true);
@@ -131,6 +132,8 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			if (transition != null){
 				s = transition.diff_unpack(graphPanel); // transitonのfromとtoの差分
 			}
+			stateLabel.setText("");
+			stateShortest.setText("");
 			stateTextField.setText(s); // this code is important!
 			stateTextField.setVisible(true);
 			setVisible(true);

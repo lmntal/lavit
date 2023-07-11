@@ -48,6 +48,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Iterator;
 
 import lavit.Env;
 import lavit.FrontEnd;
@@ -1142,17 +1143,17 @@ public class StateNodeSet {
 					child.shortestPathCount = node.shortestPathCount;
 				} else if (child.depth == node.depth + 1) {
 					long count = 0;
+					ArrayList<StateNode> parents = new ArrayList<StateNode>();
 					for (StateNode parent : child.getFromNodes()) {
-						parent.weak = true;
+						parents.add(parent);
 					}
-					for (StateNode parent : child.getFromNodes()) {
-						if (! parent.weak){
-							continue;
-						}
-						parent.weak = false;
+					Iterator<StateNode> ite = parents.iterator();
+					while (ite.hasNext()) {
+						StateNode parent = ite.next();
 						if (child.depth == parent.depth + 1) {
 							count += parent.shortestPathCount;
 						}
+						ite.remove();
 					}
 					child.shortestPathCount = count;
 				}

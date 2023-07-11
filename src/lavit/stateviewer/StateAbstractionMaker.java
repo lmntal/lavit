@@ -228,6 +228,7 @@ public class StateAbstractionMaker {
 
 	public void end() {
 		drawNodes.setTreeDepth();
+		drawNodes.setShortestPathCount();
 		drawNodes.resetOrder();
 
 		if (Env.is("SV_STARTUP_SET_BACKDUMMY")) {

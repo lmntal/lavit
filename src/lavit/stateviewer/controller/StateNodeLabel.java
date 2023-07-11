@@ -56,6 +56,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 	private JPanel stateStatus;
 	private JLabel stateNodenum;
 	private JLabel stateLabel;
+	private JLabel stateShortest;
 
 	private JTextField stateTextField;
 
@@ -65,7 +66,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 		setOpaque(false);
 
 		stateStatus = new JPanel();
-		stateStatus.setLayout(new GridLayout(1, 2));
+		stateStatus.setLayout(new GridLayout(1, 3));
 		stateStatus.setOpaque(false);
 		stateNodenum = new JLabel();
 		stateNodenum.setOpaque(false);
@@ -73,8 +74,12 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 		stateStatus.add(stateNodenum);
 		stateLabel = new JLabel();
 		stateLabel.setOpaque(false);
-		stateLabel.setHorizontalAlignment(JLabel.RIGHT);
+		stateLabel.setHorizontalAlignment(JLabel.CENTER);
 		stateStatus.add(stateLabel);
+		stateShortest = new JLabel();
+		stateShortest.setOpaque(false);
+		stateShortest.setHorizontalAlignment(JLabel.RIGHT);
+		stateStatus.add(stateShortest);
 		add(stateStatus, BorderLayout.NORTH);
 
 		stateTextField = new JTextField();
@@ -104,6 +109,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			} else {
 				stateLabel.setText("");
 			}
+			stateShortest.setText("Shortest: " + node.shortestPathCount);
 			stateTextField.setText(node.toString()); // this code is important!
 			stateTextField.setVisible(true);
 			setVisible(true);

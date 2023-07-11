@@ -354,6 +354,7 @@ public class StateNodeSet {
 		}
 
 		setTreeDepth();
+		setShortestPathCount();
 
 		resetOrder();
 		positionReset();
@@ -561,6 +562,7 @@ public class StateNodeSet {
 		}
 
 		setTreeDepth();
+		setShortestPathCount();
 
 		resetOrder();
 		positionReset();
@@ -954,6 +956,7 @@ public class StateNodeSet {
 			removeInnerNodeData(node);
 		}
 		setTreeDepth();
+		setShortestPathCount();
 		updateNodeLooks();
 	}
 
@@ -975,6 +978,7 @@ public class StateNodeSet {
 			}
 		}
 		setTreeDepth();
+		setShortestPathCount();
 		updateNodeLooks();
 	}
 
@@ -1116,6 +1120,47 @@ public class StateNodeSet {
 		dnodes.add(node);
 	}
 
+	void setShortestPathCount () {
+		allNodeUnMark();
+		LinkedList<StateNode> queue = new LinkedList<StateNode>();
+
+		for (StateNode node : startNode) {
+			node.mark();
+			node.shortestPathCount = 1;
+			queue.add(node);
+		}
+		
+		while (!queue.isEmpty()) {
+			StateNode node = queue.remove();
+			for (StateNode child : node.getToNodes()) {
+				if (child.isMarked()) {
+					continue;
+				}
+				child.mark();
+				// childがダミーかつ、深さがnode-1の場合
+				if (child.dummy && child.depth == node.depth -1 ) {
+					child.shortestPathCount = node.shortestPathCount;
+				} else if (child.depth == node.depth + 1) {
+					long count = 0;
+					for (StateNode parent : child.getFromNodes()) {
+						parent.weak = true;
+					}
+					for (StateNode parent : child.getFromNodes()) {
+						if (! parent.weak){
+							continue;
+						}
+						parent.weak = false;
+						if (child.depth == parent.depth + 1) {
+							count += parent.shortestPathCount;
+						}
+					}
+					child.shortestPathCount = count;
+				}
+				queue.add(child);
+			}
+		}
+	}
+
 	public StateNode makeDummyFromTransition(StateTransition trans) {
 		StateNode from = trans.from, to = trans.to;
 
@@ -1153,6 +1198,7 @@ public class StateNodeSet {
 		removeTransition(trans);
 
 		setTreeDepth();
+		setShortestPathCount();
 
 		return dummy;
 	}
@@ -1205,6 +1251,7 @@ public class StateNodeSet {
 		}
 
 		setTreeDepth();
+		setShortestPathCount();
 		updateNodeLooks();
 
 		/*
@@ -1282,6 +1329,7 @@ public class StateNodeSet {
 		}
 
 		setTreeDepth();
+		setShortestPathCount();
 		updateNodeLooks();
 	}
 

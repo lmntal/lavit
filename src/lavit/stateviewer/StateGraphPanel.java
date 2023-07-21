@@ -135,6 +135,10 @@ public class StateGraphPanel extends JPanel
 		nodeLabel.setVisible(false);
 		add(nodeLabel, BorderLayout.SOUTH);
 
+		// StateGraphPanelはgeneralControlPanelとnodeLabelを含んでいるが、
+		// 描画時にStateGraphPanel自体の高さを基準にしている。
+		// そのため描画がgeneralControlPanelやnodeLabelと重なってしまう。
+
 		selectNodes = new ArrayList<StateNode>();
 		selectTransitions = new ArrayList<StateTransition>();
 

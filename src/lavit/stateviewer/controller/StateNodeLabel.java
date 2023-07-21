@@ -109,7 +109,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			} else {
 				stateLabel.setText("");
 			}
-			stateShortest.setText("Shortest: " + node.shortestPathCount);
+			stateShortest.setText("ShortestPathCount: " + node.shortestPathCount);
 			stateTextField.setText(node.toString()); // this code is important!
 			stateTextField.setVisible(true);
 			setVisible(true);

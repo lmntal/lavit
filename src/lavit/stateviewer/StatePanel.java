@@ -44,6 +44,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
@@ -51,11 +52,12 @@ import javax.swing.JPanel;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.stateviewer.controller.StateControlPanel;
+import lavit.stateviewer.controller.StateNodeLabel;
 
 @SuppressWarnings("serial")
 public class StatePanel extends JPanel {
 	public StateGraphPanel stateGraphPanel;
-
+	private StateNodeLabel nodeLabel;
 	public StateControlPanel stateControlPanel;
 
 	private String originalString;
@@ -69,8 +71,18 @@ public class StatePanel extends JPanel {
 		stateGraphPanel = new StateGraphPanel(this);
 		add(stateGraphPanel, BorderLayout.CENTER);
 
+		// BorderLayout.SOUTHを2つに分ける
+		JPanel south = new JPanel();
+		south.setLayout(new BorderLayout());
+
+		nodeLabel = new StateNodeLabel();
+		nodeLabel.setVisible(true);
+		south.add(nodeLabel, BorderLayout.NORTH);
+
 		stateControlPanel = new StateControlPanel(this);
-		add(stateControlPanel, BorderLayout.SOUTH);
+		south.add(stateControlPanel, BorderLayout.SOUTH);
+
+		add(south, BorderLayout.SOUTH);
 
 		/*
 		 * setLayout(new BorderLayout());
@@ -178,5 +190,18 @@ public class StatePanel extends JPanel {
 
 	public boolean isLtl() {
 		return ltlMode;
+	}
+
+	public void updateNodeLabel(StateGraphPanel stateGraphPanel) {
+		ArrayList<StateTransition> selectTransitions = stateGraphPanel.getSelectTransitions();
+		ArrayList<StateNode> selectNodes = stateGraphPanel.getSelectNodes();
+		// nodeLabelにトランザクションの情報、か、ノードの情報を表示する
+		if (selectTransitions.size() > 0 && selectNodes.size() > 0){
+			nodeLabel.setNull();
+		} else if (selectTransitions.size() == 1) {
+			nodeLabel.setTransition(selectTransitions,stateGraphPanel);
+		} else {
+			nodeLabel.setNode(selectNodes);
+		}
 	}
 }

@@ -44,10 +44,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.plaf.nimbus.State;
 
 import lavit.Env;
 import lavit.FrontEnd;
@@ -192,16 +192,7 @@ public class StatePanel extends JPanel {
 		return ltlMode;
 	}
 
-	public void updateNodeLabel(StateGraphPanel stateGraphPanel) {
-		ArrayList<StateTransition> selectTransitions = stateGraphPanel.getSelectTransitions();
-		ArrayList<StateNode> selectNodes = stateGraphPanel.getSelectNodes();
-		// nodeLabelにトランザクションの情報、か、ノードの情報を表示する
-		if (selectTransitions.size() > 0 && selectNodes.size() > 0){
-			nodeLabel.setNull();
-		} else if (selectTransitions.size() == 1) {
-			nodeLabel.setTransition(selectTransitions,stateGraphPanel);
-		} else {
-			nodeLabel.setNode(selectNodes);
-		}
+	public StateNodeLabel getNodeLabel() {
+		return nodeLabel;
 	}
 }

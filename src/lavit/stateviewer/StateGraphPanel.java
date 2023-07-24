@@ -410,10 +410,6 @@ public class StateGraphPanel extends JPanel
 		return this.selectTransition;
 	}
 
-	public ArrayList<StateTransition> getSelectTransitions() {
-		return selectTransitions;
-	}
-
 	public boolean isSelectSquare() {
 		return this.selectSquare;
 	}
@@ -431,7 +427,15 @@ public class StateGraphPanel extends JPanel
 	}
 
 	public void updateNodeLabel() {
-		this.statePanel.updateNodeLabel(this);
+		StateNodeLabel nodeLabel = this.statePanel.getNodeLabel();
+		// nodeLabelにトランザクションの情報、か、ノードの情報を表示する
+		if (selectTransitions.size() > 0 && selectNodes.size() > 0){
+			nodeLabel.setNull();
+		} else if (selectTransitions.size() == 1) {
+			nodeLabel.setTransition(selectTransitions,this);
+		} else {
+			nodeLabel.setNode(selectNodes);
+		}
 	}
 
 	/*

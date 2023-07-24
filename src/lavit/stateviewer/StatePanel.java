@@ -47,7 +47,6 @@ import java.io.OutputStreamWriter;
 
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.plaf.nimbus.State;
 
 import lavit.Env;
 import lavit.FrontEnd;

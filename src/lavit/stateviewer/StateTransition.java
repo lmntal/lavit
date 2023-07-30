@@ -119,47 +119,40 @@ public class StateTransition {
 	public String diff_unpack(StateGraphPanel graphPanel) {
 		String diff_from = "";
 		String diff_to = "";
-		// from.stateとto.stateの差分を取得
-		// form.id、to.idを持つnodeを取得
-		StateNode from_node = null;
-		StateNode to_node = null;
-		StateNodeSet drawNodes = graphPanel.getDrawNodes();
-		for (StateNode node : new ArrayList<StateNode>(drawNodes.getAllNode())) {
-			// form_node がdummyの場合
-			if (from_node != null && from_node.dummy) {
-				// from_nodeの逆側のNodeを取得
+		// from_node.stateとto_node.stateの差分を取得
+		StateNode from_node = this.from;
+		StateNode to_node = this.to;
+		
+		// from_node or to_node がdummyの場合
+		while(true){
+			if (from_node.dummy) {
 				ArrayList<StateNode> fromNodes = from_node.getFromNodes();
+				// dummy nodeは、fromNodesを1つしか持たないはず
 				if(fromNodes.size() != 1){
-					System.out.println("error");
+					return " ";
 				}
 				from_node = fromNodes.get(0);
-			} else if (to_node != null && to_node.dummy) {
-				// to_nodeの逆側のNodeを取得
+			} else if (to_node.dummy) {
 				ArrayList<StateNode> toNodes = to_node.getToNodes();
+				// dummy nodeは、toNodesを1つしか持たないはず
 				if(toNodes.size() != 1){
-					System.out.println("error");
+					return " ";
 				}
 				to_node = toNodes.get(0);
 			} else {
-				if (from_node != null && to_node != null) break;
-				if (node.id == this.from.id) from_node = node;
-				if (node.id == this.to.id) to_node = node;
+				break;
 			}
 		}
 
-		String[] from_tokens = null;
-		String[] to_tokens = null;
-		// nodeの端がtransitionのfrom/toとは限らない
-		//// nodeに子がある場合
+		String[] from_tokens = from_node.state.split(" ");
+		String[] to_tokens = to_node.state.split(" ");
+		// nodeに子がある場合、nodeの端がtransitionのfrom/toとは限らない
 		//if (from_node != null && from_node.childSet != null && from_node.childSet.size() > 0) {
 		//	from_tokens = from_node.childSet.getRepresentationNode().toString().split(" ");
 		//}
 		//if (to_node != null && to_node.childSet != null && to_node.childSet.size() > 0) {
 		//	to_tokens = to_node.childSet.getStartNodeOne().toString().split(" ");
 		//}
-		//// nodeに子がない場合
-		from_tokens = from_node.state.split(" ");
-		to_tokens = to_node.state.split(" ");
 
 		// 差分を取得(順番は関係ないので、2重ループで全探索)
 		for (int i = 0; i < from_tokens.length; i++) {

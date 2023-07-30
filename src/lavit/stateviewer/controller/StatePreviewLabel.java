@@ -52,7 +52,7 @@ import lavit.stateviewer.StateTransition;
 import lavit.util.CommonFontUser;
 
 @SuppressWarnings("serial")
-public class StateNodeLabel extends JPanel implements CommonFontUser {
+public class StatePreviewLabel extends JPanel implements CommonFontUser {
 	private JPanel stateStatus;
 	private JLabel stateNodenum;
 	private JLabel stateLabel;
@@ -60,7 +60,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 
 	private JTextField stateTextField;
 
-	public StateNodeLabel() {
+	public StatePreviewLabel() {
 
 		setLayout(new BorderLayout());
 		setOpaque(false);

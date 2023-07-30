@@ -71,7 +71,7 @@ import lavit.FrontEnd;
 import lavit.runner.LmntalRunner;
 import lavit.stateviewer.controller.SelectStateTransitionRuleFrame;
 import lavit.stateviewer.controller.StateGenerationControlPanel;
-import lavit.stateviewer.controller.StateNodeLabel;
+import lavit.stateviewer.controller.StatePreviewLabel;
 import lavit.stateviewer.controller.StateRightMenu;
 import lavit.stateviewer.draw.StateDraw;
 import lavit.stateviewer.draw.StateGraphAtomcolorDraw;
@@ -418,7 +418,7 @@ public class StateGraphPanel extends JPanel
 	}
 
 	public void updateNodeLabel() {
-		StateNodeLabel nodeLabel = this.statePanel.getNodeLabel();
+		StatePreviewLabel nodeLabel = this.statePanel.getNodeLabel();
 		// nodeLabelにトランザクションの情報、か、ノードの情報を表示する
 		if (selectTransitions.size() > 0 && selectNodes.size() > 0){
 			nodeLabel.setNull();

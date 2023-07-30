@@ -51,12 +51,12 @@ import javax.swing.JPanel;
 import lavit.Env;
 import lavit.FrontEnd;
 import lavit.stateviewer.controller.StateControlPanel;
-import lavit.stateviewer.controller.StateNodeLabel;
+import lavit.stateviewer.controller.StatePreviewLabel;
 
 @SuppressWarnings("serial")
 public class StatePanel extends JPanel {
 	public StateGraphPanel stateGraphPanel;
-	private StateNodeLabel nodeLabel;
+	private StatePreviewLabel nodeLabel;
 	public StateControlPanel stateControlPanel;
 
 	private String originalString;
@@ -74,7 +74,7 @@ public class StatePanel extends JPanel {
 		JPanel south = new JPanel();
 		south.setLayout(new BorderLayout());
 
-		nodeLabel = new StateNodeLabel();
+		nodeLabel = new StatePreviewLabel();
 		nodeLabel.setVisible(true);
 		south.add(nodeLabel, BorderLayout.NORTH);
 
@@ -191,7 +191,7 @@ public class StatePanel extends JPanel {
 		return ltlMode;
 	}
 
-	public StateNodeLabel getNodeLabel() {
+	public StatePreviewLabel getNodeLabel() {
 		return nodeLabel;
 	}
 }

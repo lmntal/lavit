@@ -512,9 +512,10 @@ public class StateGraphBasicDraw extends StateDraw {
 					drawDummyCurve(f.from, Color.BLUE);
 				} else {
 					while (f.from.dummy) {
-						f = f.from.getFromTransition();
 						drawTransition(f, Color.BLUE);
+						f = f.from.getFromTransition();
 					}
+					drawTransition(f, Color.BLUE);
 				}
 			}
 			if (node.dummy) {
@@ -525,7 +526,7 @@ public class StateGraphBasicDraw extends StateDraw {
 		// 遷移先の描画
 		drawNodes.allNodeUnMark();
 		for (StateTransition t : node.getToTransitions()) {
-			StateTransition f = t.to.getToTransition(node);
+			StateTransition f = t.to.getToTransition(node); // 両方向のtransitionに対応
 			if (!t.to.dummy) {
 				drawTransition(t, Color.RED);
 			} else {
@@ -533,9 +534,10 @@ public class StateGraphBasicDraw extends StateDraw {
 					drawDummyCurve(t.to, Color.RED);
 				} else {
 					while (t.to.dummy) {
-						t = t.to.getToTransition();
 						drawTransition(t, Color.RED);
+						t = t.to.getToTransition();
 					}
+					drawTransition(t, Color.RED);
 				}
 			}
 			if (node.dummy) {
@@ -588,12 +590,65 @@ public class StateGraphBasicDraw extends StateDraw {
 	}
 
 	private void drawSelectTransition(StateTransition trans) {
+		// transのfrom or toがdummyならば
+		if (trans.from.dummy) {
+			if (!simpleMode) {
+				drawDummyCurve(trans.from, Color.RED);
+			} else {
+				while (trans.from.dummy) {
+					drawTransition(trans, Color.RED);
+					trans = trans.from.getFromTransition();
+				}
+				drawTransition(trans, Color.RED);
+			}
+			// 状態の描画
+			// fromはdummyなので、
+			StateNode from = trans.from;
+			while (from.dummy) {
+				ArrayList<StateNode> froms = from.getFromNodes();
+				// dummy nodeは、fromsを1つしか持たないはず
+				if (froms.size() != 1) {
+					break;
+				}
+				from = froms.get(0);
+			}
+			drawNode(from, from.getColor(), Color.BLUE);
+		}
+		if (trans.to.dummy) {
+			if (!simpleMode) {
+				drawDummyCurve(trans.to, Color.RED);
+			} else {
+				while (trans.to.dummy) {
+					drawTransition(trans, Color.RED);
+					trans = trans.to.getToTransition();
+				}
+				drawTransition(trans, Color.RED);
+			}
+			// 状態の描画
+			// toはdummyなので、
+			StateNode to = trans.to;
+			while (to.dummy) {
+				ArrayList<StateNode> tos = to.getToNodes();
+				// dummy nodeは、tosを1つしか持たないはず
+				if (tos.size() != 1) {
+					break;
+				}
+				to = tos.get(0);
+			}
+			drawNode(to, to.getColor(), Color.RED);
+		}
 
-		drawTransition(trans, Color.RED);
+		if ( !trans.from.dummy && !trans.to.dummy) {
+			drawTransition(trans, Color.RED);
+		}
 
 		// 状態の描画
-		drawNode(trans.from, trans.from.getColor(), Color.BLUE);
-		drawNode(trans.to, trans.to.getColor(), Color.RED);
+		if ( !trans.from.dummy){
+			drawNode(trans.from, trans.from.getColor(), Color.BLUE);
+		}
+		if ( !trans.to.dummy){
+			drawNode(trans.to, trans.to.getColor(), Color.RED);
+		}
 	}
 
 	private void drawSelfArrow(StateNode node) {

@@ -640,6 +640,10 @@ public class StateGraphBasicDraw extends StateDraw {
 
 		if ( !trans.from.dummy && !trans.to.dummy) {
 			drawTransition(trans, Color.RED);
+			StateTransition f = trans.to.getToTransition(trans.from); // 両方向のtransitionに対応
+			if (f != null){
+				drawTransition(f, Color.RED);
+			}
 		}
 
 		// 状態の描画

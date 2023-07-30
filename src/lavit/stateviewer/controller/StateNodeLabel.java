@@ -110,7 +110,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 				stateLabel.setText("");
 			}
 			stateShortest.setText("ShortestPathCount: " + node.shortestPathCount);
-			stateTextField.setText(node.toString()); // this code is important!
+			stateTextField.setText(node.toString()); // nodeの状態を表示
 			stateTextField.setVisible(true);
 			setVisible(true);
 		} else if (nodes.size() > 1) {
@@ -134,7 +134,7 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			}
 			stateLabel.setText("");
 			stateShortest.setText("");
-			stateTextField.setText(s); // this code is important!
+			stateTextField.setText(s); // transitionの情報(diff node)を表示
 			stateTextField.setVisible(true);
 			setVisible(true);
 		} else {

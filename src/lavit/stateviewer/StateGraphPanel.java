@@ -388,13 +388,13 @@ public class StateGraphPanel extends JPanel
 	}
 
 	public ArrayList<StateNode> getWeakNodes(){
-		ArrayList<StateNode> tmpNodes = new ArrayList<StateNode>();
+		ArrayList<StateNode> weakNodes = new ArrayList<StateNode>();
 		for(StateNode node : drawNodes.getAllNode()){
 			if(node.weak){
-				tmpNodes.add(node);
+				weakNodes.add(node);
 			}
 		}
-		return tmpNodes;
+		return weakNodes;
 	}
 
 	public StateTransition getSelectTransition() {
@@ -1025,9 +1025,6 @@ public class StateGraphPanel extends JPanel
 				dictionary.put(node, count);
 			}
 		}
-		// dictionaryをprint
-		//for (StateNode node : dictionary.keySet()) { System.out.println(node.id +
-		 //" " + dictionary.get(node)); }
 		
 		while (dictionary.size() > 0) {
 			// dictionaryのvalueが大きいkeyを取り出す
@@ -1465,7 +1462,7 @@ public class StateGraphPanel extends JPanel
 				} else {
 					drawNodes.allMove(dx, dy);
 				}
-			} else if (dx != 0 && selectNodes.size() == 1 && altDown){ // altDownは変更するかも
+			} else if (dx != 0 && selectNodes.size() == 1 && altDown){ // altDown
 				// fromTransitionsは左側
 				StateNode node = selectNodes.get(0);
 				if (dx > 0 && node.getToTransition() != null){

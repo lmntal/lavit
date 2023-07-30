@@ -167,7 +167,7 @@ public class StateTransition {
 			}
 		}
 		diff_to = String.join(" ", to_tokens);
-		return "【" + from_node.id + "】" + diff_from + "-> (" + getRuleNameString() + ") 【"  + to_node.id + "】" + diff_to ;
+		return "<" + from_node.id + "> " + diff_from + "-> (" + getRuleNameString() + ") <"  + to_node.id + "> " + diff_to ;
 	}
 
 	// this function is used in diff_unpack()

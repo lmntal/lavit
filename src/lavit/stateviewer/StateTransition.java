@@ -125,9 +125,26 @@ public class StateTransition {
 		StateNode to_node = null;
 		StateNodeSet drawNodes = graphPanel.getDrawNodes();
 		for (StateNode node : new ArrayList<StateNode>(drawNodes.getAllNode())) {
-			if (from_node != null && to_node != null) break;
-			if (node.id == from.id) from_node = node;
-			if (node.id == to.id) to_node = node;
+			// form_node がdummyの場合
+			if (from_node != null && from_node.dummy) {
+				// from_nodeの逆側のNodeを取得
+				ArrayList<StateNode> fromNodes = from_node.getFromNodes();
+				if(fromNodes.size() != 1){
+					System.out.println("error");
+				}
+				from_node = fromNodes.get(0);
+			} else if (to_node != null && to_node.dummy) {
+				// to_nodeの逆側のNodeを取得
+				ArrayList<StateNode> toNodes = to_node.getToNodes();
+				if(toNodes.size() != 1){
+					System.out.println("error");
+				}
+				to_node = toNodes.get(0);
+			} else {
+				if (from_node != null && to_node != null) break;
+				if (node.id == this.from.id) from_node = node;
+				if (node.id == this.to.id) to_node = node;
+			}
 		}
 
 		String[] from_tokens = null;
@@ -141,12 +158,8 @@ public class StateTransition {
 		//	to_tokens = to_node.childSet.getStartNodeOne().toString().split(" ");
 		//}
 		//// nodeに子がない場合
-		if (from_tokens == null) {
-			from_tokens = from.state.split(" ");
-		}
-		if (to_tokens == null) {
-			to_tokens = to.state.split(" ");
-		}
+		from_tokens = from_node.state.split(" ");
+		to_tokens = to_node.state.split(" ");
 
 		// 差分を取得(順番は関係ないので、2重ループで全探索)
 		for (int i = 0; i < from_tokens.length; i++) {
@@ -161,7 +174,7 @@ public class StateTransition {
 			}
 		}
 		diff_to = String.join(" ", to_tokens);
-		return "【" + from.id + "】" + diff_from + "-> (" + getRuleNameString() + ") 【"  + to.id + "】" + diff_to ;
+		return "【" + from_node.id + "】" + diff_from + "-> (" + getRuleNameString() + ") 【"  + to_node.id + "】" + diff_to ;
 	}
 
 	// this function is used in diff_unpack()

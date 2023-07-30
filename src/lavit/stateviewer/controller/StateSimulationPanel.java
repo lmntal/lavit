@@ -44,8 +44,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+//import java.util.HashMap;
+//import java.util.Map;
 import java.util.Set;
 
 import javax.swing.BoxLayout;
@@ -80,7 +80,6 @@ import lavit.stateviewer.StateTransition;
 @SuppressWarnings("serial")
 public class StateSimulationPanel extends JPanel {
 	private StatePanel statePanel;
-	private StateSimulationPanel simulationPanel;
 
 	private ButtonPanel buttonPanel;
 	private RulePanel rulePanel;
@@ -95,7 +94,6 @@ public class StateSimulationPanel extends JPanel {
 
 	public StateSimulationPanel(StatePanel statePanel) {
 		this.statePanel = statePanel;
-		this.simulationPanel = this;
 
 		setLayout(new BorderLayout());
 
@@ -155,14 +153,14 @@ public class StateSimulationPanel extends JPanel {
 		JButton startButton = new JButton("Start");
 		JButton endButton = new JButton("End");
 		JCheckBox autoRun = new JCheckBox("Auto Run");
-		JButton abstractButton = new JButton("Abstract");
+		//JButton abstractButton = new JButton("Abstract");
 		JSlider intervalSlider = new JSlider(10, 190);
 		JButton ruleWindowButton = new JButton("Rule Priority");
 
 		ButtonPanel() {
 
 			// setLayout(new FlowLayout(FlowLayout.LEFT));
-			setLayout(new GridLayout(1, 6));
+			setLayout(new GridLayout(1, 5));
 
 			startButton.addActionListener(this);
 			add(startButton);
@@ -170,16 +168,14 @@ public class StateSimulationPanel extends JPanel {
 			endButton.addActionListener(this);
 			add(endButton);
 
-			// autoRunのチェックボックスを初期状態でチェックする
+			// 初期状態でチェックする
 			autoRun.setSelected(true);
 			autoRun.addActionListener(this);
 			add(autoRun);
 
-			abstractButton.addActionListener(this);
-			add(abstractButton);
+			//abstractButton.addActionListener(this);
+			//add(abstractButton);
 
-			// intervalSliderの初期値を190にする
-			intervalSlider.setValue(10);
 			intervalSlider.addChangeListener(this);
 			add(intervalSlider);
 
@@ -218,8 +214,8 @@ public class StateSimulationPanel extends JPanel {
 				buttonPanel.endButton.setEnabled(false);
 			} else if (src == autoRun) {
 				updateMover();
-			} else if (src == abstractButton) {
-				simulatAbstract();
+			//} else if (src == abstractButton) {
+			//	simulatAbstract();
 			} else if (src == ruleWindowButton) {
 				if (ruleWindow == null) {
 					ruleWindow = new NumberingStateTransitionRuleFrame();
@@ -237,7 +233,7 @@ public class StateSimulationPanel extends JPanel {
 			}
 		}
 
-		public void simulatAbstract() {
+		//public void simulatAbstract() {
 			//String log = outputPanel.getText();
 			//String[] steps = log.split("\n");
 			//for (int i = 0; i < steps.length; ++i) {
@@ -362,7 +358,7 @@ public class StateSimulationPanel extends JPanel {
 			////for (int i = 0; i < steps.length; ++i) {
 			////	outputPanel.println(abstract_results[i]);
 			////}
-		}
+		//}
 
 		//// this fuction is used in simulatAbstract()
 		//private static String[] remove(String[] arr, int index) {
@@ -454,8 +450,7 @@ public class StateSimulationPanel extends JPanel {
 				rulePanel.setEnabled(true);
 			}
 			updateUI();
-			// simulationPanel.validate();
-			// simulationPanel.updateUI();
+			// validate();
 		}
 
 		public void setEnabled(boolean enabled) {

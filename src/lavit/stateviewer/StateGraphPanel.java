@@ -1462,30 +1462,30 @@ public class StateGraphPanel extends JPanel
 				} else {
 					drawNodes.allMove(dx, dy);
 				}
-			} else if (dx != 0 && selectNodes.size() == 1 && altDown){ // altDown
-				// fromTransitionsは左側
-				StateNode node = selectNodes.get(0);
-				if (dx > 0 && node.getToTransition() != null){
-					for (StateTransition t : node.getToTransitions()){
-						if (t.from == node){
-							selectTransition = t;
-							break;
-						}
-					}
-					selectTransitions.add(selectTransition);
-					selectNodes.clear();
-					nodeSelected = false;
-				} else if (dx < 0 && node.getFromTransition() != null){
-					for (StateTransition t : node.getFromTransitions()){
-						if (t.to == node){
-							selectTransition = t;
-							break;
-						}
-					}
-					selectTransitions.add(selectTransition);
-					selectNodes.clear();
-					nodeSelected = false;
-				}
+			//} else if (dx != 0 && selectNodes.size() == 1 && altDown){ // altDown
+			//	// fromTransitionsは左側
+			//	StateNode node = selectNodes.get(0);
+			//	if (dx > 0 && node.getToTransition() != null){
+			//		for (StateTransition t : node.getToTransitions()){
+			//			if (t.from == node){
+			//				selectTransition = t;
+			//				break;
+			//			}
+			//		}
+			//		selectTransitions.add(selectTransition);
+			//		selectNodes.clear();
+			//		nodeSelected = false;
+			//	} else if (dx < 0 && node.getFromTransition() != null){
+			//		for (StateTransition t : node.getFromTransitions()){
+			//			if (t.to == node){
+			//				selectTransition = t;
+			//				break;
+			//			}
+			//		}
+			//		selectTransitions.add(selectTransition);
+			//		selectNodes.clear();
+			//		nodeSelected = false;
+			//	}
 			} else {
 				for (StateNode node : selectNodes) {
 					node.move(dx, dy);

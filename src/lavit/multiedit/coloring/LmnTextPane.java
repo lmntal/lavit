@@ -56,55 +56,47 @@ import javax.swing.text.Element;
 import lavit.multiedit.coloring.event.DirtyFlagChangeListener;
 
 @SuppressWarnings("serial")
-public class LmnTextPane extends JTextPane
-{
+public class LmnTextPane extends JTextPane {
 	private final Document blankDocument = new DefaultStyledDocument();
 	private boolean autoIndentEnabled = true;
 	private boolean autoAlignEnabled = true;
 
-	public LmnTextPane()
-	{
+	public LmnTextPane() {
 		setEditorKit(new LmnEditorKit());
 
-		addCaretListener(new CaretListener()
-		{
-			public void caretUpdate(CaretEvent e)
-			{
+		addCaretListener(new CaretListener() {
+			public void caretUpdate(CaretEvent e) {
 				String text = getLMNDocument().getRowText();
 				int caretPos = getCaretPosition();
 				int pos = findMatchingParenIndex(text, caretPos);
-				if (pos == -1)
-				{
+				if (pos == -1) {
 					--caretPos;
 					pos = findMatchingParenIndex(text, caretPos);
 				}
-				if (pos != -1)
-				{
+				if (pos != -1) {
 					getLMNDocument().setParenPair(new int[] { caretPos, pos });
-				}
-				else
-				{
+				} else {
 					getLMNDocument().setParenPair(null);
 				}
 				repaint();
 			}
 		});
 
-		addKeyListener(new KeyAdapter()
-		{
-			public void keyPressed(KeyEvent e)
-			{
-				if (autoIndentEnabled && e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					if (autoIndent())
-					{
+		addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_SLASH &&
+						(e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0) {
+					// Ctrl + / でコメントアウト
+					commentOut();
+					e.consume();
+				}
+
+				if (autoIndentEnabled && e.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (autoIndent()) {
 						e.consume();
 					}
-				}
-				else if (autoAlignEnabled && e.getKeyCode() == KeyEvent.VK_TAB)
-				{
-					if (autoAlign())
-					{
+				} else if (autoAlignEnabled && e.getKeyCode() == KeyEvent.VK_TAB) {
+					if (autoAlign()) {
 						e.consume();
 					}
 				}
@@ -120,31 +112,25 @@ public class LmnTextPane extends JTextPane
 		im.put(KeyStroke.getKeyStroke("control Z"), "undo");
 
 		ActionMap am = getActionMap();
-		am.put("undo", new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		am.put("undo", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
 				getLMNDocument().undo();
 			}
 		});
-		am.put("redo", new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		am.put("redo", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
 				getLMNDocument().redo();
 			}
 		});
 	}
 
-	public void updateUI()
-	{
+	public void updateUI() {
 		super.updateUI();
 		setUI(new LineHighlightTextPaneUI());
 		setBackground(Color.WHITE);
 	}
 
-	public void setText(String text)
-	{
+	public void setText(String text) {
 		LmnDocument doc = getLMNDocument();
 		setDocument(blankDocument);
 		text = setEOLStringPropertyAndReplace(doc, text);
@@ -153,71 +139,55 @@ public class LmnTextPane extends JTextPane
 		updateHighlight();
 	}
 
-	private String setEOLStringPropertyAndReplace(Document doc, String text)
-	{
+	private String setEOLStringPropertyAndReplace(Document doc, String text) {
 		boolean isCR = false;
 		boolean isLF = false;
 		boolean isCRLF = false;
 		boolean prevCR = false;
-		for (int i = 0, limit = Math.min(text.length(), 4096); i < limit; i++)
-		{
-			switch (text.charAt(i))
-			{
-			case '\r':
-				if (prevCR)
-				{
-					isCR = true;
-				}
-				else
-				{
-					prevCR = true;
-				}
-				break;
-			case '\n':
-				if (prevCR)
-				{
-					isCRLF = true;
-				}
-				else
-				{
-					isLF = true;
-				}
-				break;
+		for (int i = 0, limit = Math.min(text.length(), 4096); i < limit; i++) {
+			switch (text.charAt(i)) {
+				case '\r':
+					if (prevCR) {
+						isCR = true;
+					} else {
+						prevCR = true;
+					}
+					break;
+				case '\n':
+					if (prevCR) {
+						isCRLF = true;
+					} else {
+						isLF = true;
+					}
+					break;
 			}
-			if (isCR || isLF || isCRLF)
-			{
+			if (isCR || isLF || isCRLF) {
 				break;
 			}
 		}
-		if (isCR)
-		{
+		if (isCR) {
 			text = text.replace('\r', '\n');
 			doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, "\r");
-		}
-		else if (isCRLF)
-		{
+		} else if (isCRLF) {
 			text = text.replace("\r\n", "\n");
 			doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, "\r\n");
-		}
-		else if (isLF)
-		{
+		} else if (isLF) {
 			doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 		}
 		return text;
 	}
 
-	public LmnDocument getLMNDocument()
-	{
+	public LmnDocument getLMNDocument() {
 		Document doc = getDocument();
 
-		if(doc instanceof LmnDocument){
+		if (doc instanceof LmnDocument) {
 			return (LmnDocument) doc;
-		}else {
+		} else {
 			LmnDocument lmndoc = new LmnDocument();
 			try {
 				lmndoc.initializeText(doc.getText(0, doc.getLength()));
 				// 0からdocのlengthまでを取ってるだけでBadLocationExceptionは起きないはずなので握り潰す
-			} catch (BadLocationException e){
+			} catch (BadLocationException e) {
 				System.err.println(e);
 			}
 
@@ -228,119 +198,92 @@ public class LmnTextPane extends JTextPane
 		}
 	}
 
-	public void setTabWidth(int spaces)
-	{
+	public void setTabWidth(int spaces) {
 		getLMNDocument().setTabWidth(spaces);
 	}
 
-	public int getTabWidth()
-	{
+	public int getTabWidth() {
 		return getLMNDocument().getTabWidth();
 	}
 
-	public boolean canUndo()
-	{
+	public boolean canUndo() {
 		return getLMNDocument().canUndo();
 	}
 
-	public boolean canRedo()
-	{
+	public boolean canRedo() {
 		return getLMNDocument().canRedo();
 	}
 
-	public void undo()
-	{
+	public void undo() {
 		getLMNDocument().undo();
 	}
 
-	public void redo()
-	{
+	public void redo() {
 		getLMNDocument().redo();
 	}
 
-	public void clearUndo()
-	{
+	public void clearUndo() {
 		getLMNDocument().clearUndo();
 	}
 
-	public boolean isModified()
-	{
+	public boolean isModified() {
 		return getLMNDocument().isDirty();
 	}
 
-	public void setModified(boolean b)
-	{
+	public void setModified(boolean b) {
 		getLMNDocument().setDirty(b);
 	}
 
-	public void updateHighlight()
-	{
+	public void updateHighlight() {
 		getLMNDocument().reparse();
 		repaint();
 	}
 
-	public void clearHighlightFlags()
-	{
+	public void clearHighlightFlags() {
 		getLMNDocument().setHighlightFlags(0);
 	}
 
-	public void addHighlight(int labelKind)
-	{
+	public void addHighlight(int labelKind) {
 		getLMNDocument().addHighlight(labelKind);
 	}
 
-	public void removeHighlight(int labelKind)
-	{
+	public void removeHighlight(int labelKind) {
 		getLMNDocument().removeHighlight(labelKind);
 	}
 
-	public void setShowTabs(boolean b)
-	{
+	public void setShowTabs(boolean b) {
 		getLMNDocument().setShowTabs(b);
 	}
 
-	public void setShowEols(boolean b)
-	{
+	public void setShowEols(boolean b) {
 		getLMNDocument().setShowEols(b);
 	}
 
-	public void addDirtyFlagChangeListener(DirtyFlagChangeListener l)
-	{
+	public void addDirtyFlagChangeListener(DirtyFlagChangeListener l) {
 		getLMNDocument().addDirtyFlagChangeListener(l);
 	}
 
 	// 右端で折り返さないようにする
-	public boolean getScrollableTracksViewportWidth()
-	{
+	public boolean getScrollableTracksViewportWidth() {
 		return getUI().getPreferredSize(this).width < getParent().getWidth();
 	}
 
-	private static int findMatchingParenIndex(String s, int p0)
-	{
-		if (0 <= p0 && p0 < s.length())
-		{
+	private static int findMatchingParenIndex(String s, int p0) {
+		if (0 <= p0 && p0 < s.length()) {
 			char c1 = s.charAt(p0);
 			char c2 = getPairParenChar(c1);
-			if (c2 != 0)
-			{
+			if (c2 != 0) {
 				int dir = isOpenParen(c1) ? 1 : -1;
 				int level = 0;
-				for (int p1 = p0 + dir; 0 <= p1 && p1 < s.length(); p1 += dir)
-				{
+				for (int p1 = p0 + dir; 0 <= p1 && p1 < s.length(); p1 += dir) {
 					char c = s.charAt(p1);
-					if (c == c2)
-					{
-						if (level == 0)
-						{
+					if (c == c2) {
+						if (level == 0) {
 							return p1;
-						}
-						else
-						{
+						} else {
 							--level;
 						}
-					}
-					else if (c == c1)
-					{
+					} else if (c == c1) {
 						++level;
 					}
 				}
@@ -349,15 +292,13 @@ public class LmnTextPane extends JTextPane
 		return -1;
 	}
 
-	private boolean autoIndent()
-	{
+	private boolean autoIndent() {
 		LmnDocument doc = getLMNDocument();
 		final int pos = getCaretPosition();
 		int lineIndex = doc.getDefaultRootElement().getElementIndex(pos);
 		Element elemLine = doc.getDefaultRootElement().getElement(lineIndex);
 		int start = elemLine.getStartOffset(), end = elemLine.getEndOffset();
-		try
-		{
+		try {
 			int localPos = pos - start;
 			String line = getText(start, end - start);
 
@@ -367,120 +308,158 @@ public class LmnTextPane extends JTextPane
 			String indent = getLeadingWhitespaces(line);
 			doc.insertString(pos, "\n" + indent, null);
 			return true;
-		}
-		catch (BadLocationException e)
-		{
+		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
 
-	private boolean autoAlign()
-	{
+	private boolean autoAlign() {
 		LmnDocument doc = getLMNDocument();
 		int pos = getCaretPosition();
 		int index = doc.getDefaultRootElement().getElementIndex(pos);
-		if (index == 0)
-		{
+		if (index == 0) {
 			return false;
 		}
 		Element elem = doc.getDefaultRootElement().getElement(index);
 		int start = elem.getStartOffset(), end = elem.getEndOffset();
-		try
-		{
+		try {
 			String line = getText(start, end - start);
 			String head = getText(start, pos - start);
-			if (isWhitespaces(head))
-			{
+			if (isWhitespaces(head)) {
 				Element prev = doc.getDefaultRootElement().getElement(index - 1);
 				String pline = getText(prev.getStartOffset(), prev.getEndOffset() - prev.getStartOffset());
 				String plws = getLeadingWhitespaces(pline);
-				if (getColumnLength(plws) <= getColumnLength(head))
-				{
+				if (getColumnLength(plws) <= getColumnLength(head)) {
 					return false;
 				}
 				String clws = getLeadingWhitespaces(line);
 				doc.replace(start, clws.length(), plws, null);
 				return true;
 			}
-		}
-		catch (BadLocationException e)
-		{
+		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
 
-	private int getColumnLength(String s)
-	{
+	// if selection is empty, comment out the current line
+	// otherwise, comment out the selected lines
+	private boolean commentOut() {
+		LmnDocument doc = getLMNDocument();
+		int pos = getCaretPosition();
+		int start = getSelectionStart();
+		int end = getSelectionEnd();
+		if (start == end) {
+			int index = doc.getDefaultRootElement().getElementIndex(pos);
+			Element elem = doc.getDefaultRootElement().getElement(index);
+			start = elem.getStartOffset();
+			end = elem.getEndOffset() - 1;
+		} else {
+			// fix up the selection to be line-based
+			int startLine = doc.getDefaultRootElement().getElementIndex(start);
+			int endLine = doc.getDefaultRootElement().getElementIndex(end);
+			Element startElem = doc.getDefaultRootElement().getElement(startLine);
+			Element endElem = doc.getDefaultRootElement().getElement(endLine);
+			start = startElem.getStartOffset();
+			end = endElem.getEndOffset() - 1;
+		}
+
+		try {
+			String text = getText(start, end - start);
+			boolean lastNewline = text.endsWith("\n");
+			String[] lines = text.split("\n");
+			String comment = "//";
+			boolean commented = lines[0].startsWith(comment);
+			StringBuilder sb = new StringBuilder();
+			for (String line : lines) {
+				if (commented) {
+					if (line.startsWith(comment)) {
+						sb.append(line.substring(comment.length()));
+					} else {
+						sb.append(line);
+					}
+				} else {
+					sb.append(comment).append(line);
+				}
+				sb.append("\n");
+			}
+
+			if (!lastNewline) {
+				sb.deleteCharAt(sb.length() - 1);
+			}
+
+			doc.replace(start, end - start, sb.toString(), null);
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+
+		return true;
+	}
+
+	private int getColumnLength(String s) {
 		int n = 0;
-		for (int i = 0; i < s.length(); i++)
-		{
+		for (int i = 0; i < s.length(); i++) {
 			char c = s.charAt(i);
-			if (c == '\t')
-			{
+			if (c == '\t') {
 				n += getTabWidth();
-			}
-			else if (c <= 0x7F)
-			{
+			} else if (c <= 0x7F) {
 				n++;
-			}
-			else
-			{
+			} else {
 				n += 2;
 			}
 		}
 		return n;
 	}
 
-	private static boolean isWhitespaces(String s)
-	{
-		for (int i = 0; i < s.length(); i++)
-		{
-			if (!Character.isWhitespace(s.charAt(i))) return false;
+	private static boolean isWhitespaces(String s) {
+		for (int i = 0; i < s.length(); i++) {
+			if (!Character.isWhitespace(s.charAt(i)))
+				return false;
 		}
 		return true;
 	}
 
-	private static String getLeadingWhitespaces(String s)
-	{
+	private static String getLeadingWhitespaces(String s) {
 		String t = "";
-		for (int i = 0; i < s.length(); i++)
-		{
+		for (int i = 0; i < s.length(); i++) {
 			char c = s.charAt(i);
-			if (c != ' ' && c != '\t') break;
+			if (c != ' ' && c != '\t')
+				break;
 			t += c;
 		}
 		return t;
 	}
 
-	private static int getLeadingWhitespaceCount(String s)
-	{
+	private static int getLeadingWhitespaceCount(String s) {
 		int i = 0;
-		for (; i < s.length(); i++)
-		{
+		for (; i < s.length(); i++) {
 			char c = s.charAt(i);
-			if (c != ' ' && c != '\t') break;
+			if (c != ' ' && c != '\t')
+				break;
 		}
 		return i;
 	}
 
-	private static char getPairParenChar(char c)
-	{
-		switch (c)
-		{
-			case '(': return ')';
-			case '{': return '}';
-			case '[': return ']';
-			case ')': return '(';
-			case '}': return '{';
-			case ']': return '[';
+	private static char getPairParenChar(char c) {
+		switch (c) {
+			case '(':
+				return ')';
+			case '{':
+				return '}';
+			case '[':
+				return ']';
+			case ')':
+				return '(';
+			case '}':
+				return '{';
+			case ']':
+				return '[';
 		}
 		return 0;
 	}
 
-	private static boolean isOpenParen(char c)
-	{
+	private static boolean isOpenParen(char c) {
 		return c == '(' || c == '{' || c == '[';
 	}
 }

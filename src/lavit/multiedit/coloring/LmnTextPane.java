@@ -97,12 +97,12 @@ public class LmnTextPane extends JTextPane
 				if (e.getKeyCode() == KeyEvent.VK_SLASH &&
 					(e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0)
 				{
-					// Ctrl + / でコメントアウト
-					commentOut();
-					e.consume();
+					if (commentOut())
+					{
+						e.consume();
+					}
 				}
-
-				if (autoIndentEnabled && e.getKeyCode() == KeyEvent.VK_ENTER)
+				else if (autoIndentEnabled && e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
 					if (autoIndent())
 					{
@@ -430,13 +430,17 @@ public class LmnTextPane extends JTextPane
 		int pos = getCaretPosition();
 		int start = getSelectionStart();
 		int end = getSelectionEnd();
+		int new_start = start;
+		int new_end = end;
+
 		if (start == end)
 		{
+			// no selection, comment out the current line
 			int index = doc.getDefaultRootElement().getElementIndex(pos);
 			Element elem = doc.getDefaultRootElement().getElement(index);
 			start = elem.getStartOffset();
 			end = elem.getEndOffset() - 1;
-		} 
+		}
 		else
 		{
 			// fix up the selection to be line-based
@@ -482,6 +486,12 @@ public class LmnTextPane extends JTextPane
 			}
 
 			doc.replace(start, end - start, sb.toString(), null);
+
+			new_start += 2 * (commented ? -1 : 1);
+			new_end += 2 * (lines.length) * (commented ? -1 : 1);
+
+			setSelectionStart(new_start);
+			setSelectionEnd(new_end);
 		}
 		catch (BadLocationException e)
 		{

@@ -97,8 +97,14 @@ public class LmnTextPane extends JTextPane
 				if (e.getKeyCode() == KeyEvent.VK_SLASH &&
 					(e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0)
 				{
-					if (commentOut())
+					if (comment())
 					{
+						e.consume();
+					}
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_TAB)
+				{
+					if (indent(e.getModifiersEx())){
 						e.consume();
 					}
 				}
@@ -424,7 +430,7 @@ public class LmnTextPane extends JTextPane
 	 * otherwise, comment out the selected lines
 	 * @return true if the operation was successful
 	 */
-	private boolean commentOut()
+	private boolean comment()
 	{
 		LmnDocument doc = getLMNDocument();
 		int pos = getCaretPosition();
@@ -496,8 +502,75 @@ public class LmnTextPane extends JTextPane
 		catch (BadLocationException e)
 		{
 			e.printStackTrace();
+			return false;
 		}
 
+		return true;
+	}
+
+	private boolean indent(int keyModifiers)
+	{
+		LmnDocument doc = getLMNDocument();
+		int start = getSelectionStart();
+		int end = getSelectionEnd();
+		int new_start = start;
+		int new_end = end;
+		boolean shift = (keyModifiers & KeyEvent.SHIFT_DOWN_MASK) != 0;
+
+		// no selection, do nothing
+		if (start == end) return false;
+		
+		// fix up the selection to be line-based
+		int startLine = doc.getDefaultRootElement().getElementIndex(start);
+		int endLine = doc.getDefaultRootElement().getElementIndex(end);
+		Element startElem = doc.getDefaultRootElement().getElement(startLine);
+		Element endElem = doc.getDefaultRootElement().getElement(endLine);
+		start = startElem.getStartOffset();
+		end = endElem.getEndOffset() - 1;
+
+		try
+		{
+			String text = getText(start, end - start);
+			String[] lines = text.split("\n");
+			StringBuilder sb = new StringBuilder();
+			for (String line : lines)
+			{
+				if (shift)
+				{
+					if (line.startsWith("\t"))
+					{
+						sb.append(line.substring(1));
+					}
+					else if (line.startsWith("  "))
+					{
+						sb.append(line.substring(1));
+					}
+					else
+					{
+						sb.append(line);
+					}
+				}
+				else
+				{
+					sb.append("\t").append(line);
+				}
+				sb.append("\n");
+			}
+
+			doc.replace(start, end - start, sb.toString(), null);
+
+			new_start += shift ? -1 : 1;
+			new_end += lines.length * (shift ? -1 : 1);
+
+			setSelectionStart(new_start);
+			setSelectionEnd(new_end);
+		}
+		catch (BadLocationException e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+		
 		return true;
 	}
 

@@ -68,52 +68,44 @@ import javax.swing.SwingUtilities;
 
 import lavit.Env;
 
-class TemplateEntry
-{
+class TemplateEntry {
 	private final File file;
 
-	public TemplateEntry(File file)
-	{
+	public TemplateEntry(File file) {
 		this.file = file;
 	}
 
-	public File getFile()
-	{
+	public File getFile() {
 		return file;
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		String name = file.getName();
 		int i = name.lastIndexOf('.');
-		if (i != -1)
-		{
+		if (i != -1) {
 			name = name.substring(0, i);
 		}
 		return name;
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		return getName();
 	}
 }
 
 @SuppressWarnings("serial")
-public class TemplateSelectDialog extends JDialog
-{
+public class TemplateSelectDialog extends JDialog {
 	private static TemplateSelectDialog dialogInstance;
 
 	private File templatesDir = new File("./templates");
 
-	private JComboBox templates;
+	private JComboBox<TemplateEntry> templates;
 	private JTextArea quickView;
 	private JButton buttonOK;
 	private JButton buttonCancel;
 	private boolean accepted;
 
-	public TemplateSelectDialog(Window owner)
-	{
+	public TemplateSelectDialog(Window owner) {
 		super(owner);
 
 		setIconImages(Env.getApplicationIcons());
@@ -123,29 +115,26 @@ public class TemplateSelectDialog extends JDialog
 		JPanel contents = new JPanel();
 		GroupLayout layout = new GroupLayout(contents);
 		contents.setLayout(layout);
-		
+
 		JLabel label = new JLabel("Template file:");
 		contents.add(label);
 
 		//
 		// templates
 		//
-		templates = new JComboBox();
+		templates = new JComboBox<TemplateEntry>();
 		Dimension dim = templates.getPreferredSize();
 		dim.width = 100;
 		templates.setPreferredSize(dim);
 		List<TemplateEntry> entries = getEntries(templatesDir);
-		for (TemplateEntry item : entries)
-		{
+		for (TemplateEntry item : entries) {
 			templates.addItem(item);
 		}
 		templates.setEnabled(templates.getItemCount() > 0);
-		templates.addActionListener(new ActionListener()
-		{
+		templates.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				TemplateEntry entry = (TemplateEntry)templates.getSelectedItem();
+			public void actionPerformed(ActionEvent e) {
+				TemplateEntry entry = (TemplateEntry) templates.getSelectedItem();
 				viewTemplate(entry);
 			}
 		});
@@ -167,28 +156,19 @@ public class TemplateSelectDialog extends JDialog
 		layout.setAutoCreateContainerGaps(true);
 		layout.setAutoCreateGaps(true);
 		layout.setHorizontalGroup(layout.createParallelGroup()
-			.addGroup(layout.createSequentialGroup()
-				.addComponent(label)
-				.addComponent(templates))
-			.addComponent(jsp)
-		);
+				.addGroup(layout.createSequentialGroup().addComponent(label).addComponent(templates)).addComponent(jsp));
 		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(label)
-				.addComponent(templates))
-			.addComponent(jsp)
-		);
+				.addGroup(layout.createParallelGroup(Alignment.BASELINE).addComponent(label).addComponent(templates))
+				.addComponent(jsp));
 
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
 		Dimension buttonSize = new Dimension(90, 22);
 		buttonOK = new JButton("OK");
 		buttonOK.setPreferredSize(buttonSize);
-		buttonOK.addActionListener(new ActionListener()
-		{
+		buttonOK.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				accepted = true;
 				dispose();
 			}
@@ -197,11 +177,9 @@ public class TemplateSelectDialog extends JDialog
 
 		buttonCancel = new JButton("Cancel");
 		buttonCancel.setPreferredSize(buttonSize);
-		buttonCancel.addActionListener(new ActionListener()
-		{
+		buttonCancel.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
 		});
@@ -215,11 +193,9 @@ public class TemplateSelectDialog extends JDialog
 		add(contents, BorderLayout.CENTER);
 		add(buttonPanel, BorderLayout.SOUTH);
 
-		addComponentListener(new ComponentAdapter()
-		{
+		addComponentListener(new ComponentAdapter() {
 			@Override
-			public void componentShown(ComponentEvent e)
-			{
+			public void componentShown(ComponentEvent e) {
 				accepted = false;
 			}
 		});
@@ -227,73 +203,54 @@ public class TemplateSelectDialog extends JDialog
 		pack();
 		setLocationRelativeTo(owner);
 
-		if (templates.isEnabled())
-		{
-			SwingUtilities.invokeLater(new Runnable()
-			{
+		if (templates.isEnabled()) {
+			SwingUtilities.invokeLater(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					templates.setSelectedIndex(0);
 				}
 			});
 		}
 	}
 
-	private void viewTemplate(TemplateEntry entry)
-	{
-		SwingUtilities.invokeLater(new Runnable()
-		{
+	private void viewTemplate(TemplateEntry entry) {
+		SwingUtilities.invokeLater(new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				quickView.setText("");
 			}
 		});
-		try
-		{
+		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(entry.getFile())));
 			final StringBuilder buf = new StringBuilder();
 			String line;
-			if ((line = reader.readLine()) != null)
-			{
+			if ((line = reader.readLine()) != null) {
 				buf.append(line);
-				while ((line = reader.readLine()) != null)
-				{
+				while ((line = reader.readLine()) != null) {
 					buf.append('\n');
 					buf.append(line);
 				}
 			}
-			SwingUtilities.invokeLater(new Runnable()
-			{
+			SwingUtilities.invokeLater(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					quickView.setText(buf.toString());
 					quickView.setCaretPosition(0);
 				}
 			});
 			reader.close();
-		}
-		catch (FileNotFoundException e)
-		{
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private static List<TemplateEntry> getEntries(File dir)
-	{
+	private static List<TemplateEntry> getEntries(File dir) {
 		List<TemplateEntry> entries = new ArrayList<TemplateEntry>();
-		if (dir.exists() && dir.isDirectory())
-		{
-			for (File child : dir.listFiles())
-			{
-				if (child.isFile())
-				{
+		if (dir.exists() && dir.isDirectory()) {
+			for (File child : dir.listFiles()) {
+				if (child.isFile()) {
 					entries.add(new TemplateEntry(child));
 				}
 			}
@@ -301,20 +258,16 @@ public class TemplateSelectDialog extends JDialog
 		return entries;
 	}
 
-	public boolean isAccepted()
-	{
+	public boolean isAccepted() {
 		return accepted;
 	}
 
-	public String getTemplateContents()
-	{
+	public String getTemplateContents() {
 		return quickView.getText();
 	}
 
-	public static TemplateSelectDialog create(Window owner)
-	{
-		if (dialogInstance == null)
-		{
+	public static TemplateSelectDialog create(Window owner) {
+		if (dialogInstance == null) {
 			dialogInstance = new TemplateSelectDialog(owner);
 		}
 		return dialogInstance;

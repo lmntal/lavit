@@ -42,20 +42,12 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.zip.GZIPInputStream;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -72,35 +64,28 @@ import lavit.frame.ChildWindowListener;
 import lavit.localizedtext.MsgID;
 import lavit.util.OuterRunner;
 
-import org.apache.tools.tar.TarEntry;
-import org.apache.tools.tar.TarInputStream;
-
-public class Ltl2baInstaller implements OuterRunner  {
+public class Ltl2baInstaller implements OuterRunner {
 
 	private ThreadRunner runner;
 	private boolean success;
-	private String tarDir = Env.LMNTAL_LIBRARY_DIR+File.separator;
 
-	public Ltl2baInstaller(){
+	public Ltl2baInstaller() {
 		this.runner = null;
 		this.success = false;
 	}
 
-	public boolean isNeedInstall(){
-		File exe = new File(Env.LMNTAL_LIBRARY_DIR+File.separator+Env.getDirNameOfLtl2ba()+File.separator+Env.getLtl2baBinaryName());
+	public boolean isNeedInstall() {
+		File exe = new File(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfLtl2ba() + File.separator
+				+ Env.getLtl2baBinaryName());
 		return !exe.exists();
 	}
 
-	public boolean isInstallable(){
-		return dirFile().exists()||tarFile().exists();
+	public boolean isInstallable() {
+		return dirFile().exists();
 	}
 
-	File tarFile(){
-		return new File(tarDir+Env.get("FILE_NAME_LTL2BA_PACK"));
-	}
-
-	File dirFile(){
-		return new File(Env.LMNTAL_LIBRARY_DIR+File.separator+Env.getDirNameOfLtl2ba());
+	File dirFile() {
+		return new File(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfLtl2ba());
 	}
 
 	public void run() {
@@ -109,55 +94,25 @@ public class Ltl2baInstaller implements OuterRunner  {
 	}
 
 	public boolean isRunning() {
-		if(runner==null) return false;
+		if (runner == null)
+			return false;
 		return true;
 	}
 
 	public void kill() {
-		if (runner!=null) {
+		if (runner != null) {
 			runner.kill();
 			runner.interrupt();
-			runner=null;
+			runner = null;
 		}
 	}
 
-	public void exit(){
-		runner=null;
+	public void exit() {
+		runner = null;
 	}
 
-	public boolean isSucceeded(){
+	public boolean isSucceeded() {
 		return success;
-	}
-
-	public ArrayList<String> unTar() throws IOException{
-
-		ArrayList<String> names = new ArrayList<String>();
-		TarInputStream tar = new TarInputStream(new GZIPInputStream(new FileInputStream(tarFile())));
-		TarEntry tarEnt = tar.getNextEntry();
-		while (tarEnt != null) {
-
-			String name = tarEnt.getName();
-			names.add(name);
-
-			if(name.endsWith("/")){
-				(new File(tarDir+name)).mkdir();
-			}else{
-				ByteArrayOutputStream bos = new ByteArrayOutputStream((int)tarEnt.getSize());
-				tar.copyEntryContents(bos);
-				InputStream in = new DataInputStream(new ByteArrayInputStream(bos.toByteArray()));
-				FileOutputStream out = new FileOutputStream(tarDir+name);
-				int size;
-				byte bytes[] = new byte[1024];
-				while((size = in.read(bytes)) >= 0) {
-					out.write(bytes,0,size);
-				}
-				out.close();
-				in.close();
-			}
-			tarEnt = tar.getNextEntry();
-		}
-		tar.close();
-		return names;
 	}
 
 	private class ThreadRunner extends Thread {
@@ -165,23 +120,13 @@ public class Ltl2baInstaller implements OuterRunner  {
 		private BufferedReader in;
 		private InstallWindow window;
 
-		ThreadRunner(){
+		ThreadRunner() {
 			window = new InstallWindow();
-			//new JDialog(window);
+			// new JDialog(window);
 		}
 
 		public void run() {
 			try {
-
-				if(tarFile().exists()){
-					if(dirFile().exists()) dirFile().delete();
-					ArrayList<String> names = unTar();
-					window.println("unpacking: "+tarFile().getName());
-					for(String name : names){
-						window.println(name);
-					}
-				}
-
 				ProcessBuilder pb;
 				String str;
 				String makeCmd = Env.getBinaryAbsolutePath("make");
@@ -191,57 +136,59 @@ public class Ltl2baInstaller implements OuterRunner  {
 
 				pb = new ProcessBuilder(strList(makeCmd));
 				Env.setProcessEnvironment(pb.environment());
-				pb.directory(new File(Env.LMNTAL_LIBRARY_DIR+File.separator+Env.getDirNameOfLtl2ba()));
+				pb.directory(new File(Env.LMNTAL_LIBRARY_DIR + File.separator + Env.getDirNameOfLtl2ba()));
 				pb.redirectErrorStream(true);
 				p = pb.start();
 				in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-				while ((str=in.readLine())!=null) {
+				while ((str = in.readLine()) != null) {
 					window.println(str);
 				}
 				in.close();
 				p.waitFor();
 
-				window.println("make end. exit="+p.exitValue()+".\n");
+				window.println("make end. exit=" + p.exitValue() + ".\n");
 
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
-						FrontEnd.mainFrame,
-						Env.getMsg(MsgID.text_install_completed),
-						"LTL2BA INSTALL",
-						JOptionPane.PLAIN_MESSAGE
-				);}});
+				javax.swing.SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						JOptionPane.showMessageDialog(FrontEnd.mainFrame, Env.getMsg(MsgID.text_install_completed),
+								"LTL2BA INSTALL", JOptionPane.PLAIN_MESSAGE);
+					}
+				});
 
 				window.dispose();
 				success = true;
 
-			}catch(Exception e){
+			} catch (Exception e) {
 
-				javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){JOptionPane.showMessageDialog(
-						FrontEnd.mainFrame,
-						Env.getMsg(MsgID.text_install_failed),
-						"LTL2BA INSTALL",
-						JOptionPane.PLAIN_MESSAGE
-				);}});
+				javax.swing.SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						JOptionPane.showMessageDialog(FrontEnd.mainFrame, Env.getMsg(MsgID.text_install_failed), "LTL2BA INSTALL",
+								JOptionPane.PLAIN_MESSAGE);
+					}
+				});
 
 				StringWriter sw = new StringWriter();
-			    e.printStackTrace(new PrintWriter(sw));
-			    window.println(sw.toString());
-			    window.exit();
+				e.printStackTrace(new PrintWriter(sw));
+				window.println(sw.toString());
+				window.exit();
 
-			}finally{
+			} finally {
 
 				exit();
 
 			}
 		}
 
-		ArrayList<String> strList(String str){
+		ArrayList<String> strList(String str) {
 			ArrayList<String> cmdList = new ArrayList<String>();
 			StringTokenizer st = new StringTokenizer(str);
-			while(st.hasMoreTokens()){
+			while (st.hasMoreTokens()) {
 				String s = st.nextToken();
-				if(s.length()>=2&&s.charAt(0)=='"'&&s.charAt(s.length()-1)=='"'){
-					s = s.substring(1,s.length()-1);
+				if (s.length() >= 2 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
+					s = s.substring(1, s.length() - 1);
 				}
 				cmdList.add(s);
 			}
@@ -249,29 +196,30 @@ public class Ltl2baInstaller implements OuterRunner  {
 		}
 
 		private void kill() {
-			if(p!=null) p.destroy();
+			if (p != null)
+				p.destroy();
 		}
 
 	}
 
-	private class InstallWindow extends JFrame implements ActionListener{
+	@SuppressWarnings("serial")
+	private class InstallWindow extends JFrame implements ActionListener {
 
 		private JProgressBar bar;
 		private JTextArea text;
 		private JButton button;
 
-		InstallWindow(){
+		InstallWindow() {
 
 			setIconImages(Env.getApplicationIcons());
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			setAlwaysOnTop(true);
-			//setUndecorated(true);
+			// setUndecorated(true);
 
-		    JPanel panel = new JPanel();
-		    panel.setBackground(new Color(255,255,255));
-			panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
+			JPanel panel = new JPanel();
+			panel.setBackground(new Color(255, 255, 255));
+			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 			add(panel);
-
 
 			bar = new JProgressBar();
 			bar.setIndeterminate(true);
@@ -280,9 +228,9 @@ public class Ltl2baInstaller implements OuterRunner  {
 			text = new JTextArea();
 			text.setEditable(false);
 			text.setLineWrap(true);
-			text.setFont(new Font(null,Font.PLAIN,11));
+			text.setFont(new Font(null, Font.PLAIN, 11));
 			JScrollPane textScrollPane = new JScrollPane(text);
-			textScrollPane.setPreferredSize(new Dimension(200,100));
+			textScrollPane.setPreferredSize(new Dimension(200, 100));
 			panel.add(textScrollPane);
 
 			button = new JButton("OK");
@@ -295,27 +243,28 @@ public class Ltl2baInstaller implements OuterRunner  {
 
 			pack();
 			setLocationRelativeTo(null);
-		    setVisible(true);
+			setVisible(true);
 
 		}
 
-		private void println(String str){
-			text.append(str+"\n");
-			text.setCaretPosition(text.getText().length()-1);
+		private void println(String str) {
+			text.append(str + "\n");
+			text.setCaretPosition(text.getText().length() - 1);
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			dispose();
 		}
 
-		public void exit(){
-			javax.swing.SwingUtilities.invokeLater(new Runnable(){public void run(){
-				bar.setIndeterminate(false);
-				button.setEnabled(true);
-			}});
+		public void exit() {
+			javax.swing.SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					bar.setIndeterminate(false);
+					button.setEnabled(true);
+				}
+			});
 		}
 
 	}
-
 
 }

@@ -1,0 +1,11 @@
+//57.フィボナッチのウサギ問題(Fibonacci's Rabbits Problem)
+//2匹のウサギを四方が壁に囲まれた場所に入れる。最初の2匹は生まれたばかりのつがいである。
+//どのウサギも生後1ヶ月は繁殖力がないが、2ヶ月目の終わりには雄と雌のウサギを1匹ずつ産み、
+//その後は毎月産むものとする。1年でウサギの数は何匹になるだろうか？
+//Anamy Levitin, Maria Levitin, Kurokawa Hiroshi and Matsuzaki kiminori, アルゴリズムパズル プログラマのための数学パズル入門:オライリージャパン,2014, p.54. 
+
+youngpair(1),adultpair(0),rabbitpair(1),month(12).
+
+youngpair(Y),adultpair(A),rabbitpair(R),month(M):-
+int(R),M>0,Maft=M-1,Yaft=A,Aaft=Y+A,Raft=R+Yaft|
+youngpair(Yaft),adultpair(Aaft),rabbitpair(Raft),month(Maft).

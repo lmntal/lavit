@@ -94,7 +94,21 @@ public class LmnTextPane extends JTextPane
 		{
 			public void keyPressed(KeyEvent e)
 			{
-				if (autoIndentEnabled && e.getKeyCode() == KeyEvent.VK_ENTER)
+				if (e.getKeyCode() == KeyEvent.VK_SLASH &&
+					(e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0)
+				{
+					if (comment())
+					{
+						e.consume();
+					}
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_TAB)
+				{
+					if (indent(e.getModifiersEx())){
+						e.consume();
+					}
+				}
+				else if (autoIndentEnabled && e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
 					if (autoIndent())
 					{
@@ -208,7 +222,24 @@ public class LmnTextPane extends JTextPane
 
 	public LmnDocument getLMNDocument()
 	{
-		return (LmnDocument)getDocument();
+		Document doc = getDocument();
+
+		if(doc instanceof LmnDocument){
+			return (LmnDocument) doc;
+		}else {
+			LmnDocument lmndoc = new LmnDocument();
+			try {
+				lmndoc.initializeText(doc.getText(0, doc.getLength()));
+				// 0からdocのlengthまでを取ってるだけでBadLocationExceptionは起きないはずなので握り潰す
+			} catch (BadLocationException e){
+				System.err.println(e);
+			}
+
+			// なぜかハイライトがされなくなったのでLmnDocument.updateHighlight()をコピペ
+			lmndoc.setDirty(true);
+			lmndoc.reparse();
+			return lmndoc;
+		}
 	}
 
 	public void setTabWidth(int spaces)
@@ -392,6 +423,155 @@ public class LmnTextPane extends JTextPane
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	/**
+	 * If selection is empty, comment out the current line
+	 * otherwise, comment out the selected lines
+	 * @return true if the operation was successful
+	 */
+	private boolean comment()
+	{
+		LmnDocument doc = getLMNDocument();
+		int pos = getCaretPosition();
+		int start = getSelectionStart();
+		int end = getSelectionEnd();
+		int new_start = start;
+		int new_end = end;
+
+		if (start == end)
+		{
+			// no selection, comment out the current line
+			int index = doc.getDefaultRootElement().getElementIndex(pos);
+			Element elem = doc.getDefaultRootElement().getElement(index);
+			start = elem.getStartOffset();
+			end = elem.getEndOffset() - 1;
+		}
+		else
+		{
+			// fix up the selection to be line-based
+			int startLine = doc.getDefaultRootElement().getElementIndex(start);
+			int endLine = doc.getDefaultRootElement().getElementIndex(end);
+			Element startElem = doc.getDefaultRootElement().getElement(startLine);
+			Element endElem = doc.getDefaultRootElement().getElement(endLine);
+			start = startElem.getStartOffset();
+			end = endElem.getEndOffset() - 1;
+		}
+
+		try
+		{
+			String text = getText(start, end - start);
+			boolean lastNewline = text.endsWith("\n");
+			String[] lines = text.split("\n");
+			String comment = "//";
+			boolean commented = lines[0].startsWith(comment);
+			StringBuilder sb = new StringBuilder();
+			for (String line : lines)
+			{
+				if (commented)
+				{
+					if (line.startsWith(comment))
+					{
+						sb.append(line.substring(comment.length()));
+					}
+					else
+					{
+						sb.append(line);
+					}
+				}
+				else
+				{
+					sb.append(comment).append(line);
+				}
+				sb.append("\n");
+			}
+
+			if (!lastNewline)
+			{
+				sb.deleteCharAt(sb.length() - 1);
+			}
+
+			doc.replace(start, end - start, sb.toString(), null);
+
+			new_start += 2 * (commented ? -1 : 1);
+			new_end += 2 * (lines.length) * (commented ? -1 : 1);
+
+			setSelectionStart(new_start);
+			setSelectionEnd(new_end);
+		}
+		catch (BadLocationException e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean indent(int keyModifiers)
+	{
+		LmnDocument doc = getLMNDocument();
+		int start = getSelectionStart();
+		int end = getSelectionEnd();
+		int new_start = start;
+		int new_end = end;
+		boolean shift = (keyModifiers & KeyEvent.SHIFT_DOWN_MASK) != 0;
+
+		// no selection, do nothing
+		if (start == end) return false;
+		
+		// fix up the selection to be line-based
+		int startLine = doc.getDefaultRootElement().getElementIndex(start);
+		int endLine = doc.getDefaultRootElement().getElementIndex(end);
+		Element startElem = doc.getDefaultRootElement().getElement(startLine);
+		Element endElem = doc.getDefaultRootElement().getElement(endLine);
+		start = startElem.getStartOffset();
+		end = endElem.getEndOffset() - 1;
+
+		try
+		{
+			String text = getText(start, end - start);
+			String[] lines = text.split("\n");
+			StringBuilder sb = new StringBuilder();
+			for (String line : lines)
+			{
+				if (shift)
+				{
+					if (line.startsWith("\t"))
+					{
+						sb.append(line.substring(1));
+					}
+					else if (line.startsWith("  "))
+					{
+						sb.append(line.substring(1));
+					}
+					else
+					{
+						sb.append(line);
+					}
+				}
+				else
+				{
+					sb.append("\t").append(line);
+				}
+				sb.append("\n");
+			}
+
+			doc.replace(start, end - start, sb.toString(), null);
+
+			new_start += shift ? -1 : 1;
+			new_end += lines.length * (shift ? -1 : 1);
+
+			setSelectionStart(new_start);
+			setSelectionEnd(new_end);
+		}
+		catch (BadLocationException e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
 	}
 
 	private int getColumnLength(String s)

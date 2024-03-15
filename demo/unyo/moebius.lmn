@@ -7,12 +7,13 @@ d(C,  X4,X11), d(CC,   X4,X44).
 
 gen(integer.set(1,30)).
 
-gen(_IX),
+gen(X),
 a(  A,X1,X11),
 b(A,B,X2,X22),
 c(B,C,X3,X33),
 d(C,  X4,X44)
   :-
+  int(X) |
   a(   AA,X1,Y1), a(  A,Y1,X11),
   b(AA,BB,X2,Y2), b(A,B,Y2,X22),
   c(BB,CC,X3,Y3), c(B,C,Y3,X33),

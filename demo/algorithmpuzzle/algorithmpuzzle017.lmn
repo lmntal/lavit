@@ -1,0 +1,23 @@
+//17.キングの到達範囲(King's Reach)
+//(a)チェスにおいてキングは水平方向、垂直方向、斜め方向の近接マスに移動することができる。
+//   キングが無限に広いチェス盤のあるマスに置かれている。
+//   そこからn回移動したとき、キングが居る可能性のあるマスの数はいくつか。
+//(b)キングが斜め方向に動けないとしたら、答えはどうなるか。
+//Anamy Levitin, Maria Levitin, Kurokawa Hiroshi and Matsuzaki kiminori, アルゴリズムパズル プログラマのための数学パズル入門:オライリージャパン,2014, p.42. 
+
+
+n(15)=king(0,0).
+
+//(a)
+v(0,1),v(0,-1),v(1,0),v(-1,0).
+v(1,1),v(-1,1),v(1,-1),v(-1,-1).
+
+//(b)
+//v(0,1),v(0,-1),v(1,0),v(-1,0).
+
+n(N)=king(X,Y),v(Xv,Yv):-
+N>0,Xaft=X+Xv,Yaft=Y+Yv,Naft=N-1|n(Naft)=king(Xaft,Yaft),v(Xv,Yv).
+
+//cf.
+//(a) end states (Answer): (2n+1)^2
+//(b) end states (Answer): (n+1)^2

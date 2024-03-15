@@ -56,18 +56,18 @@ import lavit.localizedtext.MsgID;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNodeSet;
 
-public class StateGraphStretchMoveWorker extends SwingWorker<Object,Integer>{
+public class StateGraphStretchMoveWorker extends SwingWorker<Object, Integer> {
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
 
 	private ProgressFrame frame;
 
-	public StateGraphStretchMoveWorker(StateGraphPanel panel){
+	public StateGraphStretchMoveWorker(StateGraphPanel panel) {
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
 	}
 
-	public void ready(){
+	public void ready() {
 		frame = new ProgressFrame();
 		frame.lastParam = (new StateGraphExchangeWorker(panel)).getAllCross();
 	}
@@ -77,39 +77,45 @@ public class StateGraphStretchMoveWorker extends SwingWorker<Object,Integer>{
 	}
 
 	@Override
-	protected Object doInBackground(){
+	protected Object doInBackground() {
 		int i = 0;
-		while(true){
-			if(i<10){
-				drawNodes.allScaleCenterMove(1/0.8, 0.9);
-			}else if(i<20){
-				drawNodes.allScaleCenterMove(0.8, 1/0.8);
-			}else if(i<30){
-				drawNodes.allScaleCenterMove(1/0.9, 0.9);
-			}else if(i<40){
-				drawNodes.allScaleCenterMove(0.9, 1/0.8);
-			}else if(i==40){
+		while (true) {
+			if (i < 10) {
+				drawNodes.allScaleCenterMove(1 / 0.8, 0.9);
+			} else if (i < 20) {
+				drawNodes.allScaleCenterMove(0.8, 1 / 0.8);
+			} else if (i < 30) {
+				drawNodes.allScaleCenterMove(1 / 0.9, 0.9);
+			} else if (i < 40) {
+				drawNodes.allScaleCenterMove(0.9, 1 / 0.8);
+			} else if (i == 40) {
 				panel.autoCentering();
-				for(int count=0;count<10;++count){
+				for (int count = 0; count < 10; ++count) {
 					sleep(500);
-					if(isCancelled()){ break; }
+					if (isCancelled()) {
+						break;
+					}
 				}
-			}else if(drawNodes.getHeight()*30<drawNodes.getNodesDimension().getHeight()&&i<200){
+			} else if (drawNodes.getHeight() * 30 < drawNodes.getNodesDimension().getHeight() && i < 200) {
 				drawNodes.allScaleCenterMove(1, 0.95);
-			}else{
+			} else {
 				drawNodes.allScaleCenterMove(1.1, 1);
 				panel.autoCentering();
 				publish((new StateGraphExchangeWorker(panel)).getAllCross());
-				i=-1;
-				for(int count=0;count<10;++count){
+				i = -1;
+				for (int count = 0; count < 10; ++count) {
 					sleep(500);
-					if(isCancelled()){ break; }
+					if (isCancelled()) {
+						break;
+					}
 				}
 			}
 			i++;
 			panel.update();
 			sleep(50);
-			if(isCancelled()){ break; }
+			if (isCancelled()) {
+				break;
+			}
 		}
 		panel.autoCentering();
 		frame.end();
@@ -117,8 +123,9 @@ public class StateGraphStretchMoveWorker extends SwingWorker<Object,Integer>{
 		return null;
 	}
 
-	private void sleep(int msec){
-		if(isCancelled()) return;
+	private void sleep(int msec) {
+		if (isCancelled())
+			return;
 		try {
 			Thread.sleep(msec);
 		} catch (InterruptedException e) {
@@ -127,12 +134,13 @@ public class StateGraphStretchMoveWorker extends SwingWorker<Object,Integer>{
 	}
 
 	@Override
-    protected void process(List<Integer> chunks) {
-        for (int number : chunks) {
-            frame.setParam(number);
-        }
-    }
+	protected void process(List<Integer> chunks) {
+		for (int number : chunks) {
+			frame.setParam(number);
+		}
+	}
 
+	@SuppressWarnings("serial")
 	private class ProgressFrame extends JDialog implements ActionListener {
 		private JPanel panel;
 		private JLabel label;
@@ -142,7 +150,7 @@ public class StateGraphStretchMoveWorker extends SwingWorker<Object,Integer>{
 		private int lastParam = -1;
 		private ArrayList<Integer> params = new ArrayList<Integer>();
 
-		private ProgressFrame(){
+		private ProgressFrame() {
 			panel = new JPanel();
 
 			panel.setLayout(new BorderLayout());
@@ -163,31 +171,31 @@ public class StateGraphStretchMoveWorker extends SwingWorker<Object,Integer>{
 			setAlwaysOnTop(true);
 			setResizable(false);
 
-			label.setText(0+" : cross = "+0);
-			label.setPreferredSize(new Dimension(160,20));
+			label.setText(0 + " : cross = " + 0);
+			label.setPreferredSize(new Dimension(160, 20));
 
-	        pack();
-	        setLocationRelativeTo(panel);
-	        addWindowListener(new ChildWindowListener(this));
-	        setVisible(true);
+			pack();
+			setLocationRelativeTo(panel);
+			addWindowListener(new ChildWindowListener(this));
+			setVisible(true);
 		}
 
-		public void end(){
+		public void end() {
 		}
 
-		public void setParam(int param){
+		public void setParam(int param) {
 			paramNum++;
 			params.add(param);
-			int s = param-lastParam;
-			label.setText(paramNum+" : cross = "+param+(lastParam>=0?" ("+(s>=0?"+":"")+s+")":""));
+			int s = param - lastParam;
+			label.setText(paramNum + " : cross = " + param + (lastParam >= 0 ? " (" + (s >= 0 ? "+" : "") + s + ")" : ""));
 			lastParam = param;
 			repaint();
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
-			if(src==end){
-				if(!isDone()){
+			if (src == end) {
+				if (!isDone()) {
 					cancel(false);
 				}
 			}

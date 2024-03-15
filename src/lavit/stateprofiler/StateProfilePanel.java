@@ -49,8 +49,7 @@ import lavit.Env;
 import lavit.runner.RunnerOutputGetter;
 
 @SuppressWarnings("serial")
-public class StateProfilePanel extends JPanel implements RunnerOutputGetter
-{
+public class StateProfilePanel extends JPanel implements RunnerOutputGetter {
 	private StateProfileGraphPanel graphPanel;
 	private StateProfileLabelPanel label;
 	private JTextField lastState;
@@ -63,8 +62,7 @@ public class StateProfilePanel extends JPanel implements RunnerOutputGetter
 	private List<State> allState = new ArrayList<State>();
 	List<Integer> timeLine = new ArrayList<Integer>();
 
-	public StateProfilePanel()
-	{
+	public StateProfilePanel() {
 		setLayout(new BorderLayout());
 
 		graphPanel = new StateProfileGraphPanel(this);
@@ -74,30 +72,26 @@ public class StateProfilePanel extends JPanel implements RunnerOutputGetter
 		add(label, BorderLayout.SOUTH);
 
 		lastState = new JTextField();
-		lastState.setFont(new Font(Env.get("EDITER_FONT_FAMILY"), Font.PLAIN, 9));
+		lastState.setFont(new Font(Env.get("EDITOR_FONT_FAMILY"), Font.PLAIN, 9));
 		add(lastState, BorderLayout.NORTH);
 	}
 
-	private void line(String str)
-	{
+	private void line(String str) {
 		String[] ss = str.split("::", 2);
-		if (ss.length < 2)
-		{
+		if (ss.length < 2) {
 			return;
 		}
 
 		long id = Long.parseLong(ss[0]);
-		//long hash = Long.parseLong(ss[1]);
-		//int successor = Integer.parseInt(ss[2]);
+		// long hash = Long.parseLong(ss[1]);
+		// int successor = Integer.parseInt(ss[2]);
 		String s = ss[1];
 
 		State state = new State(id, s);
 		allState.add(state);
 	}
 
-	public void outputStart(String command, String option, File target)
-	{
-		hashConflict = 0;
+	public void outputStart(String command, String option, File target) {
 		allState.clear();
 
 		timeLine.clear();
@@ -107,15 +101,13 @@ public class StateProfilePanel extends JPanel implements RunnerOutputGetter
 		label.setStatus(0, 0, 0);
 		repaint();
 
-		if (paintClock != null)
-		{
+		if (paintClock != null) {
 			paintClock.cancel();
 		}
 		paintClock = new Timer();
 		paintClock.schedule(new PaintTask(), 1000, 1000);
 
-		if (labelClock != null)
-		{
+		if (labelClock != null) {
 			labelClock.cancel();
 		}
 		labelClock = new Timer();
@@ -124,26 +116,23 @@ public class StateProfilePanel extends JPanel implements RunnerOutputGetter
 		end = false;
 	}
 
-	public void outputLine(String str)
-	{
-		if (str.equals("States")) return;
-		if (str.equals("Transitions"))
-		{
+	public void outputLine(String str) {
+		if (str.equals("States"))
+			return;
+		if (str.equals("Transitions")) {
 			end = true;
 			return;
 		}
-		if (end) return;
+		if (end)
+			return;
 		line(str);
 	}
 
-	public void outputEnd()
-	{
+	public void outputEnd() {
 		timeLine.add(allState.size());
 		int n = timeLine.size();
-		if (n >= 2)
-		{
-			if (timeLine.get(n - 2) == timeLine.get(n - 1))
-			{
+		if (n >= 2) {
+			if (timeLine.get(n - 2) == timeLine.get(n - 1)) {
 				timeLine.remove(n - 1);
 			}
 		}
@@ -155,82 +144,64 @@ public class StateProfilePanel extends JPanel implements RunnerOutputGetter
 		repaint();
 	}
 
-	private void updateLastState()
-	{
-		if (!allState.isEmpty())
-		{
+	private void updateLastState() {
+		if (!allState.isEmpty()) {
 			final String s = allState.get(allState.size() - 1).str;
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
 					lastState.setText(s);
 				}
 			});
 		}
 	}
 
-	private void updateStatusLabel()
-	{
+	private void updateStatusLabel() {
 		int states = 0;
-		if (timeLine.size() > 1)
-		{
+		if (timeLine.size() > 1) {
 			states = allState.size();
 		}
 		int time = 0;
-		if (timeLine.size() > 1)
-		{
+		if (timeLine.size() > 1) {
 			time = timeLine.size() - 1;
 		}
 		int rate = 0;
-		if (time > 0)
-		{
+		if (time > 0) {
 			rate = states / time;
 		}
 		label.setStatus(states, time, rate);
 	}
 
-	private static class State
-	{
+	private static class State {
 		public final long id;
 		public final String str;
 
-		public State(long id, String str)
-		{
+		public State(long id, String str) {
 			this.id = id;
 			this.str = str;
 		}
 	}
 
-	private class PaintTask extends TimerTask
-	{
-		public void run()
-		{
+	private class PaintTask extends TimerTask {
+		public void run() {
 			int nowCount = allState.size();
 			timeLine.add(nowCount);
 
-			//同じ値が続いたときの補正
+			// 同じ値が続いたときの補正
 			int size = timeLine.size();
-			if (size >= 2)
-			{
+			if (size >= 2) {
 				int oldCount = timeLine.get(size - 2);
-				if (nowCount > oldCount)
-				{
+				if (nowCount > oldCount) {
 					int offsetIndex = size - 3;
-					for (; offsetIndex >= 0; --offsetIndex)
-					{
-						if (timeLine.get(offsetIndex) < oldCount)
-						{
+					for (; offsetIndex >= 0; --offsetIndex) {
+						if (timeLine.get(offsetIndex) < oldCount) {
 							break;
 						}
 					}
 					offsetIndex++;
-					if (offsetIndex < size - 2)
-					{
+					if (offsetIndex < size - 2) {
 						int c = size - 1 - offsetIndex;
 						int i = 1;
-						for (offsetIndex++; offsetIndex < size - 1; offsetIndex++)
-						{
+						for (offsetIndex++; offsetIndex < size - 1; offsetIndex++) {
 							timeLine.set(offsetIndex, oldCount + (nowCount - oldCount) * i / c);
 							i++;
 						}
@@ -242,10 +213,8 @@ public class StateProfilePanel extends JPanel implements RunnerOutputGetter
 		}
 	}
 
-	private class LabelTask extends TimerTask
-	{
-		public void run()
-		{
+	private class LabelTask extends TimerTask {
+		public void run() {
 			updateStatusLabel();
 			repaint();
 		}

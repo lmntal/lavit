@@ -55,7 +55,7 @@ public final class LanguageSetting
 		dialog.setDialogTitle("Language");
 		dialog.setHeadLineText("Language");
 		dialog.setDescriptionText("Please select your language.");
-		dialog.setDialogResizable(false);
+		dialog.setDialogResizable(true);
 		dialog.setDialogIconImages(Env.getApplicationIcons());
 
 		boolean approved = dialog.showDialog();

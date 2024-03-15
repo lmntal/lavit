@@ -1,0 +1,25 @@
+/* 
+ * Structural comparison in LMNtal(lmn-mem)
+ * Author: Seiji OGAWA, 2011-03-31
+ *
+ * If you'd like to change parameter N, 
+ * please change the 1st argument of start("N", 0).
+ *
+ */
+
+{
+  s{
+    start(8000, 0).
+
+    /* integer cmp */
+    init @@ start(S, I) :- S > I, I1 = I+1, S1 = S-I | start(S, I1), c(X), c(Y), {+X,+Y}.
+    init2 @@ c(X), c(Y), {+X,+Y} :- a(X0), a(X1), a(X2), b(Y0), b(Y1), b(Y2), {+X0,+X1,+X2,+Y0,+Y1,+Y2}.     
+  
+  }.
+  ab @@ a(X), b(Y), {+X,+Y,$p} :- {$p}.
+
+}.
+{s{$p, @p}, @q}/ :- {$p, @q, '$callback'(gettime, s)}.
+{s(S), $p[], @p}/ :- unary(S) | s(S), '$callback'(gettime, e).
+e(E), s(S) :- T = E-.S | time(T).
+

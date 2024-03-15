@@ -1,0 +1,25 @@
+//13.通行止めの経路(Blocked Paths)
+//A-o-o-o-o
+//| | | | |
+//o-o-o-o-o
+//| |   | |
+//o-o   o-o
+//| |   | |
+//o-o-o-o-B
+//上図のように完全に水平な通りと垂直な筋からなる街路がある。
+//地点Aから地点Bへ行く最短経路は何通りあるか。
+//Anamy Levitin, Maria Levitin, Kurokawa Hiroshi and Matsuzaki kiminori, アルゴリズムパズル プログラマのための数学パズル入門:オライリージャパン,2014, p.40. 
+
+a(start,0,0,end).
+
+/*右への移動、(2,1)および(*,4)で右に移動できない*/
+a(BEF,H,V,end)
+:-
+H*(H-1)*(H-3)*V*(V-2)*(V-3)=:=0,V<4,V1=V+1|
+a(BEF,H,V,AFT),a(AFT,H,V1,end).
+
+/*下への移動、(1,2)および(3,*)で下に移動できない*/
+a(BEF,H,V,end)
+:-
+H*(H-2)*V*(V-1)*(V-3)*(V-4)=:=0,H<3,H1=H+1|
+a(BEF,H,V,AFT),a(AFT,H1,V,end).

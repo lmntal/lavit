@@ -37,49 +37,47 @@ package lavit.stateviewer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
-
 
 public class StateTransitionEm implements StateTransitionCatcher {
 	private StateGraphPanel graphPanel;
 
-	public StateTransitionEm(StateGraphPanel graphPanel){
+	public StateTransitionEm(StateGraphPanel graphPanel) {
 		this.graphPanel = graphPanel;
 	}
 
 	@Override
 	public void transitionCatch(Collection<StateRule> rules, Collection<StateTransition> trans) {
 		/*
-		StateNodeSet drawNodes = graphPanel.getDrawNodes();
-		ArrayList<StateNode> weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
-
-		for(StateTransition t : trans){
-			t.from.inCycle = true;
-			weaks.remove(t.from);
-
-			t.to.inCycle = true;
-			weaks.remove(t.to);
-
-			t.from.setEmToNode(t.to, true);
-		}
-
-		for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
-		graphPanel.update();
-		*/
+		 * StateNodeSet drawNodes = graphPanel.getDrawNodes(); ArrayList<StateNode>
+		 * weaks = new ArrayList<StateNode>(drawNodes.getAllNode());
+		 *
+		 * for(StateTransition t : trans){ t.from.inCycle = true; weaks.remove(t.from);
+		 *
+		 * t.to.inCycle = true; weaks.remove(t.to);
+		 *
+		 * t.from.setEmToNode(t.to, true); }
+		 *
+		 * for(StateNode node : weaks){ node.weak = true; node.updateLooks(); }
+		 * graphPanel.update();
+		 */
 
 		StateNodeSet drawNodes = graphPanel.getDrawNodes();
 		ArrayList<StateNode> weakNodes = new ArrayList<StateNode>(drawNodes.getAllNode());
 		ArrayList<StateTransition> weakTransitions = new ArrayList<StateTransition>(drawNodes.getAllTransition());
 
-		for(StateTransition t : trans){
+		for (StateTransition t : trans) {
 			drawNodes.setLastOrder(t);
 			weakNodes.remove(t.from);
 			weakNodes.remove(t.to);
 			weakTransitions.remove(t);
 		}
 
-		for(StateNode node : weakNodes){ node.weak = true; }
-		for(StateTransition t : weakTransitions){ t.weak = true; }
+		for (StateNode node : weakNodes) {
+			node.weak = true;
+		}
+		for (StateTransition t : weakTransitions) {
+			t.weak = true;
+		}
 
 		graphPanel.getDrawNodes().updateNodeLooks();
 		graphPanel.getDraw().setSearchMode(true);

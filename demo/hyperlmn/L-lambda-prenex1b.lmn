@@ -1,0 +1,710 @@
+/* 
+ * Encoding of L_lambda in HyperLMNtal 
+ * with a prenex normal form example
+ * Author: Alimjian Yasin, 2014-09-06
+ * 
+ * For L_lambda, a subset of LambdaProlog, see:
+ * Miller, D. and Nadathur, G.: Programming with Higher-Order Logic,
+ * Cambridge University Press, 2012
+ *
+ * Use nondeterministic execution mode (--nd) for proof search.
+ *
+ * based on the first running example of prenex, the following changes are made.
+ * 1. apply unification results to goals are modified:
+ *    the order of constructing list represented expressions 
+ *    is changed. previously, during applying substitutions,
+ *    expressions is constructed by inserting elements 
+ *    to a empty list from the tail. now first reverse original
+ *    list and construction is done by pushing elements
+ *    from the head.
+ * 2. goal formula is also modified, a minor changes are made. 
+ *
+ */
+
+init.
+init :- new(B,1), new(B1,1),new(C1,1),new(D1,1),
+        new(B2,1),new(D2,1),new(X2,2),new(U,1), new(V,1),
+        new(B3,1),new(C3,1),new(D3,1),new(X3,2),
+        new(B4,1),new(C4,1),new(D4,1),new(X4,2),
+        new(B5,1),new(C5,1),new(D5,1),new(X5,2), 
+        new(B6,1),new(C6,1),
+        new(L,1), new(A1,1),new(A2,1),
+        new(P,1), new(X,2), new(Y,2),new(Z,2),
+        new(All,3),new(And,3),new(Atom,3),new(Q,2)|
+        
+        pset{
+ //prenex rules     
+ program(implied(
+        c(quantifier=[] ,body(prenex,[[And,[[B1],[C1]]],[D1]])),
+        and(c(quantifier=[] ,body(prenex,[[B1],[U]])),
+        and(c(quantifier=[] ,body(prenex,[[C1],[V]])),
+            c(quantifier=[] ,body(merge,[[And,[[U],[V]]],[D1]])))))). 
+ program(c(quantifier=[] ,body(prenex,[[Atom,[B]],[Atom,[B]]]))).
+ program(implied(
+        c(quantifier=[] ,body(prenex,[[All,[B2]],[All,[D2]]])),
+        c(quantifier=[X2] ,body(prenex,[[B2,X2],[D2,X2]])))).
+
+ //merge rules 
+ program(implied(
+        c(quantifier=[],body(merge,[[And,[[All,[B3]],[All,[C3]]]],[All,[D3]]])),
+        c(quantifier=[X3],body(merge,[[And,[[B3,X3],[C3,X3]]],[D3,X3]])))).   
+ program(implied(
+        c(quantifier=[],body(merge,[[And,[[All,[B4]],[C4]]],[All,[D4]]])),
+        c(quantifier=[X4],body(merge,[[And,[[B4,X4],[C4]]],[D4,X4]])))). 
+ program(implied(
+        c(quantifier=[],body(merge,[[And,[[B5],[All,[C5]]]],[All,[D5]]])),
+        c(quantifier=[X5],body(merge,[[And,[[B5],[C5,X5]]],[D5,X5]])))). 
+ program(implied(
+        c(quantifier=[],body(merge,[[And,[[B6],[C6]]],[And,[[B6],[C6]]]])),
+        and(c(quantifier=[],body(no_quant,[B6])),
+            c(quantifier=[],body(no_quant,[C6]))))).          
+ program(c(quantifier=[],body(no_quant,[Atom,[L]]))).   
+ program(c(quantifier=[],body(no_quant,[And,[[A1],[A2]]]))).
+            },
+            
+ goal(c(quantifier=[],
+      body(prenex,[[And,[[All,lambda(X,[Atom,[Q,X,X]])],
+                         [All,lambda(Z,[All,lambda(Y,[Atom,[Q,Z,Y]])])]]],[P]]))),
+      ans(P),and(And),all(All),atom(Atom),start.
+
+//start proof by supplying programs and first query 
+start_proof@@ pset{$p},goal(A),proof{@pr,$pr,goal_list=[]}, start :- 
+        ground(A) | proof{@pr,$pr,$p,goal_list=[goal(A)],go},pset{}.
+
+
+//unification (successful) and applying right rules are over,
+//collect avilable substitutions
+eq_info@@ proof{@p,$p,unify{@u,$u},eq_info{@e,$e},sub_set{@s,$s},unify_ok(L)}/ :-
+        ground(L)|
+        proof{@p,$p,unify{@u},
+            eq_info{react{'$callback'('atomic_ruleset', 2),@e},@e,$e,$u,$s,var{}},
+            sub_set{@s},eq_info}.
+        
+//trigger application of substitutions to new goals
+apply@@ proof{@p,$p,eq_info,eq_info{@e,$e},apply{@a,$a}}/ :- 
+        proof{@p,$p,temp_list=[],eq_info{@e},apply{@a,$a,$e},apply}.
+
+//apply end, so move substitutions  
+get_subs@@ proof{@p,$p, apply{@a,$a,var{$v[]}},apply,sub_set{@s,$s}}/ :-
+        proof{@p,$p,apply{@a},get_sub,
+            sub_set{react{'$callback'('atomic_ruleset', 2),@s},@s,$s,$a}}.
+
+//invoke to perfrom lambda conversion (move goals to goal_list)
+conversion@@ proof{@p, $p, goal_list=[], temp_list=L, get_sub}/:- ground(L)|
+        proof{@p, $p, goal_list=L,temp_list=[],lambda}.
+
+move_goals@@ proof{@p,$p,goal_list=[],temp_list=L,lambda}/ :- ground(L)|
+        proof{@p,$p,goal_list=L,move}.
+        
+//invoke proving next goal
+next_proof@@ proof{@p,$p,move}/ :- proof{@p,$p,go}.
+
+proof_end@@ proof{@p,$p[],end,sub_set{@s,$s}}/, ans(P),result{@r} :-
+        hlink(P)|
+        /*proof{@p,$p,sub_set{@s}},*/
+        result{react{'$callback'('atomic_ruleset', 2),@r},@r,$s,ans(P),go}.
+        
+display_result@@result{@r,$r[],go,substitution(A,L),ans(A)}/ :- 
+        hlink(A),ground(L)| substitution(A,L),ans(A).
+        
+proof{            
+goal_list=[]. 
+
+select_goal@@ goal_list=[goal(A)|L],go :- ground(A)| goal_list=L,goal(A),next. 
+derivaion_end@@ goal_list=[],go :- end.
+
+/*******left rules********/
+select_implied@@ goal(c(Q1,body($n,R))), program(implied(c(Q2,body($m,R1)),R2)),
+                 next :-
+        $n=$m | //match predicate name
+        goal(c(Q1,body($n,R))), copy(implied(c(Q2,body($m,R1)),R2)).
+
+select_atomic@@ goal(c(Q1,body($n,R))), program(c(Q2,body($m,R1))), next :-
+        $n=$m | //match predicate name
+        goal(c(Q1,body($n,R))), copy(c(Q2,body($m,R1))).
+
+copy@@ copy(W) :- hlground(W,1,2) |  //copy program
+        decide(W),program(W).
+
+unify_implied@@ decide(implied(c(Q1,body($n,L)),R)), goal(c(Q2,body($m,L1))) :-
+        $n=$m|
+        unify(merge(Q1,Q2),body(L,L1)), goals(R), gen_goal.
+        
+unify_atomic@@ decide(c(Q1,body($n,L))), goal(c(Q2,body($m,L1))) :-
+        $n=$m| unify(merge(Q1,Q2),body(L,L1)).
+
+to_unify@@ unify(A,B), unify{@u} :- ground(A),ground(B)|
+        unify{react{'$callback'('atomic_ruleset', 2),@u},@u,unify(A,B)}.
+
+unify_ok@@unify{unify_ok,quantifier=L,go, $u,@u}/ :- ground(L)|
+        unify{$u,@u},unify_ok(L).
+        
+unify_no@@unify{unify_no,$u,@u}/ :- unify{$u,@u}, unify_no.
+
+
+/*******right rules********/
+
+right_imply@@ goal(imply(A,B)) :- program(A),goal(B).
+        
+
+/*******right rules********/
+gen_goals@@ goals(C),gen_goal,goal_list=L,unify_ok(R),gen_goal{@g,$g} :-
+        ground(C),ground(L),ground(R)|
+        gen_goal{goals(C),go,goal_list=L,unify_ok(R),
+            react{'$callback'('atomic_ruleset', 2),@g},@g,$g}.
+receive_goals@@ gen_goal{@g,goal_list=L,unify_ok(R),$g}/ :- ground(L),ground(R)|
+        gen_goal{@g,$g},goal_list=L,unify_ok(R).
+
+gen_goal{
+
+multi_goal@@ goals(and(A,B)), go,unify_ok(R) :-
+        multi_goal,unify_ok(R), goals(and(A,B)).
+right_and@@ goals(and(c(quantifier=A,B),C)), goal_list=L,unify_ok(R), multi_goal :-
+        ground(R)|
+        goal_list=ins(goal(c(quantifier=merge(A,R),B)),L),goals(C),
+        unify_ok(R),multi_goal.
+last_goal_multi@@ goals(c(quantifier=A,B)), goal_list=L,unify_ok(R), multi_goal :-
+        ground(R)|
+        goal_list=ins(goal(c(quantifier=merge(A,R),B)),L),unify_ok(R).
+
+single_goal@@ goals(c(quantifier=A,B)), goal_list=L, go, unify_ok(R) :- ground(R)|
+        goal_list=[goal(c(quantifier=merge(A,R),B))|L],unify_ok(R). 
+        
+//merge 2 list into 1
+merge1@@ merge([],[],R) :- R=[].
+merge2@@ merge([A|L],[],R):- R=[A|L].
+merge3@@ merge([],[A|L],R):- R=[A|L].
+merge4@@ merge([A|L1],[B|L2],R):- merge([A,B|L1],L2,R).
+
+//insert at the tail of a list
+ins1@@ ins(A,[],R) :- R=[A].
+ins2@@ ins(A,[Y|L1],R) :- ins(A,L1,L2), R=[Y|L2].
+}.
+
+
+/*******auxiliary  rules********/
+apply_send@@ apply{@a,$a}/, goal_list=[goal(A)|L],apply :-
+        ground(A)|
+        apply{react{'$callback'('atomic_ruleset', 2),@a},@a,$a,goal(A)}, 
+        goal_list=L,receive.
+        
+apply_receive@@ apply{@a,$a,goal(A,ok)}/, temp_list=L,receive :-
+        ground(A)|
+        apply{@a,$a}, temp_list=ins(goal(A),L),apply_ins.
+
+conversion_send@@ conversion{@c,$c}/, goal_list=[goal(A)|L],lambda :-
+        ground(A)|
+        conversion{react{'$callback'('atomic_ruleset', 2),@c},@c,$c,goal(A)},
+        goal_list=L,receive.
+        
+conversion_receive@@ conversion{@c,$c,goal(A,ok)}/, temp_list=L,receive :-
+        ground(A)|
+        conversion{@c,$c}, temp_list=ins(goal(A),L),lambda_ins. 
+        
+//insert at the tail of a list 
+ins0@@ ins(A,[],R),apply_ins :- R=[A],apply. //apply_ins tag is for to reduce states
+ins1@@ ins(A,[],R),lambda_ins :- R=[A],lambda. //lambda_ins tag is for reduce states
+ins2@@ ins(A,[Y|L1],R) :- ins(A,L1,L2), R=[Y|L2].
+
+
+unify{
+
+/********** preprocessing for unification***********/   
+
+unify_start@@ unify(merge(L1,L2),body(A,B)) :-
+        merge(L1,L2),unify(A,B),merge_go,unify_ok.
+        
+merge1@@ merge(quantifier=[],quantifier=[]),merge_go :- quantifier=[],go.
+merge2@@ merge(quantifier=[A|L],quantifier=[]),merge_go :- quantifier=[A|L],go.
+merge3@@ merge(quantifier=[],quantifier=[A|L]),merge_go :- quantifier=[A|L],go.
+merge4@@ merge(quantifier=[A|L1],quantifier=[B|L2]),merge_go :- merge(quantifier=[A,B|L1],quantifier=L2).
+
+term_reduce1@@ unify([A|L],[B|R]),go :- check_a(A),check_b(B),unify(L,R,wait).
+term_reduce2@@ unify([],[]) :- .
+term_reduce3@@ unify([A],[]) :- hlink(A,1) | unify_pattern([A],[]).
+term_reduce4@@ unify(L,R,wait),list_a(A),list_b(B) :- unify(A,B),unify(L,R),go.
+term_reduce5@@ unify(L,R,wait),link_a(A),link_b(B) :-
+        unify_pattern([A|L],[B|R]),go.
+term_reduce6@@ unify(L,R,wait),link_a(A),list_b(B) :-
+        unify_pattern(A,B),unify(L,R),go.
+term_reduce7@@ unify(L,R,wait),list_a(A),link_b(B) :-
+        unify_pattern(B,A),unify(L,R),go.
+term_reduce8@@ unify(L,R,wait),link_a(A),meta_b(B) :- 
+        hlink(A,1),ground(B)| unify_ok(A,B),unify(L,R),go.
+term_reduce9@@ unify(L,R,wait),meta_a(A),link_b(B) :- 
+        hlink(B,1),ground(A)| unify_ok(B,A),unify(L,R),go.
+        
+check_link1@@ check_a(A) :- hlink(A)|link_a(A).
+check_link2@@ check_b(A) :- hlink(A)|link_b(A).
+check_list1@@ check_a([A|L]) :- list_a([A|L]).
+check_list2@@ check_b([A|L]) :- list_b([A|L]).
+check_list3@@ check_a([]) :- list_a([]).
+check_list4@@ check_b([]) :- list_b([]).
+check_list5@@ check_a(lambda(A,B)) :- meta_a(lambda(A,B)).
+check_list6@@ check_b(lambda(A,B)) :- meta_b(lambda(A,B)).
+/********** pattern unification***********/ 
+/***************classify equation******************/
+
+flexible_L1@@unify_pattern(A,L),go :- hlink(A,1)|flexible(A,L).
+flexible_L2@@unify_pattern([A|R],L),go :- hlink(A,1)|flexible([A|R],L).
+rigid_L1@@unify_pattern(A,L),go :- hlink(A,2)|rigid(A,L).
+rigid_L2@@unify_pattern([A|R],L),go :- hlink(A,2)|rigid([A|R],L).
+rigid_L3@@unify_pattern(A,L),go :- hlink(A,3)|rigid(A,L).
+rigid_L4@@unify_pattern([A|R],L),go :- hlink(A,3)|rigid([A|R],L).
+
+flexible_R1@@ flexible(L,A) :- hlink(A,1) | flexible_flexible(L,A),go.
+flexible_R2@@ flexible(L,[A|R]) :- hlink(A,1)| flexible_flexible(L,[A|R]),go.
+flexible_R3@@ rigid(L,A) :- hlink(A,1) |flexible_rigid(A,L),go.
+flexible_R4@@ rigid(L,[A|R]) :- hlink(A,1)|flexible_rigid([A|R],L),go.
+
+rigid_R1@@flexible(L,A) :- hlink(A,2)|flexible_rigid(L,A),go.
+rigid_R2@@flexible(L,A) :- hlink(A,3)|flexible_rigid(L,A),go.
+rigid_R3@@flexible(L,[A|R]) :- hlink(A,2)|flexible_rigid(L,[A|R]),go.
+rigid_R4@@flexible(L,[A|R]) :- hlink(A,3)|flexible_rigid(L,[A|R]),go.
+
+rigid_R1@@rigid(L,A) :- hlink(A,2)|rigid_rigid(A,L),go.
+rigid_R2@@rigid(L,A) :- hlink(A,3)|rigid_rigid(A,L),go.
+rigid_R3@@rigid(L,[A|R]) :- hlink(A,2)|rigid_rigid(L,[A|R]),go.
+rigid_R4@@rigid(L,[A|R]) :- hlink(A,3)|rigid_rigid(L,[A|R]),go.
+
+rigid_nil@@ flexible(A,[]) :- flexible_rigid(A,[]),go.
+rigid_lambda1@@ flexible(A,[lambda(B,C)]) :- flexible_rigid(A,[lambda(B,C)]),go.
+rigid_lambda2@@ flexible(A,lambda(B,C)) :- flexible_rigid(A,lambda(B,C)),go.
+/*************  ****************/       
+fuse1@@ unify_ok(A,B):- hlink(A,1),hlink(B,1)| A><B.
+fuse2@@ unify_ok(A,[B]):- hlink(A,1),hlink(B,1)| A><B.
+
+post_process1@@ unify_ok([A],L) :- hlink(A,1)|unify_ok(A,L).    
+/***************rigid_rigid*****************/   
+//different heads
+rigid_no1@@ rigid_rigid([A|L],[B|R]),go :- 
+        A\=B,hlink(A),hlink(B) | 
+        fail([A|L],[B|R]),unify_no,go.
+rigid_no2@@ rigid_rigid(A,[B|R]),go :- 
+        A\=B,hlink(A),hlink(B) | 
+        fail(A,[B|R]),unify_no,go.
+rigid_no3@@ rigid_rigid([A|L],B),go :- 
+        A\=B,hlink(A),hlink(B) | 
+        fail([A|L],B),unify_no,go.      
+rigid_no4@@ rigid_rigid(A,B),go :- 
+        A\=B,hlink(A),hlink(B) | 
+        fail(A,B),unify_no,go.  
+
+//same heads
+same_head1@@ rigid_rigid([A|L],[B|R]),go :- A==B|
+        T1=trim(L),T2=trim(R),split(T1,T2).
+same_head2@@rigid_rigid(A,B) :- hlink(A),hlink(B), A==B| .
+
+
+split1@@ split([A|L],[B|R]):-check_a(A),check_b(B),
+        split(L,R,wait).
+split2@@ split(L,R,wait), list_a(A),list_b(B):-
+        unify_pattern(A,B),T1=trim(L),T2=trim(R),split(T1,T2).
+split3@@ split(L,R,wait), list_a(A),link_b(B):-
+        unify_pattern(A,B),T1=trim(L),T2=trim(R),split(T1,T2).  
+split4@@ split(L,R,wait), link_a(A),list_b(B):-
+        unify_pattern(A,B),T1=trim(L),T2=trim(R),split(T1,T2).
+split5@@ split(A,lambda(B,C)) :- unify_pattern(A,lambda(B,C)),go.       
+split6@@ split(L,R,wait),link_a(A),link_b(B) :- 
+        unify_pattern([A|L],[B|R]),go.
+
+split7@@ split(L,R,wait),link_a(A),meta_b(B) :-
+        unify_pattern([A|L],[B|R]),go.
+split8@@ split(L,R,wait),meta_a(B),link_b(A) :-
+        unify_pattern([A|L],[B|R]),go.  
+/**************** flexible-flexible form *****************/
+//
+find_common_argument1@@ flexible_flexible([A|L],[B|R]),go :- 
+        ground(L),ground(R)|
+        common_set(L,R),flexible_flexible([A|L],[B|R],wait).
+find_common_argument2@@ flexible_flexible(A,[B|R]),go :- A \= B|
+        flexible_flexible(A,[B|R],wait),common_set(ok,[]).      
+different_head1@@ flexible_flexible([A|L],[B|R],wait), common_set(ok,C) :-
+        hlink(A),hlink(B),A \= B,new(W,1),ground(C) | 
+        gen_list=[S1,S2],gen_go,S1=gen(A,L,[W|C]),S2=gen(B,R,[W|C]).
+different_head2@@ flexible_flexible(A,[B|R],wait),common_set(ok,C) :-
+        hlink(A),hlink(B),A \= B,new(W,1),ground(C)|
+        gen_list=[S1,S2],gen_go,S1=gen(A,[],[W|C]),S2=gen(B,R,[W|C]).
+
+/***************flexible_rigid*****************/                
+
+//check flexible variable occurence in rhs. 
+check_flexible@@ flexible_rigid(A,R),go :- ground(R)|
+        flexible_rigid(A,R,wait),flex_var(R),flex_list=[].
+
+//no flexible variable in rhs, go to  "step: check_rigid" at  below
+non_flex_rhs@@ flex_end, flex_list=[] :- no_flex_found.
+
+/*rhs has a list of flexible variables 
+0. if any of those flexible variables is same with head of lhs, then fail,
+   otherwise step 1.
+    {flex_list=[[s_term],[s_term]....], s_term is a term, its head is flexible
+    (they extracted from rhs)}
+1. took a term from that list (from flex_list)
+2. check its arguments are subset of lhs arguments
+3. if subset, go back to step 1
+4. if not subset, generate intermediate substitution 
+   (to eliminate those different arguments)
+    4.1 then apply that substitutions to rhs, get new rhs
+    4.2 form equation again, and get back to starting of flexible-rigid
+        equations solving
+*/
+
+exist_flex_rhs@@ flex_end,flex_list=[A|L] :- c_head,flex_list=[A|L].
+
+check_head@@ c_head,flex_list=L,flexible_rigid([B|L2],R,wait) :-
+        hlink(B),ground(L)|
+        checkHead(B,L),flex_list=L,flexible_rigid([B|L2],R,wait).
+
+//lhs head is occured in rhs, fails
+fail@@ flexible_rigid(A,R,wait),head_no,flex_list=L:-
+        ground(L)|fail(A,R),unify_no,go.        
+        
+//lhs head is not occured in rhs, so step 2
+//take terms one by one and proceed
+to_check_subset@@ head_ok,flex_list=[A|L] :- sub_term(A,ok),flex_list(L).
+
+//check subset relation
+is_subset@@ flexible_rigid([A|L],R,wait),sub_term([B|T],ok):-
+        hlink(A),hlink(B),ground(L)|
+        sub_set(trim(T),trim(L)),flexible_rigid([A|L],R,wait),sub_term(A,wait).
+
+/*
+1.if subset relation holds, check next one,
+2.keep doing until no more subterm, so generate unifier (below)
+3. or to have a subterm where we need to create
+        intermediate substitution (step 4 in above)
+*/
+next_subterm@@ flex_list([A|L]),sub_term(B,wait), sub_set(yes) :-
+        hlink(B)| sub_term(A,ok),flex_list(L).
+no_subterm@@ flex_list([]),sub_term(B,wait), sub_set(yes) :-
+        hlink(B)| gen_ok.
+        
+//sub set relation holds ( genenrate as F  --> ¦Ëc1, ... , ¦Ëcn (t). )
+generate_unifier3@@ flexible_rigid([A|L],R,wait),gen_ok :-
+        gen_list=[gen(A,L,R)],gen_go.        
+
+
+/*
+step: check_rigid
+rhs dosen't include existenial varibale, thefore,
+check such a varivale in rhs arguments.
+that variable is universally quantified 
+1. if that variable appear inside the scope of lhs head, failure
+2. otherwise, unifiable
+*/
+generate_unifier4@@ flexible_rigid(A,[B|R],wait), no_flex_found :-
+        hlink(B,3)|
+        gen_list=[gen(A,[],[B|R])],gen_go.
+
+generate_unifier5@@ flexible_rigid(A,[],wait), no_flex_found :-
+        unify_ok(A,[]),go.
+generate_unifier6@@ flexible_rigid(A,B,wait), no_flex_found :-
+        hlink(B)|
+        unify_ok(A,B),go.
+generate_unifier7@@ flexible_rigid(A,[lambda(B,C)],wait),no_flex_found:-
+        unify_ok(A,[lambda(B,C)]),go.
+generate_unifier7@@ flexible_rigid(A,lambda(B,C),wait),no_flex_found:-
+        unify_ok(A,lambda(B,C)),go.     
+
+//check rigid varibales within the scope of flexible head of lhs
+check_universal@@ flexible_rigid(A,[B|L],wait), no_flex_found :- 
+        ground(L),hlink(B,2)|T1=trim(L),
+        rigid_var(T1), flexible_rigid(A,[B|L],wait).    
+
+//case 1
+generate_unifier2@@ flexible_rigid(A,B,wait),rigid_var(ok) :- 
+        hlink(A)|
+        gen_list=[gen(A,[],B)],gen_go.
+generate_unifier3@@ flexible_rigid([A|L],B,wait),rigid_var(ok) :- 
+        hlink(A)|
+        gen_list=[gen(A,L,B)],gen_go.   
+//case 2
+unify_no2@@ flexible_rigid(A,B,wait),rigid_var(no) :- fail(A,B),unify_no,go.
+
+/*****************search flexible variable in rhs**********************/        
+
+// search flexible variable in rhs 
+
+flex_var1@@ flex_var([A|L]) :- head(A,!M),term(!M,trim(L)).
+flex_var2@@ term(H,[A|L]) :- ground(A)|check(A),term(H,trim(L),on). 
+flex_var3@@ term(H,A,on),on :- term(H,A).
+flex_var4@@ term(H,A,on),list(B) :- term(H,A,!M),term(!M,B).
+flex_var5@@ term(H,A,M),term(M,[]) :- hlink(M)|term(H,A).
+flex_var6@@ term(H,A,M),term(M,off) :- hlink(M)|term(H,A).
+flex_var7@@ head(A,M),term(M,[]) :- ground(A),hlink(M)|flex_end.
+flex_var8@@ head(A,M),term(M,off) :- ground(A),hlink(M)|flex_end.
+flex_var9@@ flex_var([]) :- flex_end.
+flex_var10@@ flex_var(A) :- hlink(A,3)|flex_end.
+flex_var11@@ flex_var(A) :- hlink(A,2)|flex_end.
+
+add@@ var(A),term(H,L,on),flex_list=R :- 
+        hlink(A,1)|flex_list=ins([A|L],R),term(H,off).
+go_on1@@ var(A) :- hlink(A,2)|on.
+go_on2@@ var(A) :- hlink(A,3)|on.
+go_on3@@ abs(lambda(A,L)) :- hlink(A),ground(L)|on.
+go_on4@@ var([]) :- on.  //unary is satisfied with empty list, strange? 
+
+check_var@@ check(A) :- unary(A) | var(A).
+check_list@@ check([A|L]) :- list([A|L]).
+check_abs@@ check(lambda(A,L)) :- abs(lambda(A,L)). 
+
+
+
+//check lhs head wether occured in rhs 
+flex_head_check1@@ checkHead(A,[[B|L]|R]) :- 
+        A==B,ground(L),ground(R) | head_no.
+flex_head_check2@@ checkHead(A,[[B|L]|R]) :- 
+        A\=B,ground(L)| checkHead(A,R).
+flex_head_check3@@ checkHead(A,[]) :- hlink(A)|head_ok.
+
+                
+//sub_set(L,R), judge if L is subset of R.
+  {sub_set(yes) indicates subset relation holds}
+check_subset1@@ sub_set([],[]):-sub_set(yes).
+check_subset0@@ sub_set([],[A|L]) :- ground(A),ground(L)| sub_set(yes).
+                                        //empty set is subset of any other set
+check_subset1@@ sub_set([A|L],[]) :- ground(A),ground(L)| sub_set(no).   
+check_subset2@@ sub_set([A|L],R) :- 
+        ground(R)| s_list(A,R), sub_set(L,R,wait).
+check_subset3@@ sub_set([A|L],R,wait), s_list(B,ok) :- 
+        hlink(B),ground(R)|
+        s_list(A,R), sub_set(L,R,wait).
+check_subset4@@ sub_set(L,R,wait), s_list(A,no) :-
+        hlink(A),ground(L),ground(R) | sub_set(no).   //not sebset
+check_subset5@@ sub_set([],R,wait), s_list(A,ok) :- 
+        hlink(A),ground(R) | sub_set(ok).             //is subset
+
+//search rigid variable 
+search_rigid_var1@@ rigid_var([A|L]),quantifier=Q :- 
+        hlink(A,2),ground(Q)| 
+        rigid_var(L,wait), s_list(A,Q),quantifier=Q.
+search_rigid_var2@@ rigid_var(L,wait),s_list(A,ok) :- 
+        hlink(A)|rigid_var(L).
+search_rigid_var3@@ rigid_var(L,wait),s_list(A,no) :- 
+        hlink(A),ground(L)|rigid_var(no).
+search_rigid_var4@@ rigid_var([]) :- rigid_var(ok).
+search_rigid_var5@@ rigid_var([lambda(A,L)|R]) :-  
+        hlink(A),ground(L),ground(R)|rigid_var(ok).
+
+/*****************auxiliary rules*************************/
+
+//search A inside a list
+search_list1@@ s_list(A,[B|R]) :- A\=B| s_list(A,R).
+search_list2@@ s_list(A,[B|R]) :- A==B,ground(R)| s_list(A,ok). //found
+search_list3@@ s_list(A,[]) :-  s_list(A,no). //not found
+
+clean1@@ unify_no,unify_no :- unify_no.
+clean2@@ unify_no,unify_ok :- unify_no.
+
+trim1@@ trim([A],R) :-  unary(A)|R=[A].
+trim2@@ trim([[A|L]],R) :- trim([A|L],R). 
+trim3@@ trim([],R) :- R=[].
+trim4@@ trim([lambda(A,B)],R) :- R=[lambda(A,B)].
+trim5@@ trim(lambda(A,B),R) :- R=lambda(A,B).
+trim6@@ trim(A,R) :- unary(A) | R=A. 
+trim7@@ trim([[A|L],[B|L1]],R) :- R=[[A|L],[B|L1]].
+trim8@@ trim([A|L],R) :- unary(A) |R=[A|L].
+trim9@@ trim([A,B|L],R) :- unary(B) | R=[A,B|L].
+
+//insert at the tail
+ins1@@ ins(A,[],R) :- R=[A].
+ins2@@ ins(A,[Y|L1],R) :- ins(A,L1,L2), R=[Y|L2].
+
+//generate substitutions which involves with lambda terms
+gen0@@ gen_list=[gen(A,L,R)|X],gen_go :- 
+        gen_list =X,gen(A,L,R).
+gen1@@ gen_list=[],gen_go :- go.
+gen2@@ gen(A,L,R) :- lhs_var(A),reverse(L),body(R). 
+gen3@@ reverse([],L) :- abs(L).
+gen4@@ abs([A|L]),body(R) :- abs(L), lambda(A,R).
+gen5@@ abs([A|L]),lambda(L1,R1) :- abs(L), lambda(A,lambda(L1,R1)).
+gen_sub1@@ abs([]),lhs_var(A),lambda(L,R) :- 
+        unify_ok(A,lambda(L,R)),gen_go.
+gen_sub2@@ abs([]),lhs_var(A),body(L) :- unify_ok(A,L),gen_go.
+
+//reverse list
+reverse0@@ reverse([]) :- reverse([],[]).
+reverse1@@ reverse(L) :- reverse(L,[]).
+reverse2@@ reverse([A|L],R) :- reverse(L,[A|R]).
+
+// find common elements of 2 sets (multiple occurence is not expected)
+common_set1@@ common_set([],[]) :- common_set(ok,[]).
+common_set2@@ common_set([],[A|L]) :- ground(A),ground(L)|common_set(ok,[]).
+common_set3@@ common_set([A|L],[]) :- ground(A),ground(L)|common_set(ok,[]).
+common_set4@@ common_set([A|L],[B|R]) :- common_set([A|L],[B|R],[]).
+common_set5@@ common_set([A|L],R,C) :- ground(R)|
+        common_set(L,R,C,wait), s_list(A,R).    
+common_set6@@ common_set([A|L],R,C,wait),s_list(D,no) :- 
+        ground(D),ground(A),ground(R)|
+        common_set(L,R,C,wait),s_list(A,R).
+common_set7@@ common_set([],R,C,wait),s_list(D,no) :- 
+        ground(D),ground(R)|
+        common_set(C,ok).       
+common_set8@@ common_set([A|L],R,C,wait),s_list(D,ok) :- 
+        ground(D),ground(A),ground(R)|
+        common_set(L,R,ins(D,C),wait),s_list(A,R).
+common_set9@@ common_set([],R,C,wait),s_list(D,ok) :- 
+        ground(D),ground(R)|
+        common_set(ins(D,C),ok).        
+}.
+
+eq_info{
+e_var@@ unify_ok(A,L),var{$v}:- hlink(A),ground(L) | eq(A,L), var{$v,v(A)}.
+eq(A,[lambda(B,C)]) :- eq(A,lambda(B,C)).
+}.
+
+sub_set{
+rename@@ eq(A,B) :- unify_ok(A,B).
+}.
+
+
+apply{
+//only 1 goal is allowed to process at a time
+apply_start@@goal(c(quantifier=L,body(A,B))) :-
+        quantifier=L, predicate(A,!M),augment(!M,B,[],on).
+apply_end@@ predicate(A,M),augment(M,[],B,rev),quantifier=L :- hlink(M) |
+        goal(c(quantifier=L,body(A,B)),ok).
+
+augment_0@@ augment(M,A,R,on) :- hlink(A)|as_variable(A), augment(M,[],R,wait).
+augment_1@@ augment(M,[A|X],R,on) :- reverse(!T,[A|X],[]),augment(M,!T,R). 
+augment_2@@ augment(M,T,R),reverse(T,[],L) :- hlink(T)|augment(M,L,R,rev).
+augment_3@@ augment(M,[A|X],R,rev) :- check(A),augment(M,X,R,wait). 
+augment_4@@ augment(M,X,R,wait), as_list(L) :-
+        augment(M,X,R,!M1), augment(!M1,L,[],on).
+augment_5@@ augment(M,X,R,wait), search(A,no) :- augment(M,X,[A|R],rev).
+augment_6@@ augment(M,X,R,wait), search(A,ok),eq(A,L) :- hlink(A),ground(L)|
+        augment(M,X,trim([L|R]),rev),eq(A,L).
+augment_7@@ augment(M,X,R,M1),augment(M1,[],L,rev) :- hlink(M1)|
+        augment(M,X,[L|R],rev).
+
+abs_split1@@ augment(M,X,R,wait), abs_abstraction(lambda(A,L)) :-
+        augment(M,X,R,!N), lambda(!N,A,!N1),abs(!N1,L,[],on).
+abs_spli2@@ abs(M,X,R,wait), abs_abstraction(lambda(A,L)) :- 
+        abs(M,X,R,!N), lambda(!N,A,!N1), abs(!N1,L,[],on).      
+lambda_back@@ augment(M,X,R,M1), lambda(M1,A,L,on) :- hlink(M1)|
+        augment(M,X,[lambda(A,L)|R],rev).       
+abs_back1@@ lambda(M,A,M1),abs(M1,[],L,rev) :- hlink(M1)| 
+        lambda(M,A,L,on). 
+abs_back2@@ abs(M,X,R,M1), lambda(M1,A,L,on) :- hlink(M1) |
+        abs(M,X,[lambda(A,L)|R],rev).   
+        
+abs_1@@ abs(M,[A|X],R,on) :- reverse(!T,[A|X],[]), abs(M,!T,R).
+abs_2@@ abs(M,T,R),reverse(T,[],L) :- hlink(T)| abs(M,L,R,rev).
+abs_3@@ abs(M,[A|X],R,rev) :- check(A),abs(M,X,R,wait).
+abs_4@@ abs(M,X,R,wait),as_list(L) :- abs(M,X,R,!M1),abs(!M1,L,[],on).
+abs_5@@ abs(M,X,R,wait), search(A,no) :- abs(M,X,[A|R],rev). 
+abs_6@@ abs(M,X,R,wait), search(A,ok), eq(A,L) :- hlink(A),ground(L)|
+        abs(M,X,trim([L|R]),rev),eq(A,L).
+abs_7@@ abs(M,X,R,M1),abs(M1,[],L,rev) :- hlink(M1)|
+        abs(M,X,[L|R],rev).
+        
+search_var@@ as_variable($n), var{$v[]} :- unary($n)|
+        search($n,var{$v[]}),var{$v[]}.
+
+check_var@@ check(A) :- unary(A) | as_variable(A).
+check_list@@ check([A|L]) :- as_list([A|L]).
+check_abs@@ check(lambda(A,L)) :- abs_abstraction(lambda(A,L)). 
+
+//reverse_list1@@ reverse(A,[X|L],[]) :- reverse(A,L,[X]).
+reverse_list2@@ reverse(A,[X|L],R) :- reverse(A,L,[X|R]).
+
+//search A in variable set var{$v}
+search1@@ search(A,var{$v[],v(B)}) :- A==B | search(A,ok). // found
+search2@@ search(A,var{$v,v(B)}) :- A \=B  | search(A,var{$v}).
+search3@@ search(A,var{}) :- search(A,no).
+
+
+trim1@@ trim([A],R) :-  unary(A)|R=[A].
+trim2@@ trim([[A|L]],R) :- trim([A|L],R). 
+trim3@@ trim([],R) :- R=[].
+trim4@@ trim([lambda(A,B)],R) :- R=lambda(A,B).
+//trim5@@ trim(lambda(A,B),R) :- R=lambda(A,B).
+trim6@@ trim(A,R) :- unary(A) | R=A. 
+trim7@@ trim([[A|L],[B|L1]],R) :- R=[[A|L],[B|L1]].
+trim8@@ trim([A|L],R) :- unary(A) |R=[A|L].
+trim9@@ trim([A,B|L],R) :- unary(B) | R=[A,B|L].
+}.
+
+conversion{
+//only 1 goal is allowed to process at a time
+conversion_start@@goal(c(quantifier=L,body(A,B))) :- 
+        quantifier=L, predicate(A,!M),body(!M,B,[],on).
+conversion_end@@ predicate(A,M),body(M,[],B,on),quantifier=L :- 
+        hlink(M) | goal(c(quantifier=L,body(A,B)),ok).
+
+sub_term1@@ body(M,[A|L],R,on) :- check(A),body(M,L,R,wait).
+sub_term2@@ body(M,L,R,wait),as_list(A) :-
+        body(M,L,R,!N),body(!N,A,[],on).
+sub_term3@@ body(M,L,R,wait),as_variable(A) :-
+        body(M,L,ins(A,R),wait).
+sub_term4@@ body(M,A,L,wait),lambda(B,ok) :-
+        body(M,A,ins(B,L),wait).
+sub_term5@@ body(M,A,L,N),body(N,[],R,on) :- hlink(N)|
+        body(M,A,ins(R,L),wait).
+do_ins@@ body(M,L,R,wait), ins_ok :-  body(M,L,R,on).
+
+check_var1@@ check(A) :- unary(A) | as_variable(A).
+check_abs_no_arg@@ check(lambda(A,L)) :- as_variable(lambda(A,L)).
+check_abs_no_arg1@@ check([lambda(A,L)]) :- as_list([lambda(A,L)]).
+check_list1@@ check([A|L]) :- unary(A)|as_list([A|L]).
+check_list2@@ check([[A|L]|R]) :- as_list([[A|L]|R]).
+check_abs_arg@@ check([lambda(A,B),L]) :- abs([lambda(A,B),L]).
+
+
+//here, only 1 argument (which is Hyperlink, just fuse them)
+beta0@@ abs([lambda(A,B),T]) :- hlink(T) | lambda(B,ok),T><A.
+
+//insert at the tail of a list
+ins1@@ ins(A,[],R) :- R=[A],ins_ok.
+ins2@@ ins(A,[Y|L1],R) :- ins(A,L1,L2), R=[Y|L2].  
+}.
+
+
+}.
+
+result{
+//inserts unification results to display readiable answer
+result@@ ans(A),unify_ok(A,L) :- hlink(A)|solution(A,L),ans(A).
+rule2@@ solution(A,L) :-lhs(A,!M),rhs(!M,L,[],on). 
+rule3@@ rhs(M,[A|L],R,on) :- check(A), rhs(M,L,R,wait).
+rule4@@ rhs(M,L,R,wait),con_link(A) :- rhs(M,L,ins(A,R),wait).
+rule5@@ rhs(M,L,R,wait),val_link(A),unify_ok(A,L1) :- hlink(A)|
+        rhs(M,L,R,!N),rhs(!N,L1,[],on).
+rule6@@ rhs(M,lambda(A,L),R,on):- rhs(M,abs,R,!N),lambda(!N,A,L,[],on).
+rule7@@ lambda(M,A,[B|L],R,on) :- check(B),lambda(M,A,L,R,wait).
+rule8@@ lambda(M,A,L,R,wait),con_link(B) :- lambda(M,A,L,ins(B,R),wait).
+rule9@@ lambda(M,A,L,R,wait),unify_ok(B,L1),val_link(B) :-  hlink(B)|
+        lambda(M,A,L,R,!N),rhs(!N,L1,[],on).    
+rule10@@ lambda(M,A,L,R,wait), list_link(L1) :-
+        lambda(M,A,L,R,!N),rhs(!N,L1,[],on).
+rule11@@ rhs(M,L,R,wait) , list_link(L1) :-
+        rhs(M,L,R,!N),rhs(!N,L1,[],on).
+
+rule12@@ rhs(M,L,R,wait),abs_link(lambda(A,L1)):-
+        rhs(M,L,R,!N),rhs(!N,lambda(A,L1),[],on).
+abs_5@@ check(lambda(A,L)):-abs_link(lambda(A,L)).
+
+insert1@@ rhs(M,L,R,N),rhs(N,[],R1,on) :- hlink(N)|
+        rhs(M,L,ins(R1,R),wait).
+insert2@@ lambda(M,A,L,R,N),rhs(N,[],R1,on) :- hlink(N)|
+        lambda(M,A,L,ins(R1,R),wait).
+insert3@@ rhs(M,abs,R,N),lambda(N,A,[],L,on) :- hlink(N)|
+        rhs(M,[],ins(lambda(A,L),R),wait).
+insert4@@ lhs(A,M),rhs(M,[],L,on) :- hlink(M)|substitution(A,L).
+
+rule_on1@@ rhs(M,A,B,wait),ins_ok :- rhs(M,A,B,on).
+rule_on2@@ lambda(M,A,L,R,wait),ins_ok :- lambda(M,A,L,R,on).
+
+//classify and judge what is next
+link_1@@ check(A):- hlink(A,1)| val_link(A).
+link_2@@ check(A):- hlink(A,2)| con_link(A).
+link_3@@ check(A):- hlink(A,3)| con_link(A).
+list_4@@ check([A|L]) :- list_link([A|L]).
+
+//insert at the tail of a list
+ins1@@ ins(A,[],R) :- R=[A],ins_ok.
+ins2@@ ins(A,[Y|L1],R) :- ins(A,L1,L2), R=[Y|L2].
+}.
+
+

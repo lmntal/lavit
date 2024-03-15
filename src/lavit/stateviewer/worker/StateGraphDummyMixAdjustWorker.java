@@ -39,19 +39,16 @@ import lavit.Env;
 import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNodeSet;
 
-public class StateGraphDummyMixAdjustWorker extends Thread
-{
+public class StateGraphDummyMixAdjustWorker extends Thread {
 	private StateGraphPanel panel;
 	private StateNodeSet drawNodes;
 
-	public StateGraphDummyMixAdjustWorker(StateGraphPanel panel)
-	{
+	public StateGraphDummyMixAdjustWorker(StateGraphPanel panel) {
 		this.panel = panel;
 		this.drawNodes = panel.getDrawNodes();
 	}
 
-	public void run()
-	{
+	public void run() {
 		panel.setActive(false);
 
 		boolean crossreduction_dummyonly = Env.is("SV_CROSSREDUCTION_DUMMYONLY");

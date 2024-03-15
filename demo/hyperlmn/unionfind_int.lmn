@@ -1,0 +1,43 @@
+/* 
+ * Union-Find algorithm in LMNtal(lmn-int)
+ * Author: Seiji OGAWA, 2011-03-31
+ * 
+ * Examples are taken from:
+ *   http://dtai.cs.kuleuven.be/CHR/examples.shtml
+ *
+ * If you'd like to change parameter N, 
+ * please change the 1st argument of start("N").
+ *
+ */
+
+{
+
+  linkEq   @@ link(A1,A2) :- A1 =:= A2 | .   
+  linkLeft @@ link(A1,B1), root(A2,NA), root(B2,NB) :- A1 =:= A2, B1 =:= B2, NA>=NB, NB1 = NB+1 | 
+      '~>'(B1,A1), NA1 = max(NA,NB1), root(A1,NA1).
+  linkRight@@ link(B1,A1), root(A2,NA), root(B2,NB) :- A1 =:= A2, B1 =:= B2, NA>=NB, NB1 = NB+1 |
+      '~>'(B1,A1), NA1 = max(NA,NB1), root(A1,NA1).
+  max1 @@ H = max(A,B) :- A =< B | H = B.
+  max2 @@ H = max(A,B) :- A > B  | H = A.
+
+  findNode @@ '~>'(A1,B), find(A2,link(find(X))) :- A1 =:= A2, int(X) | find(B,link(find(X))), '~>'(A1,X).
+  findRoot @@ root(B1,R) \ find(B2,X) :- B1 =:= B2 | X=B1.
+
+  union @@ union(A,B) :- find(A,X), find(B,Y), link(X,Y).
+  make   @@ make(A) :- root(A,0).
+
+  {
+    start(200).
+
+    start(S) :- S > 0 | i(S, S).
+    i(I, S) :- I > 0, I1 = I-1 | i(I1, S), root(I, 0).
+    i(0, S) :- j(S).
+    j(J) :- J > 1, J1 = J-1 | j(J1), union(J, 1).
+
+  }.
+  {$p, @p}/ :- $p, '$callback'(gettime, start).
+
+}.
+{start(S), $p[], @p}/ :- float(S) | start(S), '$callback'(gettime, end).
+end(E), start(S) :- T = E-.S | time(T).
+

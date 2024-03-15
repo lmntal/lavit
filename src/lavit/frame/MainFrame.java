@@ -35,22 +35,18 @@
 
 package lavit.frame;
 
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JFrame;
-import javax.swing.JSplitPane;
-import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
+import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.text.BadLocationException;
 
 import lavit.Env;
@@ -78,6 +74,21 @@ public class MainFrame extends JFrame
 
 	public MainFrame()
 	{
+		int uiFontSizeDiff = Env.getInt("UI_FONT_SIZE_DIFF", 0);
+		for (Map.Entry<Object, Object> entry : UIManager.getDefaults().entrySet())
+		{
+			String key = entry.getKey().toString();
+			if (key.toLowerCase().endsWith("font"))
+			{
+				Font font = UIManager.getFont(key);
+				float size = font.getSize() + uiFontSizeDiff;
+				if (size > 0)
+				{
+					UIManager.put(key, new FontUIResource(font.deriveFont(size)));
+				}
+			}
+		}
+
 		sizeSave = new Dimension(Env.getInt("WINDOW_WIDTH"), Env.getInt("WINDOW_HEIGHT"));
 		setSize(sizeSave);
 

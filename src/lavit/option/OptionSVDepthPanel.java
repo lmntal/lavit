@@ -47,26 +47,23 @@ import lavit.Env;
 import lavit.util.FixFlowLayout;
 
 @SuppressWarnings("serial")
-class OptionSVDepthPanel extends JPanel
-{
-	private static final String[] DEPTH_LIST = {"unset","1","2","3","5","10","20","30","50","100","200","300","500","1000","2000","3000","5000","10000"};
+class OptionSVDepthPanel extends JPanel {
+	private static final String[] DEPTH_LIST = { "unset", "1", "2", "3", "5", "10", "20", "30", "50", "100", "200", "300",
+			"500", "1000", "2000", "3000", "5000", "10000" };
 
-	private JComboBox comboBox;
+	private JComboBox<String> comboBox;
 
-	public OptionSVDepthPanel()
-	{
+	public OptionSVDepthPanel() {
 		setLayout(new FixFlowLayout());
 		setBorder(new TitledBorder("StateViewer Depth Limit"));
 
 		add(new JLabel("--bfs_depth"));
 
-		comboBox = new JComboBox(DEPTH_LIST);
+		comboBox = new JComboBox<String>(DEPTH_LIST);
 		comboBox.setSelectedItem(Env.get("SV_DEPTH_LIMIT"));
-		comboBox.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				Env.set("SV_DEPTH_LIMIT", (String)comboBox.getSelectedItem());
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Env.set("SV_DEPTH_LIMIT", (String) comboBox.getSelectedItem());
 			}
 		});
 		add(comboBox);

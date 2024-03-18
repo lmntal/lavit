@@ -1,0 +1,7 @@
+q($n) :- int($n) |
+  r(integer.set(1,$n)), u(integer.set(2,$n*2)),
+  d(integer.set(1-$n,$n-1)), c(1).
+  
+c(C), r(R), u(U), d(D) :-
+  U=:=R+C, D=:=R-C, C1=C+1 | queen(C,R), c(C1).
+q(8).

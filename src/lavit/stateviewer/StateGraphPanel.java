@@ -53,10 +53,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Stack;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -68,7 +71,7 @@ import lavit.FrontEnd;
 import lavit.runner.LmntalRunner;
 import lavit.stateviewer.controller.SelectStateTransitionRuleFrame;
 import lavit.stateviewer.controller.StateGenerationControlPanel;
-import lavit.stateviewer.controller.StateNodeLabel;
+import lavit.stateviewer.controller.StatePreviewLabel;
 import lavit.stateviewer.controller.StateRightMenu;
 import lavit.stateviewer.draw.StateDraw;
 import lavit.stateviewer.draw.StateGraphAtomcolorDraw;
@@ -95,7 +98,6 @@ public class StateGraphPanel extends JPanel
 	public StatePanel statePanel;
 
 	private StateGenerationControlPanel generalControlPanel;
-	private StateNodeLabel nodeLabel;
 
 	private StateNodeSet drawNodes;
 	private StateNodeSet rootDrawNodes;
@@ -104,6 +106,7 @@ public class StateGraphPanel extends JPanel
 	private double drawTime;
 
 	private ArrayList<StateNode> selectNodes;
+	private ArrayList<StateTransition> selectTransitions;
 	private boolean nodeSelected;
 	private StateTransition selectTransition;
 
@@ -127,11 +130,8 @@ public class StateGraphPanel extends JPanel
 		generalControlPanel.setVisible(false);
 		add(generalControlPanel, BorderLayout.NORTH);
 
-		nodeLabel = new StateNodeLabel();
-		nodeLabel.setVisible(false);
-		add(nodeLabel, BorderLayout.SOUTH);
-
 		selectNodes = new ArrayList<StateNode>();
+		selectTransitions = new ArrayList<StateTransition>();
 
 		draw = new StateGraphBasicDraw(this);
 
@@ -157,6 +157,7 @@ public class StateGraphPanel extends JPanel
 		this.drawTime = 0.0;
 
 		this.selectNodes.clear();
+		this.selectTransitions.clear();
 		this.nodeSelected = false;
 		this.selectTransition = null;
 
@@ -386,6 +387,16 @@ public class StateGraphPanel extends JPanel
 		selectTransition = null;
 	}
 
+	public ArrayList<StateNode> getWeakNodes(){
+		ArrayList<StateNode> weakNodes = new ArrayList<StateNode>();
+		for(StateNode node : drawNodes.getAllNode()){
+			if(node.weak){
+				weakNodes.add(node);
+			}
+		}
+		return weakNodes;
+	}
+
 	public StateTransition getSelectTransition() {
 		return this.selectTransition;
 	}
@@ -407,7 +418,15 @@ public class StateGraphPanel extends JPanel
 	}
 
 	public void updateNodeLabel() {
-		nodeLabel.setNode(selectNodes);
+		StatePreviewLabel nodeLabel = this.statePanel.getNodeLabel();
+		// nodeLabelにトランザクションの情報、か、ノードの情報を表示する
+		if (selectTransitions.size() > 0 && selectNodes.size() > 0){
+			nodeLabel.setNull();
+		} else if (selectTransitions.size() == 1) {
+			nodeLabel.setTransition(selectTransitions,this);
+		} else {
+			nodeLabel.setNode(selectNodes);
+		}
 	}
 
 	/*
@@ -946,6 +965,133 @@ public class StateGraphPanel extends JPanel
 		maker.end();
 	}
 
+	public void sccAbstraction() {
+		// dummyNodeを削除
+		statePanel.stateGraphPanel.getDrawNodes().removeDummy();
+		statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
+		statePanel.stateGraphPanel.selectClear();
+		statePanel.stateGraphPanel.update();
+
+		ArrayList<StateNode> allNodes = new ArrayList<StateNode>(drawNodes.getAllNode());
+		// allNodesからdummyを除く
+		for (int i = 0; i < allNodes.size(); i++) {
+			if (allNodes.get(i).dummy) {
+				allNodes.remove(i);
+				i--;
+			}
+		}
+		// nodeを番号付け　dictionaryを作成
+		HashMap<StateNode, Integer> dictionary = new HashMap<StateNode, Integer>();
+		for (int i = 0; i < allNodes.size(); i++) {
+			dictionary.put(allNodes.get(i), 0);
+		}
+
+		Integer count = 0;
+		while (allNodes.size() > 0) {
+			StateNode node = allNodes.get(0);
+			allNodes.remove(node);
+			Stack<StateNode> stack = new Stack<StateNode>();
+			stack.push(node);
+			while (stack.size() > 0) {
+				node = stack.peek();
+				Boolean flag = true;
+				ArrayList<StateNode> toNodes = new ArrayList<StateNode>();
+				// 深さ優先探索
+				while (flag == true) {
+					// nodeのtoを全て取る
+					for (StateNode n : node.getToNodes()) {
+						toNodes.add(n);
+					}
+					// toNodesのうち、allNodesに含まれているものを1つ取り出す
+					while (true) {
+						if (toNodes.size() == 0) {
+							flag = false;
+							break;
+						}
+						node = toNodes.get(0);
+						if (allNodes.contains(node)) {
+							allNodes.remove(node);
+							stack.push(node);
+							toNodes.clear();
+							break;
+						} else {
+							toNodes.remove(node);
+						}
+					}
+				}
+				// stackの中身を1つ取り出して、番号を振る
+				node = stack.pop();
+				count++;
+				dictionary.put(node, count);
+			}
+		}
+		
+		while (dictionary.size() > 0) {
+			// dictionaryのvalueが大きいkeyを取り出す
+			StateNode maxNode = getKeyWithMaxValue(dictionary);
+			// maxNodeを含む強連結成分を取り出す
+			ArrayList<StateNode> sccNodes = new ArrayList<StateNode>();
+			Boolean flag2 = true;
+			// fromを辿って、強連結成分を取り出す
+			while (flag2 == true) {
+				dictionary.remove(maxNode);
+				sccNodes.add(maxNode);
+				// maxNodeのfromを全て取る
+				ArrayList<StateNode> fromNodes = new ArrayList<StateNode>();
+				for (StateNode n : maxNode.getFromNodes()) {
+					fromNodes.add(n);
+				}
+				// fromNodesのうち、dictionaryに含まれているものを1つ取り出す
+				StateNode tmpNode = null;
+				while (true) {
+					if (fromNodes.size() == 0) {
+						flag2 = false;
+						break;
+					}
+					tmpNode = fromNodes.get(0);
+					if (dictionary.containsKey(tmpNode)) {
+						fromNodes.clear();
+						break;
+					} else {
+						fromNodes.remove(tmpNode);
+					}
+				}
+				if (flag2 == true) {
+					maxNode = tmpNode;
+				}
+			}
+			if (sccNodes.size() > 2) {
+				// sccNodesをgroupNodesに入れて、Abstractionを作成
+				List<StateNode> groupNodes = new ArrayList<StateNode>();
+				for (StateNode node : sccNodes) {
+					if (!node.dummy) {
+						groupNodes.add(node);
+					}
+				}
+				StateAbstractionMaker maker = new StateAbstractionMaker(this);
+				maker.makeNode(groupNodes);
+				maker.end();
+
+				// dummyNodeを削除
+				statePanel.stateGraphPanel.getDrawNodes().removeDummy();
+				statePanel.stateGraphPanel.getDrawNodes().updateNodeLooks();
+				statePanel.stateGraphPanel.selectClear();
+				statePanel.stateGraphPanel.update();
+			}
+		}
+	}
+
+	// this function is used in sccAbstraction
+	public static StateNode getKeyWithMaxValue( HashMap<StateNode, Integer> map ) {
+	    Integer maxValue = Collections.max( map.values() );
+		for (StateNode node : map.keySet()) {
+			if (map.get(node) == maxValue) {
+				return node;
+			}
+		}
+		return null;
+	}
+
 	public boolean isDragg() {
 		if (lastPoint == null) {
 			return false;
@@ -997,7 +1143,7 @@ public class StateGraphPanel extends JPanel
 					selectNodes.clear();
 					selectNodes.add(selectNode);
 				} else if (e.getClickCount() == 2) {
-					if (e.isShiftDown()) {
+					if (e.isAltDown()) {
 						selectNode.debugFrame(this);
 					} else {
 						selectNode.doubleClick(this);
@@ -1014,13 +1160,22 @@ public class StateGraphPanel extends JPanel
 		if (selectNode == null && selectNodes.size() == 0) {
 			if (zoom > 0.3) {
 				selectTransition = drawNodes.pickATransition(p);
-				if (selectTransition != null && e.getClickCount() == 2) {
-					selectTransition.doubleClick(this);
+				if (selectTransition != null){
+					if(!selectTransitions.contains(selectTransition)){
+						selectTransitions.clear();
+						selectTransitions.add(selectTransition);
+					} else if (e.getClickCount() == 2) {
+						selectTransition.doubleClick(this);
+					}
+				} else {
+					selectTransitions.clear();
 				}
 			} else {
+				selectTransitions.clear();
 				selectTransition = null;
 			}
 		} else {
+			selectTransitions.clear();
 			selectTransition = null;
 		}
 
@@ -1232,61 +1387,38 @@ public class StateGraphPanel extends JPanel
 			s += 1.0;
 		}
 
+		double scaleX = 1;
+		double scaleY = 1;
+		double dx = 0;
+		double dy = 0;
+		boolean ctrlDown = false;
+		boolean altDown = false;
+
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:
-			if (selectNodes.size() == 0) {
-				if (e.isControlDown()) {
-					drawNodes.allScaleCenterMove(1.0 / s, 1);
-				} else {
-					drawNodes.allMove(-d / zoom, 0);
-				}
-			} else {
-				for (StateNode node : selectNodes) {
-					node.move(-d / zoom, 0);
-				}
-			}
+			scaleX = 1.0 / s;
+			dx = -d / zoom;
+			ctrlDown = e.isControlDown();
+			altDown = e.isAltDown();
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_RIGHT:
-			if (selectNodes.size() == 0) {
-				if (e.isControlDown()) {
-					drawNodes.allScaleCenterMove(s, 1);
-				} else {
-					drawNodes.allMove(d / zoom, 0);
-				}
-			} else {
-				for (StateNode node : selectNodes) {
-					node.move(d / zoom, 0);
-				}
-			}
+			scaleX = s;
+			dx = d / zoom;
+			ctrlDown = e.isControlDown();
+			altDown = e.isAltDown();
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_DOWN:
-			if (selectNodes.size() == 0) {
-				if (e.isControlDown()) {
-					drawNodes.allScaleCenterMove(1, s);
-				} else {
-					drawNodes.allMove(0, d / zoom);
-				}
-			} else {
-				for (StateNode node : selectNodes) {
-					node.move(0, d / zoom);
-				}
-			}
+			scaleY = s;
+			dy = d / zoom;
+			ctrlDown = e.isControlDown();
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_UP:
-			if (selectNodes.size() == 0) {
-				if (e.isControlDown()) {
-					drawNodes.allScaleCenterMove(1, 1 / s);
-				} else {
-					drawNodes.allMove(0, -d / zoom);
-				}
-			} else {
-				for (StateNode node : selectNodes) {
-					node.move(0, -d / zoom);
-				}
-			}
+			scaleY = 1 / s;
+			dy = -d / zoom;
+			ctrlDown = e.isControlDown();
 			isUpdate = true;
 			break;
 		case KeyEvent.VK_DELETE:
@@ -1322,6 +1454,45 @@ public class StateGraphPanel extends JPanel
 			}
 			break;
 		}
+
+		if (dx != 0 || dy != 0){
+			if (selectNodes.size() == 0) {
+				if (ctrlDown) {
+					drawNodes.allScaleCenterMove(scaleX, scaleY);
+				} else {
+					drawNodes.allMove(dx, dy);
+				}
+			//} else if (dx != 0 && selectNodes.size() == 1 && altDown){ // altDown
+			//	// fromTransitionsは左側
+			//	StateNode node = selectNodes.get(0);
+			//	if (dx > 0 && node.getToTransition() != null){
+			//		for (StateTransition t : node.getToTransitions()){
+			//			if (t.from == node){
+			//				selectTransition = t;
+			//				break;
+			//			}
+			//		}
+			//		selectTransitions.add(selectTransition);
+			//		selectNodes.clear();
+			//		nodeSelected = false;
+			//	} else if (dx < 0 && node.getFromTransition() != null){
+			//		for (StateTransition t : node.getFromTransitions()){
+			//			if (t.to == node){
+			//				selectTransition = t;
+			//				break;
+			//			}
+			//		}
+			//		selectTransitions.add(selectTransition);
+			//		selectNodes.clear();
+			//		nodeSelected = false;
+			//	}
+			} else {
+				for (StateNode node : selectNodes) {
+					node.move(dx, dy);
+				}
+			}
+		}
+
 		if (isUpdate)
 			update();
 	}

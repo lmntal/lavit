@@ -70,6 +70,7 @@ public class StateNode implements Shape {
 
 	public int depth;
 	public int nth;
+	public long shortestPathCount;
 
 	public boolean dummy;
 	public boolean backDummy; // dummy=trueの場合のみtrueになる可能性がある
@@ -100,6 +101,7 @@ public class StateNode implements Shape {
 
 		this.depth = 0;
 		this.nth = 0;
+		this.shortestPathCount = 0;
 
 		this.dummy = false;
 		this.backDummy = false;
@@ -685,6 +687,7 @@ public class StateNode implements Shape {
 		buf.append("inCycle:" + cycle + "\n");
 		buf.append("depth:" + depth + "\n");
 		buf.append("nth:" + nth + "\n");
+		buf.append("shortestPathCount:" + shortestPathCount + "\n");
 		buf.append("dummy:" + dummy + "\n");
 		buf.append("weak:" + weak + "\n");
 		buf.append("x:" + getX() + "\n");

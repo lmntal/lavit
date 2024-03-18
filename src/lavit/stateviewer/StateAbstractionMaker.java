@@ -76,7 +76,7 @@ public class StateAbstractionMaker {
 			if (newNode.depth > node.depth) {
 				newNode.depth = node.depth;
 			}
-
+			// newNodeに対するshortestPathCountの設定は不要
 			for (StateTransition t : new LinkedList<StateTransition>(node.getToTransitions())) {
 				if (!groupNodes.contains(t.to)) {
 					// グループ外への遷移
@@ -228,6 +228,7 @@ public class StateAbstractionMaker {
 
 	public void end() {
 		drawNodes.setTreeDepth();
+		drawNodes.setShortestPathCount();
 		drawNodes.resetOrder();
 
 		if (Env.is("SV_STARTUP_SET_BACKDUMMY")) {

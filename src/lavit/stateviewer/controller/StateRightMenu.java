@@ -53,7 +53,8 @@ public class StateRightMenu extends JPopupMenu implements ActionListener {
 	private StateGraphPanel graphPanel;
 
 	private JMenu nodeSubmenu = new JMenu("Node");
-	private JMenuItem remove = new JMenuItem("Remove");
+	private JMenuItem remove = new JMenuItem("Select Node(s) Remove");
+	private JMenuItem weak_remove = new JMenuItem("Weak Node(s) Remove");
 	private JMenuItem unyo3 = new JMenuItem("Unyo");
 	private JMenuItem graphene = new JMenuItem("Graphene");
 	private JMenuItem add = new JMenuItem("add Editor");
@@ -76,6 +77,9 @@ public class StateRightMenu extends JPopupMenu implements ActionListener {
 
 		remove.addActionListener(this);
 		nodeSubmenu.add(remove);
+
+		weak_remove.addActionListener(this);
+		nodeSubmenu.add(weak_remove);
 
 		unyo3.addActionListener(this);
 		nodeSubmenu.add(unyo3);
@@ -131,6 +135,10 @@ public class StateRightMenu extends JPopupMenu implements ActionListener {
 			graphPanel.getDrawNodes().remove(graphPanel.getSelectNodes());
 			graphPanel.getSelectNodes().clear();
 			graphPanel.repaint();
+		} else if (src == weak_remove) {
+			graphPanel.getDrawNodes().remove(graphPanel.getWeakNodes());
+			graphPanel.getSelectNodes().clear();
+			graphPanel.repaint();
 		} else if (src == unyo3) {
 			for (StateNode node : graphPanel.getSelectNodes()) {
 				node.runUnyo3();
@@ -162,6 +170,7 @@ public class StateRightMenu extends JPopupMenu implements ActionListener {
 
 	private void updateEnabled() {
 		remove.setEnabled(true);
+		weak_remove.setEnabled(true);
 		unyo3.setEnabled(true);
 		graphene.setEnabled(true);
 		add.setEnabled(true);
@@ -183,7 +192,17 @@ public class StateRightMenu extends JPopupMenu implements ActionListener {
 			graphene.setEnabled(false);
 			add.setEnabled(false);
 		}
-
+		if (graphPanel.getSelectNodes().size() == 1) {
+			StateNode node = graphPanel.getSelectNodes().get(0);
+			if (node.childSet != null && node.childSet.size() > 0) {
+				unyo3.setEnabled(false);
+				graphene.setEnabled(false);
+				add.setEnabled(false);
+			}
+		}
+		if (graphPanel.getWeakNodes().size() == 0) {
+			weak_remove.setEnabled(false);
+		}
 	}
 
 }

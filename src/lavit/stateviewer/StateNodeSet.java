@@ -48,6 +48,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Iterator;
 
 import lavit.Env;
 import lavit.FrontEnd;
@@ -354,6 +355,7 @@ public class StateNodeSet {
 		}
 
 		setTreeDepth();
+		setShortestPathCount();
 
 		resetOrder();
 		positionReset();
@@ -561,6 +563,7 @@ public class StateNodeSet {
 		}
 
 		setTreeDepth();
+		setShortestPathCount();
 
 		resetOrder();
 		positionReset();
@@ -954,6 +957,7 @@ public class StateNodeSet {
 			removeInnerNodeData(node);
 		}
 		setTreeDepth();
+		setShortestPathCount();
 		updateNodeLooks();
 	}
 
@@ -975,6 +979,7 @@ public class StateNodeSet {
 			}
 		}
 		setTreeDepth();
+		setShortestPathCount();
 		updateNodeLooks();
 	}
 
@@ -1116,6 +1121,47 @@ public class StateNodeSet {
 		dnodes.add(node);
 	}
 
+	void setShortestPathCount () {
+		allNodeUnMark();
+		LinkedList<StateNode> queue = new LinkedList<StateNode>();
+
+		for (StateNode node : startNode) {
+			node.mark();
+			node.shortestPathCount = 1;
+			queue.add(node);
+		}
+		
+		while (!queue.isEmpty()) {
+			StateNode node = queue.remove();
+			for (StateNode child : node.getToNodes()) {
+				if (child.isMarked()) {
+					continue;
+				}
+				child.mark();
+				// childがダミーかつ、深さがnode-1の場合
+				if (child.dummy && child.depth == node.depth -1 ) {
+					child.shortestPathCount = node.shortestPathCount;
+				} else if (child.depth == node.depth + 1) {
+					long count = 0;
+					ArrayList<StateNode> parents = new ArrayList<StateNode>();
+					for (StateNode parent : child.getFromNodes()) {
+						parents.add(parent);
+					}
+					Iterator<StateNode> ite = parents.iterator();
+					while (ite.hasNext()) {
+						StateNode parent = ite.next();
+						if (child.depth == parent.depth + 1) {
+							count += parent.shortestPathCount;
+						}
+						ite.remove();
+					}
+					child.shortestPathCount = count;
+				}
+				queue.add(child);
+			}
+		}
+	}
+
 	public StateNode makeDummyFromTransition(StateTransition trans) {
 		StateNode from = trans.from, to = trans.to;
 
@@ -1153,6 +1199,7 @@ public class StateNodeSet {
 		removeTransition(trans);
 
 		setTreeDepth();
+		setShortestPathCount();
 
 		return dummy;
 	}
@@ -1205,6 +1252,7 @@ public class StateNodeSet {
 		}
 
 		setTreeDepth();
+		setShortestPathCount();
 		updateNodeLooks();
 
 		/*
@@ -1282,6 +1330,7 @@ public class StateNodeSet {
 		}
 
 		setTreeDepth();
+		setShortestPathCount();
 		updateNodeLooks();
 	}
 
@@ -1433,6 +1482,19 @@ public class StateNodeSet {
 
 	StateTransition pickATransition(Point p) {
 		StateTransition pick = null;
+		//for (StateTransition trans : getAllOutTransition()){
+		//	if (trans == null) {
+		//		continue;
+		//	}
+		//	if (trans.contains(p)) {
+		//		pick = trans;
+		//	}
+		//	// System.out.print(trans.from);
+		//	// System.out.println(trans.to);
+		//}
+		// if (pick == null) {
+		// 	System.out.println("null");
+		// }
 		for (StateTransition trans : getAllTransition()) {
 			if (trans == null) {
 				continue;

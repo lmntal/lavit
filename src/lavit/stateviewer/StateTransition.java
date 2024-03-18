@@ -115,6 +115,75 @@ public class StateTransition {
 				from.state + "\n\n-> (" + getRuleNameString() + ")\n\n" + to.state);
 	}
 
+
+	public String diff_unpack(StateGraphPanel graphPanel) {
+		String diff_from = "";
+		String diff_to = "";
+		// from_node.stateとto_node.stateの差分を取得
+		StateNode from_node = this.from;
+		StateNode to_node = this.to;
+		
+		// from_node or to_node がdummyの場合
+		while(true){
+			if (from_node.dummy) {
+				ArrayList<StateNode> fromNodes = from_node.getFromNodes();
+				// dummy nodeは、fromNodesを1つしか持たないはず
+				if(fromNodes.size() != 1){
+					return " ";
+				}
+				from_node = fromNodes.get(0);
+			} else if (to_node.dummy) {
+				ArrayList<StateNode> toNodes = to_node.getToNodes();
+				// dummy nodeは、toNodesを1つしか持たないはず
+				if(toNodes.size() != 1){
+					return " ";
+				}
+				to_node = toNodes.get(0);
+			} else {
+				break;
+			}
+		}
+
+		String[] from_tokens = from_node.state.split(" ");
+		String[] to_tokens = to_node.state.split(" ");
+		// nodeに子がある場合、nodeの端がtransitionのfrom/toとは限らない
+		//if (from_node != null && from_node.childSet != null && from_node.childSet.size() > 0) {
+		//	from_tokens = from_node.childSet.getRepresentationNode().toString().split(" ");
+		//}
+		//if (to_node != null && to_node.childSet != null && to_node.childSet.size() > 0) {
+		//	to_tokens = to_node.childSet.getStartNodeOne().toString().split(" ");
+		//}
+
+		// 差分を取得(順番は関係ないので、2重ループで全探索)
+		for (int i = 0; i < from_tokens.length; i++) {
+			for (int j = 0; j < to_tokens.length; j++) {
+				if (from_tokens[i].equals(to_tokens[j])) {
+					// 一致した場合は、to_tokensから削除
+					to_tokens = remove(to_tokens, j);
+					break;
+				} else if (j == to_tokens.length - 1) {
+					diff_from += from_tokens[i] + " ";
+				}
+			}
+		}
+		diff_to = String.join(" ", to_tokens);
+		return "<" + from_node.id + "> " + diff_from + "-> (" + getRuleNameString() + ") <"  + to_node.id + "> " + diff_to ;
+	}
+
+	// this function is used in diff_unpack()
+	private static String[] remove(String[] arr, int index) {
+        if (arr == null || index < 0 || index >= arr.length) {
+            return arr;
+        }
+		ArrayList<String> result = new ArrayList<>();
+		for (int i = 0; i < arr.length; i++) {
+			if (i != index) {
+				result.add(arr[i]);
+			}
+		}
+		return result.toArray(new String[0]);
+    }
+
 	public String toString() {
 		return from.id + " -> " + to.id + " (" + getRuleNameString() + ")";
 	}

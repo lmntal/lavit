@@ -46,24 +46,27 @@ import javax.swing.JTextField;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.stateviewer.StateGraphPanel;
 import lavit.stateviewer.StateNode;
+import lavit.stateviewer.StateTransition;
 import lavit.util.CommonFontUser;
 
 @SuppressWarnings("serial")
-public class StateNodeLabel extends JPanel implements CommonFontUser {
+public class StatePreviewLabel extends JPanel implements CommonFontUser {
 	private JPanel stateStatus;
 	private JLabel stateNodenum;
 	private JLabel stateLabel;
+	private JLabel stateShortest;
 
 	private JTextField stateTextField;
 
-	public StateNodeLabel() {
+	public StatePreviewLabel() {
 
 		setLayout(new BorderLayout());
 		setOpaque(false);
 
 		stateStatus = new JPanel();
-		stateStatus.setLayout(new GridLayout(1, 2));
+		stateStatus.setLayout(new GridLayout(1, 3));
 		stateStatus.setOpaque(false);
 		stateNodenum = new JLabel();
 		stateNodenum.setOpaque(false);
@@ -71,8 +74,12 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 		stateStatus.add(stateNodenum);
 		stateLabel = new JLabel();
 		stateLabel.setOpaque(false);
-		stateLabel.setHorizontalAlignment(JLabel.RIGHT);
+		stateLabel.setHorizontalAlignment(JLabel.CENTER);
 		stateStatus.add(stateLabel);
+		stateShortest = new JLabel();
+		stateShortest.setOpaque(false);
+		stateShortest.setHorizontalAlignment(JLabel.RIGHT);
+		stateStatus.add(stateShortest);
 		add(stateStatus, BorderLayout.NORTH);
 
 		stateTextField = new JTextField();
@@ -102,12 +109,14 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 			} else {
 				stateLabel.setText("");
 			}
-			stateTextField.setText(node.toString());
+			stateShortest.setText("ShortestPathCount: " + node.shortestPathCount);
+			stateTextField.setText(node.toString()); // nodeの状態を表示
 			stateTextField.setVisible(true);
 			setVisible(true);
 		} else if (nodes.size() > 1) {
 			stateNodenum.setText("Node: " + nodes.size());
 			stateLabel.setText("");
+			stateShortest.setText("");
 			stateTextField.setText("");
 			stateTextField.setVisible(false);
 			setVisible(true);
@@ -116,4 +125,24 @@ public class StateNodeLabel extends JPanel implements CommonFontUser {
 		}
 	}
 
+	public void setTransition(ArrayList<StateTransition> transitions,StateGraphPanel graphPanel) {
+		if (transitions.size() == 1) {
+			StateTransition transition = transitions.get(0);
+			String s = "";
+			if (transition != null){
+				s = transition.diff_unpack(graphPanel); // transitonのfromとtoの差分
+			}
+			stateLabel.setText("");
+			stateShortest.setText("");
+			stateTextField.setText(s); // transitionの情報(diff node)を表示
+			stateTextField.setVisible(true);
+			setVisible(true);
+		} else {
+			setVisible(false);
+		}
+	}
+
+	public void setNull() {
+		setVisible(false);
+	}
 }

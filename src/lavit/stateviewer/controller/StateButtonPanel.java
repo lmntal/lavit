@@ -77,6 +77,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 
 	private JPanel abstractionPanel = new JPanel();
 	private JButton transitionAbstraction = new JButton("Transition Abstraction");
+	private JButton sccAbstraction = new JButton("SCC Abstraction");
 	private JButton selectAbstraction = new JButton("Select Abstraction");
 
 	private JPanel basicPanel = new JPanel();
@@ -86,7 +87,7 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 
 	private JComponent comps[] = { posReset, adjustReset, adjust2Reset, adjust3Reset, simpleMixAdjust, dummyMixAdjust,
 			geneticAlgorithm, exchangeReset, exchangeDummyOnly, setBackDummy, setVerticalDummy, removeDummy, dummyCentering,
-			dummySmoothing, transitionAbstraction, selectAbstraction, autoCentering, fitCentering, allReset };
+			dummySmoothing, transitionAbstraction, sccAbstraction, selectAbstraction, autoCentering, fitCentering, allReset };
 
 	StateButtonPanel(StatePanel statePanel) {
 		this.statePanel = statePanel;
@@ -135,10 +136,12 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		dummyPanel.add(dummySmoothing);
 		add(dummyPanel);
 
-		abstractionPanel.setLayout(new GridLayout(1, 2));
+		abstractionPanel.setLayout(new GridLayout(1, 3));
 		abstractionPanel.setBorder(new TitledBorder("Abstraction"));
 		transitionAbstraction.addActionListener(this);
 		abstractionPanel.add(transitionAbstraction);
+		sccAbstraction.addActionListener(this);
+		abstractionPanel.add(sccAbstraction);
 		selectAbstraction.addActionListener(this);
 		abstractionPanel.add(selectAbstraction);
 		add(abstractionPanel);
@@ -213,6 +216,8 @@ public class StateButtonPanel extends JPanel implements ActionListener {
 		} else if (src == transitionAbstraction) {
 			StateGraphPanel p = statePanel.stateGraphPanel;
 			new SelectStateTransitionRuleFrame(p, new StateTransitionAbstraction(p));
+		} else if (src == sccAbstraction) {
+			statePanel.stateGraphPanel.sccAbstraction();
 		} else if (src == selectAbstraction) {
 			statePanel.stateGraphPanel.selectNodeAbstraction();
 		}

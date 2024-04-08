@@ -142,7 +142,7 @@ public class FrontEnd
 		Properties properties = createProperties(properties_path);
 		properties.setProperty("additional_options", Env.get("SLIM_OPTION"));
 		properties.setProperty("slim_path", Paths.get(Env.get("path.slim.exe")).toAbsolutePath().toString());
-		properties.setProperty("lmntal_home", System.getenv("LMNTAL_HOME"));
+		properties.setProperty("lmntal_home", Env.getLmntalLinuxPath());
 		try {
 		    FileOutputStream fos = new FileOutputStream(properties_path);
 		    properties.store(fos, "from lavit");

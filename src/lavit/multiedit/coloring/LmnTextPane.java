@@ -500,42 +500,63 @@ public class LmnTextPane extends JTextPane
       boolean commented = lines[0].startsWith(comment_par.substring(0, 2))
           || lines[0].startsWith(comment_sl.substring(0, 3));
       StringBuilder sb = new StringBuilder();
-      for (String line : lines) {
-        if (commented) {
-          if (line.startsWith(comment_par.substring(0, 2))) {
+      for (String line : lines)
+      {
+        if (commented)
+        {
+          if (line.startsWith(comment_par.substring(0, 2)))
+          {
             sb.append(line.substring(comment_par.length()));
             int count = 0;
-            for (int i = 0; i < sb.length(); i++) {
-              if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_par.charAt(0)) {
+            for (int i = 0; i < sb.length(); i++)
+            {
+              if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_par.charAt(0))
+              {
                 count++;
-              } else {
+              }
+              else
+              {
                 break;
               }
             }
             sb.delete(0, count);
-          } else if (line.startsWith(comment_sl.substring(0, 3))) {
+          }
+          else if (line.startsWith(comment_sl.substring(0, 3)))
+          {
             sb.append(line.substring(comment_sl.length()));
             int count = 0;
-            for (int i = 0; i < sb.length(); i++) {
-              if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_sl.charAt(0)) {
+            for (int i = 0; i < sb.length(); i++)
+            {
+              if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_sl.charAt(0))
+              {
                 count++;
-              } else {
+              }
+
+              else
+              {
                 break;
               }
             }
             sb.delete(0, count);
-          } else {
+          }
+          else
+          {
             sb.append(line);
           }
-        } else if (line.length() == 0 || isWhitespaces(line)) {
+        }
+        else if (line.length() == 0 || isWhitespaces(line))
+        {
           sb.append(line);
-        } else {
+        }
+        else
+        {
           sb.append(comment_sl).append(line);
         }
         sb.append("\n");
       }
 
-      if (!lastNewline) {
+      if (!lastNewline)
+      {
         sb.deleteCharAt(sb.length() - 1);
       }
 
@@ -546,7 +567,9 @@ public class LmnTextPane extends JTextPane
 
       setSelectionStart(new_start);
       setSelectionEnd(new_end);
-    } catch (BadLocationException e) {
+    }
+    catch (BadLocationException e)
+    {
       e.printStackTrace();
       return false;
     }

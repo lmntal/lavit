@@ -125,6 +125,39 @@ public class LmnTextPane extends JTextPane
 			}
 		});
 
+    /*
+     * ペア括弧とクオーテーションの自動補完
+     */
+    addKeyListener(new KeyAdapter()
+    {
+      public void keyTyped(KeyEvent e)
+      {
+        char c = e.getKeyChar();
+        if (c == '(' || c == '{' || c == '[' || c == '"' || c == '\'')
+        {
+          LmnDocument doc = getLMNDocument();
+          int pos = getCaretPosition();
+          try
+          {
+            if (c == '"' || c == '\'')
+            {
+              doc.insertString(pos, String.valueOf(c), null);
+              setCaretPosition(pos);
+            }
+            else
+            {
+              doc.insertString(pos, String.valueOf(getPairParenChar(c)), null);
+              setCaretPosition(pos);
+            }
+          }
+          catch (BadLocationException ex)
+          {
+            ex.printStackTrace();
+          }
+        }
+      }
+    });
+
 		CustomCaret caret = new CustomCaret();
 		caret.setBlinkRate(getCaret().getBlinkRate());
 		setCaret(caret);
@@ -458,55 +491,68 @@ public class LmnTextPane extends JTextPane
 			end = endElem.getEndOffset() - 1;
 		}
 
-		try
-		{
-			String text = getText(start, end - start);
-			boolean lastNewline = text.endsWith("\n");
-			String[] lines = text.split("\n");
-			String comment = "//";
-			boolean commented = lines[0].startsWith(comment);
-			StringBuilder sb = new StringBuilder();
-			for (String line : lines)
-			{
-				if (commented)
-				{
-					if (line.startsWith(comment))
-					{
-						sb.append(line.substring(comment.length()));
-					}
-					else
-					{
-						sb.append(line);
-					}
-				}
-				else
-				{
-					sb.append(comment).append(line);
-				}
-				sb.append("\n");
-			}
+    try {
+      String text = getText(start, end - start);
+      boolean lastNewline = text.endsWith("\n");
+      String[] lines = text.split("\n");
+      String comment_par = "% ";
+      String comment_sl = "// ";
+      boolean commented = lines[0].startsWith(comment_par.substring(0, 2))
+          || lines[0].startsWith(comment_sl.substring(0, 3));
+      StringBuilder sb = new StringBuilder();
+      for (String line : lines) {
+        if (commented) {
+          if (line.startsWith(comment_par.substring(0, 2))) {
+            sb.append(line.substring(comment_par.length()));
+            int count = 0;
+            for (int i = 0; i < sb.length(); i++) {
+              if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_par.charAt(0)) {
+                count++;
+              } else {
+                break;
+              }
+            }
+            sb.delete(0, count);
+          } else if (line.startsWith(comment_sl.substring(0, 3))) {
+            sb.append(line.substring(comment_sl.length()));
+            int count = 0;
+            for (int i = 0; i < sb.length(); i++) {
+              if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_sl.charAt(0)) {
+                count++;
+              } else {
+                break;
+              }
+            }
+            sb.delete(0, count);
+          } else {
+            sb.append(line);
+          }
+        } else if (line.length() == 0 || isWhitespaces(line)) {
+          sb.append(line);
+        } else {
+          sb.append(comment_sl).append(line);
+        }
+        sb.append("\n");
+      }
 
-			if (!lastNewline)
-			{
-				sb.deleteCharAt(sb.length() - 1);
-			}
+      if (!lastNewline) {
+        sb.deleteCharAt(sb.length() - 1);
+      }
 
-			doc.replace(start, end - start, sb.toString(), null);
+      doc.replace(start, end - start, sb.toString(), null);
 
-			new_start += 2 * (commented ? -1 : 1);
-			new_end += 2 * (lines.length) * (commented ? -1 : 1);
+      new_start += 2 * (commented ? -1 : 1);
+      new_end += 2 * (lines.length) * (commented ? -1 : 1);
 
-			setSelectionStart(new_start);
-			setSelectionEnd(new_end);
-		}
-		catch (BadLocationException e)
-		{
-			e.printStackTrace();
-			return false;
-		}
+      setSelectionStart(new_start);
+      setSelectionEnd(new_end);
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+      return false;
+    }
 
-		return true;
-	}
+    return true;
+  }
 
 	private boolean indent(int keyModifiers)
 	{
@@ -519,7 +565,7 @@ public class LmnTextPane extends JTextPane
 
 		// no selection, do nothing
 		if (start == end) return false;
-		
+
 		// fix up the selection to be line-based
 		int startLine = doc.getDefaultRootElement().getElementIndex(start);
 		int endLine = doc.getDefaultRootElement().getElementIndex(end);
@@ -570,7 +616,7 @@ public class LmnTextPane extends JTextPane
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		return true;
 	}
 

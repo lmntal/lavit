@@ -135,25 +135,25 @@ public class LmnTextPane extends JTextPane
             char c = e.getKeyChar();
             if (c == '(' || c == '{' || c == '[' || c == '"' || c == '\'')
             {
-            LmnDocument doc = getLMNDocument();
-            int pos = getCaretPosition();
-            try
-            {
-                if (c == '"' || c == '\'')
+                LmnDocument doc = getLMNDocument();
+                int pos = getCaretPosition();
+                try
                 {
-                doc.insertString(pos, String.valueOf(c), null);
-                setCaretPosition(pos);
+                    if (c == '"' || c == '\'')
+                    {
+                        doc.insertString(pos, String.valueOf(c), null);
+                        setCaretPosition(pos);
+                    }
+                    else
+                    {
+                        doc.insertString(pos, String.valueOf(getPairParenChar(c)), null);
+                        setCaretPosition(pos);
+                    }
                 }
-                else
+                catch (BadLocationException ex)
                 {
-                doc.insertString(pos, String.valueOf(getPairParenChar(c)), null);
-                setCaretPosition(pos);
+                    ex.printStackTrace();
                 }
-            }
-            catch (BadLocationException ex)
-            {
-                ex.printStackTrace();
-            }
             }
         }
     });
@@ -505,53 +505,52 @@ public class LmnTextPane extends JTextPane
             {
                 if (commented)
                 {
-                if (line.startsWith(comment_par.substring(0, 2)))
-                {
-                    sb.append(line.substring(comment_par.length()));
-                    int count = 0;
-                    for (int i = 0; i < sb.length(); i++)
+                    if (line.startsWith(comment_par.substring(0, 2)))
                     {
-                    if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_par.charAt(0))
+                        sb.append(line.substring(comment_par.length()));
+                        int count = 0;
+                        for (int i = 0; i < sb.length(); i++)
+                        {
+                            if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_par.charAt(0))
+                            {
+                                count++;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        sb.delete(0, count);
+                    }
+                    else if (line.startsWith(comment_sl.substring(0, 3)))
                     {
-                        count++;
+                        sb.append(line.substring(comment_sl.length()));
+                        int count = 0;
+                        for (int i = 0; i < sb.length(); i++)
+                        {
+                            if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_sl.charAt(0))
+                            {
+                                count++;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        sb.delete(0, count);
                     }
                     else
                     {
-                        break;
+                        sb.append(line);
                     }
-                    }
-                    sb.delete(0, count);
-                }
-                else if (line.startsWith(comment_sl.substring(0, 3)))
-                {
-                    sb.append(line.substring(comment_sl.length()));
-                    int count = 0;
-                    for (int i = 0; i < sb.length(); i++)
-                    {
-                    if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_sl.charAt(0))
-                    {
-                        count++;
-                    }
-
-                    else
-                    {
-                        break;
-                    }
-                    }
-                    sb.delete(0, count);
-                }
-                else
-                {
-                    sb.append(line);
-                }
                 }
                 else if (line.length() == 0 || isWhitespaces(line))
                 {
-                sb.append(line);
+                    sb.append(line);
                 }
                 else
                 {
-                sb.append(comment_sl).append(line);
+                    sb.append(comment_sl).append(line);
                 }
                 sb.append("\n");
             }

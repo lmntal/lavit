@@ -493,86 +493,86 @@ public class LmnTextPane extends JTextPane
 
         try
         {
-        String text = getText(start, end - start);
-        boolean lastNewline = text.endsWith("\n");
-        String[] lines = text.split("\n");
-        String comment_par = "% ";
-        String comment_sl = "// ";
-        boolean commented = lines[0].startsWith(comment_par.substring(0, 2))
-            || lines[0].startsWith(comment_sl.substring(0, 3));
-        StringBuilder sb = new StringBuilder();
-        for (String line : lines)
-        {
-            if (commented)
+            String text = getText(start, end - start);
+            boolean lastNewline = text.endsWith("\n");
+            String[] lines = text.split("\n");
+            String comment_par = "% ";
+            String comment_sl = "// ";
+            boolean commented = lines[0].startsWith(comment_par.substring(0, 2))
+                || lines[0].startsWith(comment_sl.substring(0, 3));
+            StringBuilder sb = new StringBuilder();
+            for (String line : lines)
             {
-            if (line.startsWith(comment_par.substring(0, 2)))
-            {
-                sb.append(line.substring(comment_par.length()));
-                int count = 0;
-                for (int i = 0; i < sb.length(); i++)
+                if (commented)
                 {
-                if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_par.charAt(0))
+                if (line.startsWith(comment_par.substring(0, 2)))
                 {
-                    count++;
+                    sb.append(line.substring(comment_par.length()));
+                    int count = 0;
+                    for (int i = 0; i < sb.length(); i++)
+                    {
+                    if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_par.charAt(0))
+                    {
+                        count++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    }
+                    sb.delete(0, count);
                 }
-                else
+                else if (line.startsWith(comment_sl.substring(0, 3)))
                 {
-                    break;
-                }
-                }
-                sb.delete(0, count);
-            }
-            else if (line.startsWith(comment_sl.substring(0, 3)))
-            {
-                sb.append(line.substring(comment_sl.length()));
-                int count = 0;
-                for (int i = 0; i < sb.length(); i++)
-                {
-                if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_sl.charAt(0))
-                {
-                    count++;
-                }
+                    sb.append(line.substring(comment_sl.length()));
+                    int count = 0;
+                    for (int i = 0; i < sb.length(); i++)
+                    {
+                    if (sb.charAt(i) == ' ' || sb.charAt(i) == '\t' || sb.charAt(i) == comment_sl.charAt(0))
+                    {
+                        count++;
+                    }
 
+                    else
+                    {
+                        break;
+                    }
+                    }
+                    sb.delete(0, count);
+                }
                 else
                 {
-                    break;
+                    sb.append(line);
                 }
                 }
-                sb.delete(0, count);
-            }
-            else
-            {
+                else if (line.length() == 0 || isWhitespaces(line))
+                {
                 sb.append(line);
+                }
+                else
+                {
+                sb.append(comment_sl).append(line);
+                }
+                sb.append("\n");
             }
-            }
-            else if (line.length() == 0 || isWhitespaces(line))
+
+            if (!lastNewline)
             {
-            sb.append(line);
+                sb.deleteCharAt(sb.length() - 1);
             }
-            else
-            {
-            sb.append(comment_sl).append(line);
-            }
-            sb.append("\n");
-        }
 
-        if (!lastNewline)
-        {
-            sb.deleteCharAt(sb.length() - 1);
-        }
+            doc.replace(start, end - start, sb.toString(), null);
 
-        doc.replace(start, end - start, sb.toString(), null);
+            new_start += 2 * (commented ? -1 : 1);
+            new_end += 2 * (lines.length) * (commented ? -1 : 1);
 
-        new_start += 2 * (commented ? -1 : 1);
-        new_end += 2 * (lines.length) * (commented ? -1 : 1);
-
-        setSelectionStart(new_start);
-        setSelectionEnd(new_end);
+            setSelectionStart(new_start);
+            setSelectionEnd(new_end);
         }
         catch (BadLocationException e)
         {
-        e.printStackTrace();
-        return false;
+            e.printStackTrace();
+            return false;
         }
 
         return true;

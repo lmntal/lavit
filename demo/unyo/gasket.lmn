@@ -1,0 +1,21 @@
+% Sierpinski Gasket (triangle-shaped fractal)
+%   as an example of copying n-ary ground
+% by Naoki Yamamoto, 2018
+
+% initialize (target size: 5)
+counter(5).
+a(A,B),b(C,D),c(E,F),
+p(B,G,H,C),p(D,H,I,E),p(F,I,G,A).
+
+% a single transition rule
+counter(N),a(A,B),b(C,D),c(E,F),$p[A,B,C,D,E,F]
+ :- ground($p), N>0, N_=N-1
+ | counter(N_),a(A,B),b(C,D),c(E,F),
+ p(P1,P2,P3,P4),p(Q1,Q2,Q3,Q4),p(R1,R2,R3,R4),
+ $p[A,B,P1,P2,R3,R4], % a
+ $p[P3,P4,C,D,Q1,Q2], % b
+ $p[R1,R2,Q3,Q4,E,F]. % c
+
+% termination
+counter(0),a(A,B),b(C,D),c(E,F),$p[A,B,C,D,E,F]
+ :- ground($p) | p(A,B),p(C,D),p(E,F),$p[A,B,C,D,E,F].

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008, Ueda Laboratory LMNtal Group <lmntal@ueda.info.waseda.ac.jp>
+ *   Copyright (c) 2025, Ueda Laboratory LMNtal Group <lmntal@ueda.info.waseda.ac.jp>
  *   All rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
@@ -33,71 +33,14 @@
  *
  */
 
-package lavit.frame;
+package lavit.pmc;
 
-import java.awt.Dimension;
+import java.awt.BorderLayout;
 
-import javax.swing.JTabbedPane;
+import javax.swing.JPanel;
 
-import lavit.ltl.LtlPanel;
-import lavit.option.OptionPanel;
-import lavit.stateprofiler.StateProfilePanel;
-import lavit.stateviewer.StatePanel;
-import lavit.system.SystemPanel;
-import lavit.visualeditor.VisualPanel;
-import lavit.pmc.PmcPanel;
-
-@SuppressWarnings("serial")
-public class ToolTab extends JTabbedPane
-{
-	public SystemPanel systemPanel;
-	public VisualPanel visualPanel;
-	public LtlPanel ltlPanel;
-	public StatePanel statePanel;
-	public StateProfilePanel stateProfilePanel;
-	public OptionPanel optionPanel;
-	public PmcPanel pmcPanel;
-
-	public ToolTab()
-	{
-		setMinimumSize(new Dimension(0, 0));
-		setFocusable(false);
-
-		systemPanel = new SystemPanel();
-		addTab("System", systemPanel);
-
-		//visualPanel = new VisualPanel();
-		//addTab("Visual", visualPanel);
-
-		ltlPanel = new LtlPanel();
-		addTab("LTL Model Check", ltlPanel);
-
-		statePanel = new StatePanel();
-		addTab("StateViewer", statePanel);
-
-		stateProfilePanel = new StateProfilePanel();
-		addTab("StateProfiler", stateProfilePanel);
-
-		optionPanel = new OptionPanel();
-		addTab("Option", optionPanel);
-
-		pmcPanel = new PmcPanel();
-		addTab("Probabilistic MC", pmcPanel);
-	}
-
-	public void setTab(String tab)
-	{
-		if (tab.equals("System"))
-		{
-			setSelectedComponent(systemPanel);
-		}
-		else if (tab.equals("StateViewer"))
-		{
-			setSelectedComponent(statePanel);
-		}
-		else if (tab.equals("StateProfiler"))
-		{
-			setSelectedComponent(stateProfilePanel);
-		}
-	}
+public class PmcPanel extends JPanel {
+  public PmcPanel() {
+    setLayout(new BorderLayout());
+  }
 }

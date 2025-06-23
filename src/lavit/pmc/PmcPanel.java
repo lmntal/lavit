@@ -40,16 +40,16 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 
 // TODO: 1. SLIM 実行
-// slim -t --nd --hl --use-builtin-rule --show-transition <lmntal_file.lmn> で実行し，
-// 実行結果を <lmntal_file>_slim.txt に保存する．
+// slim -t --nd --hl --use-builtin-rule --show-transition <model_name>.lmn で実行し，
+// 実行結果を <model_name>_slim.txt に保存する．
 
 // TODO: 2. weights.json の作成
 // パネル内で，各ルールに weight を設定できるようにする．
-// 設定した weight を weights.json として保存する．
+// 設定した weight を <model_name>_weights.json として保存する．
 
 // TODO: 3. translator 実行
-// <path_to_translator> <slim_output.txt> --model_type dtmc --weight <weights.json> --output <lmntal_file>_dtmc.tra
-// <lmntal_file>_dtmc.tra を保存する．
+// <path_to_translator> <slim_output>.txt --model_type dtmc --weight <weights.json> --output <model_name>_dtmc.tra
+// <model_name>_dtmc.tra を保存する．
 
 // TODO: 4. predicates.pctl 等の作成
 // パネル内で，PCTL 等を入力できるようにする．
@@ -57,7 +57,7 @@ import javax.swing.JPanel;
 // その他，ラベル付けファイルや，状態への報酬設定など．
 
 // TODO: 5. PRISM 実行
-// e.g. prism -importmodel '<lmntal_file>_dtmc.tra,srew' predicates.pctl
+// e.g. prism -importmodel '<model_name>_dtmc.tra,srew' predicates.pctl
 // 実行結果を表示する．
 
 // TODO: 6. State Viewer

@@ -41,7 +41,7 @@ import javax.swing.JPanel;
 
 // TODO: 1. SLIM 実行
 // slim -t --nd --hl --use-builtin-rule --show-transition <lmntal_file.lmn> で実行し，
-// 実行結果を <lmntal_file>_slim_result.txt に保存する．
+// 実行結果を <lmntal_file>_slim.txt に保存する．
 
 // TODO: 2. weights.json の作成
 // パネル内で，各ルールに weight を設定できるようにする．

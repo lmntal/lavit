@@ -39,6 +39,30 @@ import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 
+// TODO: 1. SLIM 実行
+// slim -t --nd --hl --use-builtin-rule --show-transition <lmntal_file.lmn> で実行し，
+// 実行結果を <lmntal_file>_slim_result.txt に保存する．
+
+// TODO: 2. weights.json の作成
+// パネル内で，各ルールに weight を設定できるようにする．
+// 設定した weight を weights.json として保存する．
+
+// TODO: 3. translator 実行
+// <path_to_translator> <slim_output.txt> --model_type dtmc --weight <weights.json> --output <lmntal_file>_dtmc.tra
+// <lmntal_file>_dtmc.tra を保存する．
+
+// TODO: 4. predicates.pctl 等の作成
+// パネル内で，PCTL 等を入力できるようにする．
+// predicates.pctl に保存する．
+// その他，ラベル付けファイルや，状態への報酬設定など．
+
+// TODO: 5. PRISM 実行
+// e.g. prism -importmodel '<lmntal_file>_dtmc.tra,srew' predicates.pctl
+// 実行結果を表示する．
+
+// TODO: 6. State Viewer
+// StateViewer 上で各遷移について実際に割り当てられる確率を表示できるようにする．
+
 public class PmcPanel extends JPanel {
   public PmcPanel() {
     setLayout(new BorderLayout());

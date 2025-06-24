@@ -38,6 +38,7 @@ package lavit.pmc;
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 
 // TODO: 1. SLIM 実行
 // slim -t --nd --hl --use-builtin-rule --show-transition <model_name>.lmn で実行し，
@@ -64,7 +65,14 @@ import javax.swing.JPanel;
 // StateViewer 上で各遷移について実際に割り当てられる確率を表示できるようにする．
 
 public class PmcPanel extends JPanel {
+  private SlimButtonPanel slimButtonPanel;
+
   public PmcPanel() {
     setLayout(new BorderLayout());
+
+    slimButtonPanel = new SlimButtonPanel(this);
+    JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, slimButtonPanel, new JPanel());
+    jsp.setResizeWeight(0.5);
+    add(jsp, BorderLayout.CENTER);
   }
 }

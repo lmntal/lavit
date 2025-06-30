@@ -21,7 +21,7 @@ public class PmcButtonPanel extends JPanel implements ActionListener {
     setLayout(new FixFlowLayout());
 
     JPanel filePanel = new JPanel();
-    filePanel.setBorder(new TitledBorder("PMC File"));
+    filePanel.setBorder(new TitledBorder("Input Files"));
 
     loadButton = new JButton("Load");
     loadButton.addActionListener(this);

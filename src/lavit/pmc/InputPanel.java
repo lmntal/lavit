@@ -37,12 +37,12 @@ public class InputPanel extends JPanel implements CommonFontUser {
 		weightsInputArea.setFont(font);
 	}
 
-  public void setText(String str) {
+  public void setWeightsText(String str) {
     weightsInputArea.setText(str);
     weightsUndoManager.discardAllEdits();
   }
 
-  public String getText() {
+  public String getWeightsText() {
     return weightsInputArea.getText();
   }
 }

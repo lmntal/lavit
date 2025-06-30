@@ -139,10 +139,12 @@ public class MainFrame extends JFrame
 				if (editorPanel.getTabCount() > 0)
 				{
 					loadLTLFile(editorPanel.getFile());
+					loadPmcFile(editorPanel.getFile());
 				}
 				else
 				{
 					unloadLTLFile();
+					unloadPmcFile();
 				}
 			}
 		});
@@ -302,5 +304,16 @@ public class MainFrame extends JFrame
 	private void unloadLTLFile()
 	{
 		toolTab.ltlPanel.unloadFiles();
+	}
+
+	private void loadPmcFile(File lmntalFile)
+	{
+		toolTab.pmcPanel.setTargetLMNtalFile(lmntalFile);
+		toolTab.pmcPanel.loadPmcFiles();
+	}
+
+	private void unloadPmcFile()
+	{
+		toolTab.pmcPanel.unloadPmcFiles();
 	}
 }

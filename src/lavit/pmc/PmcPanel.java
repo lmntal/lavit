@@ -36,9 +36,21 @@
 package lavit.pmc;
 
 import java.awt.BorderLayout;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+
+import lavit.Env;
+import lavit.FrontEnd;
+import lavit.util.FileUtils;
 
 // TODO: 2. weights.json の作成
 // パネル内で，各ルールに weight を設定できるようにする．
@@ -61,6 +73,9 @@ import javax.swing.JSplitPane;
 // StateViewer 上で各遷移について実際に割り当てられる確率を表示できるようにする．
 
 public class PmcPanel extends JPanel {
+  private File targetLMNtalFile;
+  private File targetWeightsFile;
+
   private SlimButtonPanel slimButtonPanel;
   private InputPanel inputPanel;
   private PmcButtonPanel pmcButtonPanel;
@@ -70,8 +85,7 @@ public class PmcPanel extends JPanel {
 
     slimButtonPanel = new SlimButtonPanel(this);
     inputPanel = new InputPanel(this);
-    JSplitPane jsp = 
-      new JSplitPane(JSplitPane.VERTICAL_SPLIT, slimButtonPanel, inputPanel);
+    JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, slimButtonPanel, inputPanel);
     jsp.setResizeWeight(0.1);
     add(jsp, BorderLayout.CENTER);
 
@@ -79,11 +93,77 @@ public class PmcPanel extends JPanel {
     add(pmcButtonPanel, BorderLayout.SOUTH);
   }
 
+  public void setTargetLMNtalFile(File lmntalFile) {
+    targetLMNtalFile = lmntalFile;
+    setPmcFiles();
+  }
+
+  public void setPmcFiles() {
+    if(targetLMNtalFile != null) {
+      String baseName = FileUtils.removeExtension(targetLMNtalFile.getAbsolutePath());
+      targetWeightsFile = new File(baseName + "_weights.json");
+    }
+  }
+
   public void loadPmcFiles() {
-    // TODO: load files
+    if (targetWeightsFile != null && targetWeightsFile.exists()) {
+      inputPanel.setWeightsText(openFile(targetWeightsFile));
+    } else {
+      inputPanel.setWeightsText("");
+    }
+  }
+
+  public void unloadPmcFiles() {
+    targetWeightsFile = null;
+    inputPanel.setWeightsText("");
   }
 
   public void savePmcFiles() {
-    // TODO: save files
+    if (targetWeightsFile != null) {
+      writeFile(targetWeightsFile, inputPanel.getWeightsText());
+    }
   }
+
+  private static String openFile(File file) {
+    if (!file.exists()) {
+      return "";
+    }
+
+    try {
+      String encoding = Env.get("EDITOR_FILE_READ_ENCODING");
+      BufferedReader reader = new BufferedReader(
+          new InputStreamReader(new FileInputStream(file), encoding));
+
+      StringBuilder buf = new StringBuilder();
+      String line;
+      if ((line = reader.readLine()) != null) {
+        buf.append(line);
+      }
+      while ((line = reader.readLine()) != null) {
+        buf.append("\r\n" + line);
+      }
+      reader.close();
+
+      return buf.toString();
+    } catch (Exception e) {
+      FrontEnd.printException(e);
+    }
+    return "";
+  }
+
+  private static void writeFile(File file, String str)
+	{
+		try
+		{
+			String encoding = Env.get("EDITOR_FILE_WRITE_ENCODING");
+			BufferedWriter writer = new BufferedWriter(
+				new OutputStreamWriter(new FileOutputStream(file), encoding));
+			writer.write(str + "\r\n");
+			writer.close();
+		}
+		catch (IOException e)
+		{
+			FrontEnd.printException(e);
+		}
+	}
 }

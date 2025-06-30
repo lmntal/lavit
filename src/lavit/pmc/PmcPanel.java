@@ -40,10 +40,6 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-// TODO: 1. SLIM 実行
-// slim -t --nd --hl --use-builtin-rule --show-transition <model_name>.lmn で実行し，
-// 実行結果を <model_name>_slim.txt に保存する．
-
 // TODO: 2. weights.json の作成
 // パネル内で，各ルールに weight を設定できるようにする．
 // 設定した weight を <model_name>_weights.json として保存する．
@@ -66,13 +62,28 @@ import javax.swing.JSplitPane;
 
 public class PmcPanel extends JPanel {
   private SlimButtonPanel slimButtonPanel;
+  private InputPanel inputPanel;
+  private PmcButtonPanel pmcButtonPanel;
 
   public PmcPanel() {
     setLayout(new BorderLayout());
 
     slimButtonPanel = new SlimButtonPanel(this);
-    JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, slimButtonPanel, new JPanel());
-    jsp.setResizeWeight(0.5);
+    inputPanel = new InputPanel(this);
+    JSplitPane jsp = 
+      new JSplitPane(JSplitPane.VERTICAL_SPLIT, slimButtonPanel, inputPanel);
+    jsp.setResizeWeight(0.1);
     add(jsp, BorderLayout.CENTER);
+
+    pmcButtonPanel = new PmcButtonPanel(this);
+    add(pmcButtonPanel, BorderLayout.SOUTH);
+  }
+
+  public void loadPmcFiles() {
+    // TODO: load files
+  }
+
+  public void savePmcFiles() {
+    // TODO: save files
   }
 }

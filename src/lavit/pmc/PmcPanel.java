@@ -187,11 +187,6 @@ public class PmcPanel extends JPanel {
       return;
     }
 
-    // debug
-    System.out.println("Running translator with:");
-    System.out.println("  Target SLIM dump file: " + targetSlimDumpFile.getAbsolutePath());
-    System.out.println("  Target weights file: " + targetWeightsFile.getAbsolutePath());
-
     translatorRunner = new ProbabilisticTranslatorRunner(targetSlimDumpFile, targetWeightsFile);
     translatorRunner.run();
 

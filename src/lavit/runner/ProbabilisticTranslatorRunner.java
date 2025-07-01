@@ -80,8 +80,6 @@ public class ProbabilisticTranslatorRunner implements OuterRunner {
           command.add("--output");
           command.add(outputFileName);
 
-          System.out.println("Running command: " + String.join(" ", command));
-
           ProcessBuilder pb = new ProcessBuilder(command);
           Env.setProcessEnvironment(pb.environment());
           pb.redirectErrorStream(true);

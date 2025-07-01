@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -25,14 +24,12 @@ public class SlimButtonPanel extends JPanel implements ActionListener {
 
     setLayout(new FixFlowLayout());
 
-    setBorder(new javax.swing.border.TitledBorder("Generate State Transition System from LMNtal model"));
-
     JPanel buttonPanel = new JPanel();
-    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-
-    slimButton = new JButton("RUN SLIM");
+    
+    slimButton = new JButton("Generate State Transition System from LMNtal model (SLIM)");
     slimButton.addActionListener(this);
     buttonPanel.add(slimButton);
+
     add(buttonPanel);
   }
 

@@ -50,15 +50,8 @@ import javax.swing.JSplitPane;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.runner.ProbabilisticTranslatorRunner;
 import lavit.util.FileUtils;
-
-// TODO: 2. weights.json の作成
-// パネル内で，各ルールに weight を設定できるようにする．
-// 設定した weight を <model_name>_weights.json として保存する．
-
-// TODO: 3. translator 実行
-// <path_to_translator> <slim_output>.txt --model_type dtmc --weight <weights.json> --output <model_name>_dtmc.tra
-// <model_name>_dtmc.tra を保存する．
 
 // TODO: 4. predicates.pctl 等の作成
 // パネル内で，PCTL 等を入力できるようにする．
@@ -74,34 +67,44 @@ import lavit.util.FileUtils;
 
 public class PmcPanel extends JPanel {
   private File targetLMNtalFile;
+  private File targetSlimDumpFile;
   private File targetWeightsFile;
+
+  private String targetBasePath;
 
   private SlimButtonPanel slimButtonPanel;
   private InputPanel inputPanel;
   private PmcButtonPanel pmcButtonPanel;
+
+  private ProbabilisticTranslatorRunner translatorRunner;
 
   public PmcPanel() {
     setLayout(new BorderLayout());
 
     slimButtonPanel = new SlimButtonPanel(this);
     inputPanel = new InputPanel(this);
-    JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, slimButtonPanel, inputPanel);
-    jsp.setResizeWeight(0.1);
+    pmcButtonPanel = new PmcButtonPanel(this);
+
+    add(slimButtonPanel, BorderLayout.NORTH);
+
+    JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, inputPanel, new JPanel());
+    jsp.setResizeWeight(0.2);
     add(jsp, BorderLayout.CENTER);
 
-    pmcButtonPanel = new PmcButtonPanel(this);
     add(pmcButtonPanel, BorderLayout.SOUTH);
   }
 
   public void setTargetLMNtalFile(File lmntalFile) {
     targetLMNtalFile = lmntalFile;
+    if( targetLMNtalFile != null) {
+      targetBasePath = FileUtils.removeExtension(targetLMNtalFile.getAbsolutePath());
+    }
     setPmcFiles();
   }
 
   public void setPmcFiles() {
     if(targetLMNtalFile != null) {
-      String baseName = FileUtils.removeExtension(targetLMNtalFile.getAbsolutePath());
-      targetWeightsFile = new File(baseName + "_weights.json");
+      targetWeightsFile = new File(targetBasePath + "_weights.json");
     }
   }
 
@@ -166,4 +169,51 @@ public class PmcPanel extends JPanel {
 			FrontEnd.printException(e);
 		}
 	}
+
+  // run translator
+  public void runTranslator() 
+  {
+    FrontEnd.mainFrame.toolTab.setTab("System");
+    FrontEnd.println("Running translator...");
+
+    targetSlimDumpFile = new File(targetBasePath + "_slim.txt");
+    if (!targetSlimDumpFile.exists()) {
+      FrontEnd.println("SLIM dump file does not exist: " + targetSlimDumpFile.getAbsolutePath());
+      return;
+    }
+
+    if (targetWeightsFile == null || !targetWeightsFile.exists()) {
+      FrontEnd.println("Weights file does not exist: " + (targetWeightsFile != null ? targetWeightsFile.getAbsolutePath() : "null"));
+      return;
+    }
+
+    // debug
+    System.out.println("Running translator with:");
+    System.out.println("  Target SLIM dump file: " + targetSlimDumpFile.getAbsolutePath());
+    System.out.println("  Target weights file: " + targetWeightsFile.getAbsolutePath());
+
+    translatorRunner = new ProbabilisticTranslatorRunner(targetSlimDumpFile, targetWeightsFile);
+    translatorRunner.run();
+
+    new Thread() {
+      public void run() {
+        while (translatorRunner.isRunning()) {
+          FrontEnd.sleep(200);
+        }
+        if (translatorRunner.isSucceeded()) {
+          FrontEnd.println("Translation completed successfully.");
+        } else {
+          FrontEnd.println("Translator run failed.");
+        }
+        translatorRunner = null;
+      }
+    }.start();
+  }
+
+  public void killTranslator() {
+    if (translatorRunner != null) {
+      translatorRunner.kill();
+      translatorRunner = null;
+    }
+  }
 }

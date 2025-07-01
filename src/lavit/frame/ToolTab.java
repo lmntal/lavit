@@ -78,11 +78,11 @@ public class ToolTab extends JTabbedPane
 		stateProfilePanel = new StateProfilePanel();
 		addTab("StateProfiler", stateProfilePanel);
 
-		optionPanel = new OptionPanel();
-		addTab("Option", optionPanel);
-
 		pmcPanel = new PmcPanel();
 		addTab("Probabilistic MC", pmcPanel);
+
+		optionPanel = new OptionPanel();
+		addTab("Option", optionPanel);
 	}
 
 	public void setTab(String tab)

@@ -14,6 +14,8 @@ public class PmcButtonPanel extends JPanel implements ActionListener {
 
   private JButton saveButton;
   private JButton loadButton;
+  private JButton translatorRunButton;
+  private JButton translatorKillButton;
 
   public PmcButtonPanel(PmcPanel pmcPanel) {
     this.pmcPanel = pmcPanel;
@@ -31,7 +33,19 @@ public class PmcButtonPanel extends JPanel implements ActionListener {
     saveButton.addActionListener(this);
     filePanel.add(saveButton);
 
+    JPanel translatorPanel = new JPanel();
+    translatorPanel.setBorder(new TitledBorder("Translator(slim dump to dtmc)"));
+
+    translatorRunButton = new JButton("Run Translator");
+    translatorRunButton.addActionListener(this);
+    translatorPanel.add(translatorRunButton);
+
+    translatorKillButton = new JButton("Kill");
+    translatorKillButton.addActionListener(this);
+    translatorPanel.add(translatorKillButton);
+
     add(filePanel);
+    add(translatorPanel);
   }
 
   public void actionPerformed(ActionEvent e) {
@@ -40,6 +54,10 @@ public class PmcButtonPanel extends JPanel implements ActionListener {
       pmcPanel.savePmcFiles();
     } else if (src == loadButton) {
       pmcPanel.loadPmcFiles();
+    } else if (src == translatorRunButton) {
+      pmcPanel.runTranslator();
+    } else if (src == translatorKillButton) {
+      pmcPanel.killTranslator();
     } else {
       System.err.println("Unknown action source: " + src);
     }

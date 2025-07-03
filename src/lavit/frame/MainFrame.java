@@ -309,11 +309,11 @@ public class MainFrame extends JFrame
 	private void loadPmcFile(File lmntalFile)
 	{
 		toolTab.pmcPanel.setTargetLMNtalFile(lmntalFile);
-		toolTab.pmcPanel.loadPmcFiles();
+		toolTab.pmcPanel.loadInputFiles();
 	}
 
 	private void unloadPmcFile()
 	{
-		toolTab.pmcPanel.unloadPmcFiles();
+		toolTab.pmcPanel.unloadInputFiles();
 	}
 }

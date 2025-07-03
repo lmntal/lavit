@@ -51,9 +51,9 @@ public class PmcButtonPanel extends JPanel implements ActionListener {
   public void actionPerformed(ActionEvent e) {
     Object src = e.getSource();
     if (src == saveButton) {
-      pmcPanel.savePmcFiles();
+      pmcPanel.saveInputFiles();
     } else if (src == loadButton) {
-      pmcPanel.loadPmcFiles();
+      pmcPanel.loadInputFiles();
     } else if (src == translatorRunButton) {
       pmcPanel.runTranslator();
     } else if (src == translatorKillButton) {

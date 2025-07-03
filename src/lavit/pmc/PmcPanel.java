@@ -69,11 +69,16 @@ public class PmcPanel extends JPanel {
   private File targetLMNtalFile;
   private File targetSlimDumpFile;
   private File targetWeightsFile;
+  private File targetPredicatesFile;
+  private File targetTransitionFile;
+  private File targetLabelsFile;
+  private File targetStateRewardsFile;
 
   private String targetBasePath;
 
   private SlimButtonPanel slimButtonPanel;
   private WeightsInputPanel weightsInputPanel;
+  private PrismInputPanel prismInputPanel;
   private PmcButtonPanel pmcButtonPanel;
 
   private ProbabilisticTranslatorRunner translatorRunner;
@@ -83,11 +88,12 @@ public class PmcPanel extends JPanel {
 
     slimButtonPanel = new SlimButtonPanel(this);
     weightsInputPanel = new WeightsInputPanel(this);
+    prismInputPanel = new PrismInputPanel(this);
     pmcButtonPanel = new PmcButtonPanel(this);
 
     add(slimButtonPanel, BorderLayout.NORTH);
 
-    JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, weightsInputPanel, new JPanel());
+    JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, weightsInputPanel, prismInputPanel);
     jsp.setResizeWeight(0.2);
     add(jsp, BorderLayout.CENTER);
 
@@ -99,31 +105,79 @@ public class PmcPanel extends JPanel {
     if( targetLMNtalFile != null) {
       targetBasePath = FileUtils.removeExtension(targetLMNtalFile.getAbsolutePath());
     }
-    setPmcFiles();
+    setInputFiles();
   }
 
-  public void setPmcFiles() {
+  public void setInputFiles() {
     if(targetLMNtalFile != null) {
       targetWeightsFile = new File(targetBasePath + "_weights.json");
+      targetPredicatesFile = new File(targetBasePath + "_dtmc.pctl");
+      targetTransitionFile = new File(targetBasePath + "_dtmc.tra");
+      targetLabelsFile = new File(targetBasePath + "_dtmc.lab");
+      targetStateRewardsFile = new File(targetBasePath + "_dtmc.srew");
     }
   }
 
-  public void loadPmcFiles() {
+  public void loadInputFiles() {  
     if (targetWeightsFile != null && targetWeightsFile.exists()) {
       weightsInputPanel.setWeightsText(openFile(targetWeightsFile));
     } else {
       weightsInputPanel.setWeightsText("");
     }
+
+    if (targetPredicatesFile != null && targetPredicatesFile.exists()) {
+      prismInputPanel.setPredicatesText(openFile(targetPredicatesFile));
+    } else {
+      prismInputPanel.setPredicatesText("");
+    }
+
+    if (targetTransitionFile != null && targetTransitionFile.exists()) {
+      prismInputPanel.setTransitionText(openFile(targetTransitionFile));
+    } else {
+      prismInputPanel.setTransitionText("");
+    }
+
+    if (targetLabelsFile != null && targetLabelsFile.exists()) {
+      prismInputPanel.setLabelsText(openFile(targetLabelsFile));
+    } else {
+      prismInputPanel.setLabelsText("");
+    }
+
+    if (targetStateRewardsFile != null && targetStateRewardsFile.exists()) {
+      prismInputPanel.setStateRewardsText(openFile(targetStateRewardsFile));
+    } else {
+      prismInputPanel.setStateRewardsText("");
+    }
   }
 
-  public void unloadPmcFiles() {
+  public void unloadInputFiles() {
     targetWeightsFile = null;
     weightsInputPanel.setWeightsText("");
+    targetPredicatesFile = null;
+    prismInputPanel.setPredicatesText("");
+    targetTransitionFile = null;
+    prismInputPanel.setTransitionText("");
+    targetLabelsFile = null;
+    prismInputPanel.setLabelsText("");
+    targetStateRewardsFile = null;
+    prismInputPanel.setStateRewardsText("");
   }
 
-  public void savePmcFiles() {
+  public void saveInputFiles() {
     if (targetWeightsFile != null) {
       writeFile(targetWeightsFile, weightsInputPanel.getWeightsText());
+    }
+    if (targetPredicatesFile != null) {
+      writeFile(targetPredicatesFile, prismInputPanel.getPredicatesText());
+    }
+    if (targetTransitionFile != null) {
+      writeFile(targetTransitionFile, prismInputPanel.getTransitionText());
+    }
+    if (targetLabelsFile != null) {
+      writeFile(targetLabelsFile, prismInputPanel.getLabelsText());
+    }
+    if (targetStateRewardsFile != null) {
+      writeFile(targetStateRewardsFile, prismInputPanel.getStateRewardsText());
     }
   }
 

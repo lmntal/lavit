@@ -14,12 +14,12 @@ import lavit.util.CommonFontUser;
 import lavit.util.SimpleUndoKeyListener;
 import lavit.util.SimpleUndoableEditListener;
 
-public class InputPanel extends JPanel implements CommonFontUser {
-  public InputPanel inputPanel;
+public class WeightsInputPanel extends JPanel implements CommonFontUser {
+  public WeightsInputPanel inputPanel;
   private JTextArea weightsInputArea;
   private UndoManager weightsUndoManager = new UndoManager();
 
-  public InputPanel(PmcPanel pmcPanel) {
+  public WeightsInputPanel(PmcPanel pmcPanel) {
     setBorder(new TitledBorder("Weights Settings"));
 		setLayout(new BorderLayout());
 

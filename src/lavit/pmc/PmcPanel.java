@@ -73,7 +73,7 @@ public class PmcPanel extends JPanel {
   private String targetBasePath;
 
   private SlimButtonPanel slimButtonPanel;
-  private InputPanel inputPanel;
+  private WeightsInputPanel weightsInputPanel;
   private PmcButtonPanel pmcButtonPanel;
 
   private ProbabilisticTranslatorRunner translatorRunner;
@@ -82,12 +82,12 @@ public class PmcPanel extends JPanel {
     setLayout(new BorderLayout());
 
     slimButtonPanel = new SlimButtonPanel(this);
-    inputPanel = new InputPanel(this);
+    weightsInputPanel = new WeightsInputPanel(this);
     pmcButtonPanel = new PmcButtonPanel(this);
 
     add(slimButtonPanel, BorderLayout.NORTH);
 
-    JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, inputPanel, new JPanel());
+    JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, weightsInputPanel, new JPanel());
     jsp.setResizeWeight(0.2);
     add(jsp, BorderLayout.CENTER);
 
@@ -110,20 +110,20 @@ public class PmcPanel extends JPanel {
 
   public void loadPmcFiles() {
     if (targetWeightsFile != null && targetWeightsFile.exists()) {
-      inputPanel.setWeightsText(openFile(targetWeightsFile));
+      weightsInputPanel.setWeightsText(openFile(targetWeightsFile));
     } else {
-      inputPanel.setWeightsText("");
+      weightsInputPanel.setWeightsText("");
     }
   }
 
   public void unloadPmcFiles() {
     targetWeightsFile = null;
-    inputPanel.setWeightsText("");
+    weightsInputPanel.setWeightsText("");
   }
 
   public void savePmcFiles() {
     if (targetWeightsFile != null) {
-      writeFile(targetWeightsFile, inputPanel.getWeightsText());
+      writeFile(targetWeightsFile, weightsInputPanel.getWeightsText());
     }
   }
 

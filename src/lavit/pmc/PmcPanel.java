@@ -164,19 +164,19 @@ public class PmcPanel extends JPanel {
   }
 
   public void saveInputFiles() {
-    if (targetWeightsFile != null) {
+    if (targetWeightsFile != null && !weightsInputPanel.getWeightsText().isEmpty()) {
       writeFile(targetWeightsFile, weightsInputPanel.getWeightsText());
     }
-    if (targetPredicatesFile != null) {
+    if (targetPredicatesFile != null && !prismInputPanel.getPredicatesText().isEmpty()) {
       writeFile(targetPredicatesFile, prismInputPanel.getPredicatesText());
     }
-    if (targetTransitionFile != null) {
+    if (targetTransitionFile != null && !prismInputPanel.getTransitionText().isEmpty()) {
       writeFile(targetTransitionFile, prismInputPanel.getTransitionText());
     }
-    if (targetLabelsFile != null) {
+    if (targetLabelsFile != null && !prismInputPanel.getLabelsText().isEmpty()) {
       writeFile(targetLabelsFile, prismInputPanel.getLabelsText());
     }
-    if (targetStateRewardsFile != null) {
+    if (targetStateRewardsFile != null && !prismInputPanel.getStateRewardsText().isEmpty()) {
       writeFile(targetStateRewardsFile, prismInputPanel.getStateRewardsText());
     }
   }

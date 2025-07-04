@@ -1,0 +1,5 @@
+coin=[], toss, toss, toss.   // initial state
+head@@ coin=H, toss :- coin=[h|H].
+tail@@ coin=H, toss :- coin=[t|H].
+head2@@ coin=[h,h,h] :- coin=[h], toss, toss.
+tail2@@ coin=[t,t,t] :- coin=[t], toss, toss.

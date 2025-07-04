@@ -54,15 +54,6 @@ import lavit.runner.PrismRunner;
 import lavit.runner.ProbabilisticTranslatorRunner;
 import lavit.util.FileUtils;
 
-// TODO: 4. predicates.pctl 等の作成
-// パネル内で，PCTL 等を入力できるようにする．
-// predicates.pctl に保存する．
-// その他，ラベル付けファイルや，状態への報酬設定など．
-
-// TODO: 5. PRISM 実行
-// e.g. prism -importmodel '<model_name>_dtmc.tra,srew' predicates.pctl
-// 実行結果を表示する．
-
 // TODO: 6. State Viewer
 // StateViewer 上で各遷移について実際に割り当てられる確率を表示できるようにする．
 
@@ -230,16 +221,16 @@ public class PmcPanel extends JPanel {
   public void runTranslator() 
   {
     FrontEnd.mainFrame.toolTab.setTab("System");
-    FrontEnd.println("Running translator...");
+    FrontEnd.println("(Probability) Running translator...");
 
     targetSlimDumpFile = new File(targetBasePath + "_slim.txt");
     if (!targetSlimDumpFile.exists()) {
-      FrontEnd.println("SLIM dump file does not exist: " + targetSlimDumpFile.getAbsolutePath());
+      FrontEnd.println("(Probability) SLIM dump file does not exist: " + targetSlimDumpFile.getAbsolutePath());
       return;
     }
 
     if (targetWeightsFile == null || !targetWeightsFile.exists()) {
-      FrontEnd.println("Weights file does not exist: " + (targetWeightsFile != null ? targetWeightsFile.getAbsolutePath() : "null"));
+      FrontEnd.println("(Probability) Weights file does not exist: " + (targetWeightsFile != null ? targetWeightsFile.getAbsolutePath() : "null"));
       return;
     }
 
@@ -252,9 +243,9 @@ public class PmcPanel extends JPanel {
           FrontEnd.sleep(200);
         }
         if (translatorRunner.isSucceeded()) {
-          FrontEnd.println("Translation completed successfully.");
+          FrontEnd.println("(Probability) Translation completed successfully.");
         } else {
-          FrontEnd.println("Translator run failed.");
+          FrontEnd.println("(Probability) Translator run failed.");
         }
         translatorRunner = null;
       }
@@ -262,7 +253,7 @@ public class PmcPanel extends JPanel {
   }
 
   public void killTranslator() {
-    if (translatorRunner != null) {
+    if (translatorRunner != null && translatorRunner.isRunning()) {
       translatorRunner.kill();
       translatorRunner = null;
     }
@@ -272,13 +263,13 @@ public class PmcPanel extends JPanel {
   public void runPrism()
   {
     FrontEnd.mainFrame.toolTab.setTab("System");
-    FrontEnd.println("Running PRISM...");
+    FrontEnd.println("(PRISM) Running PRISM...");
     if (targetTransitionFile == null || !targetTransitionFile.exists()) {
-      FrontEnd.println("Transition file does not exist: " + (targetTransitionFile != null ? targetTransitionFile.getAbsolutePath() : "null"));
+      FrontEnd.println("(PRISM) Transition file does not exist: " + (targetTransitionFile != null ? targetTransitionFile.getAbsolutePath() : "null"));
       return;
     }
     if (targetPredicatesFile == null || !targetPredicatesFile.exists()) {
-      FrontEnd.println("Predicates file does not exist: " + (targetPredicatesFile != null ? targetPredicatesFile.getAbsolutePath() : "null"));
+      FrontEnd.println("(PRISM) Predicates file does not exist: " + (targetPredicatesFile != null ? targetPredicatesFile.getAbsolutePath() : "null"));
       return;
     }
 
@@ -291,9 +282,9 @@ public class PmcPanel extends JPanel {
           FrontEnd.sleep(200);
         }
         if (prismRunner.isSucceeded()) {
-          FrontEnd.println("PRISM run completed successfully.");
+          FrontEnd.println("(PRISM) run completed successfully.");
         } else {
-          FrontEnd.println("PRISM run failed.");
+          FrontEnd.println("(PRISM) run failed.");
         }
         prismRunner = null;
       }
@@ -301,7 +292,7 @@ public class PmcPanel extends JPanel {
   }
 
   public void killPrism() {
-    if (prismRunner != null) {
+    if (prismRunner != null && prismRunner.isRunning()) {
       prismRunner.kill();
       prismRunner = null;
     }

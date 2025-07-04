@@ -8,6 +8,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 
 import lavit.Env;
+import lavit.FrontEnd;
 import lavit.util.OuterRunner;
 
 public class PrismRunner implements OuterRunner {
@@ -121,10 +122,7 @@ public class PrismRunner implements OuterRunner {
         command.add(importModelString);
         command.add(targetPredicatesFile.getAbsolutePath());
 
-        // debug
-        // System.out.println("Running PRISM with command: " + String.join(" ", command));
-
-        // TODO: 正しく動作するようにする．
+        FrontEnd.mainFrame.toolTab.systemPanel.outputPanel.printTitle("> " + String.join(" ", command));
 
         ProcessBuilder pb = new ProcessBuilder(command);
         Env.setProcessEnvironment(pb.environment());
@@ -132,10 +130,10 @@ public class PrismRunner implements OuterRunner {
         p = pb.start();
         BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-        // TODO: PRISM の出力を FrontEnd に出力する．
         String str;
         while ((str = in.readLine()) != null) {
           buffer.append(str + "\n");
+          FrontEnd.mainFrame.toolTab.systemPanel.outputPanel.println(str);
         }
 
         in.close();
@@ -149,6 +147,8 @@ public class PrismRunner implements OuterRunner {
         e.printStackTrace(new PrintWriter(sw));
         buffer.append(sw.toString());
 
+      } finally {
+        exit();
       }
     }
   }

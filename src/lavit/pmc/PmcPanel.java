@@ -50,6 +50,7 @@ import javax.swing.JSplitPane;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.runner.PrismRunner;
 import lavit.runner.ProbabilisticTranslatorRunner;
 import lavit.util.FileUtils;
 
@@ -82,6 +83,7 @@ public class PmcPanel extends JPanel {
   private PmcButtonPanel pmcButtonPanel;
 
   private ProbabilisticTranslatorRunner translatorRunner;
+  private PrismRunner prismRunner;
 
   public PmcPanel() {
     setLayout(new BorderLayout());
@@ -263,6 +265,45 @@ public class PmcPanel extends JPanel {
     if (translatorRunner != null) {
       translatorRunner.kill();
       translatorRunner = null;
+    }
+  }
+
+  // run PRISM
+  public void runPrism()
+  {
+    FrontEnd.mainFrame.toolTab.setTab("System");
+    FrontEnd.println("Running PRISM...");
+    if (targetTransitionFile == null || !targetTransitionFile.exists()) {
+      FrontEnd.println("Transition file does not exist: " + (targetTransitionFile != null ? targetTransitionFile.getAbsolutePath() : "null"));
+      return;
+    }
+    if (targetPredicatesFile == null || !targetPredicatesFile.exists()) {
+      FrontEnd.println("Predicates file does not exist: " + (targetPredicatesFile != null ? targetPredicatesFile.getAbsolutePath() : "null"));
+      return;
+    }
+
+    prismRunner = new PrismRunner(targetTransitionFile);
+    prismRunner.run();
+
+    new Thread() {
+      public void run() {
+        while (prismRunner.isRunning()) {
+          FrontEnd.sleep(200);
+        }
+        if (prismRunner.isSucceeded()) {
+          FrontEnd.println("PRISM run completed successfully.");
+        } else {
+          FrontEnd.println("PRISM run failed.");
+        }
+        prismRunner = null;
+      }
+    }.start();
+  }
+
+  public void killPrism() {
+    if (prismRunner != null) {
+      prismRunner.kill();
+      prismRunner = null;
     }
   }
 }

@@ -16,6 +16,8 @@ public class PmcButtonPanel extends JPanel implements ActionListener {
   private JButton loadButton;
   private JButton translatorRunButton;
   private JButton translatorKillButton;
+  private JButton prismRunButton;
+  private JButton prismKillButton;
 
   public PmcButtonPanel(PmcPanel pmcPanel) {
     this.pmcPanel = pmcPanel;
@@ -34,7 +36,7 @@ public class PmcButtonPanel extends JPanel implements ActionListener {
     filePanel.add(saveButton);
 
     JPanel translatorPanel = new JPanel();
-    translatorPanel.setBorder(new TitledBorder("Translator(slim dump to dtmc)"));
+    translatorPanel.setBorder(new TitledBorder("Translator"));
 
     translatorRunButton = new JButton("Run Translator");
     translatorRunButton.addActionListener(this);
@@ -44,8 +46,19 @@ public class PmcButtonPanel extends JPanel implements ActionListener {
     translatorKillButton.addActionListener(this);
     translatorPanel.add(translatorKillButton);
 
+    JPanel prismPanel = new JPanel();
+    prismPanel.setBorder(new TitledBorder("PRISM"));
+    prismRunButton = new JButton("Run PRISM");
+    prismRunButton.addActionListener(this);
+    prismPanel.add(prismRunButton);
+
+    prismKillButton = new JButton("Kill");
+    prismKillButton.addActionListener(this);
+    prismPanel.add(prismKillButton);
+
     add(filePanel);
     add(translatorPanel);
+    add(prismPanel);
   }
 
   public void actionPerformed(ActionEvent e) {
@@ -58,6 +71,10 @@ public class PmcButtonPanel extends JPanel implements ActionListener {
       pmcPanel.runTranslator();
     } else if (src == translatorKillButton) {
       pmcPanel.killTranslator();
+    } else if (src == prismRunButton) {
+      pmcPanel.runPrism();
+    } else if (src == prismKillButton) {
+      pmcPanel.killPrism();
     } else {
       System.err.println("Unknown action source: " + src);
     }

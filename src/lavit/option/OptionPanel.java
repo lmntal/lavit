@@ -62,6 +62,7 @@ public class OptionPanel extends JPanel
 			//.addPage("slim-compile", "SLIM Compile Options", new OptionCompilePanel(readOptions("options.lmntal_slim")))
 			.addPage("sv", "StateViewer SLIM Options", new OptionSVPanel(readOptions("options.stateviewer")))
 			.addPage("ltl", "LTL Model Check SLIM Options", new OptionLtlPanel(readOptions("options.ltl")))
+			.addPage("prob", "Probabilistic Model Check Options", new OptionProbPanel())
 		;
 
 		for (String key : readOptions("window.controls.switches.expanded"))

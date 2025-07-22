@@ -1,0 +1,9 @@
+P=? [F "one"]
+P=? [F "two"]
+P=? [F "three"]
+P=? [F "four"]
+P=? [F "five"]
+P=? [F "six"]
+
+// 必要なコイントス回数の期待値
+R=? [F ("one" | "two" | "three" | "four" | "five" | "six")]

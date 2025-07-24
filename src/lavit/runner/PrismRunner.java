@@ -23,6 +23,8 @@ public class PrismRunner implements OuterRunner {
 
   private boolean success;
 
+  public static final String PRISM_OPTIONS = "PRISM_OPTIONS";
+
   public PrismRunner(File targetTransitionFile) {
     this.targetTransitionFile = targetTransitionFile;
     if (targetTransitionFile == null) {
@@ -118,6 +120,9 @@ public class PrismRunner implements OuterRunner {
         }
 
         command.add(prismExePath);
+        if( !Env.get(PRISM_OPTIONS, "").isEmpty()) {
+          command.addAll(Env.getList(PRISM_OPTIONS));
+        }
         command.add("-importmodel");
         command.add(importModelString);
         command.add(targetPredicatesFile.getAbsolutePath());

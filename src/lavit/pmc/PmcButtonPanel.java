@@ -18,6 +18,7 @@ public class PmcButtonPanel extends JPanel implements ActionListener {
   private JButton translatorKillButton;
   private JButton prismRunButton;
   private JButton prismKillButton;
+  private JButton stateViewerButton;
 
   public PmcButtonPanel(PmcPanel pmcPanel) {
     this.pmcPanel = pmcPanel;
@@ -56,9 +57,16 @@ public class PmcButtonPanel extends JPanel implements ActionListener {
     prismKillButton.addActionListener(this);
     prismPanel.add(prismKillButton);
 
+    JPanel stateViewerPanel = new JPanel();
+    stateViewerPanel.setBorder(new TitledBorder("State Viewer"));
+    stateViewerButton = new JButton("Open State Viewer");
+    stateViewerButton.addActionListener(this);
+    stateViewerPanel.add(stateViewerButton);
+
     add(filePanel);
     add(translatorPanel);
     add(prismPanel);
+    add(stateViewerPanel);
   }
 
   public void actionPerformed(ActionEvent e) {
@@ -75,6 +83,8 @@ public class PmcButtonPanel extends JPanel implements ActionListener {
       pmcPanel.runPrism();
     } else if (src == prismKillButton) {
       pmcPanel.killPrism();
+    } else if (src == stateViewerButton) {
+      pmcPanel.openStateViewer();
     } else {
       System.err.println("Unknown action source: " + src);
     }

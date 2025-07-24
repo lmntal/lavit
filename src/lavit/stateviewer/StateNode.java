@@ -317,6 +317,20 @@ public class StateNode implements Shape {
 		return "";
 	}
 
+	public double getToProbability(StateNode toNode) {
+		for (StateTransition t : toes) {
+			System.out.println(t.from.id + " -> " + t.to.id + " : " + t.probability);
+			if (t.to == toNode) {
+				if (t.probability >= 0.0) {
+					return t.probability;
+				} else {
+					return -1.0;
+				}
+			}
+		}
+		return -1.0;
+	}
+
 	/*
 	 * from系メソッド
 	 */

@@ -61,6 +61,7 @@ public class StatePanel extends JPanel {
 
 	private String originalString;
 	private boolean ltlMode;
+	private String dtmcString;
 	private StateNodeSet drawNodes;
 
 	public StatePanel() {
@@ -97,16 +98,17 @@ public class StatePanel extends JPanel {
 		 */
 	}
 
-	public void start(String str, boolean ltlMode) {
+	public void start(String str, boolean ltlMode, String dtmcStr) {
 
 		this.originalString = str;
 		this.ltlMode = ltlMode;
+		this.dtmcString = dtmcStr;
 		this.drawNodes = new StateNodeSet(stateGraphPanel);
 
 		FrontEnd.println("(StateViewer) parsing.");
 		boolean res = false;
 		try {
-			res = drawNodes.setSlimResult(str, ltlMode);
+			res = drawNodes.setSlimResult(str, ltlMode, dtmcStr);
 		} catch (NumberFormatException e) {
 			FrontEnd.printException(e);
 		}
@@ -123,7 +125,7 @@ public class StatePanel extends JPanel {
 	}
 
 	public void reset() {
-		start(originalString, ltlMode);
+		start(originalString, ltlMode, dtmcString);
 	}
 
 	public void savaFile(File file) {
@@ -150,9 +152,9 @@ public class StatePanel extends JPanel {
 
 			String str = buf.toString();
 			if (str.indexOf("no cycles found") >= 0) {
-				start(str, true);
+				start(str, true, "");
 			} else {
-				start(str, false);
+				start(str, false, "");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

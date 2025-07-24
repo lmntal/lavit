@@ -141,11 +141,15 @@ public class StateNodeSet {
 		return r;
 	}
 
-	public boolean setSlimResult(String str, boolean ltlMode) {
+	public boolean setSlimResult(String str, boolean ltlMode, String dtmcStr) {
 
 		int line = 0;
 		Long init = -1L;
 		String[] strs = str.split("\n");
+		String[] dtmcStrs = dtmcStr.split("\n");
+		Map<String, Double> dtmcMap = new HashMap<>();
+
+		boolean isPmcMode = !dtmcStr.isEmpty();
 
 		// cycle parse
 		if (!Env.is("SLIM2")) {
@@ -213,6 +217,26 @@ public class StateNodeSet {
 			return false; // エラー
 		}
 
+		// dtmcStr
+		if (isPmcMode) {
+			for (String dtmcLine : dtmcStrs) {
+				// from, to, probability
+				String[] ss = dtmcLine.split(" ");
+				if (ss.length < 3) {
+					continue;
+				}
+				try {
+					int from = Integer.parseInt(ss[0]);
+					int to = Integer.parseInt(ss[1]);
+					double probability = Double.parseDouble(ss[2]);
+					String key = Integer.toString(from+1) + "," + Integer.toString(to+1);
+					dtmcMap.put(key, probability);
+				} catch (NumberFormatException e) {
+					FrontEnd.printException(e);
+				}
+			}
+		}
+
 		// Transitions解析
 		for (line++; line < strs.length; ++line) {
 			String ss[] = strs[line].split("::", 2);
@@ -247,6 +271,11 @@ public class StateNodeSet {
 					StateTransition t = new StateTransition();
 					t.from = from;
 					t.to = to;
+					if(isPmcMode) {
+						String key = Long.toString(from.id) + "," + Long.toString(to.id);
+						Double probabilityValue = dtmcMap.get(key);
+						t.probability = (probabilityValue != null) ? probabilityValue : -1.0;
+					}
 					for (String rule : rules.split(" ")) {
 						t.addRules(getRule(rule));
 					}

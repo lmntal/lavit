@@ -50,8 +50,10 @@ import javax.swing.JSplitPane;
 
 import lavit.Env;
 import lavit.FrontEnd;
+import lavit.editor.EditorPanel;
 import lavit.runner.PrismRunner;
 import lavit.runner.ProbabilisticTranslatorRunner;
+import lavit.runner.SlimRunner;
 import lavit.util.FileUtils;
 
 // TODO: 6. State Viewer
@@ -103,6 +105,7 @@ public class PmcPanel extends JPanel {
 
   public void setInputFiles() {
     if(targetLMNtalFile != null) {
+      targetSlimDumpFile = new File(targetBasePath + "_slim.txt");
       targetWeightsFile = new File(targetBasePath + "_weights.json");
       targetPredicatesFile = new File(targetBasePath + "_dtmc.pctl");
       targetTransitionFile = new File(targetBasePath + "_dtmc.tra");
@@ -296,5 +299,36 @@ public class PmcPanel extends JPanel {
       prismRunner.kill();
       prismRunner = null;
     }
+  }
+
+  // state viewer
+  public void openStateViewer() {
+    FrontEnd.mainFrame.toolTab.setTab("System");
+    if (targetTransitionFile == null || !targetTransitionFile.exists()) {
+      FrontEnd.println("(StateViewer) Transition file does not exist: " + (targetTransitionFile != null ? targetTransitionFile.getAbsolutePath() : "null"));
+      return;
+    }
+
+    String dtmcString = openFile(targetTransitionFile);
+
+    EditorPanel editorPanel = FrontEnd.mainFrame.editorPanel;
+
+    if (editorPanel.isChanged()) {
+      editorPanel.fileSave();
+    }
+
+    final SlimRunner slimRunner = new SlimRunner("--nd -t --dump-lavit --hide-ruleset --show-transition --hl --use-builtin-rule");
+    slimRunner.setBuffering(true);
+    slimRunner.run();
+    new Thread() {
+				public void run() {
+					while (slimRunner.isRunning()) {
+						FrontEnd.sleep(200);
+					}
+          if (slimRunner.isSucceeded()) {
+            FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), false, dtmcString);
+          }
+				}
+			}.start();
   }
 }

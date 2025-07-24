@@ -240,7 +240,7 @@ class LtlButtonPanel extends JPanel implements ActionListener {
 						FrontEnd.sleep(200);
 					}
 					if (slimRunner.isSucceeded()) {
-						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), true);
+						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), true, "");
 					}
 					slimRunner = null;
 					SwingUtilities.invokeLater(new Runnable() {

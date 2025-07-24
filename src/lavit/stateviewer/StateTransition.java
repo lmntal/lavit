@@ -50,6 +50,7 @@ public class StateTransition {
 	public StateNode to;
 	public boolean cycle;
 	public boolean weak;
+	public double probability = -1.0; // -1.0 means no probability
 
 	private ArrayList<StateRule> rules = new ArrayList<StateRule>();
 
@@ -115,6 +116,9 @@ public class StateTransition {
 				from.state + "\n\n-> (" + getRuleNameString() + ")\n\n" + to.state);
 	}
 
+	public void addProbability(double probability) {
+		this.probability = probability;
+	}
 
 	public String diff_unpack(StateGraphPanel graphPanel) {
 		String diff_from = "";

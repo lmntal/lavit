@@ -331,7 +331,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 					}
 					FrontEnd.println("(SLIM) Done! [" + (slimRunner.getTime() / 1000.0) + "s]");
 					if (slimRunner.isSucceeded()) {
-						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), false);
+						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), false, "");
 					}
 					slimRunner = null;
 					SwingUtilities.invokeLater(new Runnable() {

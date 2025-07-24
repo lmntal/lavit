@@ -117,9 +117,9 @@ public class StateGraphBasicDraw extends StateDraw {
 				if (nocurve) {
 					drawTransition(t, null);
 				} else if (t.from.dummy) {
-					drawDummyCurve(t.from, null);
+					drawDummyCurve(t.from, null, t);
 				} else if (t.to.dummy) {
-					drawDummyCurve(t.to, null);
+					drawDummyCurve(t.to, null, t);
 				} else {
 					drawTransition(t, null);
 				}
@@ -141,9 +141,9 @@ public class StateGraphBasicDraw extends StateDraw {
 				if (simpleMode) {
 					drawTransition(t, null);
 				} else if (t.from.dummy) {
-					drawDummyCurve(t.from, null);
+					drawDummyCurve(t.from, null, t);
 				} else if (t.to.dummy) {
-					drawDummyCurve(t.to, null);
+					drawDummyCurve(t.to, null, t);
 				} else {
 					drawTransition(t, null);
 				}
@@ -270,6 +270,15 @@ public class StateGraphBasicDraw extends StateDraw {
 					}
 				}
 			}
+
+			// 確率の表示
+			if(t.probability >= 0.0) {
+				String str = String.format("%.2f", t.probability);
+				FontMetrics fm = g2.getFontMetrics();
+				int h = 0;
+				g2.drawString(str, (int) ((from.getX() * 3 + to.getX()) / 4) - fm.stringWidth(str) / 2,
+								(int) ((from.getY() * 3 + to.getY()) / 4) + h);
+			}
 		} else {
 			if (to != from) {
 				drawLine(from.getX(), from.getY(), to.getX(), to.getY());
@@ -339,12 +348,12 @@ public class StateGraphBasicDraw extends StateDraw {
 			 * points.get(i).getY(), points.get(i+1).getX(), points.get(i+1).getY()); }
 			 * p.lineTo(nN.getX(), nN.getY()); g2.draw(p);
 			 */
-			drawDummyCurve(dummyGroup.get(0), null);
+			drawDummyCurve(dummyGroup.get(0), null, null);
 		}
 	}
 
 	// ダミーカーブの描画
-	private void drawDummyCurve(StateNode dummy, Color color) {
+	private void drawDummyCurve(StateNode dummy, Color color, StateTransition t) {
 		// markされてる場合は描画しない
 		if (dummy.isMarked()) {
 			return;
@@ -424,6 +433,15 @@ public class StateGraphBasicDraw extends StateDraw {
 				}
 			}
 		}
+
+		// TODO: バックエッジの確率の表示
+		// {
+		// 	String str = String.format("%.2f", probability);
+		// 	FontMetrics fm = g2.getFontMetrics();
+		// 	int h = 0;
+		// 	g2.drawString(str, (int) ((n0.getX() * 3 + dummyGroup.get(0).getX()) / 4) - fm.stringWidth(str) / 2,
+		// 					(int) ((n0.getY() * 3 + dummyGroup.get(0).getY()) / 4) + h);
+		// }
 	}
 
 	private void drawOutTransition() {
@@ -509,7 +527,7 @@ public class StateGraphBasicDraw extends StateDraw {
 				drawTransition(f, Color.BLUE);
 			} else {
 				if (!simpleMode) {
-					drawDummyCurve(f.from, Color.BLUE);
+					drawDummyCurve(f.from, Color.BLUE, null);
 				} else {
 					while (f.from.dummy) {
 						drawTransition(f, Color.BLUE);
@@ -531,7 +549,7 @@ public class StateGraphBasicDraw extends StateDraw {
 				drawTransition(t, Color.RED);
 			} else {
 				if (!simpleMode) {
-					drawDummyCurve(t.to, Color.RED);
+					drawDummyCurve(t.to, Color.RED, t);
 				} else {
 					while (t.to.dummy) {
 						drawTransition(t, Color.RED);
@@ -593,7 +611,7 @@ public class StateGraphBasicDraw extends StateDraw {
 		// transのfrom or toがdummyならば
 		if (trans.from.dummy) {
 			if (!simpleMode) {
-				drawDummyCurve(trans.from, Color.RED);
+				drawDummyCurve(trans.from, Color.RED, trans);
 			} else {
 				while (trans.from.dummy) {
 					drawTransition(trans, Color.RED);
@@ -616,7 +634,7 @@ public class StateGraphBasicDraw extends StateDraw {
 		}
 		if (trans.to.dummy) {
 			if (!simpleMode) {
-				drawDummyCurve(trans.to, Color.RED);
+				drawDummyCurve(trans.to, Color.RED, trans);
 			} else {
 				while (trans.to.dummy) {
 					drawTransition(trans, Color.RED);

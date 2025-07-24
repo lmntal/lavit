@@ -63,7 +63,6 @@ public class ProbabilisticTranslatorRunner implements OuterRunner {
 
     public void run() {
       try {
-        // TODO: PROB_TRANSLATOR_EXE_PATH を GUI から設定できるようにする．
         String translatorPath = Env.get("PROB_TRANSLATOR_EXE_PATH");
 
         if (translatorPath == null || translatorPath.trim().isEmpty()) {

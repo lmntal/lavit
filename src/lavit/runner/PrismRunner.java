@@ -92,7 +92,6 @@ public class PrismRunner implements OuterRunner {
 
     public void run() {
       try {
-        // TODO: PRISM_EXE_PATH を GUI から設定できるようにする．
         String prismExePath = Env.get("PRISM_EXE_PATH");
 
         if (prismExePath == null || prismExePath.trim().isEmpty()) {

@@ -1,0 +1,4 @@
+c(l,r),c(l,r),c(l,r).
+
+hold@@ 
+l(X),r(Y) :- lr(X,Y).

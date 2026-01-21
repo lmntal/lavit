@@ -1,0 +1,3 @@
+p = p{state(cs), $p}, p{state(cs), $q} :- |
+q = p{state(g1), test, $p} :- |
+c = p{state(cs), test, $p} :- |

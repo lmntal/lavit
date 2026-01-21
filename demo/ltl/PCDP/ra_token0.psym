@@ -1,0 +1,4 @@
+p = p{state(cs), $p}, p{state(cs), $q} :- |
+q = p{state(send), id(1), $p}
+r = p{state(cs), id(1), $p}
+s = p{r(A,B), $p} :- int(A),int(B) |

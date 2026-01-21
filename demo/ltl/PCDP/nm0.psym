@@ -1,0 +1,7 @@
+t2 = p{token, $p}, p{token, $q} :- |
+t1 = p{token, $p} :- |
+ts1 = msg(X,token) :- |
+
+p = p{state(wait), id(1), $p} :-  |
+q = p{state(cs), id(1), $p} :- |
+r = msg(X,token) :- |

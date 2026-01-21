@@ -1,0 +1,76 @@
+chan{
+
+gen{
+m(2), token{}, reqs{}.
+dup0 @@ m(P) :- int(P) | pnum(P), genr(P).
+dup1 @@ genr(N), pnum(P) :- N=:=0, int(P) | pnum(P), n(P). 
+gen_reqs @@ genr(N), reqs{$p[]}, token{$q[]} :- 
+		N2=N-1, N>0 | 
+		genr(N2), reqs{r(N2,0), $p[]}, token{t(N2,0), $q[]}.
+gen_proc @@ n(N), pnum(M), reqs{$p[]} :- 
+		N2=N-1, N>0, int(M) |
+		n(N2), pnum(M), reqs{$p[]}, p{state(idle), hold(false), incs(false), id(N2), mynum(0), pn(M), reqs{$p[]}, current(0)}, c{cid(N2),stack(out),buf(1)}.
+set_token @@ token{$q[]}, p{hold(false), id(0), $p} :- p{hold(true),token{$q[]}, id(0), $p}.
+del @@ n(0), reqs{$p[]} :- | n(0).
+}.
+end_gen @@ gen{n(0), $p, @p}/ :- $p.
+
+n(0), m(0).
+con @@ pnum(P), n(N), m(M), p{id(I0), $p}, c{cid(I1), $q} :-
+		M<P, M2=M+1, N=I0, M=I1, int(N) |
+		pnum(P), n(N), m(M2), p{id(N), ch(X), $p}, c{+X, cid(I1), $q}.
+inc @@ n(N), m(M), pnum(P) :- N<P, M=:=P, N2=N+1 | n(N2), m(0), pnum(P).
+end @@ n(N), m(M), pnum(P) :- N=:=P, int(M) | .
+}. 
+end_chan @@ chan{$p, @p}/ :- $p.
+
+%Main
+holding @@ p{state(idle), hold(true), incs(false), $p} :- p{state(cs), hold(true), incs(true), $p}.
+notoken @@ p{state(idle), hold(false), mynum(N), $p} :- 
+		N2= (N+1)  |
+		p{state(send), hold(false), mynum(N2), dst(0), $p}.
+req @@ p{state(send), id(I), dst(D0), mynum(N), pn(M), ch(X), $p}, c{+X,cid(D1),buf(B),stack(Y), $q} :-
+		D0<M, D0=:=D1, D2=D0+1, I=\=D0, B>0, B2=B-1, int(N), ground(Y) |
+		p{state(send), id(I),  dst(D2), mynum(N), pn(M), ch(X), $p}, c{+X, cid(D1), buf(B2), stack(msg(req,D1,I,M,Y)), $q}.
+self @@ p{state(send), id(I), dst(D0), pn(M), $p} :-
+		D0<M, D2=D0+1, I=:=D0 |
+		p{state(send), id(I), dst(D2), pn(M), $p}.
+end_req @@ p{state(send), dst(D), pn(M), $p} :- D=:=M |
+		p{state(wait), pn(M), $p}.
+rec_token @@ p{state(wait), hold(false), incs(false), ch(X), $p}, c{+X, msg(token{$q},out,Y), buf(B), $r} :- B1=B+1,ground(Y) | 
+		p{state(cs), hold(true), incs(true), token{$q}, ch(X), $p}, c{+X, out(Y), buf(B1), $r}.
+cs @@ p{state(cs), incs(true), id(I0), token{t(I1,G), $q}, mynum(M), $p} :-
+		I0=:=I1, int(G), int(M) |
+		p_sendtoken{state(idle), incs(false), id(I0), token{t(I1,M), $q}, mynum(M), cnt(0), $p}.
+		
+%Receiver
+
+rec @@ p{id(I), ch(X), $p}, c{+X, msg(req,D,Src,R,out,Y),buf(B), $q} :-
+		I=:=D, B1=B+1, int(Src), int(R), ground(Y) |
+		p_rec{id(I), r(Src,R), ch(X), $p}, c{+X,out(Y),buf(B1), $q}.
+%if M > Rnum
+rec0 @@ p_rec{reqs{r(N,M),$q}, r(Src,R), $p}:- 
+		N=:=Src, M>R |
+		p_check{reqs{r(N,M), $q},$p}.
+rec1 @@ p_rec{reqs{r(N,M),$q}, r(Src,R), $p}:- 
+		N=:=Src, M=<R |
+		p_check{reqs{r(N,R), $q},$p}.
+
+%if hold and not cs
+go_st @@ p_check{hold(true), incs(false), $p} :-  | p_sendtoken{hold(true), cnt(0), incs(false), $p}.
+not_st0 @@ p_check{hold(true), incs(true), $p} :-  |  p{ hold(true), incs(true), $p}.
+not_st1 @@ p_check{hold(false), $p} :-  p{hold(false), $p}.
+
+%Send_token
+
+Search @@ p_sendtoken{cnt(C), current(N), pn(M), reqs{r(D0,R),$q}, token{t(D1,G),$r}, $p} :-
+		Idx=(N+C) mod M, C<M, Idx=:=D0, D0=:=D1, R=<G, C2=C+1 |
+		p_sendtoken{cnt(C2), current(N), pn(M), reqs{r(D0,R),$q}, token{t(D1,G),$r}, $p}.
+find @@ p_sendtoken{hold(true), cnt(C), current(N), pn(M), reqs{r(D0,R),$q}, token{t(D1,G),$r}, ch(X), $p}, c{+X, cid(D2),stack(Y), buf(B), $s} :-
+		Idx=(N+C) mod M, Idx=:=D0, D0=:=D1, D0=:=D2, R>G, B>0, B1=B-1, ground(Y) |
+		p{hold(false), current(Idx), pn(M), reqs{r(D0,R),$q}, ch(X), $p}, c{+X, cid(D2),stack(msg(token{t(D2,G),$r}, Y)),buf(B1), $s}.
+nfind @@ p_sendtoken{cnt(C), current(N), pn(M), $p} :-
+		Idx=(N+C) mod M, C=:=M |
+		p{current(Idx), pn(M), $p}.
+	
+

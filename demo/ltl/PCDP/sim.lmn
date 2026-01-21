@@ -1,0 +1,34 @@
+
+
+
+{
+init{
+turn(0).
+
+/*
+e(1,2), e(1,3), e(1,4), e(1,5), e(1,6),
+        e(2,3), e(2,4), e(2,5), e(2,6),
+                e(3,4), e(3,5), e(3,6),
+                        e(4,5), e(4,6),
+                                e(5,6).
+*/
+
+n{+X0,+X1,+X2,+X3,+X4}, n{+X0,+X5,+X6,+X7,+X8}, n{+X1,+X5,+X9,+X10,+X11},n{+X2,+X6,+X9,+X12,+X13},
+n{+X3,+X7,+X10,+X12,+X14}, n{+X4,+X8,+X11,+X13,+X14}.
+
+e(f,X0,Y0),e(f,X1,Y1),e(f,X2,Y2),e(f,X3,Y3),e(f,X4,Y4),e(f,X5,Y5),
+e(f,X6,Y6),e(f,X7,Y7),e(f,X8,Y8),e(f,X9,Y9),e(f,X10,Y10),e(f,X11,Y11),
+e(f,X12,Y12),e(f,X13,Y13),e(f,X14,Y14).
+
+}.
+start @@ init{$p,@p}/ :- $p.
+
+//lose @@ line(A0,B0,P0), line(B1,C0,P1), line(A1,C1,P2), turn(P) :- 
+	//A0=:=A1,B0=:=B1,C0=:=C1,P0=:=P1,P1=:=P2,int(P) |
+	//loser(P0), line(A0,B0,P0), line(B1,C0,P1), line(A1,C1,P2).
+	
+//lose @@ 
+
+}.
+ 
+ln @@ {turn(P), n{+X,$p}, n{+x,$p}, $p, @p}/ :- NP=1-P | {n{-X,$p}, e(P,X,Y), n{-Y,$p}, turn(NP), $p, @p}. 

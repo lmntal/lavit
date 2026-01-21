@@ -1,0 +1,38 @@
+
+
+gen{
+wants(0).
+p{s, gate1, gate2}.
+n(5). /*n(2)*/  //proc num
+gen_proc @@ n(N) :- N>0, N2=N-1 |
+		n(N2), p{state(wait),want(false)}.
+/*
+t.
+p{$p}, t :- p{test, $p}.
+*/
+}.
+end_gen @@ gen{n(0), $p, @p}/ :- $p.
+
+enter_g1 @@ p{state(wait), want(false), $p}, p{gate1, $q}, wants(W) :- W2=W+1 |
+		 p{state(g1), want(true), gate1, $p}, p{$q}, wants(W2).//
+wait_g2 @@  p{state(g1), want(true), $p}, p{state(S), gate2, $q}, wants(W) :- unary(S), W2=W-1 |
+		 p{state(wg2), want(false), $p}, p{state(S), gate2, $q}, wants(W2).//
+go_start @@ p{state(wg2), $p}, p{s, gate2, $q} :- |
+		p{state(wait), $p}, p{s, gate2, $q}.//
+enter_g2 @@ p{state(g1), $p}, p{s, gate2, $q} :- |
+		p{state(g2), gate2, $p}, p{s, $q}.//
+fp_cs @@ p{state(g2), gate1, $p} :- |
+		p{state(cs), gate1, $p}. //
+go_sp @@ p{state(g2), want(true), $p}, p{state(S), gate1, $q}, wants(W) :- unary(S),W2=W-1 |
+		p{state(sp), want(false), $p}, p{state(S), gate1, $q}, wants(W2).//
+wait_false @@ p{state(sp), $p}, wants(W) :- W=:=0 |
+              p{state(g2_sp), $p}, wants(W).
+sp_cs @@ p{state(g2_sp), gate2, $p} :- |
+		p{state(cs), gate2, $p}.//
+sp_start @@ p{state(g2_sp), $p}, p{state(S), gate2, $q} :- |
+		p{state(wg2), $p}, p{state(S), gate2, $q}.//
+critical @@ p{state(cs), $p} :- p{state(ex), $p}.
+exit1 @@ p{state(ex), want(true), gate2, $p}, p{s, $q}, wants(W) :- W2=W-1 |
+		 p{state(wait), want(false), $p}, p{s, gate2, $q}, wants(W2).//
+exit2 @@ p{state(ex), want(false), gate2, $p}, p{s, $q} :- |
+		 p{state(wait), want(false), $p}, p{s, gate2, $q}.//

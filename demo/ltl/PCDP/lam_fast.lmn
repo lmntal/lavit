@@ -1,0 +1,49 @@
+/*
+ *  lam_fast.lmn -- Lamport's fast mutual exclusion algorithm
+ * 
+ *  @author  Mahiro Ueda
+ *  @date    2025.11.27
+ * 
+ *  from Principle of Concurrent and Distributed Programming (Second Edition)
+ */
+ 
+% property0: critical section <= 1
+% property1: Liveness 
+
+
+gen{
+gate1(0), gate2(0), wants(0).
+n(5). /*n(2)*/  //proc num
+gen_proc @@ n(N) :- N>0, N2=N-1 |
+		n(N2), p{state(wait), pid(N2), want(false)}
+}.
+end_gen @@ gen{n(0), $p, @p}/ :- $p.
+
+enter_g1 @@ p{state(wait), pid(P), want(false)}, gate1(G), wants(W) :- int(G), G2=P+1, W2=W+1 |
+		 p{state(g1), pid(P), want(true)}, gate1(G2), wants(W2).
+wait_g2 @@  p{state(g1), want(true), $p}, gate2(G), wants(W) :- G=\=0, W2=W-1 |
+		 p{state(wg2), want(false), $p}, gate2(G), wants(W2).
+go_start @@ p{state(wg2), $p}, gate2(G) :- G=:=0 |
+		p{state(wait), $p}, gate2(G).
+enter_g2 @@ p{state(g1), pid(P), $p}, gate2(G) :- G=:=0, G2=P+1 |
+		p{state(g2), pid(P), $p}, gate2(G2).
+fp_cs @@ p{state(g2), pid(P), $p}, gate1(G) :- G=:=P+1 |
+		p{state(cs), pid(P), $p}, gate1(G).
+go_sp @@ p{state(g2), pid(P), want(true)}, gate1(G), wants(W) :- G=\=P+1, W2=W-1 |
+		p{state(sp), pid(P), want(false)}, gate1(G), wants(W2).
+wait_false @@ p{state(sp), $p}, wants(W) :- W=:=0 |
+              p{state(g2_sp), $p}, wants(W).
+sp_cs @@ p{state(g2_sp), pid(P), $p}, gate2(G) :- G=:=P+1 |
+		p{state(cs), pid(P), $p}, gate2(G).
+sp_start @@ p{state(g2_sp), pid(P), $p}, gate2(G) :- G=\=P+1 |
+		p{state(wg2), pid(P), $p}, gate2(G).
+critical @@ p{state(cs), $p} :- p{state(ex), $p}.
+exit1 @@ p{state(ex), want(true), $p}, gate2(G), wants(W) :- int(G), W2=W-1 |
+		 p{state(wait), want(false), $p}, gate2(0), wants(W2).
+exit2 @@ p{state(ex), want(false), $p}, gate2(G) :- int(G) |
+		 p{state(wait), want(false), $p}, gate2(0).
+
+/*
+crush.
+crush, p{state(ex), pid(N), $p[]} :- int(N) | p{state(wait), pid(N), want(false)}.
+*/

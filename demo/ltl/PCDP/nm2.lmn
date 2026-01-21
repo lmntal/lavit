@@ -1,0 +1,38 @@
+
+s.
+p{state(idle), hold(false), parent(X0),s(X2), s(X3), incs(false), def(false) },
+p{state(idle), hold(false), parent(X1), incs(false), def(false) },
+p{state(idle), hold(true), token, parent(),s(X1),s(X0), incs(false), def(false)}.
+p{state(idle), hold(false), parent(X2), incs(false), def(false) }.
+p{state(idle), hold(false), parent(X3), incs(false), def(false) }.
+
+/*
+p{state(idle), hold(false), id(0), parent(X0),s(X2), s(X3), incs(false), def(false) },
+p{state(idle), hold(false), id(1), parent(X1), incs(false), def(false) },
+p{state(idle), hold(true), id(2), token, parent(),s(X1),s(X0), incs(false), def(false)}.
+p{state(idle), hold(false), id(3), parent(X2), incs(false), def(false) }.
+p{state(idle), hold(false), id(4), parent(X3), incs(false), def(false) }.
+*/
+
+%Main
+send_req @@ p{state(idle), hold(false),parent(X),$p}, s :-  |
+		p{state(wait), hold(false), parent(), s(Y),tokenr(Z), $p}, req(X), t(Y), tr(Z).
+rec_token @@ p{state(wait), tokenr(X), $p}, token(X):- 
+		p{state(cs), token, $p}, s.
+holding @@ p{state(idle), hold(true), $p} :- |
+		p{state(cs), hold(false), $p}.
+crit @@ p{state(cs), $p} :- p{state(exit), $p}.
+exit0 @@ p{state(exit), def(false), hold(false), $p} :- 
+		p{state(idle), def(false), hold(true), $p}.
+exit1 @@ p{state(exit), def(true), token, $p},tr(X) :- |
+		p{state(idle), def(false), $p}, token(X).
+
+%Receiver
+%if parent == 0; if hold == true; 
+rec0 @@ p{parent(), hold(true), incs(false), token, s(X), $p}, req(X), t(Y), tr(Z) :- |
+		p{parent(Y), hold(false), $p}, token(Z).
+rec1 @@ p{parent(), hold(true), s(X), incs(true), def(false), $p}, req(X), t(Y) :-  |
+		p{parent(Y), hold(true), def(true), $p}.
+rec2 @@ p{parent(X), s(Y), $p}, req(Y), t(Z) :- |
+		p{parent(Z), s(Y), $p}, req(X), t(Y).
+

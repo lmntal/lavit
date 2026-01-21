@@ -1,0 +1,43 @@
+/*
+ *  nm.lmn -- Neilsen-Mizuno token algorithm for distributed mutual exclusion
+ * 
+ *  @author  Mahiro Ueda
+ *  @date    2025.12.1
+ * 
+ *  from Principle of Concurrent and Distributed Programming (Second Edition)
+ */
+ 
+% property0: count_token == 1
+% property1: Liveness (send request -> cs)
+
+
+p{state(idle), hold(false), id(1),parent(X0),s(X2), def(0), incs(false) },
+p{state(idle), hold(false), id(2),parent(X1), def(0), incs(false) },
+p{state(idle), hold(true), token, id(3), parent(),s(X1),s(X0), def(0), incs(false)}.
+p{state(idle), hold(false), id(4),parent(X2), def(0), incs(false) }.
+
+%Main
+send_req @@ p{state(idle), hold(false),id(ID),parent(X),$p} :- int(ID) |
+		p{state(wait), hold(false), id(ID), parent(), s(Y),tokenr(Z), $p}, msg(X,req,ID,ID),t(Y,ID), tr(Z,ID).
+rec_token @@ p{state(wait), tokenr(X),incs(false), $p}, msg(X,token):- 
+		p{state(cs), token,incs(true), $p}.
+holding @@ p{state(idle), hold(true), incs(false), $p} :- |
+		p{state(cs), hold(false),incs(true), $p}.
+crit @@ p{state(cs),incs(true), $p} :- p{state(exit),incs(false), $p}.
+exit0 @@ p{state(exit), def(0), hold(false), $p} :- 
+		p{state(idle), def(0), hold(true), $p}.
+exit1 @@ p{state(exit), def(D0), token, $p},tr(X,D1) :- D0=\=0,D0=:=D1 |
+		p{state(idle), def(0), $p}, msg(X,token).
+
+%Receiver
+%if parent == 0; if hold == true; 
+rec0 @@ p{parent(), hold(true), incs(false), token, s(X), $p}, msg(X,req,Src0,Orig0), t(Y,Src1), tr(Z,Orig1) :- 
+		Src0=:=Src1, Orig0=:=Orig1 |
+		p{parent(Y), hold(true), incs(false),$p}, msg(Z,token).
+rec1 @@ p{parent(), hold(true), incs(true), s(X), def(D), $p}, msg(X,req,Src0,Orig), t(Y,Src1) :- 
+		Src0=:=Src1, int(Orig),int(D) |
+		p{parent(Y), hold(true), def(Orig), incs(true),$p}.
+rec2 @@ p{parent(X), s(Y),id(ID), $p}, msg(Y,req,Src0,Orig), t(Z,Src1) :- 
+		Src0=:=Src1,int(Orig),int(ID) |
+		p{parent(Z), s(Y), id(ID), $p}, msg(X,req,ID,Orig),t(Y,ID).
+

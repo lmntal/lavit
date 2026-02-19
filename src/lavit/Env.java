@@ -74,8 +74,8 @@ import lavit.util.StringUtils;
 
 public final class Env {
 	public static final String APP_NAME = "LaViT";
-	public static final String APP_VERSION = "2.10.0";
-	public static final String APP_DATE = "2023/04/03";
+	public static final String APP_VERSION = "2.10.1";
+	public static final String APP_DATE = "2023/10/23";
 	public static final String APP_HREF = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
 
 	public static final String LMNTAL_VERSION = "LMNtal : 1.60 (2023/04/03)";

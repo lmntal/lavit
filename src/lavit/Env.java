@@ -78,11 +78,11 @@ public final class Env {
 	public static final String APP_DATE = "2023/10/23";
 	public static final String APP_HREF = "http://www.ueda.info.waseda.ac.jp/lmntal/lavit/";
 
-	public static final String LMNTAL_VERSION = "LMNtal : 1.60 (2023/04/03)";
-	public static final String SLIM_VERSION = "SLIM : 2.6.0 (2023/04/03)";
+	public static final String LMNTAL_VERSION = "LMNtal : 1.80 (2025/05/08)";
+	public static final String SLIM_VERSION = "SLIM : 2.8.0 (2025/05/08)";
 	public static final String UNYO_VERSION = "UNYO UNYO : 1.1.1 (2010/03/07)";
 
-	public static final String DIR_NAME_SLIM = "slim-2.6.0";
+	public static final String DIR_NAME_SLIM = "slim-2.8.0";
 	public static final String DIR_NAME_UNYO = "unyo1_1_1";
 	public static final String DIR_NAME_GRAPHENE = "graphene";
 	public static final String DIR_NAME_LTL2BA = "ltl2ba";

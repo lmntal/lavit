@@ -1,0 +1,281 @@
+/*
+A proposed method for English syntactic parsing using LMNtal
+*/
+
+input = [{"we"}, {"are"}, {"trying"}, {"to"}, {"find"}, {"you"}, {"."}].    //basic sentence
+/*
+input = [{"I"}, {"saw"}, {"the"}, {"man"}, {"with"}, {"the"}, {"telescope"}, {"."}].    //ambiguous sentence
+input = [{"they"}, {"have"}, {"arrested"}, {"him"}, {"."}].     //tense 
+input = [{"have"}, {"they"}, {"arrested"}, {"him"}, {"?"}].     //yes-no question
+input = [{"who"},{"have"}, {"they"}, {"arrested"}, {"?"}].      //long distance dependency
+*/
+count(-1).
+
+{'$callback'(zerostep).
+input(Y), '.'({$p}, X, Y), count(-1) :-
+input(Y), '.'({$p, x}, X, Y), count(0).
+
+'.'({$p, x}, X, Y), '.'({$q}, Z, X), count(A) :-
+int(A), B = A + 1|
+'.'({$p, index(A, B)}, X, Y),
+'.'({$q, x}, Z, X), count(B).
+
+'.'({$p, x}, X, Y), '[]'(X), count(C) :-
+int(C)|
+'.'({$p}, X, Y), '[]'(X).
+}.
+
+//{'$callback'(zerostep).
+{"who",$p}:-{"who"(wh),prn,$p}.
+{"they",$p}:- {"they"(prn),$p}.
+{"have",$p}:- {"have"(t),$p}.
+{"arrested",$p}:- {"arrested"(v),past,$p}.
+{"him",$p}:- {"him"(prn),$p}.
+{"?",$p}:-{"?"(q),question,$p}.
+
+{"we",$p}:- {"we"(prn),$p}.
+{"are",$p}:- {"are"(t), present, $p}.
+{"trying",$p}:- {"trying"(v),$p}.
+{"to",$p}:- {"to"(to),$p}.
+{"find",$p}:- {"find"(v),$p}.
+{"you",$p}:- {"you"(prn),$p}.
+{"that",$p}:-{"that"(that), $p}.
+{"I", $p} :- {"I"(prn), $p}.
+{"said", $p} :- {"said"(v), $p}.
+{"the", $p} :- {"the"(det), $p}.
+{"man", $p} :- {"man"(n), $p}.
+{"telescope", $p} :- {"telescope"(n), $p}.
+{"scientist", $p} :- {"scientist"(n), $p}.
+{"university", $p} :- {"university"(n), $p}.
+{"saw", $p} :- {"saw"(v), past, $p}.
+{"hired", $p} :- {"hired"(v), $p}.
+{"developed", $p} :- {"developed"(v), $p}.
+{"with", $p} :- {"with"(p), $p}.
+
+'.'(X2,X3,X1),'.'(L2,X4,X3),'.'(X5,X6,X4),
+{v(L1), past, $p[L1], index(I1,I2), +L2} :-
+	int(I1),int(I2)|
+	'.'(X2,X3,X1),'.'(NL1,NL2,X3),
+	'.'(L2,X4,NL2),'.'(X5,X6,X4),
+	{t, past, index(I1,I1),+NL1},
+	{v(L1), $p[L1], index(I1,I2), +L2}.
+	
+'.'(X2,X3,X1),'.'(L2,X4,X3),'.'(X5,X6,X4),
+{v(L1), present, $p[L1], index(I1,I2), +L2} :-
+	int(I1),int(I2)|
+	'.'(X2,X3,X1),'.'(NL1,NL2,X3),
+	'.'(L2,X4,NL2),'.'(X5,X6,X4),
+	{t, present, index(I1,I1), +NL1},
+	{v(L1), $p[L1], index(I1,I2), +L2}.
+	
+'.'(L2,L3,L1),'.'(L4,L5,L3),
+{t, $p, index(X1,X2), +L2},{t, $q, index(X3,X4), +L4} :-
+	int(X1), int(X2), int(X3), int(X4), 
+	X2 = X3 ,X3 = X4|
+	'.'(L2,L5,L1),
+	{t, $p, $q, index(X1,X2), +L2}.
+	
+input(L1),'.'(L2,L3,L1),
+'.'(L5,L6,L4),{"?"(q),question,+L5} :-                                               
+	input(L1),'.'(NL1,NL2,L1),{op_ynq,index(0,0),+NL1},
+	'.'(L2,L3,NL2),
+	'.'(L5,L6,L4),{"?"(q),+L5}.
+
+'.'(L2,L3,L1),{+L2,op_ynq,index(0,0),$p},
+'.'(L4,L5,L3),{+L4,wh(L6),$q[L6]} :-
+	'.'(L4,L5,L1),{+L4,wh(L6),$p,$q[L6]}.
+
+//}.
+/*
+Af@@
+{af,$p,index(X1,X2),+L1} :-
+    int(X1),int(X2)|
+    {t(NL1),index(X1,X2)},
+    {af(NL1),$p,index(X1,X2),+L1}.
+*/
+
+/*tmp
+PRN_VP@@
+{prn(L1), $p[L1], index(X1, X2), +L2},
+{vp(L3,L4), $q, index(X3, X4)} :-
+    int(X1),int(X4), X3 = X2|
+    {tp(NL1, NL2),index(X1,X4)},
+    {prn(NL1, L1), $p[L1], index(X1,X2), +L2},
+    {vp(NL2,L3,L4),$q,index(X3,X4)}.
+*/
+{wh(IL1),$p[IL1],prn,+L0},'.'(L2,L3,L1),
+{+L2,v(IL2),index(X1,X2),$q[IL2]},'.'(L4,L5,L3) :-
+	int(X1),int(X2)|
+	{wh(IL1),$p[IL1],prn(EL1),+L0},
+	'.'(L2,NL1,L1),{+L2,v(IL2),index(X1,X2),$q[IL2]},
+	'.'(NL2,L3,NL1),{+NL2,prn(EL1),index(X2,X2)},
+	'.'(L4,L5,L3).
+
+whprn_Cver@@
+{wh(IL1),$p[IL1],index(X1,X2),prn(EL1),+L1},
+{c_ver(L2,L3),index(X3,X4)} :- 
+	int(X1),int(X4),X2=X3|
+	{cp(NL1,NL2),index(X1,X4)},
+	{wh(NL1,IL1),$p[IL1],index(X1,X2),prn(EL1),+L1},
+	{c_ver(NL2,L2,L3),index(X3,X4)}.
+
+Opynq_Cver@@
+{op_ynq,$p,+L1},{c_ver(L2,L3),index(X1,X2)} :-
+	int(X1),int(X2)|
+	{cp(NL1,NL2),index(0,X2)},
+	{op_ynq(NL1),$p,+L1},
+	{c_ver(NL2,L2,L3),index(X1,X2)}.
+	
+T_fai_TP@@
+{t(L1), $p[L1], index(X1, X2), +L2},
+{tp(L3,L4), $q, index(X3, X4)}, 
+{t(L5), $r, +L6} :-
+	int(X1),int(X4), X2 = X3|
+	{c_ver(NL1, NL2),index(X1,X4)},
+	{c(NL1,NL3,NL4),index(X1,X2)},
+	{c(NL4,phi),index(X1,X1)},
+	{t(NL3,NL5,L1), $p[L1], index(X1,X2), +L2},
+	{tp(NL2,L3,L4), $q, index(X3,X4)},
+	{t(NL5,L5), $r, +L6}.
+
+T_VP0@@
+{t, $p, index(X1, X2), +L2},
+{vp(L3,L4), $q, index(X3, X4)} :-
+int(X1),int(X4), X2 = X3|
+    {t_ver(NL1, NL2),index(X1,X4)},
+    {t(NL1), $p, index(X1,X2), +L2},
+    {vp(NL2,L3,L4), $q, index(X3,X4)}.
+
+PRN_Tver@@
+{prn(L1), $p[L1], index(X1, X2), +L2},
+{t_ver(L3,L4), $q, index(X3, X4)} :-
+    int(X1),int(X4), X2 = X3|
+    {tp(NL1, NL2),index(X1,X4)},
+    {prn(NL1, L1), $p[L1], index(X1,X2), +L2},
+    {t_ver(NL2,L3,L4), $q, index(X3,X4)}.
+
+VP_PP@@
+{vp(L1,L2), $p, index(X1, X2)},
+{pp(L3,L4), $q, index(X3, X4)} :-
+    int(X1),int(X4), X2 = X3|
+    {vp(NL1, NL2),index(X1,X4)},
+    {vp(NL1,L1,L2), $p, index(X1,X2)},
+    {pp(NL2,L3,L4),$q,index(X3,X4)}.
+
+
+V_DP@@
+{v(L1), $p[L1], index(X1, X2), +L2},
+{dp(L3,L4), $q, index(X3, X4)} :-
+    int(X1),int(X4), X2 = X3|
+    {vp(NL1, NL2),index(X1,X4)},
+    {v(NL1, L1), $p[L1], index(X1,X2), +L2},
+    {dp(NL2,L3,L4),$q,index(X3,X4)}.
+
+/*VP_PP@@
+{vp(L1), $p[L1], index(X1, X2), +L2},
+{dp(L3,L4), $q, index(X3, X4)} :-
+int(X1),int(X4), X2 =< X3|
+    {vp(NL1, NL2),index(X1,X4)},
+    {vp(NL1, L1), $p[L1], index(X1,X2), +L2},
+    {dp(NL2,L3,L4),$q,index(X3,X4)}.
+*/
+
+DET_N_PP@@
+{det(L1), $p[L1], index(X1, X2), +L2},
+{n(L3), $q[L3], index(X3, X4), +L4},
+{pp(L5,L6), $r, index(X5, X6)} :-
+    int(X1),int(X6), X2 = X3, X4 = X5|
+    {dp(NL1,NL2), index(X1,X6)},
+    {det(NL1,L1), $p[L1], index(X1,X2), +L2},
+    {np(NL2,NL3,NL4), index(X3,X6)},
+    {n(NL3,L3), $q[L3], index(X3,X4), +L4},
+    {pp(NL4,L5,L6),$r,index(X5,X6)}.
+
+V_PRN1@@
+{v(L1), $p[L1], index(X1, X2), +L2},
+{prn(L3), $q[L3], index(X3, X4), +L4} :-
+    int(X1),int(X4), X2 = X3|
+    {vp(NL1, NL2),index(X1,X4)},
+    {v(NL1, L1), $p[L1], index(X1,X2), +L2},
+    {prn(NL2,L3),$q[L3],index(X3,X4),+L4}.
+
+V_PRN2@@
+{v(L1), $p[L1], index(X1, X2), +L2},
+{prn(L3), $q, index(X3, X4), +L4} :-
+    int(X1),int(X4), X2 = X3|
+    {vp(NL1, NL2),index(X1,X4)},
+    {v(NL1, L1), $p[L1], index(X1,X2), +L2},
+    {prn(NL2,L3), $q, index(X3,X4),+L4}.
+
+to_VP@@
+{to(L1), $p[L1], index(X1, X2), +L2},
+{vp(L3,L4), $q, index(X3, X4)} :-
+    int(X1),int(X4), X3 = X2|
+    {tp(NL1, NL2),index(X1,X4)},
+    {to(NL1, L1), $p[L1], index(X1,X2), +L2},
+    {vp(NL2,L3,L4),$q,index(X3,X4)}.
+
+V_TP@@
+{v(L1), $p[L1], index(X1, X2), +L2},
+{tp(L3,L4), $q, index(X3, X4)} :-
+    int(X1),int(X4), X2 =< X3|
+    {vp(NL1, NL2),index(X1,X4)},
+    {v(NL1, L1), $p[L1], index(X1,X2), +L2},
+    {tp(NL2,L3,L4),$q,index(X3,X4)}.
+
+PRN_T_VP1@@
+{prn(L1), $p[L1], index(X1, X2), +L2},
+{t(L3), $q[L3], index(X3, X4), +L4},
+{vp(L5,L6), $r, index(X5, X6)} :-
+    int(X1),int(X6), X2 = X3, X4 = X5|
+    {tp(NL1,NL2), index(X1,X6)},
+    {prn(NL1,L1), $p[L1], index(X1,X2), +L2},
+    {t_ver(NL2,NL3,NL4), index(X3,X6)},
+    {t(NL3,L3), $q[L3], index(X3,X4), +L4},
+    {vp(NL4,L5,L6),$r,index(X5,X6)}.
+
+PRN_T_VP2@@
+{prn(L1), $p[L1], index(X1, X2), +L2},
+{t(L3), $q, index(X3, X4)},
+{vp(L5,L6), $r, index(X5, X6)} :-
+    int(X1),int(X6), X2 = X3, X4 = X5|
+    {tp(NL1,NL2), index(X1,X6)},
+    {prn(NL1,L1), $p[L1], index(X1,X2), +L2},
+    {t_ver(NL2,NL3,NL4), index(X3,X6)},
+    {t(NL3,L3), $q, index(X3,X4)},
+    {vp(NL4,L5,L6),$r,index(X5,X6)}.
+
+that_TP@@
+{that(L1), $p[L1], index(X1, X2), +L2},
+{tp(L3,L4), $q, index(X3, X4)} :-
+    int(X1),int(X4), X2 = X3|
+    {cp(NL1, NL2),index(X1,X4)},
+    {that(NL1, L1), $p[L1], index(X1,X2), +L2},
+    {tp(NL2,L3,L4),$q,index(X3,X4)}.
+
+PRN_V_CP@@
+{prn(L1), $p[L1], index(X1, X2), +L2},
+{v(L3), $q[L3], index(X3, X4), +L4},
+{cp(L5,L6), $r, index(X5, X6)} :-
+    int(X1),int(X6), X2 = X3, X4 = X5|
+    {tp(NL1,NL2), index(X1,X6)},
+    {prn(NL1,L1), $p[L1], index(X1,X2), +L2},
+    {t_ver(NL2,NL3,NL4), index(X3,X6)},
+    {v(NL3,L3), $q[L3], index(X3,X4), +L4},
+    {cp(NL4,L5,L6),$r,index(X5,X6)}.
+
+DET_N@@
+{det(L1), $p[L1], index(X1, X2), +L2},
+{n(L3), $q[L3], index(X3, X4), +L4} :-
+    int(X1),int(X4), X2 = X3|
+    {dp(NL1, NL2),index(X1,X4)},
+    {det(NL1, L1), $p[L1], index(X1,X2), +L2},
+    {n(NL2,L3),$q[L3],index(X3,X4),+L4}.
+
+P_DP@@
+{p(L1), $p[L1], index(X1, X2), +L2},
+{dp(L3, L4), $q, index(X3, X4)} :-
+    int(X1),int(X4), X2 = X3|
+    {pp(NL1, NL2),index(X1,X4)},
+    {p(NL1, L1), $p[L1], index(X1,X2), +L2},
+    {dp(NL2, L3, L4), $q, index(X3,X4)}.

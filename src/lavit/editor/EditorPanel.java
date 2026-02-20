@@ -403,7 +403,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			EditorPage previousSelectedPage = tabView.getSelectedPage();
 			tabView.setSelectedPage(page);
 
-			if(file.exists() && page == previousSelectedPage)
+			if (file.exists() && page == previousSelectedPage)
 			{
 				MainFrame mainFrame = FrontEnd.mainFrame;
 				if (mainFrame != null) {

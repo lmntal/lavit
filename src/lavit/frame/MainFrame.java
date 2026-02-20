@@ -292,7 +292,7 @@ public class MainFrame extends JFrame
 		Env.set("window.fileview.filter", editorPanel.getFileViewExtensionFilterText());
 	}
 
-	private void loadLTLFile(File lmntalFile)
+	public void loadLTLFile(File lmntalFile)
 	{
 		toolTab.ltlPanel.setTargetLMNtalFile(lmntalFile);
 		toolTab.ltlPanel.setSelectedSuffix("0");

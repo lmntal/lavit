@@ -75,6 +75,7 @@ import lavit.Env;
 import lavit.FrontEnd;
 import lavit.event.TabChangeListener;
 import lavit.frame.FindReplaceDialog;
+import lavit.frame.MainFrame;
 import lavit.localizedtext.MsgID;
 import lavit.multiedit.EditorPage;
 import lavit.multiedit.LineColumn;
@@ -399,6 +400,14 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			EditorPage page = createPage(file, buf.toString());
 			page.setFile(file);
 			tabView.setSelectedPage(page);
+
+			if(file.exists())
+			{
+				MainFrame mainFrame = FrontEnd.getMainFrame();
+				if (mainFrame != null) {
+					mainFrame.loadLTLFile(file);
+        }
+			}
 
 			FrontEnd.println("(EDITOR) file open. [ " + file.getName() + " ]");
 		}

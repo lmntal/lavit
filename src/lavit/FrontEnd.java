@@ -71,6 +71,16 @@ public class FrontEnd
 	private static Set<CommonFontUser> fontUsers = new HashSet<CommonFontUser>();
 	private static List<ProcessTask> processTasks = new ArrayList<ProcessTask>();
 
+	public static void setMainFrame(MainFrame frame)
+	{
+		mainFrame = frame;
+	}
+
+	public static MainFrame getMainFrame()
+	{
+		return mainFrame;
+	}
+
 	private static void loadArgs(String[] args)
 	{
 		for (int i = 0; i < args.length; i++)

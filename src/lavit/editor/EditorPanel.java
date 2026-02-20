@@ -399,12 +399,14 @@ public class EditorPanel extends JPanel implements CommonFontUser
 
 			EditorPage page = createPage(file, buf.toString());
 			page.setFile(file);
+
+			EditorPage previousSelectedPage = tabView.getSelectedPage();
 			tabView.setSelectedPage(page);
 
 			if(file.exists())
 			{
-				MainFrame mainFrame = FrontEnd.getMainFrame();
-				if (mainFrame != null) {
+				MainFrame mainFrame = FrontEnd.mainFrame;
+				if (mainFrame != null && previousSelectedPage == tabView.getSelectedPage()) {
 					mainFrame.loadLTLFile(file);
 				}
 			}

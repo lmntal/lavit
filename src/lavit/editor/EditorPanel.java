@@ -406,7 +406,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 				MainFrame mainFrame = FrontEnd.getMainFrame();
 				if (mainFrame != null) {
 					mainFrame.loadLTLFile(file);
-        }
+				}
 			}
 
 			FrontEnd.println("(EDITOR) file open. [ " + file.getName() + " ]");

@@ -1,0 +1,38 @@
+/*
+ *  barz.lmn -- Barz's implementation of general semaphores
+ * 
+ *  @author  Mahiro Ueda
+ *  @date    2025.11.27
+ * 
+ *  from Principle of Concurrent and Distributed Programming (Second Edition)
+ */
+ 
+% property0: gate is a binary semaphore
+% property1: count == 0 -> gate == 0
+% property2: (gate == 0 && !test) -> count == 0
+
+
+gen{
+gate(1), count(2).
+n(15).
+gen_proc @@ n(N) :- N>0, N2=N-1 |
+		    n(N2), p{state(wait), pid(N2)}.
+}.
+end_gen @@ gen{$p, @p, n(0)}/ :- $p.
+
+enter @@ p{state(wait), $p}, gate(G) :- G>0, G2=G-1 | 
+		p{state(get),test, $p}, gate(G2).
+		
+get0 @@ p{state(get),test, $p}, count(C), gate(G) :- 
+		C2=C-1, C2>0, G2=G+1 |
+		p{state(cs), $p}, count(C2), gate(G2). 
+get1 @@ p{state(get),test, $p}, count(C) :- C2=C-1, C2=:=0 |
+		p{state(cs), $p}, count(C2).
+		
+critical @@ p{state(cs), $p} :- p{state(rel), $p}.
+
+release0 @@ p{state(rel), $p}, count(C), gate(G) :- 
+		C2=C+1, C2=:=1, G2=G+1 |
+		p{state(wait), $p}, count(C2), gate(G2). 
+release1 @@ p{state(rel), $p}, count(C) :- C2=C+1, C2=\=1 |
+		p{state(wait), $p}, count(C2).

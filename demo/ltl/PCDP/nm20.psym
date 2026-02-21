@@ -1,0 +1,4 @@
+t2 = p{token, $p}, p{token, $q} :- |
+t1 = p{token, $p} :- |
+ts1 = token(X) :- |
+

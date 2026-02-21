@@ -1,0 +1,6 @@
+p = p{state(cs), $p}, p{state(cs), $q}, p{state(cs), $r} :- |
+q = p{state(cs), $p}, p{state(cs), $q} :- |
+r = gate(G) :- G>2 |
+c = count(0) :- |
+g = gate(0) :- |
+

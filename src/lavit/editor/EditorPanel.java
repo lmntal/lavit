@@ -237,6 +237,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 			page.addHighlight(hlFlags);
 			page.setShowTabs(Env.is("SHOW_TABS"));
 			page.setShowEols(Env.is("SHOW_LINE_DELIMITERS"));
+			page.setLineWrap(Env.is("WORD_WRAP"));
 		}
 		repaint();
 	}
@@ -512,6 +513,7 @@ public class EditorPanel extends JPanel implements CommonFontUser
 		page.addHighlight(hlFlags);
 		page.setShowTabs(Env.is("SHOW_TABS"));
 		page.setShowEols(Env.is("SHOW_LINE_DELIMITERS"));
+		page.setLineWrap(Env.is("WORD_WRAP"));
 		return page;
 	}
 

@@ -44,7 +44,7 @@ s3@@subst(!V,T), U=arrow(!V,Y) :- ground(T) | subst(!V,T), U=arrow(T,Y).
 s4@@subst(!V,T), U=arrow(X,!V) :- ground(T) | subst(!V,T), U=arrow(X,T).
 s5@@subst(!V,T), U=list(!V) :- ground(T) | subst(!V,T), U=list(T).
 s6@@subst(!V,T), ans(X,!V) :- ground(T) | subst(!V,T), ans(X,T).
-s7@@subst(!V,T) :- num(!V,1), ground(T) | lock.
+s7@@subst(!V,T) :- num(!V)=:=1, ground(T) | lock.
 
 % Examples
 init.

@@ -196,6 +196,7 @@ public class GeneralSettingDialog extends JDialog {
 		private JCheckBox checkRulename;
 		private JCheckBox optShowEols;
 		private JCheckBox optShowTabs;
+		private JCheckBox optWordWrap;
 
 		public EditorColorPanel() {
 			setBorder(new TitledBorder("Color"));
@@ -231,6 +232,14 @@ public class GeneralSettingDialog extends JDialog {
 				}
 			});
 
+			optWordWrap = new JCheckBox("Word Wrap");
+			optWordWrap.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Env.set("WORD_WRAP", optWordWrap.isSelected());
+					FrontEnd.mainFrame.editorPanel.updateHighlight();
+				}
+			});
+
 			Component pad1 = Box.createHorizontalGlue();
 			Component pad2 = Box.createHorizontalGlue();
 
@@ -242,12 +251,13 @@ public class GeneralSettingDialog extends JDialog {
 					.addGroup(gl.createParallelGroup()
 							.addGroup(gl.createSequentialGroup().addComponent(checkComment).addComponent(checkSymbol)
 									.addComponent(checkKeyword).addComponent(checkRulename))
-							.addGroup(gl.createSequentialGroup().addComponent(optShowEols).addComponent(optShowTabs)))
+							.addGroup(gl.createSequentialGroup().addComponent(optShowEols).addComponent(optShowTabs)
+									.addComponent(optWordWrap)))
 					.addComponent(pad2));
 			gl.setVerticalGroup(gl.createParallelGroup(Alignment.BASELINE).addComponent(pad1)
 					.addGroup(gl.createSequentialGroup().addComponent(checkComment).addComponent(optShowEols))
 					.addGroup(gl.createSequentialGroup().addComponent(checkSymbol).addComponent(optShowTabs))
-					.addComponent(checkKeyword).addComponent(checkRulename).addComponent(pad2));
+					.addComponent(checkKeyword).addComponent(checkRulename).addComponent(optWordWrap).addComponent(pad2));
 
 			initialize();
 		}
@@ -260,6 +270,7 @@ public class GeneralSettingDialog extends JDialog {
 			checkRulename.setSelected(options.contains("rulename"));
 			optShowEols.setSelected(Env.is("SHOW_LINE_DELIMITERS"));
 			optShowTabs.setSelected(Env.is("SHOW_TABS"));
+			optWordWrap.setSelected(Env.is("WORD_WRAP"));
 		}
 
 		private void updateColorSettings() {

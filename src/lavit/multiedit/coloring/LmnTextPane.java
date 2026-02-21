@@ -61,6 +61,7 @@ public class LmnTextPane extends JTextPane
 	private final Document blankDocument = new DefaultStyledDocument();
 	private boolean autoIndentEnabled = true;
 	private boolean autoAlignEnabled = true;
+	private boolean lineWrap = false;
 
 	public LmnTextPane()
 	{
@@ -356,10 +357,35 @@ public class LmnTextPane extends JTextPane
 		getLMNDocument().addDirtyFlagChangeListener(l);
 	}
 
-	// 右端で折り返さないようにする
+	// 右端で折り返さないようにする (line-wrap mode overrides this)
 	public boolean getScrollableTracksViewportWidth()
 	{
+		if (lineWrap) return true;
 		return getUI().getPreferredSize(this).width < getParent().getWidth();
+	}
+
+	public boolean isLineWrap()
+	{
+		return lineWrap;
+	}
+
+	public void setLineWrap(boolean wrap)
+	{
+		if (this.lineWrap == wrap) return;
+		this.lineWrap = wrap;
+		// Propagate to the view factory so the next view-creation pass picks
+		// the right view type (LmnView vs LmnWrappedView).
+		// LmnTextPane always installs an LmnEditorKit, but guard defensively.
+		if (getEditorKit() instanceof LmnEditorKit)
+		{
+			((LmnEditorKit) getEditorKit()).getStylePreferences().setLineWrap(wrap);
+		}
+		// Force view recreation by swapping documents.
+		Document doc = getDocument();
+		setDocument(blankDocument);
+		setDocument(doc);
+		revalidate();
+		repaint();
 	}
 
 	private static int findMatchingParenIndex(String s, int p0)

@@ -273,6 +273,18 @@ public class EditorPage extends JScrollPane
 		text.setShowEols(b);
 	}
 
+	/**
+	 * <p>行の折り返しを設定します。折り返しが有効なときは行番号表示を隠します。</p>
+	 * @param b 折り返しを有効にする場合は {@code true}
+	 */
+	public void setLineWrap(boolean b)
+	{
+		text.setLineWrap(b);
+		// Hide line-number gutter when wrapping: logical and visual line
+		// numbers no longer match 1-to-1.
+		setRowHeaderView(b ? null : lineNumberView);
+	}
+
 	public void updateHighlight()
 	{
 		text.updateHighlight();
